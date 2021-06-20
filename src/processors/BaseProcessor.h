@@ -32,7 +32,9 @@ public:
 
     // UI-related methods
     virtual Colour getColour() const { return Colours::red; }
-    virtual int getNumParameters() const { return 0; };
+    virtual int getNumParameters() const { return getParameters().size(); };
+
+    AudioProcessorValueTreeState& getVTS() { return vts; }
 
 protected:
     AudioProcessorValueTreeState vts;

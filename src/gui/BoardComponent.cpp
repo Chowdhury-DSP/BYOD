@@ -53,17 +53,35 @@ void BoardComponent::resized()
 
 }
 
-void BoardComponent::processorAdded (BaseProcessor* newProc)
+void BoardComponent::refreshBoardSize()
 {
-    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc));
-    addAndMakeVisible (newEditor);
-
     auto newWidth = getIdealWidth();
     auto oldWidth = getWidth();
     setSize (newWidth, getHeight());
     
     if (newWidth == oldWidth)
         resized();
+}
+
+void BoardComponent::processorAdded (BaseProcessor* newProc)
+{
+    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain));
+    addAndMakeVisible (newEditor);
+
+    refreshBoardSize();
+}
+
+void BoardComponent::processorRemoved (BaseProcessor* proc)
+{
+    for (auto* editor : processorEditors)
+    {
+        if (editor->getProcPtr() == proc)
+        {
+            processorEditors.removeObject (editor);
+            refreshBoardSize();
+            return;
+        }
+    }
 }
 
 void BoardComponent::showNewProcMenu() const

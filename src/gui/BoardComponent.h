@@ -15,9 +15,11 @@ public:
 
     int getIdealWidth (int parentWidth = -1) const;
     void processorAdded (BaseProcessor* newProc) override;
+    void processorRemoved (BaseProcessor* proc) override;
 
 private:
     void showNewProcMenu() const;
+    void refreshBoardSize();
 
     ProcessorChain& procChain;
 

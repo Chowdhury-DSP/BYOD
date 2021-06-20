@@ -30,9 +30,17 @@ void ProcessorChain::addProcessor (BaseProcessor::Ptr newProc)
     DBG (String ("Creating processor: ") + newProc->getName());
 
     newProc->prepare (mySampleRate, mySamplesPerBlock);
-    
+
     SpinLock::ScopedLockType scopedProcessingLock (processingLock);
     auto* newProcPtr = procs.add (std::move (newProc));
 
     listeners.call (&Listener::processorAdded, newProcPtr);
+}
+
+void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
+{
+    listeners.call (&Listener::processorRemoved, procToRemove);
+
+    SpinLock::ScopedLockType scopedProcessingLock (processingLock);
+    procs.removeObject (procToRemove);
 }

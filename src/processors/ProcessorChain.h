@@ -6,6 +6,7 @@ class ProcessorChain
 {
     CREATE_LISTENER (Listener, listeners,
         virtual void processorAdded (BaseProcessor* /*proc*/) {}\
+        virtual void processorRemoved (BaseProcessor* /*proc*/) {}\
     )
 public:
     ProcessorChain (ProcessorStore& store);
@@ -14,6 +15,7 @@ public:
     void processAudio (AudioBuffer<float> buffer);
 
     void addProcessor (BaseProcessor::Ptr newProc);
+    void removeProcessor (BaseProcessor* procToRemove);
 
     ProcessorStore& getProcStore() { return procStore; }
 

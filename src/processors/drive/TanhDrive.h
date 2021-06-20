@@ -15,6 +15,10 @@ public:
         using Params = std::vector<std::unique_ptr<RangedAudioParameter>>;
         Params params;
 
+        params.push_back (std::make_unique<AudioParameterFloat> ("float_param", "Float", 0.0f, 1.0f, 0.5f));
+        params.push_back (std::make_unique<AudioParameterBool> ("bool_param2", "Bool", false));
+        params.push_back (std::make_unique<AudioParameterChoice> ("choice_param3", "Choice", StringArray { "One", "Two" }, 1));
+
         return { params.begin(), params.end() };
     }
 

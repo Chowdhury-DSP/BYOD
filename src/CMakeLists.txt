@@ -2,6 +2,7 @@ target_sources(BYOD PRIVATE
     BYOD.cpp
 
     gui/BoardComponent.cpp
+    gui/KnobsComponent.cpp
     gui/ProcessorEditor.cpp
 
     processors/BaseProcessor.cpp
