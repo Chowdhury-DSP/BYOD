@@ -13,8 +13,12 @@ public:
     void releaseResources() override;
     void processAudioBlock (AudioBuffer<float>& buffer) override;
 
-    ProcessorChain& getProcChain() { return procs; }
     AudioProcessorEditor* createEditor() override;
+
+    void getStateInformation (MemoryBlock& destData) override;
+    void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    ProcessorChain& getProcChain() { return procs; }
 
 private:
     ProcessorStore procStore;

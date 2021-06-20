@@ -7,6 +7,7 @@ class ProcessorStore
 public:
     ProcessorStore();
 
+    BaseProcessor::Ptr createProcByName (const String& name);
     void createProcList (PopupMenu& menu, int& menuID, ProcessorType type);
 
     std::function<void(BaseProcessor::Ptr)> addProcessorCallback = nullptr;

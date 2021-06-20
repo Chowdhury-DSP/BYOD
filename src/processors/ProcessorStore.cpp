@@ -23,6 +23,14 @@ ProcessorStore::ProcessorStore()
     }
 }
 
+BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
+{
+    if (store.find (name) == store.end())
+        return {};
+
+    return store[name]();
+}
+
 void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType type)
 {
     for (auto& procDesc : store)

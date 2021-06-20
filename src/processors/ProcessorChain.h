@@ -16,8 +16,13 @@ public:
 
     void addProcessor (BaseProcessor::Ptr newProc);
     void removeProcessor (BaseProcessor* procToRemove);
+    OwnedArray<BaseProcessor>& getProcessors() { return procs; }
+
+    std::unique_ptr<XmlElement> saveProcChain();
+    void loadProcChain (XmlElement* xml);
 
     ProcessorStore& getProcStore() { return procStore; }
+    const SpinLock& getProcChainLock() const { return processingLock; }
 
 private:
     double mySampleRate = 48000.0;

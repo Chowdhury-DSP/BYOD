@@ -15,6 +15,9 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     addAndMakeVisible (newProcButton);
     newProcButton.onClick = [=] { showNewProcMenu(); };
 
+    for (auto* p : procs.getProcessors())
+        processorAdded (p);
+
     procChain.addListener (this);
 }
 
