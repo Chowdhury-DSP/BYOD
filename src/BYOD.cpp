@@ -5,12 +5,13 @@ BYOD::BYOD() : procs (procStore)
 {
 }
 
-void BYOD::addParameters (Parameters& params)
+void BYOD::addParameters (Parameters& /*params*/)
 {
 }
 
 void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    procs.prepare (sampleRate, samplesPerBlock);
 }
 
 void BYOD::releaseResources()
@@ -19,6 +20,7 @@ void BYOD::releaseResources()
 
 void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
+    procs.processAudio (buffer);
 }
 
 AudioProcessorEditor* BYOD::createEditor()

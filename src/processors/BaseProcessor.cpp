@@ -9,11 +9,13 @@ BaseProcessor::BaseProcessor (const String& name,
 
 std::unique_ptr<XmlElement> BaseProcessor::toXML()
 {
-    // @TODO
-    return std::make_unique<XmlElement> (String());
+    auto state = vts.copyState();
+    return state.createXml();
 }
 
 void BaseProcessor::fromXML (XmlElement* xml)
 {
-    // @TODO
+    if (xml != nullptr)
+        if (xml->hasTagName (vts.state.getType()))
+            vts.replaceState (ValueTree::fromXml (*xml));
 }

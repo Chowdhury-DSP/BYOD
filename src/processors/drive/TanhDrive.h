@@ -20,7 +20,7 @@ public:
 
     virtual ProcessorType getProcessorType() const { return ProcessorType::Drive; }
 
-    virtual void prepare (double sampleRate, int samplesPerBlock) 
+    virtual void prepare (double, int) 
     {
         // @TODO...
     }
@@ -30,7 +30,7 @@ public:
         for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
         {
             auto* x = buffer.getWritePointer (ch);
-            for (int n = 0; n , buffer.getNumSamples(); ++ch)
+            for (int n = 0; n < buffer.getNumSamples(); ++n)
                 x[n] = std::tanh (x[n]);
         }
     }
