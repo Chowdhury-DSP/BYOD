@@ -3,6 +3,13 @@ include(cmake/SubprojectVersion.cmake)
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 
+include(cmake/CPM.cmake)
+CPMAddPackage(
+    NAME magic_enum
+    GITHUB_REPOSITORY Neargye/magic_enum
+    GIT_TAG v0.7.2
+)
+
 juce_add_modules(foleys_gui_magic)
 juce_add_modules(chowdsp_utils)
 
@@ -31,7 +38,7 @@ target_compile_definitions(juce_plugin_modules
         JucePlugin_Manufacturer="chowdsp"
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
-        FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
+        FOLEYS_SHOW_GUI_EDITOR_PALLETTE=1
         FOLEYS_ENABLE_BINARY_DATA=1
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
@@ -40,6 +47,8 @@ target_compile_definitions(juce_plugin_modules
 target_include_directories(juce_plugin_modules
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,INCLUDE_DIRECTORIES>
+    PUBLIC
+        ${magic_enum_SOURCE_DIR}/include
 )
 
 set_target_properties(juce_plugin_modules PROPERTIES

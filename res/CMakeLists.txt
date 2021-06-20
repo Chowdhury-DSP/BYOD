@@ -1,6 +1,6 @@
 juce_add_binary_data(BinaryData SOURCES
-    temp.png
-    )
+    gui.xml
+)
 
 # Need to build BinaryData with -fPIC flag on Linux
 set_target_properties(BinaryData PROPERTIES
