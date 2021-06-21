@@ -8,6 +8,10 @@ target_sources(BYOD PRIVATE
     processors/BaseProcessor.cpp
     processors/ProcessorChain.cpp
     processors/ProcessorStore.cpp
+
+    processors/drive/DiodeClipper.cpp
+
+    processors/tone/HighCut.cpp
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)

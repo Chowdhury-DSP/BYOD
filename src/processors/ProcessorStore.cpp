@@ -1,6 +1,7 @@
 #include "ProcessorStore.h"
 
-#include "drive/TanhDrive.h"
+#include "drive/DiodeClipper.h"
+#include "tone/HighCut.h"
 
 template <typename ProcType>
 static std::unique_ptr<BaseProcessor> processorFactory()
@@ -10,7 +11,8 @@ static std::unique_ptr<BaseProcessor> processorFactory()
 }
 
 ProcessorStore::StoreMap ProcessorStore::store = {
-    { "TanhDrive", &processorFactory<TanhDrive> }
+    { "Diode Clipper", &processorFactory<DiodeClipper> },
+    { "High Cut", &processorFactory<HighCut> }
 };
 
 ProcessorStore::ProcessorStore()
