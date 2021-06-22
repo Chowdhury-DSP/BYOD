@@ -1,5 +1,7 @@
 juce_add_binary_data(BinaryData SOURCES
     gui.xml
+
+    faceplates/DiodeClipper.png
 )
 
 # Need to build BinaryData with -fPIC flag on Linux

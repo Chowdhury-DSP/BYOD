@@ -1,21 +1,22 @@
 #include "DiodeClipper.h"
+#include "../ParameterHelpers.h"
 
 DiodeClipper::DiodeClipper (UndoManager* um) : BaseProcessor ("Diode Clipper", createParameterLayout(), um)
 {
     cutoffParam = vts.getRawParameterValue ("cutoff");
     driveParam = vts.getRawParameterValue ("drive");
+
+    // uiOptions.backgroundImage = Drawable::createFromImageData (BinaryData::DiodeClipper_png, BinaryData::DiodeClipper_pngSize);
+    uiOptions.backgroundColour = Colours::white;
 }
 
 AudioProcessorValueTreeState::ParameterLayout DiodeClipper::createParameterLayout()
 {
-    using Params = std::vector<std::unique_ptr<RangedAudioParameter>>;
+    using namespace ParameterHelpers;
     Params params;
 
-    NormalisableRange<float> cutoffRange { 200.0f, 20.0e3f };
-    cutoffRange.setSkewForCentre (2000.0f);
-    params.push_back (std::make_unique<AudioParameterFloat> ("cutoff", "Cutoff", cutoffRange, 5000.0f, "Hz"));
-
-    params.push_back (std::make_unique<AudioParameterFloat> ("drive", "Drive", 0.0f, 1.0f, 0.5f));
+    createFreqParameter (params, "cutoff", "Cutoff", 200.0f, 20.0e3f, 2000.0f, 5000.0f);
+    createPercentParameter (params, "drive", "Drive", 0.5f);
 
     return { params.begin(), params.end() };
 }

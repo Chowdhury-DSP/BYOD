@@ -31,7 +31,7 @@ AudioProcessorEditor* BYOD::createEditor()
     auto editor = new foleys::MagicPluginEditor (magicState, BinaryData::gui_xml, BinaryData::gui_xmlSize, std::move (builder));
 
     // we need to set resize limits for StandalonePluginHolder
-    editor->setResizeLimits (10, 10, 1000, 1000);
+    editor->setResizeLimits (10, 10, 2000, 2000);
 
     return editor;
 }

@@ -5,7 +5,7 @@
 class KnobsComponent : public Component
 {
 public:
-    KnobsComponent (AudioProcessorValueTreeState& vts, std::function<void()> paramLambda = {});
+    KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& colour, std::function<void()> paramLambda = {});
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -36,6 +36,8 @@ private:
     OwnedArray<SliderWithAttachment> sliders;
     OwnedArray<BoxWithAttachment> boxes;
     OwnedArray<ButtonWithAttachment> buttons;
+
+    const Colour& colour;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KnobsComponent)
 };

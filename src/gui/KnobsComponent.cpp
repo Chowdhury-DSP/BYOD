@@ -1,6 +1,6 @@
 #include "KnobsComponent.h"
 
-KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, std::function<void()> paramLambda)
+KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& c, std::function<void()> paramLambda) : colour (c)
 {
     auto addSlider = [=, &vts] (AudioParameterFloat* param)
     {
@@ -11,7 +11,8 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, std::function
         newSlide->slider.setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         newSlide->slider.setName (param->name);
         newSlide->slider.setTextBoxStyle (Slider::TextBoxBelow, false, 75, 16);
-        newSlide->slider.setColour (Slider::textBoxOutlineColourId, Colours::transparentBlack);
+        newSlide->slider.setColour (Slider::textBoxOutlineColourId, colour);
+        newSlide->slider.setColour (Slider::textBoxTextColourId, colour);
         newSlide->slider.onValueChange = paramLambda;
 
         sliders.add (std::move (newSlide));
@@ -62,10 +63,11 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, std::function
 
 void KnobsComponent::paint (Graphics& g)
 {
-    g.setColour (Colours::white);
+    g.setColour (colour);
     auto makeName = [&g] (Component& comp, String name)
     {
         const int height = 20;
+        g.setFont (Font (18.0f).boldened());
         Rectangle<int> nameBox (comp.getX(), 2, comp.getWidth(), height);
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
@@ -83,6 +85,21 @@ void KnobsComponent::resized()
 
     int compHeight = getHeight() - 20;
     int compWidth = totalNumComponents > 1 ? (getWidth() - 10) / totalNumComponents : compHeight;
+
+    if (totalNumComponents == 1)
+    {
+        const int x = (getWidth() - compWidth) / 2;
+        for (auto* s : sliders)
+            s->slider.setBounds (x, 15, compWidth, compWidth);
+        
+        for (auto* b : boxes)
+            b->box.setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+
+        for (auto* b : buttons)
+            b->button.setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+
+        return;
+    }
 
     int x = 5;
     bool first = true;

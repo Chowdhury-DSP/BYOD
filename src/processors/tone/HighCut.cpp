@@ -1,4 +1,5 @@
 #include "HighCut.h"
+#include "../ParameterHelpers.h"
 
 namespace
 {
@@ -11,16 +12,16 @@ constexpr float freq2Rv2 (float cutoff, float C8, float R3)
 HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterLayout(), um)
 {
     cutoffParam = vts.getRawParameterValue ("cutoff");
+
+    uiOptions.backgroundColour = Colour (0xFFFF8B3D);
 }
 
 AudioProcessorValueTreeState::ParameterLayout HighCut::createParameterLayout()
 {
-    using Params = std::vector<std::unique_ptr<RangedAudioParameter>>;
+    using namespace ParameterHelpers;
     Params params;
 
-    NormalisableRange<float> cutoffRange { 200.0f, 20.0e3f };
-    cutoffRange.setSkewForCentre (2000.0f);
-    params.push_back (std::make_unique<AudioParameterFloat> ("cutoff", "Cutoff", cutoffRange, 5000.0f, "Hz"));
+    createFreqParameter (params, "cutoff", "Cutoff", 200.0f, 20.0e3f, 2000.0f, 5000.0f);
 
     return { params.begin(), params.end() };
 }

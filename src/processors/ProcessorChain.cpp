@@ -52,7 +52,7 @@ std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
     auto xml = std::make_unique<XmlElement> ("proc_chain");
     for (auto* proc : procs)
     {
-        auto procXml = std::make_unique<XmlElement> (proc->getName());
+        auto procXml = std::make_unique<XmlElement> (proc->getName().replaceCharacter (' ', '_'));
         procXml->addChildElement (proc->toXML().release());
         xml->addChildElement (procXml.release());
     }
@@ -67,7 +67,7 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
 
     for (auto* procXml : xml->getChildIterator())
     {
-        auto newProc = procStore.createProcByName (procXml->getTagName());
+        auto newProc = procStore.createProcByName (procXml->getTagName().replaceCharacter ('_', ' '));
         if (newProc == nullptr)
         {
             jassertfalse;
