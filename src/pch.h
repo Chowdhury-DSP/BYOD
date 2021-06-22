@@ -6,6 +6,7 @@
 
 // C++/STL headers here...
 #include <future>
+#include <unordered_map>
 
 // JUCE modules
 #include <JuceHeader.h>

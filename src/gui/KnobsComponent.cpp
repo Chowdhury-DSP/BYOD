@@ -63,7 +63,7 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, std::function
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (Colours::white);
-    auto makeName = [this, &g] (Component& comp, String name)
+    auto makeName = [&g] (Component& comp, String name)
     {
         const int height = 20;
         Rectangle<int> nameBox (comp.getX(), 2, comp.getWidth(), height);

@@ -1,48 +1,5 @@
 #include "DiodeClipper.h"
 
-using namespace chowdsp::WDFT;
-
-class DiodeClipperWDF
-{
-public:
-    DiodeClipperWDF (float sampleRate) : C1 (capVal, sampleRate) {}
-
-    void setParameters (float cutoff)
-    {
-        Vs.setResistanceValue (1.0f / (MathConstants<float>::twoPi * cutoff * capVal));
-    }
-
-    void process (float* buffer, const int numSamples) noexcept
-    {
-        for (int n = 0; n < numSamples; ++n)
-        {
-            Vs.setVoltage (buffer[n]);
-
-            dp.incident (P1.reflected());
-            buffer[n] = voltage<float> (C1);
-            P1.incident (dp.reflected());
-        }
-    }
-
-private:
-    using wdf_type = float;
-    using Res = ResistorT<wdf_type>;
-    using Cap = CapacitorT<wdf_type>;
-    using ResVs = ResistiveVoltageSourceT<wdf_type>;
-
-    static constexpr float capVal = 47.0e-9f;
-
-    ResVs Vs { 4700.0f };
-    Cap C1;
-
-    WDFParallelT<wdf_type, Cap, ResVs> P1 { C1, Vs };
-
-    // GZ34 diode pair (@TODO implement other types of diodes)
-    DiodePairT<wdf_type, decltype (P1)> dp { 2.52e-9f, 0.02585f, P1 };
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiodeClipperWDF)
-};
-
 DiodeClipper::DiodeClipper (UndoManager* um) : BaseProcessor ("Diode Clipper", createParameterLayout(), um)
 {
     cutoffParam = vts.getRawParameterValue ("cutoff");

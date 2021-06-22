@@ -2,8 +2,6 @@
 
 namespace
 {
-constexpr float Rv2Value = 50.0e3f;
-
 constexpr float freq2Rv2 (float cutoff, float C8, float R3)
 {
     return (1.0f / (C8 * cutoff)) - R3;
