@@ -7,7 +7,7 @@ namespace ParameterHelpers
 using namespace chowdsp::ParamUtils;
 using Params = std::vector<std::unique_ptr<RangedAudioParameter>>;
 
-static void createFreqParameter (Params& params, const String& id, const String& name, float min, float max, float centre, float defaultValue)
+inline void createFreqParameter (Params& params, const String& id, const String& name, float min, float max, float centre, float defaultValue)
 {
     NormalisableRange<float> freqRange { min, max };
     freqRange.setSkewForCentre (centre);
@@ -21,7 +21,7 @@ static void createFreqParameter (Params& params, const String& id, const String&
                                                   &stringToFreqVal));
 }
 
-static void createPercentParameter (Params& params, const String& id, const String& name, float defaultValue)
+inline void createPercentParameter (Params& params, const String& id, const String& name, float defaultValue)
 {
     params.push_back (std::make_unique<VTSParam> (id,
                                                   name,
@@ -30,6 +30,14 @@ static void createPercentParameter (Params& params, const String& id, const Stri
                                                   defaultValue,
                                                   &percentValToString,
                                                   &stringToPercentVal));
+}
+
+inline Params createBaseParams()
+{
+    Params params;
+    params.push_back (std::make_unique<AudioParameterBool> ("on_off", "On/Off", true));
+
+    return std::move (params);
 }
 
 }; // namespace ParameterHelpers

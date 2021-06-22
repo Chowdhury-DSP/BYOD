@@ -22,7 +22,15 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
         return;
 
     for (auto* processor : procs)
+    {
+        if (processor->isBypassed())
+        {
+            processor->processAudioBypassed (buffer);
+            continue;
+        }
+
         processor->processAudio (buffer);
+    }
 }
 
 void ProcessorChain::addProcessor (BaseProcessor::Ptr newProc)

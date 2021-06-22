@@ -2,6 +2,7 @@
 
 #include "../processors/ProcessorChain.h"
 #include "KnobsComponent.h"
+#include "utils/PowerButton.h"
 
 class ProcessorEditor : public Component
 {
@@ -19,9 +20,10 @@ private:
     ProcessorChain& procChain;
     
     const ProcessorUIOptions& procUI;
-    const Colour contrastColour;
+    Colour contrastColour;
 
     KnobsComponent knobs;
+    PowerButton powerButton;
     TextButton xButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)

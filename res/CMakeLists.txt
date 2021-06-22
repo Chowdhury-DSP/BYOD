@@ -1,5 +1,6 @@
 juce_add_binary_data(BinaryData SOURCES
     gui.xml
+    PowerButton.svg
 
     faceplates/DiodeClipper.png
 )

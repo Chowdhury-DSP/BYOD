@@ -34,6 +34,9 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
 
     auto addButton = [=, &vts] (AudioParameterBool* param)
     {
+        if (param->paramID == "on_off")
+            return;
+
         auto newButton = std::make_unique<ButtonWithAttachment>();
         addAndMakeVisible (newButton->button);
         newButton->button.setButtonText (param->name);
@@ -63,7 +66,7 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
 
 void KnobsComponent::paint (Graphics& g)
 {
-    g.setColour (colour);
+    g.setColour (colour.withAlpha (isEnabled() ? 1.0f : 0.6f));
     auto makeName = [&g] (Component& comp, String name)
     {
         const int height = 20;

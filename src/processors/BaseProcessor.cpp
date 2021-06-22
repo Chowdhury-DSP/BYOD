@@ -5,6 +5,7 @@ BaseProcessor::BaseProcessor (const String& name,
                               UndoManager* um) : JuceProcWrapper (name),
                                                   vts (*this, um, Identifier ("Parameters"), std::move (params))
 {
+    onOffParam = vts.getRawParameterValue ("on_off");
 }
 
 std::unique_ptr<XmlElement> BaseProcessor::toXML()

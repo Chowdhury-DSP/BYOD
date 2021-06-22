@@ -14,13 +14,14 @@ HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterL
     cutoffParam = vts.getRawParameterValue ("cutoff");
 
     uiOptions.backgroundColour = Colour (0xFFFF8B3D);
+    uiOptions.powerColour = Colour (Colours::blue);
 }
 
 AudioProcessorValueTreeState::ParameterLayout HighCut::createParameterLayout()
 {
     using namespace ParameterHelpers;
-    Params params;
-
+    
+    auto params = createBaseParams();
     createFreqParameter (params, "cutoff", "Cutoff", 200.0f, 20.0e3f, 2000.0f, 5000.0f);
 
     return { params.begin(), params.end() };

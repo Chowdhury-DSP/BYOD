@@ -9,9 +9,14 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
                                                                                     procChain (procs),
                                                                                     procUI (proc.getUIOptions()),
                                                                                     contrastColour (procUI.backgroundColour.contrasting()),
-                                                                                    knobs (proc.getVTS(), contrastColour)
+                                                                                    knobs (proc.getVTS(), contrastColour),
+                                                                                    powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);
+
+    addAndMakeVisible (powerButton);
+    powerButton.setEnableDisableComps ({ &knobs });
+    powerButton.attachButton (proc.getVTS(), "on_off");
 
     xButton.setButtonText ("x");
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
@@ -34,7 +39,12 @@ ProcessorEditor::~ProcessorEditor()
 void ProcessorEditor::paint (Graphics& g)
 {
     const auto& procColour = procUI.backgroundColour;
-    g.setColour (procColour);
+    ColourGradient grad { procColour,
+                          0.0f, 0.0f,
+                          procColour.darker (0.25f),
+                          (float) getWidth(), (float) getWidth(),
+                          false };
+    g.setGradientFill (grad);
     g.fillRoundedRectangle (getLocalBounds().toFloat(), cornerSize);
 
     if (procUI.backgroundImage != nullptr)
@@ -52,6 +62,7 @@ void ProcessorEditor::resized()
 {
     knobs.setBounds (5, 35, getWidth() - 10, getHeight() - 40);
 
-    const int xButtonSize = 30;
+    constexpr int xButtonSize = 27;
+    powerButton.setBounds (getWidth() - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
     xButton.setBounds (getWidth() - xButtonSize, 0, xButtonSize, xButtonSize);
 }

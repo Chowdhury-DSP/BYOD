@@ -12,6 +12,7 @@ enum ProcessorType
 struct ProcessorUIOptions
 {
     Colour backgroundColour = Colours::red;
+    Colour powerColour = Colour (0xFFFF4D29);
     std::unique_ptr<Drawable> backgroundImage;
     LookAndFeel* lnf = nullptr;
 };
@@ -33,6 +34,10 @@ public:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
 
+    // bypass methods
+    bool isBypassed() const { return static_cast<bool> (onOffParam->load()); }
+    virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) {}
+
     // state save/load methods
     virtual std::unique_ptr<XmlElement> toXML();
     virtual void fromXML (XmlElement* xml);
@@ -44,6 +49,8 @@ public:
 protected:
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
+
+    std::atomic<float>* onOffParam = nullptr;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)

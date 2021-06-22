@@ -34,7 +34,7 @@ int BoardComponent::getIdealWidth (int parentWidth) const
 
 void BoardComponent::paint (Graphics& g)
 {
-    g.fillAll (Colours::slategrey);
+    g.fillAll (Colours::slategrey.darker());
 }
 
 void BoardComponent::resized()
