@@ -35,7 +35,7 @@ public:
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
 
     // bypass methods
-    bool isBypassed() const { return static_cast<bool> (onOffParam->load()); }
+    bool isBypassed() const { return ! static_cast<bool> (onOffParam->load()); }
     virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) {}
 
     // state save/load methods
