@@ -9,6 +9,9 @@ public:
     BoardViewport (ProcessorChain& procChain) : comp (procChain)
     {
         setViewedComponent (&comp, false);
+        
+        getVerticalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFFD0592C));
+        getHorizontalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFFD0592C));
     }
 
     void resized() override
