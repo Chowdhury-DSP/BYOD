@@ -4,6 +4,8 @@
 #include "ProcessorEditor.h"
 
 class BoardComponent : public Component,
+                       public DragAndDropContainer,
+                       public DragAndDropTarget,
                        private ProcessorChain::Listener
 {
 public:
@@ -15,7 +17,11 @@ public:
 
     int getIdealWidth (int parentWidth = -1) const;
     void processorAdded (BaseProcessor* newProc) override;
-    void processorRemoved (BaseProcessor* proc) override;
+    void processorRemoved (const BaseProcessor* proc) override;
+    void processorMoved (int procToMove, int procInSlot) override;
+
+    bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
+    void itemDropped (const SourceDetails& dragSourceDetails) override;
 
 private:
     void showNewProcMenu() const;

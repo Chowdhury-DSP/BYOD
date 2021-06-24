@@ -12,6 +12,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    void mouseDrag (const MouseEvent& e) override;
 
     const BaseProcessor* getProcPtr() const { return &proc; }
 

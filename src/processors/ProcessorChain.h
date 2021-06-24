@@ -6,7 +6,8 @@ class ProcessorChain
 {
     CREATE_LISTENER (Listener, listeners,
         virtual void processorAdded (BaseProcessor* /*proc*/) {}\
-        virtual void processorRemoved (BaseProcessor* /*proc*/) {}\
+        virtual void processorRemoved (const BaseProcessor* /*proc*/) {}\
+        virtual void processorMoved (int /*procToMove*/, int /*procInSlot*/) {}\
     )
 public:
     ProcessorChain (ProcessorStore& store);
@@ -15,7 +16,8 @@ public:
     void processAudio (AudioBuffer<float> buffer);
 
     void addProcessor (BaseProcessor::Ptr newProc);
-    void removeProcessor (BaseProcessor* procToRemove);
+    void removeProcessor (const BaseProcessor* procToRemove);
+    void moveProcessor (const BaseProcessor* procToMove, const BaseProcessor* procInSlot);
     OwnedArray<BaseProcessor>& getProcessors() { return procs; }
 
     std::unique_ptr<XmlElement> saveProcChain();

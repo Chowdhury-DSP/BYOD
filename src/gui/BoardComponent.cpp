@@ -74,7 +74,7 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     refreshBoardSize();
 }
 
-void BoardComponent::processorRemoved (BaseProcessor* proc)
+void BoardComponent::processorRemoved (const BaseProcessor* proc)
 {
     for (auto* editor : processorEditors)
     {
@@ -84,6 +84,44 @@ void BoardComponent::processorRemoved (BaseProcessor* proc)
             refreshBoardSize();
             return;
         }
+    }
+}
+
+void BoardComponent::processorMoved (int procToMove, int procInSlot)
+{
+    processorEditors.move (procToMove, procInSlot);
+    resized();
+}
+
+bool BoardComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
+{
+    return processorEditors.contains (dynamic_cast<ProcessorEditor*> (dragSourceDetails.sourceComponent.get()));
+}
+
+void BoardComponent::itemDropped (const SourceDetails& dragSourceDetails)
+{
+    const auto dragX = dragSourceDetails.localPosition.x;
+    if (dragX < 0 || dragX > getWidth())
+        return;
+
+    int lastX = 0;
+    for (const auto* editor : processorEditors)
+    {
+        auto newX = editor->getRight();
+        if (dragX >= lastX && dragX < newX)
+        {
+            auto* draggedEditor = dynamic_cast<ProcessorEditor*> (dragSourceDetails.sourceComponent.get());
+            procChain.moveProcessor (draggedEditor->getProcPtr(), editor->getProcPtr());
+            return;
+        }
+
+        lastX = newX;
+    }
+
+    if (lastX > 0)
+    {
+        auto* draggedEditor = dynamic_cast<ProcessorEditor*> (dragSourceDetails.sourceComponent.get());
+        procChain.moveProcessor (draggedEditor->getProcPtr(), nullptr);
     }
 }
 

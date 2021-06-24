@@ -45,7 +45,7 @@ void ProcessorChain::addProcessor (BaseProcessor::Ptr newProc)
     listeners.call (&Listener::processorAdded, newProcPtr);
 }
 
-void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
+void ProcessorChain::removeProcessor (const BaseProcessor* procToRemove)
 {
     DBG (String ("Removing processor: ") + procToRemove->getName());
 
@@ -53,6 +53,18 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
 
     SpinLock::ScopedLockType scopedProcessingLock (processingLock);
     procs.removeObject (procToRemove);
+}
+
+void ProcessorChain::moveProcessor (const BaseProcessor* procToMove, const BaseProcessor* procInSlot)
+{
+    if (procToMove == procInSlot)
+        return;
+
+    auto indexToMove = procs.indexOf (procToMove);
+    auto slotIndex = procInSlot == nullptr ? procs.size() - 1 : procs.indexOf (procInSlot);
+    procs.move (indexToMove, slotIndex);
+
+    listeners.call (&Listener::processorMoved, indexToMove, slotIndex);
 }
 
 std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()

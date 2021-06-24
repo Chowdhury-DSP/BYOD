@@ -66,3 +66,12 @@ void ProcessorEditor::resized()
     powerButton.setBounds (getWidth() - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
     xButton.setBounds (getWidth() - xButtonSize, 0, xButtonSize, xButtonSize);
 }
+
+void ProcessorEditor::mouseDrag (const MouseEvent&)
+{
+    if (auto* dragC = DragAndDropContainer::findParentDragContainerFor(this))
+    {
+        if (! dragC->isDragAndDropActive())
+          dragC->startDragging("ProcessorEditor", this);
+    }
+}
