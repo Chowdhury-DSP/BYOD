@@ -14,7 +14,7 @@ HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterL
     cutoffParam = vts.getRawParameterValue ("cutoff");
 
     uiOptions.backgroundColour = Colour (0xFFFF8B3D);
-    uiOptions.powerColour = Colour (Colours::blue);
+    uiOptions.powerColour = Colours::blue;
 }
 
 AudioProcessorValueTreeState::ParameterLayout HighCut::createParameterLayout()

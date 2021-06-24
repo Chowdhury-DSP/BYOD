@@ -3,6 +3,10 @@
 #include "drive/DiodeClipper.h"
 #include "tone/HighCut.h"
 
+#include "utility/CleanGain.h"
+#include "utility/DCBias.h"
+#include "utility/DCBlocker.h"
+
 template <typename ProcType>
 static std::unique_ptr<BaseProcessor> processorFactory()
 {
@@ -12,7 +16,10 @@ static std::unique_ptr<BaseProcessor> processorFactory()
 
 ProcessorStore::StoreMap ProcessorStore::store = {
     { "Diode Clipper", &processorFactory<DiodeClipper> },
-    { "High Cut", &processorFactory<HighCut> }
+    { "High Cut", &processorFactory<HighCut> },
+    { "Clean Gain", &processorFactory<CleanGain> },
+    { "DC Bias", &processorFactory<DCBias> },
+    { "DC Blocker", &processorFactory<DCBlocker> },
 };
 
 ProcessorStore::ProcessorStore()

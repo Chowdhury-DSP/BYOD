@@ -133,7 +133,7 @@ void BoardComponent::showNewProcMenu() const
 
     int menuID = 0;
     PopupMenu menu;
-    for (auto type : { Drive, Tone, Other })
+    for (auto type : { Drive, Tone, Utility, Other })
     {
         PopupMenu subMenu;
         procStore.createProcList (subMenu, menuID, type);
