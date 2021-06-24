@@ -2,8 +2,8 @@
 
 namespace
 {
-    constexpr int editorWidth = 300;
-    constexpr int editorHeight = 200;
+    constexpr int editorWidth = 400;
+    constexpr int editorHeight = 300;
     constexpr int editorPad = 10;
     constexpr int newButtonWidth = 40;
     constexpr int newButtonPad = 10;
@@ -12,6 +12,8 @@ namespace
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 {
     newProcButton.setButtonText ("+");
+    newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.4f));
+    newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
     newProcButton.onClick = [=] { showNewProcMenu(); };
 
@@ -34,7 +36,7 @@ int BoardComponent::getIdealWidth (int parentWidth) const
 
 void BoardComponent::paint (Graphics& g)
 {
-    g.fillAll (Colours::slategrey.darker());
+    ignoreUnused (g);
 }
 
 void BoardComponent::resized()
@@ -140,5 +142,10 @@ void BoardComponent::showNewProcMenu() const
         menu.addSubMenu (String (typeName), subMenu);
     }
 
-    menu.showMenuAsync(PopupMenu::Options().withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards));
+    auto options = PopupMenu::Options()
+        .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
+        .withMinimumWidth (125)
+        .withStandardItemHeight (27);
+
+    menu.showMenuAsync(options);
 }
