@@ -33,9 +33,9 @@ void ProcessorChain::createParameters (Parameters& params)
 
 void ProcessorChain::initializeProcessors (int curOS)
 {
-    const auto osFactor = overSample[curOS]->getOversamplingFactor();
+    const auto osFactor = (int) overSample[curOS]->getOversamplingFactor();
     const double osSampleRate = mySampleRate * osFactor;
-    const double osSamplesPerBlock = mySamplesPerBlock * osFactor;
+    const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
     
     for (auto* processor : procs)
         processor->prepare (osSampleRate, osSamplesPerBlock);
@@ -75,7 +75,7 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
     auto osBlock = overSample[curOS]->processSamplesUp (block);
 
     // process mono or stereo buffer?
-    const auto osNumSamples = osBlock.getNumSamples();
+    const auto osNumSamples = (int) osBlock.getNumSamples();
     const auto numChannels = buffer.getNumChannels();
     const auto useMono = monoModeParam->load() == 0.0f;
 
@@ -86,7 +86,7 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
         monoBuffer.copyFrom (0, 0, osBlock.getChannelPointer (0), osNumSamples);
 
         for (int ch = 1; ch < numChannels; ++ch)
-            monoBuffer.addFrom (0, 0, osBlock.getChannelPointer (ch), osNumSamples);
+            monoBuffer.addFrom (0, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
 
         monoBuffer.applyGain (1.0f / (float) numChannels);
     }
@@ -96,7 +96,7 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
         stereoBuffer.clear();
 
         for (int ch = 0; ch < numChannels; ++ch)
-            stereoBuffer.copyFrom (ch, 0, osBlock.getChannelPointer (ch), osNumSamples);
+            stereoBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
     }
 
     auto& processBuffer = useMono ? monoBuffer : stereoBuffer;
@@ -117,12 +117,13 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
     {
         auto processedData = processBuffer.getReadPointer (0);
         for (int ch = 0; ch < numChannels; ++ch)
-            FloatVectorOperations::copy (osBlock.getChannelPointer (ch), processedData, osNumSamples);
+            FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
+                                         processedData, osNumSamples);
     }
     else
     {
         for (int ch = 0; ch < numChannels; ++ch)
-            FloatVectorOperations::copy (osBlock.getChannelPointer (ch),
+            FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
                                          processBuffer.getReadPointer (ch),
                                          osNumSamples);
     }

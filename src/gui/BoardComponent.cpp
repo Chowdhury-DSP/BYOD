@@ -2,8 +2,8 @@
 
 namespace
 {
-    constexpr int editorWidth = 400;
-    constexpr int editorHeight = 300;
+    constexpr int editorWidth = 300;
+    constexpr int editorHeight = 200;
     constexpr int editorPad = 10;
     constexpr int newButtonWidth = 40;
     constexpr int newButtonPad = 10;
