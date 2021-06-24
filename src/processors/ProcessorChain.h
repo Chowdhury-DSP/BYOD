@@ -10,8 +10,9 @@ class ProcessorChain
         virtual void processorMoved (int /*procToMove*/, int /*procInSlot*/) {}\
     )
 public:
-    ProcessorChain (ProcessorStore& store);
+    ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts);
 
+    static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);
     void processAudio (AudioBuffer<float> buffer);
 
@@ -27,13 +28,22 @@ public:
     const SpinLock& getProcChainLock() const { return processingLock; }
 
 private:
+    void initializeProcessors (int curOS);
+    
     double mySampleRate = 48000.0;
     int mySamplesPerBlock = 512;
 
     OwnedArray<BaseProcessor> procs;
     ProcessorStore& procStore;
-
     SpinLock processingLock;
+
+    std::atomic<float>* monoModeParam = nullptr;
+    AudioBuffer<float> monoBuffer;
+    AudioBuffer<float> stereoBuffer;
+
+    std::atomic<float>* oversamplingParam = nullptr;
+    std::unique_ptr<dsp::Oversampling<float>> overSample[5];
+    int prevOS = 0;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

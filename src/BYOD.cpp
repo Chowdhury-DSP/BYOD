@@ -1,12 +1,13 @@
 #include "BYOD.h"
 #include "gui/BoardViewport.h"
 
-BYOD::BYOD() : procs (procStore)
+BYOD::BYOD() : procs (procStore, vts)
 {
 }
 
-void BYOD::addParameters (Parameters& /*params*/)
+void BYOD::addParameters (Parameters& params)
 {
+    ProcessorChain::createParameters (params);
 }
 
 void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
