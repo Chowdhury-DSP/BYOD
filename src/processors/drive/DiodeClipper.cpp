@@ -5,8 +5,9 @@ DiodeClipper::DiodeClipper (UndoManager* um) : BaseProcessor ("Diode Clipper", c
 {
     cutoffParam = vts.getRawParameterValue ("cutoff");
     driveParam = vts.getRawParameterValue ("drive");
+    diodeTypeParam = vts.getRawParameterValue ("diode");
+    nDiodesParam = vts.getRawParameterValue ("num_diodes");
 
-    // uiOptions.backgroundImage = Drawable::createFromImageData (BinaryData::DiodeClipper_png, BinaryData::DiodeClipper_pngSize);
     uiOptions.backgroundColour = Colours::white;
 }
 
@@ -17,6 +18,19 @@ AudioProcessorValueTreeState::ParameterLayout DiodeClipper::createParameterLayou
     auto params = createBaseParams();
     createFreqParameter (params, "cutoff", "Cutoff", 200.0f, 20.0e3f, 2000.0f, 5000.0f);
     createPercentParameter (params, "drive", "Drive", 0.5f);
+
+    params.push_back (std::make_unique<AudioParameterChoice> ("diode",
+                                                              "Diodes",
+                                                              StringArray { "GZ34", "1N34", "1N4148" },
+                                                              0));
+
+    params.push_back (std::make_unique<VTSParam> ("num_diodes",
+                                                  "# Diodes",
+                                                  String(),
+                                                  NormalisableRange<float> { 0.5f, 3.0f },
+                                                  1.0f,
+                                                  &freqValToString,
+                                                  &stringToFreqVal));
 
     return { params.begin(), params.end() };
 }
@@ -42,9 +56,10 @@ void DiodeClipper::processAudio (AudioBuffer<float>& buffer)
     dsp::ProcessContextReplacing<float> context (block);
     inGain.process (context);
 
+    int diodeType = static_cast<int> (*diodeTypeParam);
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch]->setParameters (*cutoffParam);
+        wdf[ch]->setParameters (*cutoffParam, DiodeClipperWDF::getDiodeIs (diodeType), *nDiodesParam);
         auto* x = buffer.getWritePointer (ch);
         wdf[ch]->process (x, buffer.getNumSamples());
     }

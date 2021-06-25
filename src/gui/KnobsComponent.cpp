@@ -67,16 +67,16 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (colour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name)
+    auto makeName = [&g] (Component& comp, String name, int offset = 0)
     {
         const int height = 20;
         g.setFont (Font (18.0f).boldened());
-        Rectangle<int> nameBox (comp.getX(), 2, comp.getWidth(), height);
+        Rectangle<int> nameBox (comp.getX(), comp.getY() - 22 + offset, comp.getWidth(), height);
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
 
     for (auto* s : sliders)
-        makeName (s->slider, s->slider.getName());
+        makeName (s->slider, s->slider.getName(), 6);
 
     for (auto* b : boxes)
         makeName (b->box, b->box.getName());
@@ -104,29 +104,78 @@ void KnobsComponent::resized()
         return;
     }
 
-    int x = 5;
-    bool first = true;
-    for (auto* s : sliders)
+    if (totalNumComponents == 2)
     {
-        int offset = first ? 0 : 20;
-        s->slider.setBounds (x - offset, 15, compWidth, compWidth);
-        x = s->slider.getRight() + 5;
-        first = false;
+        int compIdx = 0;
+        const int x = (getWidth() - 2 * compWidth) / 2;
+
+        for (auto* s : sliders)
+            s->slider.setBounds (x + (compIdx++) * compWidth, 15, compWidth, compWidth);
+        
+        for (auto* b : boxes)
+            b->box.setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+
+        for (auto* b : buttons)
+            b->button.setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+
+        return;
     }
 
-    for (auto* b : boxes)
+    if (totalNumComponents == 3)
     {
-        int offset = first ? 0 : 5;
-        b->box.setBounds (x - offset, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
-        x = b->box.getRight() + 10;
-        first = false;
+        int compIdx = 0;
+        const int x = (getWidth() - 3 * compWidth) / 2;
+        const int y = 30;
+
+        for (auto* s : sliders)
+            s->slider.setBounds (x + (compIdx++) * compWidth, y, compWidth, compWidth);
+        
+        for (auto* b : boxes)
+            b->box.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
+
+        for (auto* b : buttons)
+            b->button.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
+
+        return;
     }
 
-    for (auto* b : buttons)
+    if (totalNumComponents == 3)
     {
-        int offset = first ? 0 : 5;
-        b->button.setBounds (x - offset, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
-        x = b->button.getRight() + 10;
-        first = false;
+        int compIdx = 0;
+        const int x = (getWidth() - 3 * compWidth) / 2;
+        const int y = 30;
+
+        for (auto* s : sliders)
+            s->slider.setBounds (x + (compIdx++) * compWidth, y, compWidth, compWidth);
+        
+        for (auto* b : boxes)
+            b->box.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
+
+        for (auto* b : buttons)
+            b->button.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
+
+        return;
+    }
+
+    if (totalNumComponents == 4)
+    {
+        int compIdx = 0;
+        
+        Rectangle<int> bounds[4];
+        bounds[0] = Rectangle<int> { 0, 15, 100, 100 };
+        bounds[1] = Rectangle<int> { 72, 80, 100, 100 };
+        bounds[2] = Rectangle<int> { 144, 15, 100, 100 };
+        bounds[3] = Rectangle<int> { 216, 80, 100, 100 };
+
+        for (auto* s : sliders)
+            s->slider.setBounds (bounds[compIdx++]);
+        
+        for (auto* b : boxes)
+            b->box.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+
+        for (auto* b : buttons)
+            b->button.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+
+        return;
     }
 }

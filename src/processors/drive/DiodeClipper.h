@@ -7,9 +7,26 @@ class DiodeClipperWDF
 public:
     DiodeClipperWDF (float sampleRate) : C1 (capVal, sampleRate) {}
 
-    void setParameters (float cutoff)
+    static float getDiodeIs (int diodeType)
+    {
+        switch (diodeType)
+        {
+        case 0: // GZ34
+            return 2.52e-9f;
+        case 1: // 1N34
+            return 15.0e-6f;
+        case 2: // 1N4148
+            return 2.64e-9f;
+        }
+
+        jassertfalse;
+        return 1.0e-9f;
+    }
+
+    void setParameters (float cutoff, float diodeIs, float nDiodes)
     {
         Vs.setResistanceValue (1.0f / (MathConstants<float>::twoPi * cutoff * capVal));
+        dp.setDiodeParameters (diodeIs, 0.02585f, nDiodes);
     }
 
     void process (float* buffer, const int numSamples) noexcept
@@ -35,7 +52,7 @@ private:
     Cap C1;
 
     chowdsp::WDFT::WDFParallelT<wdf_type, Cap, ResVs> P1 { C1, Vs };
-    chowdsp::WDFT::DiodePairT<wdf_type, decltype (P1)> dp { 2.52e-9f, 0.02585f, P1 }; // GZ34 diode pair (@TODO implement other types of diodes)
+    chowdsp::WDFT::DiodePairT<wdf_type, decltype (P1)> dp { 2.52e-9f, 0.02585f, 1.0f, P1 }; // GZ34 diode pair (@TODO implement other types of diodes)
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiodeClipperWDF)
 };
@@ -55,6 +72,8 @@ public:
 private:
     std::atomic<float>* cutoffParam = nullptr;
     std::atomic<float>* driveParam = nullptr;
+    std::atomic<float>* diodeTypeParam = nullptr;
+    std::atomic<float>* nDiodesParam = nullptr;
 
     dsp::Gain<float> inGain, outGain;
     std::unique_ptr<DiodeClipperWDF> wdf[2];
