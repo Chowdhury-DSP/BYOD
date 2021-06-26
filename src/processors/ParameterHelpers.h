@@ -40,4 +40,14 @@ inline Params createBaseParams()
     return std::move (params);
 }
 
+static float logPot (float x)
+{
+    return (std::pow (10.0f, x) - 1.0f) / 9.0f;
+}
+
+static float iLogPot (float x)
+{
+    return (std::pow (0.1f, x) - 1.0f) / -0.9f;
+}
+
 }; // namespace ParameterHelpers

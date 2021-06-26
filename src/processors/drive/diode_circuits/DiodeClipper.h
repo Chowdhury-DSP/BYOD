@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../BaseProcessor.h"
+#include "processors/BaseProcessor.h"
 #include "DiodeClipperWDF.h"
 
 class DiodeClipper : public BaseProcessor
@@ -22,7 +22,7 @@ private:
     std::atomic<float>* nDiodesParam = nullptr;
 
     dsp::Gain<float> inGain, outGain;
-    using DiodeClipperDP = DiodeClipperWDF<chowdsp::WDFT::DiodePairT>;
+    using DiodeClipperDP = DiodeClipperWDF<wdft::DiodePairT>;
     std::unique_ptr<DiodeClipperDP> wdf[2];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiodeClipper)

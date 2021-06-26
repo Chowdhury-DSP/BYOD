@@ -2,7 +2,7 @@
 
 #include <pch.h>
 
-template <template <typename, typename, chowdsp::WDFT::DiodeQuality> typename DiodeType>
+template <template <typename, typename, wdft::DiodeQuality> typename DiodeType>
 class DiodeClipperWDF
 {
 public:
@@ -37,7 +37,7 @@ public:
             Vs.setVoltage (buffer[n]);
 
             dp.incident (P1.reflected());
-            buffer[n] = chowdsp::WDFT::voltage<float> (C1);
+            buffer[n] = wdft::voltage<float> (C1);
             P1.incident (dp.reflected());
         }
     }
@@ -45,15 +45,15 @@ public:
 private:
     static constexpr float capVal = 47.0e-9f;
     using wdf_type = float;
-    using Res = chowdsp::WDFT::ResistorT<wdf_type>;
-    using Cap = chowdsp::WDFT::CapacitorT<wdf_type>;
-    using ResVs = chowdsp::WDFT::ResistiveVoltageSourceT<wdf_type>;
+    using Res = wdft::ResistorT<wdf_type>;
+    using Cap = wdft::CapacitorT<wdf_type>;
+    using ResVs = wdft::ResistiveVoltageSourceT<wdf_type>;
 
     ResVs Vs { 4700.0f };
     Cap C1;
 
-    chowdsp::WDFT::WDFParallelT<wdf_type, Cap, ResVs> P1 { C1, Vs };
-    DiodeType<wdf_type, decltype (P1), chowdsp::WDFT::DiodeQuality::Best> dp { P1, 2.52e-9f };
+    wdft::WDFParallelT<wdf_type, Cap, ResVs> P1 { C1, Vs };
+    DiodeType<wdf_type, decltype (P1), wdft::DiodeQuality::Best> dp { P1, 2.52e-9f };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiodeClipperWDF)
 };

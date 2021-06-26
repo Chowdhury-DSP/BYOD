@@ -1,17 +1,17 @@
-#include "DiodeRectifier.h"
-#include "../ParameterHelpers.h"
+#include "DiodeClipper.h"
+#include "../../ParameterHelpers.h"
 
-DiodeRectifier::DiodeRectifier (UndoManager* um) : BaseProcessor ("Diode Rectifier", createParameterLayout(), um)
+DiodeClipper::DiodeClipper (UndoManager* um) : BaseProcessor ("Diode Clipper", createParameterLayout(), um)
 {
     cutoffParam = vts.getRawParameterValue ("cutoff");
     driveParam = vts.getRawParameterValue ("drive");
     diodeTypeParam = vts.getRawParameterValue ("diode");
     nDiodesParam = vts.getRawParameterValue ("num_diodes");
 
-    uiOptions.backgroundColour = Colours::goldenrod.brighter (0.25f);
+    uiOptions.backgroundColour = Colours::white;
 }
 
-AudioProcessorValueTreeState::ParameterLayout DiodeRectifier::createParameterLayout()
+AudioProcessorValueTreeState::ParameterLayout DiodeClipper::createParameterLayout()
 {
     using namespace ParameterHelpers;
     
@@ -37,10 +37,10 @@ AudioProcessorValueTreeState::ParameterLayout DiodeRectifier::createParameterLay
     return { params.begin(), params.end() };
 }
 
-void DiodeRectifier::prepare (double sampleRate, int samplesPerBlock)
+void DiodeClipper::prepare (double sampleRate, int samplesPerBlock)
 {
     for (int ch = 0; ch < 2; ++ch)
-        wdf[ch] = std::make_unique<DiodeRectifierWDF> ((float) sampleRate);
+        wdf[ch] = std::make_unique<DiodeClipperDP> ((float) sampleRate);
 
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
     for (auto* gain : { &inGain, &outGain })
@@ -50,7 +50,7 @@ void DiodeRectifier::prepare (double sampleRate, int samplesPerBlock)
     }
 }
 
-void DiodeRectifier::processAudio (AudioBuffer<float>& buffer)
+void DiodeClipper::processAudio (AudioBuffer<float>& buffer)
 {
     setGains (*driveParam);
 
@@ -61,7 +61,7 @@ void DiodeRectifier::processAudio (AudioBuffer<float>& buffer)
     int diodeType = static_cast<int> (*diodeTypeParam);
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch]->setParameters (*cutoffParam, DiodeRectifierWDF::getDiodeIs (diodeType), *nDiodesParam);
+        wdf[ch]->setParameters (*cutoffParam, DiodeClipperDP::getDiodeIs (diodeType), *nDiodesParam);
         auto* x = buffer.getWritePointer (ch);
         wdf[ch]->process (x, buffer.getNumSamples());
     }
@@ -69,11 +69,11 @@ void DiodeRectifier::processAudio (AudioBuffer<float>& buffer)
     outGain.process (context);
 }
 
-void DiodeRectifier::setGains (float driveValue)
+void DiodeClipper::setGains (float driveValue)
 {
     auto inGainAmt = jmap (driveValue, 0.5f, 10.0f);
     auto outGainAmt = inGainAmt < 1.0f ? 1.0f / inGainAmt : 1.0f / std::sqrt (inGainAmt);
 
     inGain.setGainLinear (inGainAmt);
-    outGain.setGainLinear (-1.0f * outGainAmt); // flip rectifier polarity so output wave is positive
+    outGain.setGainLinear (outGainAmt);
 }

@@ -7,3 +7,9 @@ bin/
 
 # Mac extras
 .DS_Store
+
+# SPICE stuff
+*.raw
+*.log
+*.net
+*.op.raw

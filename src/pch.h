@@ -16,6 +16,7 @@
 
 // global definitions
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
+namespace wdft = chowdsp::WDFT;
 
 // Useful for creating Listener patterns
 #define CREATE_LISTENER(ListenerName, listName, funcs)\

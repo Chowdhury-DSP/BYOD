@@ -9,8 +9,9 @@ target_sources(BYOD PRIVATE
     processors/ProcessorChain.cpp
     processors/ProcessorStore.cpp
 
-    processors/drive/DiodeClipper.cpp
-    processors/drive/DiodeRectifier.cpp
+    processors/drive/diode_circuits/DiodeClipper.cpp
+    processors/drive/diode_circuits/DiodeRectifier.cpp
+    processors/drive/zen_drive/ZenDrive.cpp
 
     processors/tone/HighCut.cpp
     processors/tone/TrebleBooster.cpp
