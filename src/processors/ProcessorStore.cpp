@@ -1,7 +1,10 @@
 #include "ProcessorStore.h"
 
 #include "drive/DiodeClipper.h"
+#include "drive/DiodeRectifier.h"
+
 #include "tone/HighCut.h"
+#include "tone/TrebleBooster.h"
 
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
@@ -16,7 +19,9 @@ static std::unique_ptr<BaseProcessor> processorFactory()
 
 ProcessorStore::StoreMap ProcessorStore::store = {
     { "Diode Clipper", &processorFactory<DiodeClipper> },
+    { "Diode Rectifier", &processorFactory<DiodeRectifier> },
     { "High Cut", &processorFactory<HighCut> },
+    { "Treble Booster", &processorFactory<TrebleBooster> },
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },

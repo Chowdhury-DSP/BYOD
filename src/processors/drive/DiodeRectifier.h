@@ -3,10 +3,10 @@
 #include "../BaseProcessor.h"
 #include "DiodeClipperWDF.h"
 
-class DiodeClipper : public BaseProcessor
+class DiodeRectifier : public BaseProcessor
 {
 public:
-    DiodeClipper (UndoManager* um = nullptr);
+    DiodeRectifier (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -22,8 +22,8 @@ private:
     std::atomic<float>* nDiodesParam = nullptr;
 
     dsp::Gain<float> inGain, outGain;
-    using DiodeClipperDP = DiodeClipperWDF<chowdsp::WDFT::DiodePairT>;
-    std::unique_ptr<DiodeClipperDP> wdf[2];
+    using DiodeRectifierWDF = DiodeClipperWDF<chowdsp::WDFT::DiodeT>;
+    std::unique_ptr<DiodeRectifierWDF> wdf[2];
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiodeClipper)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiodeRectifier)
 };

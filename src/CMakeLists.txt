@@ -10,8 +10,10 @@ target_sources(BYOD PRIVATE
     processors/ProcessorStore.cpp
 
     processors/drive/DiodeClipper.cpp
+    processors/drive/DiodeRectifier.cpp
 
     processors/tone/HighCut.cpp
+    processors/tone/TrebleBooster.cpp
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)
