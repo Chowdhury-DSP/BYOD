@@ -9,6 +9,8 @@ DiodeClipper::DiodeClipper (UndoManager* um) : BaseProcessor ("Diode Clipper", c
     nDiodesParam = vts.getRawParameterValue ("num_diodes");
 
     uiOptions.backgroundColour = Colours::white;
+    uiOptions.info.description = "Emulation of a simple diode waveform clipper circuit with options for different configurations of diodes.";
+    uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
 AudioProcessorValueTreeState::ParameterLayout DiodeClipper::createParameterLayout()

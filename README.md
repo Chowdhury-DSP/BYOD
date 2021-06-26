@@ -8,9 +8,9 @@ audio plugin.
 
 ## TODO
 - New processors: tube screamer, bass cleaner, klon
-- Processor info
 - Audit which parameters need more smoothing
 - Audit which processors need pre-buffering
+- Undo/Redo
 
 ## Building
 
@@ -28,6 +28,10 @@ $ git submodule update --init --recursive
 $ cmake -Bbuild
 $ cmake --build build --config Release
 ```
+
+## Credits:
+- Foleys' GUI Magic
+- FontAwesome
 
 ## License
 

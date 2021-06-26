@@ -17,6 +17,8 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     addAndMakeVisible (newProcButton);
     newProcButton.onClick = [=] { showNewProcMenu(); };
 
+    addChildComponent (infoComp);
+
     for (auto* p : procs.getProcessors())
         processorAdded (p);
 
@@ -56,6 +58,7 @@ void BoardComponent::resized()
         newProcButton.setBounds (Rectangle<int> (newButtonWidth, newButtonWidth).withCentre (centre));
     }
 
+    infoComp.setBounds (Rectangle<int> (jmin (400, getWidth()), jmin (250, getHeight())).withCentre (getLocalBounds().getCentre()));
 }
 
 void BoardComponent::refreshBoardSize()
@@ -70,7 +73,7 @@ void BoardComponent::refreshBoardSize()
 
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
-    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain));
+    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
     addAndMakeVisible (newEditor);
 
     refreshBoardSize();
@@ -93,6 +96,13 @@ void BoardComponent::processorMoved (int procToMove, int procInSlot)
 {
     processorEditors.move (procToMove, procInSlot);
     resized();
+}
+
+void BoardComponent::showInfoComp (const BaseProcessor& proc)
+{
+    infoComp.setInfoForProc (proc.getName(), proc.getUIOptions().info);
+    infoComp.setVisible (true);
+    infoComp.toFront (true);
 }
 
 bool BoardComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)

@@ -12,6 +12,8 @@ public:
 
         uiOptions.backgroundColour = Colours::black;
         uiOptions.powerColour = Colours::yellow;
+        uiOptions.info.description = "Simple linear gain boost.";
+        uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
     }
 
     ProcessorType getProcessorType() const override { return Utility; }

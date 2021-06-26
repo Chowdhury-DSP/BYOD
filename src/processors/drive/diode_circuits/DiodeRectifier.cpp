@@ -9,6 +9,8 @@ DiodeRectifier::DiodeRectifier (UndoManager* um) : BaseProcessor ("Diode Rectifi
     nDiodesParam = vts.getRawParameterValue ("num_diodes");
 
     uiOptions.backgroundColour = Colours::goldenrod.brighter (0.25f);
+    uiOptions.info.description = "Emulation of a simple diode rectifier circuit with options for different configurations of diodes.";
+    uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
 AudioProcessorValueTreeState::ParameterLayout DiodeRectifier::createParameterLayout()

@@ -12,6 +12,8 @@ public:
 
         uiOptions.backgroundColour = Colours::darkgrey;
         uiOptions.powerColour = Colours::yellow;
+        uiOptions.info.description = "A DC blocking filter with adjustable cutoff frequency.";
+        uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
     }
 
     ProcessorType getProcessorType() const override { return Utility; }

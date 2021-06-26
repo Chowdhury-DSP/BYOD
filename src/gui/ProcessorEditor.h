@@ -7,7 +7,7 @@
 class ProcessorEditor : public Component
 {
 public:
-    ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs);
+    ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs, Component* parent);
     ~ProcessorEditor();
 
     void paint (Graphics& g) override;
@@ -26,6 +26,7 @@ private:
     KnobsComponent knobs;
     PowerButton powerButton;
     TextButton xButton;
+    DrawableButton infoButton { "", DrawableButton::ButtonStyle::ImageFitted };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)
 };

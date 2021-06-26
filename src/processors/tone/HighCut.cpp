@@ -15,6 +15,8 @@ HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterL
 
     uiOptions.backgroundColour = Colour (0xFFFF8B3D);
     uiOptions.powerColour = Colours::blue;
+    uiOptions.info.description = "A simple high-cut filter with adjustable cutoff frequency.";
+    uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
 AudioProcessorValueTreeState::ParameterLayout HighCut::createParameterLayout()

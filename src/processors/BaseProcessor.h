@@ -16,6 +16,12 @@ struct ProcessorUIOptions
     Colour powerColour = Colour (0xFFFF4D29);
     std::unique_ptr<Drawable> backgroundImage;
     LookAndFeel* lnf = nullptr;
+
+    struct ProcInfo
+    {
+        String description;
+        StringArray authors;
+    } info;
 };
 
 class BaseProcessor : private JuceProcWrapper

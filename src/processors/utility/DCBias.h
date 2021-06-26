@@ -12,6 +12,8 @@ public:
 
         uiOptions.backgroundColour = Colours::slategrey;
         uiOptions.powerColour = Colours::yellow;
+        uiOptions.info.description = "Adds a constant DC bias to the signal.";
+        uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
     }
 
     ProcessorType getProcessorType() const override { return Utility; }

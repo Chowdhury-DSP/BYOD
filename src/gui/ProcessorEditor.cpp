@@ -1,16 +1,18 @@
 #include "ProcessorEditor.h"
+#include "BoardComponent.h"
 
 namespace
 {
 constexpr float cornerSize = 5.0f;
 }
 
-ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs) : proc (baseProc),
-                                                                                    procChain (procs),
-                                                                                    procUI (proc.getUIOptions()),
-                                                                                    contrastColour (procUI.backgroundColour.contrasting()),
-                                                                                    knobs (proc.getVTS(), contrastColour),
-                                                                                    powerButton (procUI.powerColour)
+ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs, Component* parent) :
+    proc (baseProc),
+    procChain (procs),
+    procUI (proc.getUIOptions()),
+    contrastColour (procUI.backgroundColour.contrasting()),
+    knobs (proc.getVTS(), contrastColour),
+    powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);
 
@@ -26,6 +28,14 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         procChain.removeProcessor (&proc);
     });};
     addAndMakeVisible (xButton);
+
+    auto infoSvg = Drawable::createFromImageData (BinaryData::info_svg, BinaryData::info_svgSize);
+    infoSvg->replaceColour (Colours::black, contrastColour);
+    infoButton.setImages (infoSvg.get());
+    addAndMakeVisible (infoButton);
+    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)] {
+        boardComp->showInfoComp (baseProc);
+    };
 
     if (procUI.lnf != nullptr)
         setLookAndFeel (procUI.lnf);
@@ -65,6 +75,9 @@ void ProcessorEditor::resized()
     constexpr int xButtonSize = 27;
     powerButton.setBounds (getWidth() - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
     xButton.setBounds (getWidth() - xButtonSize, 0, xButtonSize, xButtonSize);
+
+    constexpr int infoButtonSize = 20;
+    infoButton.setBounds (getWidth() - infoButtonSize, getHeight() - infoButtonSize, infoButtonSize, infoButtonSize);
 }
 
 void ProcessorEditor::mouseDrag (const MouseEvent&)

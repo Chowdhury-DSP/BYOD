@@ -7,6 +7,8 @@ TrebleBooster::TrebleBooster (UndoManager* um) : BaseProcessor ("Treble Booster"
 
     uiOptions.backgroundColour = Colours::cyan.darker (0.15f);
     uiOptions.powerColour = Colours::red.darker (0.1f);
+    uiOptions.info.description = "A treble boosting filter based on the tone circuit in the Klon Centaur distortion pedal.";
+    uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
 AudioProcessorValueTreeState::ParameterLayout TrebleBooster::createParameterLayout()
