@@ -7,10 +7,9 @@ This repository contains template code for building a Chowdhury DSP
 audio plugin.
 
 ## TODO
-- New processors: tube screamer, bass cleaner, klon
+- New processors: tube screamer, klon
 - Audit which parameters need more smoothing
 - Audit which processors need pre-buffering
-- Undo/Redo
 
 ## Building
 

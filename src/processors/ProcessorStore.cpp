@@ -4,6 +4,7 @@
 #include "drive/diode_circuits/DiodeRectifier.h"
 #include "drive/zen_drive/ZenDrive.h"
 
+#include "tone/BassCleaner.h"
 #include "tone/HighCut.h"
 #include "tone/TrebleBooster.h"
 
@@ -21,6 +22,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
     { "Zen Drive", &processorFactory<ZenDrive> },
+    { "Bass Cleaner", &processorFactory<BassCleaner> },
     { "High Cut", &processorFactory<HighCut> },
     { "Treble Booster", &processorFactory<TrebleBooster> },
     { "Clean Gain", &processorFactory<CleanGain> },
