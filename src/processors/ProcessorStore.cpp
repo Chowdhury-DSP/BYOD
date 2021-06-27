@@ -12,10 +12,9 @@
 #include "utility/DCBlocker.h"
 
 template <typename ProcType>
-static std::unique_ptr<BaseProcessor> processorFactory()
+static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 {
-    // @TODO: forward constructor args
-    return std::make_unique<ProcType>();
+    return std::make_unique<ProcType> (um);
 }
 
 ProcessorStore::StoreMap ProcessorStore::store = {
@@ -29,11 +28,11 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "DC Blocker", &processorFactory<DCBlocker> },
 };
 
-ProcessorStore::ProcessorStore()
+ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
 {
     for (auto& [name, procFactory] : store)
     {
-        auto proc = procFactory();
+        auto proc = procFactory (undoManager);
         jassert (name == proc->getName());
         procTypeStore[name] = proc->getProcessorType();
     }
@@ -44,7 +43,7 @@ BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
     if (store.find (name) == store.end())
         return {};
 
-    return store[name]();
+    return store[name] (undoManager);
 }
 
 void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType type)
@@ -57,7 +56,7 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=] { addProcessorCallback (procDesc.second()); };
+        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }

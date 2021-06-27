@@ -3,8 +3,8 @@ juce_add_binary_data(BinaryData SOURCES
     PowerButton.svg
     info.svg
     background.jpeg
-
-    faceplates/DiodeClipper.png
+    undo-solid.png
+    redo-solid.png
 )
 
 # Need to build BinaryData with -fPIC flag on Linux
