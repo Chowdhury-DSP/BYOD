@@ -3,11 +3,16 @@
 ![CI](https://github.com/Chowdhury-DSP/BYOD/workflows/CI/badge.svg)
 [![License](https://img.shields.io/badge/License-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-This repository contains template code for building a Chowdhury DSP
-audio plugin.
+BYOD is a guitar distortion plugin with a customisable
+signal chain that allows users to create their own guitar
+distortion effects. The plugin contains a wide variety
+of distortion effects from analog modelled circuits
+to purely digital creations, along with some musical
+tone-shaping filters, and a handful of other useful
+processing blocks.
 
 ## TODO
-- New processors: tube screamer, klon
+- New processors: tube screamer, klon, fender bassman, neural stuff, hysteresis...
 - Audit which parameters need more smoothing
 - Audit which processors need pre-buffering
 
@@ -29,8 +34,13 @@ $ cmake --build build --config Release
 ```
 
 ## Credits:
-- Foleys' GUI Magic
-- FontAwesome
+
+- GUI Framework - [Plugin GUI Magic](https://github.com/ffAudio/PluginGUIMagic)
+- Extra Icons - [FontAwesome](https://fontawesome.com/)
+
+Credits for the individual processing blocks are shown on
+the information page for each block. Big thanks to all who
+have contributed!
 
 ## License
 
