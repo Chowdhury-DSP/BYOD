@@ -43,7 +43,7 @@ manu=$(cut -f 6 -d ' ' <<< "$(grep 'PLUGIN_MANUFACTURER_CODE' CMakeLists.txt)")
 code=$(cut -f 6 -d ' ' <<< "$(grep 'PLUGIN_CODE' CMakeLists.txt)")
 
 set +e
-auval_result=$(auval -v aumu "$code" "$manu")
+auval_result=$(auval -v aufx "$code" "$manu")
 auval_code="$?"
 echo "AUVAL code: $auval_code"
 

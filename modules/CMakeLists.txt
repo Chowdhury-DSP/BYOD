@@ -19,8 +19,6 @@ juce_add_modules(chowdsp_utils)
 set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
 add_subdirectory(RTNeural)
 
-find_package(Eigen3 REQUIRED PATHS RTNeural/modules/Eigen)
-
 include(cmake/WarningFlags.cmake)
 add_library(juce_plugin_modules STATIC)
 target_link_libraries(juce_plugin_modules
@@ -30,7 +28,6 @@ target_link_libraries(juce_plugin_modules
         foleys_gui_magic
         chowdsp_utils
         RTNeural
-        Eigen3::Eigen
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags

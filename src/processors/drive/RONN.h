@@ -25,6 +25,7 @@ private:
     // input gain
     std::atomic<float>* inGainDbParam = nullptr;
     dsp::Gain<float> inputGain;
+    float makeupGain = 1.0f;
 
     // example of model defined at compile-time
     RTNeural::ModelT<float, 1, 1,
