@@ -32,6 +32,17 @@ inline void createPercentParameter (Params& params, const String& id, const Stri
                                                   &stringToPercentVal));
 }
 
+inline void createGainDBParameter (Params& params, const String& id, const String& name, float min, float max, float defaultValue)
+{
+    params.push_back (std::make_unique<VTSParam> (id,
+                                                  name,
+                                                  String(),
+                                                  NormalisableRange<float> { min, max },
+                                                  defaultValue,
+                                                  &gainValToString,
+                                                  &stringToGainVal));
+}
+
 inline Params createBaseParams()
 {
     Params params;

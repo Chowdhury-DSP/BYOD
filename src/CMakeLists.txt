@@ -13,6 +13,7 @@ target_sources(BYOD PRIVATE
     processors/drive/diode_circuits/DiodeClipper.cpp
     processors/drive/diode_circuits/DiodeRectifier.cpp
     processors/drive/zen_drive/ZenDrive.cpp
+    processors/drive/RONN.cpp
 
     processors/tone/BassCleaner.cpp
     processors/tone/HighCut.cpp

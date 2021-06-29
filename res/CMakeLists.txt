@@ -5,6 +5,8 @@ juce_add_binary_data(BinaryData SOURCES
     background.jpeg
     undo-solid.png
     redo-solid.png
+
+    ronn.json #REMOVE!
 )
 
 # Need to build BinaryData with -fPIC flag on Linux

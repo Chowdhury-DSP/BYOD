@@ -3,6 +3,7 @@ include(cmake/SubprojectVersion.cmake)
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 
+# add magic_enum
 include(cmake/CPM.cmake)
 CPMAddPackage(
     NAME magic_enum
@@ -10,8 +11,15 @@ CPMAddPackage(
     GIT_TAG v0.7.2
 )
 
+# add custom JUCE modules
 juce_add_modules(foleys_gui_magic)
 juce_add_modules(chowdsp_utils)
+
+# add RTNeural
+set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
+add_subdirectory(RTNeural)
+
+find_package(Eigen3 REQUIRED PATHS RTNeural/modules/Eigen)
 
 include(cmake/WarningFlags.cmake)
 add_library(juce_plugin_modules STATIC)
@@ -21,6 +29,8 @@ target_link_libraries(juce_plugin_modules
         juce::juce_audio_utils
         foleys_gui_magic
         chowdsp_utils
+        RTNeural
+        Eigen3::Eigen
     PUBLIC
         juce::juce_recommended_config_flags
         juce::juce_recommended_lto_flags
@@ -49,6 +59,8 @@ target_include_directories(juce_plugin_modules
         $<TARGET_PROPERTY:juce_plugin_modules,INCLUDE_DIRECTORIES>
     PUBLIC
         ${magic_enum_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/modules/RTNeural
+        ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/Eigen
 )
 
 set_target_properties(juce_plugin_modules PROPERTIES

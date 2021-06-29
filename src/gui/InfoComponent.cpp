@@ -46,7 +46,7 @@ void InfoComponent::setInfoForProc (const String& name, const ProcessorUIOptions
     description = info.description;
         
     numAuthors = info.authors.size();
-    authors = "Authors: ";
+    authors = numAuthors == 1 ? "Author: " : "Authors: ";
     for (int i = 0; i < numAuthors; ++i)
     {
         if (i + 1 == numAuthors)

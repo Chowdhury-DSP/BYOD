@@ -7,12 +7,15 @@
 // C++/STL headers here...
 #include <future>
 #include <unordered_map>
+#include <random>
 
 // JUCE modules
 #include <JuceHeader.h>
 
 // Any other widely used headers that don't change...
 #include <magic_enum.hpp>
+#include <RTNeural/RTNeural.h>
+#include <Eigen/Dense>
 
 // global definitions
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
