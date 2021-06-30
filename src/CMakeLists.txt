@@ -1,3 +1,5 @@
+add_subdirectory(headless)
+
 target_sources(BYOD PRIVATE
     BYOD.cpp
 

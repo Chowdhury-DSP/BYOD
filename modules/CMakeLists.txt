@@ -25,6 +25,7 @@ target_link_libraries(juce_plugin_modules
     PRIVATE
         BinaryData
         juce::juce_audio_utils
+        juce::juce_audio_plugin_client
         foleys_gui_magic
         chowdsp_utils
         RTNeural
@@ -58,6 +59,7 @@ target_include_directories(juce_plugin_modules
         ${magic_enum_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/modules/RTNeural
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/Eigen
+        ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/xsimd/include
 )
 
 set_target_properties(juce_plugin_modules PROPERTIES

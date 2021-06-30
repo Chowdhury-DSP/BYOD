@@ -19,6 +19,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     ProcessorChain& getProcChain() { return procs; }
+    AudioProcessorValueTreeState& getVTS() { return vts; }
 
 private:
     ProcessorStore procStore;
