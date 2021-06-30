@@ -12,9 +12,15 @@ tone-shaping filters, and a handful of other useful
 processing blocks.
 
 ## TODO
-- New processors: tube screamer, klon, fender bassman, hysteresis...
-- Audit which parameters need more smoothing
-- Audit which processors need pre-buffering
+- New processors:
+  - tube screamer
+  - klon drive stage
+  - bassman tone stack
+  - hysteresis
+  - wavefolder
+  - tremolo
+  - envelope filter
+- expose processor parameters to DAW?
 
 ## Building
 
