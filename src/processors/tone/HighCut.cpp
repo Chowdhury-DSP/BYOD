@@ -7,7 +7,7 @@ constexpr float freq2Rv2 (float cutoff, float C8, float R3)
 {
     return (1.0f / (C8 * cutoff)) - R3;
 }
-}
+} // namespace
 
 HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterLayout(), um)
 {
@@ -22,7 +22,7 @@ HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterL
 AudioProcessorValueTreeState::ParameterLayout HighCut::createParameterLayout()
 {
     using namespace ParameterHelpers;
-    
+
     auto params = createBaseParams();
     createFreqParameter (params, "cutoff", "Cutoff", 200.0f, 20.0e3f, 2000.0f, 5000.0f);
 

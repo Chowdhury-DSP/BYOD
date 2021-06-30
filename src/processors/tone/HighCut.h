@@ -20,7 +20,7 @@ private:
         float a_s[] { (R3 + Rv2Val) * C8, 1.0f };
 
         float fc = 1.0f / ((R3 + Rv2Val) * C8);
-        float K = fc / std::tanh(fc / (2.0f * fs));
+        float K = fc / std::tanh (fc / (2.0f * fs));
 
         float b[2];
         float a[2];

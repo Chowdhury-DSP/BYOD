@@ -3,9 +3,9 @@
 
 namespace
 {
-    const String monoModeTag = "mono_stereo";
-    const String oversamplingTag = "oversampling";
-}
+const String monoModeTag = "mono_stereo";
+const String oversamplingTag = "oversampling";
+} // namespace
 
 ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store),
                                                                                             um (vts.undoManager)
@@ -38,7 +38,7 @@ void ProcessorChain::initializeProcessors (int curOS)
     const auto osFactor = (int) overSample[curOS]->getOversamplingFactor();
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
-    
+
     for (auto* processor : procs)
         processor->prepare (osSampleRate, osSamplesPerBlock);
 }
@@ -47,7 +47,7 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
 {
     mySampleRate = sampleRate;
     mySamplesPerBlock = samplesPerBlock;
-    
+
     monoBuffer.setSize (1, samplesPerBlock * 16); // allocate extra space for upsampled buffers
     stereoBuffer.setSize (2, samplesPerBlock * 16);
 
@@ -120,7 +120,8 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
         auto processedData = processBuffer.getReadPointer (0);
         for (int ch = 0; ch < numChannels; ++ch)
             FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
-                                         processedData, osNumSamples);
+                                         processedData,
+                                         osNumSamples);
     }
     else
     {
@@ -152,7 +153,7 @@ void ProcessorChain::moveProcessor (const BaseProcessor* procToMove, const BaseP
 
     auto indexToMove = procs.indexOf (procToMove);
     auto slotIndex = procInSlot == nullptr ? procs.size() - 1 : procs.indexOf (procInSlot);
-    
+
     um->beginNewTransaction();
     um->perform (new MoveProcessor (*this, indexToMove, slotIndex));
 }
@@ -185,7 +186,7 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
             jassertfalse;
             continue;
         }
-        
+
         if (procXml->getNumChildElements() > 0)
             newProc->fromXML (procXml->getChildElement (0));
 

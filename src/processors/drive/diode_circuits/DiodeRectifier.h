@@ -1,7 +1,7 @@
 #pragma once
 
-#include "processors/BaseProcessor.h"
 #include "DiodeClipperWDF.h"
+#include "processors/BaseProcessor.h"
 
 class DiodeRectifier : public BaseProcessor
 {

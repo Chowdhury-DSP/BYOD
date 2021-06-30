@@ -14,7 +14,7 @@ BassCleaner::BassCleaner (UndoManager* um) : BaseProcessor ("Bass Cleaner", crea
 AudioProcessorValueTreeState::ParameterLayout BassCleaner::createParameterLayout()
 {
     using namespace ParameterHelpers;
-    
+
     auto params = createBaseParams();
     createPercentParameter (params, "clean", "Clean", 0.5f);
 

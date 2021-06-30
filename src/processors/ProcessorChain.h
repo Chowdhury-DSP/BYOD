@@ -4,11 +4,10 @@
 
 class ProcessorChain
 {
-    CREATE_LISTENER (Listener, listeners,
-        virtual void processorAdded (BaseProcessor* /*proc*/) {}\
-        virtual void processorRemoved (const BaseProcessor* /*proc*/) {}\
-        virtual void processorMoved (int /*procToMove*/, int /*procInSlot*/) {}\
-    )
+    CREATE_LISTENER (
+        Listener,
+        listeners,
+        virtual void processorAdded (BaseProcessor* /*proc*/) {} virtual void processorRemoved (const BaseProcessor* /*proc*/) {} virtual void processorMoved (int /*procToMove*/, int /*procInSlot*/) {})
 public:
     ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts);
 
@@ -29,7 +28,7 @@ public:
 
 private:
     void initializeProcessors (int curOS);
-    
+
     double mySampleRate = 48000.0;
     int mySamplesPerBlock = 512;
 
@@ -47,6 +46,6 @@ private:
 
     friend class ProcChainActions;
     UndoManager* um;
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

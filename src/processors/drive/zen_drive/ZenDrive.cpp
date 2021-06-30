@@ -14,7 +14,7 @@ ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Zen Drive", createParamet
 AudioProcessorValueTreeState::ParameterLayout ZenDrive::createParameterLayout()
 {
     using namespace ParameterHelpers;
-    
+
     auto params = createBaseParams();
     createPercentParameter (params, "voice", "Voice", 0.5f);
     createPercentParameter (params, "gain", "Gain", 0.5f);

@@ -14,7 +14,7 @@ TrebleBooster::TrebleBooster (UndoManager* um) : BaseProcessor ("Treble Booster"
 AudioProcessorValueTreeState::ParameterLayout TrebleBooster::createParameterLayout()
 {
     using namespace ParameterHelpers;
-    
+
     auto params = createBaseParams();
     createPercentParameter (params, "boost", "Boost", 0.25f);
 

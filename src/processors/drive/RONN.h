@@ -28,14 +28,7 @@ private:
     float makeupGain = 1.0f;
 
     // example of model defined at compile-time
-    RTNeural::ModelT<float, 1, 1,
-        RTNeural::DenseT<float, 1, 8>,
-        RTNeural::TanhActivationT<float, 8>,
-        RTNeural::Conv1DT<float, 8, 4, 3, 2>,
-        RTNeural::TanhActivationT<float, 4>,
-        RTNeural::GRULayerT<float, 4, 8>,
-        RTNeural::DenseT<float, 8, 1>
-    > neuralNet[2];
+    RTNeural::ModelT<float, 1, 1, RTNeural::DenseT<float, 1, 8>, RTNeural::TanhActivationT<float, 8>, RTNeural::Conv1DT<float, 8, 4, 3, 2>, RTNeural::TanhActivationT<float, 4>, RTNeural::GRULayerT<float, 4, 8>, RTNeural::DenseT<float, 8, 1>> neuralNet[2];
 
     DCBlocker dcBlocker;
 

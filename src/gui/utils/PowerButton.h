@@ -22,7 +22,8 @@ public:
         offImage->replaceColour (Colours::black, Colours::darkgrey);
         button.setImages (offImage.get(), offImage.get(), onImage.get(), offImage.get(), onImage.get(), onImage.get(), offImage.get());
 
-        button.onStateChange = [=] { enableDisable(); };
+        button.onStateChange = [=]
+        { enableDisable(); };
     }
 
     void resized() override

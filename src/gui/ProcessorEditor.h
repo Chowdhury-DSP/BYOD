@@ -19,7 +19,7 @@ public:
 private:
     BaseProcessor& proc;
     ProcessorChain& procChain;
-    
+
     const ProcessorUIOptions& procUI;
     Colour contrastColour;
 

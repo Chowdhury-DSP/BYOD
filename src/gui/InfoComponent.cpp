@@ -8,7 +8,8 @@ InfoComponent::InfoComponent()
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, Colours::white);
-    xButton.onClick = [=] { setVisible (false); };
+    xButton.onClick = [=]
+    { setVisible (false); };
     addAndMakeVisible (xButton);
 }
 
@@ -19,7 +20,7 @@ void InfoComponent::paint (Graphics& g)
 
     g.setColour (Colours::darkgrey.darker());
     g.fillRoundedRectangle (fBounds, 5.0f);
-        
+
     g.setColour (Colours::slategrey.brighter());
     g.drawRoundedRectangle (fBounds, 5.0f, 5.0f);
 
@@ -44,7 +45,7 @@ void InfoComponent::setInfoForProc (const String& name, const ProcessorUIOptions
 {
     procName = name;
     description = info.description;
-        
+
     numAuthors = info.authors.size();
     authors = numAuthors == 1 ? "Author: " : "Authors: ";
     for (int i = 0; i < numAuthors; ++i)
@@ -54,7 +55,7 @@ void InfoComponent::setInfoForProc (const String& name, const ProcessorUIOptions
             authors += info.authors[i];
             continue;
         }
-        
+
         authors += info.authors[i] + ", ";
     }
 }

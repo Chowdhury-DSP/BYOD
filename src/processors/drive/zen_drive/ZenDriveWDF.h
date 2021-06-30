@@ -28,7 +28,7 @@ public:
 private:
     ResVs R4 { 470.0e3f };
     Cap C3;
-    
+
     wdft::WDFSeriesT<float, ResVs, Cap> S1 { R4, C3 };
     wdft::PolarityInverterT<float, decltype (S1)> I1 { S1 };
 
@@ -113,7 +113,8 @@ public:
     ZenDriveWDF (float sampleRate) : inputBuffer (sampleRate),
                                      voiceCircuit (sampleRate),
                                      driveStage (sampleRate)
-    {}
+    {
+    }
 
     void setParameters (float voiceParam, float gainParam)
     {

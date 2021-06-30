@@ -2,12 +2,12 @@
 
 namespace
 {
-    constexpr int editorWidth = 330;
-    constexpr int editorHeight = 220;
-    constexpr int editorPad = 10;
-    constexpr int newButtonWidth = 40;
-    constexpr int newButtonPad = 10;
-}
+constexpr int editorWidth = 330;
+constexpr int editorHeight = 220;
+constexpr int editorPad = 10;
+constexpr int newButtonWidth = 40;
+constexpr int newButtonPad = 10;
+} // namespace
 
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 {
@@ -15,7 +15,8 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.4f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=] { showNewProcMenu(); };
+    newProcButton.onClick = [=]
+    { showNewProcMenu(); };
 
     addChildComponent (infoComp);
 
@@ -66,7 +67,7 @@ void BoardComponent::refreshBoardSize()
     auto newWidth = getIdealWidth();
     auto oldWidth = getWidth();
     setSize (newWidth, getHeight());
-    
+
     if (newWidth == oldWidth)
         resized();
 }
@@ -153,9 +154,9 @@ void BoardComponent::showNewProcMenu() const
     }
 
     auto options = PopupMenu::Options()
-        .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-        .withMinimumWidth (125)
-        .withStandardItemHeight (27);
+                       .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
+                       .withMinimumWidth (125)
+                       .withStandardItemHeight (27);
 
-    menu.showMenuAsync(options);
+    menu.showMenuAsync (options);
 }

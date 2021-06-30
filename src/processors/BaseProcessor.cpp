@@ -3,7 +3,7 @@
 BaseProcessor::BaseProcessor (const String& name,
                               AudioProcessorValueTreeState::ParameterLayout params,
                               UndoManager* um) : JuceProcWrapper (name),
-                                                  vts (*this, um, Identifier ("Parameters"), std::move (params))
+                                                 vts (*this, um, Identifier ("Parameters"), std::move (params))
 {
     onOffParam = vts.getRawParameterValue ("on_off");
 }

@@ -53,7 +53,7 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
     {
         if (auto* paramFloat = dynamic_cast<AudioParameterFloat*> (param))
             addSlider (paramFloat);
-        
+
         else if (auto* paramChoice = dynamic_cast<AudioParameterChoice*> (param))
             addBox (paramChoice);
 
@@ -94,7 +94,7 @@ void KnobsComponent::resized()
         const int x = (getWidth() - compWidth) / 2;
         for (auto* s : sliders)
             s->slider.setBounds (x, 15, compWidth, compWidth);
-        
+
         for (auto* b : boxes)
             b->box.setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
 
@@ -111,7 +111,7 @@ void KnobsComponent::resized()
 
         for (auto* s : sliders)
             s->slider.setBounds (x + (compIdx++) * compWidth, 15, compWidth, compWidth);
-        
+
         for (auto* b : boxes)
             b->box.setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
 
@@ -129,7 +129,7 @@ void KnobsComponent::resized()
 
         for (auto* s : sliders)
             s->slider.setBounds (x + (compIdx++) * compWidth, y, compWidth, compWidth);
-        
+
         for (auto* b : boxes)
             b->box.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
 
@@ -147,7 +147,7 @@ void KnobsComponent::resized()
 
         for (auto* s : sliders)
             s->slider.setBounds (x + (compIdx++) * compWidth, y, compWidth, compWidth);
-        
+
         for (auto* b : boxes)
             b->box.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
 
@@ -160,7 +160,7 @@ void KnobsComponent::resized()
     if (totalNumComponents == 4)
     {
         int compIdx = 0;
-        
+
         Rectangle<int> bounds[4];
         bounds[0] = Rectangle<int> { 0, 15, 100, 100 };
         bounds[1] = Rectangle<int> { 72, 80, 100, 100 };
@@ -169,7 +169,7 @@ void KnobsComponent::resized()
 
         for (auto* s : sliders)
             s->slider.setBounds (bounds[compIdx++]);
-        
+
         for (auto* b : boxes)
             b->box.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
 

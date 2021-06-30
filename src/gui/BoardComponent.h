@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../processors/ProcessorChain.h"
-#include "ProcessorEditor.h"
 #include "InfoComponent.h"
+#include "ProcessorEditor.h"
 
 class BoardComponent : public Component,
                        public DragAndDropContainer,

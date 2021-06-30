@@ -1,8 +1,8 @@
 #pragma once
 
-#include "processors/BaseProcessor.h"
-#include "ZenDriveWDF.h"
 #include "../../utility/DCBlocker.h"
+#include "ZenDriveWDF.h"
+#include "processors/BaseProcessor.h"
 
 class ZenDrive : public BaseProcessor
 {

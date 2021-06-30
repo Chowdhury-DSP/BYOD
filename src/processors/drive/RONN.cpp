@@ -14,7 +14,7 @@ Vec createRandomVec (std::default_random_engine& generator, DistType& distributi
     Vec v ((size_t) size, 0.0f);
     for (int i = 0; i < size; ++i)
         v[(size_t) i] = distribution (generator);
-    
+
     return v;
 }
 
@@ -25,24 +25,27 @@ Vec2 createRandomVec2 (std::default_random_engine& generator, DistType& distribu
     for (int i = 0; i < size1; ++i)
         for (int j = 0; j < size2; ++j)
             v[(size_t) i][(size_t) j] = distribution (generator);
-    
+
     return v;
 }
 
-struct Orthogonal {};
-template<>
+struct Orthogonal
+{
+};
+template <>
 Vec2 createRandomVec2<Orthogonal> (std::default_random_engine& generator, Orthogonal&, int size1, int size2)
 {
     static std::normal_distribution<float> gaussian (0.0f, 1.0f);
 
     using namespace Eigen;
     const auto dim = jmax (size1, size2);
-    MatrixXf X = MatrixXf::Zero (dim, dim).unaryExpr([&generator](double) { return gaussian (generator); });
+    MatrixXf X = MatrixXf::Zero (dim, dim).unaryExpr ([&generator] (double)
+                                                      { return gaussian (generator); });
     MatrixXf XtX = X.transpose() * X;
     SelfAdjointEigenSolver<MatrixXf> es (XtX);
     MatrixXf S = es.operatorInverseSqrt();
     MatrixXf R = X * S;
-    
+
     Vec2 v ((size_t) size1, Vec ((size_t) size2, 0.0f));
     for (int i = 0; i < size1; ++i)
         std::copy (R.col (i).data(), R.col (i).data() + size2, v[(size_t) i].data());
@@ -60,7 +63,7 @@ struct GlorotUniform
     }
 };
 
-template<>
+template <>
 Vec2 createRandomVec2<GlorotUniform> (std::default_random_engine& generator, GlorotUniform& glorot, int size1, int size2)
 {
     auto limit = std::sqrt (6.0f / float (size1 + size2));
@@ -76,11 +79,11 @@ Vec3 createRandomVec3 (std::default_random_engine& generator, DistType& distribu
         for (int j = 0; j < size2; ++j)
             for (int k = 0; k < size3; ++k)
                 v[(size_t) i][(size_t) j][(size_t) k] = distribution (generator);
-    
+
     return v;
 }
 
-template<>
+template <>
 Vec3 createRandomVec3<GlorotUniform> (std::default_random_engine& generator, GlorotUniform& glorot, int size1, int size2, int size3)
 {
     int fan_in = size2 * size3;
@@ -89,7 +92,7 @@ Vec3 createRandomVec3<GlorotUniform> (std::default_random_engine& generator, Glo
     glorot.initialise (-limit, limit);
     return createRandomVec3 (generator, *glorot.dist, size1, size2, size3);
 }
-}
+} // namespace
 
 RONN::RONN (UndoManager* um) : BaseProcessor ("RONN", createParameterLayout(), um)
 {
@@ -108,7 +111,7 @@ AudioProcessorValueTreeState::ParameterLayout RONN::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
     createGainDBParameter (params, "gain_db", "Gain", -12.0f, 12.0f, 0.0f);
-    
+
     StringArray seeds;
     for (int sInt : randomSeeds)
         seeds.add (String (sInt));
@@ -121,13 +124,13 @@ void RONN::parameterChanged (const String& parameterID, float newValue)
 {
     if (parameterID != "seed")
         return;
-    
+
     auto seedIdx = int (newValue);
     reloadModel (randomSeeds[seedIdx]);
 }
 
 void RONN::reloadModel (int randomSeed)
-{   
+{
     // set up random distributions
     std::default_random_engine generator ((std::default_random_engine::result_type) randomSeed);
     static std::normal_distribution<float> normal (0.0f, 0.05f);
@@ -152,7 +155,7 @@ void RONN::reloadModel (int randomSeed)
     {
         nn.get<0>().setWeights (denseInWeights);
         nn.get<0>().setBias (denseInBias.data());
-        
+
         nn.get<2>().setWeights (convWeights);
         nn.get<2>().setBias (convBias);
 
@@ -206,7 +209,7 @@ void RONN::processAudio (AudioBuffer<float>& buffer)
     }
 
     dcBlocker.processAudio (buffer);
-    
+
     buffer.applyGain (makeupGain);
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
@@ -218,7 +221,7 @@ void RONN::processAudio (AudioBuffer<float>& buffer)
 
         // size for which the vectorization is possible
         const auto vec_size = numSamples - numSamples % inc;
-        for(int i = 0; i < vec_size; i += inc)
+        for (int i = 0; i < vec_size; i += inc)
         {
             x_type xvec = xsimd::load_unaligned (&x[i]);
             auto yvec = xsimd::tanh (xvec);
@@ -226,7 +229,7 @@ void RONN::processAudio (AudioBuffer<float>& buffer)
         }
 
         // Remaining part that cannot be vectorized
-        for(int i = vec_size; i < numSamples; ++i)
+        for (int i = vec_size; i < numSamples; ++i)
             x[i] = std::tanh (x[i]);
     }
 

@@ -16,7 +16,7 @@ DiodeClipper::DiodeClipper (UndoManager* um) : BaseProcessor ("Diode Clipper", c
 AudioProcessorValueTreeState::ParameterLayout DiodeClipper::createParameterLayout()
 {
     using namespace ParameterHelpers;
-    
+
     auto params = createBaseParams();
     createFreqParameter (params, "cutoff", "Cutoff", 200.0f, 20.0e3f, 2000.0f, 5000.0f);
     createPercentParameter (params, "drive", "Drive", 0.5f);

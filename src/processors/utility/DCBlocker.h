@@ -44,7 +44,7 @@ public:
 
         dsp::AudioBlock<float> block { buffer };
         dsp::ProcessContextReplacing<float> context { block };
-        filter.process<decltype(context), chowdsp::StateVariableFilterType::Highpass> (context);
+        filter.process<decltype (context), chowdsp::StateVariableFilterType::Highpass> (context);
     }
 
 private:

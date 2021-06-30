@@ -1,9 +1,9 @@
 #include "ProcessorStore.h"
 
+#include "drive/RONN.h"
 #include "drive/diode_circuits/DiodeClipper.h"
 #include "drive/diode_circuits/DiodeRectifier.h"
 #include "drive/zen_drive/ZenDrive.h"
-#include "drive/RONN.h"
 
 #include "tone/BassCleaner.h"
 #include "tone/HighCut.h"
@@ -47,7 +47,7 @@ BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
     if (store.find (name) == store.end())
         return {};
 
-    return store[name] (undoManager);
+    return store[name](undoManager);
 }
 
 void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType type)
@@ -60,7 +60,8 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=]
+        { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }

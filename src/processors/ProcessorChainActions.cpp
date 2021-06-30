@@ -8,10 +8,10 @@ public:
         DBG (String ("Creating processor: ") + newProc->getName());
 
         newProc->prepare (chain.mySampleRate, chain.mySamplesPerBlock);
-    
+
         SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
         auto* newProcPtr = chain.procs.add (std::move (newProc));
-    
+
         chain.listeners.call (&ProcessorChain::Listener::processorAdded, newProcPtr);
         return newProcPtr;
     }
@@ -37,17 +37,15 @@ private:
 };
 
 //=========================================================
-AddOrRemoveProcessor::AddOrRemoveProcessor (ProcessorChain& procChain, BaseProcessor::Ptr newProc) :
-    chain (procChain),
-    actionProc (std::move (newProc)),
-    isRemoving (false)
+AddOrRemoveProcessor::AddOrRemoveProcessor (ProcessorChain& procChain, BaseProcessor::Ptr newProc) : chain (procChain),
+                                                                                                     actionProc (std::move (newProc)),
+                                                                                                     isRemoving (false)
 {
 }
 
-AddOrRemoveProcessor::AddOrRemoveProcessor (ProcessorChain& procChain, BaseProcessor* procToRemove) :
-    chain (procChain),
-    actionProcPtr (procToRemove),
-    isRemoving (true)
+AddOrRemoveProcessor::AddOrRemoveProcessor (ProcessorChain& procChain, BaseProcessor* procToRemove) : chain (procChain),
+                                                                                                      actionProcPtr (procToRemove),
+                                                                                                      isRemoving (true)
 {
 }
 
@@ -56,17 +54,17 @@ bool AddOrRemoveProcessor::perform()
     if (isRemoving)
     {
         jassert (actionProcPtr != nullptr);
-        
+
         ProcChainActions::removeProcessor (chain, actionProcPtr);
         actionProc.reset (actionProcPtr);
     }
     else
     {
         jassert (actionProc != nullptr);
-        
+
         actionProcPtr = ProcChainActions::addProcessor (chain, std::move (actionProc));
     }
-    
+
     return true;
 }
 
@@ -75,17 +73,17 @@ bool AddOrRemoveProcessor::undo()
     if (isRemoving)
     {
         jassert (actionProc != nullptr);
-        
+
         actionProcPtr = ProcChainActions::addProcessor (chain, std::move (actionProc));
     }
     else
     {
         jassert (actionProcPtr != nullptr);
-        
+
         ProcChainActions::removeProcessor (chain, actionProcPtr);
         actionProc.reset (actionProcPtr);
     }
-    
+
     return true;
 }
 

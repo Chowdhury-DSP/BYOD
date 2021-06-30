@@ -20,13 +20,13 @@ private:
         Slider slider;
         std::unique_ptr<SliderAttachment> attachment;
     };
-    
+
     struct BoxWithAttachment
     {
         ComboBox box;
         std::unique_ptr<ComboBoxAttachment> attachment;
     };
-    
+
     struct ButtonWithAttachment
     {
         TextButton button;
