@@ -28,6 +28,14 @@ void ZenDrive::prepare (double sampleRate, int samplesPerBlock)
         wdf[ch] = std::make_unique<ZenDriveWDF> ((float) sampleRate);
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
+
+    // pre-buffering
+    AudioBuffer<float> buffer (2, samplesPerBlock);
+    for (int i = 0; i < 10000; i += samplesPerBlock)
+    {
+        buffer.clear();
+        processAudio (buffer);
+    }
 }
 
 void ZenDrive::processAudio (AudioBuffer<float>& buffer)

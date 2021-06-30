@@ -29,6 +29,9 @@ void TrebleBooster::prepare (double sampleRate, int samplesPerBlock)
     trebleSmooth.reset (sampleRate, 0.01);
     trebleSmooth.setCurrentAndTargetValue (*trebleParam);
     calcCoefs (trebleSmooth.getCurrentValue());
+
+    for (auto& filt : iir)
+        filt.reset();
 }
 
 void TrebleBooster::processAudio (AudioBuffer<float>& buffer)
