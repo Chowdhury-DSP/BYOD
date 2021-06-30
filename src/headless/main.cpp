@@ -1,7 +1,7 @@
 #include "../pch.h"
 #include "PresetResaver.h"
 #include "ScreenshotGenerator.h"
-#include "UnitTests/UnitTests.h"
+#include "tests/UnitTests.h"
 
 String getVersion()
 {

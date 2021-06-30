@@ -14,8 +14,9 @@ target_sources(BYOD_headless PRIVATE
     PresetResaver.cpp
     ScreenshotGenerator.cpp
 
-    UnitTests/PreBufferTest.cpp
-    UnitTests/UnitTests.cpp
+    tests/ParameterSmoothTest.cpp
+    tests/PreBufferTest.cpp
+    tests/UnitTests.cpp
 )
 
 target_precompile_headers(BYOD_headless PRIVATE ../pch.h)

@@ -26,7 +26,7 @@ void BassCleaner::prepare (double sampleRate, int samplesPerBlock)
     ignoreUnused (samplesPerBlock);
     fs = (float) sampleRate;
 
-    Rv1.reset (sampleRate, 0.01);
+    Rv1.reset (sampleRate, 0.05);
     Rv1.setCurrentAndTargetValue (ParameterHelpers::logPot (*cleanParam) * Rv1Value);
     calcCoefs (Rv1.getCurrentValue());
 

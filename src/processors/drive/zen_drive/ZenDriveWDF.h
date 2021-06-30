@@ -114,29 +114,80 @@ public:
                                      voiceCircuit (sampleRate),
                                      driveStage (sampleRate)
     {
+        voiceSmooth.reset ((double) sampleRate, 0.01);
+        gainSmooth.reset ((double) sampleRate, 0.01);
     }
 
-    void setParameters (float voiceParam, float gainParam)
+    void setParameters (float voiceParam, float gainParam, bool force = false)
     {
-        voiceCircuit.setVoiceParameter (voiceParam);
-        driveStage.setGainParam (gainParam);
+        if (force)
+        {
+            voiceSmooth.setCurrentAndTargetValue (voiceParam);
+            gainSmooth.setCurrentAndTargetValue (gainParam);
+
+            voiceCircuit.setVoiceParameter (voiceSmooth.getTargetValue());
+            driveStage.setGainParam (gainSmooth.getTargetValue());
+        }
+        else
+        {
+            voiceSmooth.setTargetValue (voiceParam);
+            gainSmooth.setTargetValue (gainParam);
+        }
+    }
+
+    inline float processSample (float x) noexcept
+    {
+        auto Vplus = inputBuffer.process (x);
+        auto I0 = voiceCircuit.process (Vplus);
+        auto Vf = driveStage.process (I0);
+        return Vf + Vplus;
     }
 
     void process (float* buffer, const int numSamples)
     {
-        for (int n = 0; n < numSamples; ++n)
+        if (voiceSmooth.isSmoothing() && gainSmooth.isSmoothing())
         {
-            auto Vplus = inputBuffer.process (buffer[n]);
-            auto I0 = voiceCircuit.process (Vplus);
-            auto Vf = driveStage.process (I0);
-            buffer[n] = Vf + Vplus;
+            for (int n = 0; n < numSamples; ++n)
+            {
+                voiceCircuit.setVoiceParameter (voiceSmooth.getNextValue());
+                driveStage.setGainParam (gainSmooth.getNextValue());
+
+                buffer[n] = processSample (buffer[n]);
+            }
+            return;
         }
+        
+        if (voiceSmooth.isSmoothing())
+        {
+            for (int n = 0; n < numSamples; ++n)
+            {
+                voiceCircuit.setVoiceParameter (voiceSmooth.getNextValue());
+                buffer[n] = processSample (buffer[n]);
+            }
+            return;
+        }
+        
+        if (gainSmooth.isSmoothing())
+        {
+            for (int n = 0; n < numSamples; ++n)
+            {
+                driveStage.setGainParam (gainSmooth.getNextValue());
+                buffer[n] = processSample (buffer[n]);
+            }
+            return;
+        }
+
+        for (int n = 0; n < numSamples; ++n)
+            buffer[n] = processSample (buffer[n]);
     }
 
 private:
     ZenDriveWDFs::InputBufferWDF inputBuffer;
     ZenDriveWDFs::VoiceCircuitWDF voiceCircuit;
     ZenDriveWDFs::DriveStageWDF driveStage;
+
+    SmoothedValue<float, ValueSmoothingTypes::Linear> voiceSmooth;
+    SmoothedValue<float, ValueSmoothingTypes::Linear> gainSmooth;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenDriveWDF)
 };
