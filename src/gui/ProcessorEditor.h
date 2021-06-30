@@ -14,7 +14,7 @@ public:
     void resized() override;
     void mouseDrag (const MouseEvent& e) override;
 
-    const BaseProcessor* getProcPtr() const { return &proc; }
+    BaseProcessor* getProcPtr() const { return &proc; }
 
 private:
     BaseProcessor& proc;

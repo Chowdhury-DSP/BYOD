@@ -12,6 +12,8 @@ public:
         
         getVerticalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFFD0592C));
         getHorizontalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFFD0592C));
+        
+        setScrollBarsShown (false, true);
     }
 
     void resized() override

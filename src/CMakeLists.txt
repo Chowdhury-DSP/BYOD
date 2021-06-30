@@ -8,6 +8,7 @@ target_sources(BYOD PRIVATE
 
     processors/BaseProcessor.cpp
     processors/ProcessorChain.cpp
+    processors/ProcessorChainActions.cpp
     processors/ProcessorStore.cpp
 
     processors/drive/diode_circuits/DiodeClipper.cpp

@@ -1,4 +1,5 @@
 #include "ProcessorChain.h"
+#include "ProcessorChainActions.h"
 
 namespace
 {
@@ -6,7 +7,8 @@ namespace
     const String oversamplingTag = "oversampling";
 }
 
-ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store)
+ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store),
+                                                                                            um (vts.undoManager)
 {
     using namespace std::placeholders;
     procStore.addProcessorCallback = std::bind (&ProcessorChain::addProcessor, this, _1);
@@ -23,7 +25,7 @@ void ProcessorChain::createParameters (Parameters& params)
     params.push_back (std::make_unique<AudioParameterChoice> (monoModeTag,
                                                               "Mono/Stereo",
                                                               StringArray { "Mono", "Stereo" },
-                                                              1));
+                                                              0));
 
     params.push_back (std::make_unique<AudioParameterChoice> (oversamplingTag,
                                                               "Oversampling",
@@ -133,24 +135,14 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
 
 void ProcessorChain::addProcessor (BaseProcessor::Ptr newProc)
 {
-    DBG (String ("Creating processor: ") + newProc->getName());
-
-    newProc->prepare (mySampleRate, mySamplesPerBlock);
-
-    SpinLock::ScopedLockType scopedProcessingLock (processingLock);
-    auto* newProcPtr = procs.add (std::move (newProc));
-
-    listeners.call (&Listener::processorAdded, newProcPtr);
+    um->beginNewTransaction();
+    um->perform (new AddOrRemoveProcessor (*this, std::move (newProc)));
 }
 
-void ProcessorChain::removeProcessor (const BaseProcessor* procToRemove)
+void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
 {
-    DBG (String ("Removing processor: ") + procToRemove->getName());
-
-    listeners.call (&Listener::processorRemoved, procToRemove);
-
-    SpinLock::ScopedLockType scopedProcessingLock (processingLock);
-    procs.removeObject (procToRemove);
+    um->beginNewTransaction();
+    um->perform (new AddOrRemoveProcessor (*this, procToRemove));
 }
 
 void ProcessorChain::moveProcessor (const BaseProcessor* procToMove, const BaseProcessor* procInSlot)
@@ -160,9 +152,9 @@ void ProcessorChain::moveProcessor (const BaseProcessor* procToMove, const BaseP
 
     auto indexToMove = procs.indexOf (procToMove);
     auto slotIndex = procInSlot == nullptr ? procs.size() - 1 : procs.indexOf (procInSlot);
-    procs.move (indexToMove, slotIndex);
-
-    listeners.call (&Listener::processorMoved, indexToMove, slotIndex);
+    
+    um->beginNewTransaction();
+    um->perform (new MoveProcessor (*this, indexToMove, slotIndex));
 }
 
 std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
@@ -180,8 +172,10 @@ std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 
 void ProcessorChain::loadProcChain (XmlElement* xml)
 {
+    um->beginNewTransaction();
+
     while (! procs.isEmpty())
-        removeProcessor (procs.getLast());
+        um->perform (new AddOrRemoveProcessor (*this, procs.getLast()));
 
     for (auto* procXml : xml->getChildIterator())
     {
@@ -195,6 +189,6 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
         if (procXml->getNumChildElements() > 0)
             newProc->fromXML (procXml->getChildElement (0));
 
-        addProcessor (std::move (newProc));
+        um->perform (new AddOrRemoveProcessor (*this, std::move (newProc)));
     }
 }

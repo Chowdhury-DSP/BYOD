@@ -45,7 +45,7 @@ Vec2 createRandomVec2<Orthogonal> (std::default_random_engine& generator, Orthog
     
     Vec2 v ((size_t) size1, Vec ((size_t) size2, 0.0f));
     for (int i = 0; i < size1; ++i)
-        std::copy (R.col (i).data(), R.col (i).data() + size2, v[i].data());
+        std::copy (R.col (i).data(), R.col (i).data() + size2, v[(size_t) i].data());
 
     return v;
 }

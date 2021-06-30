@@ -17,7 +17,7 @@ public:
     void processAudio (AudioBuffer<float> buffer);
 
     void addProcessor (BaseProcessor::Ptr newProc);
-    void removeProcessor (const BaseProcessor* procToRemove);
+    void removeProcessor (BaseProcessor* procToRemove);
     void moveProcessor (const BaseProcessor* procToMove, const BaseProcessor* procInSlot);
     OwnedArray<BaseProcessor>& getProcessors() { return procs; }
 
@@ -44,6 +44,9 @@ private:
     std::atomic<float>* oversamplingParam = nullptr;
     std::unique_ptr<dsp::Oversampling<float>> overSample[5];
     int prevOS = 0;
+
+    friend class ProcChainActions;
+    UndoManager* um;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };
