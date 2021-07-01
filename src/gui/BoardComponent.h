@@ -3,6 +3,7 @@
 #include "../processors/ProcessorChain.h"
 #include "InfoComponent.h"
 #include "ProcessorEditor.h"
+#include "utils/LookAndFeels.h"
 
 class BoardComponent : public Component,
                        public DragAndDropContainer,
@@ -34,6 +35,8 @@ private:
     TextButton newProcButton;
     OwnedArray<ProcessorEditor> processorEditors;
     InfoComponent infoComp;
+
+    SharedResourcePointer<LNFAllocator> lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardComponent)
 };

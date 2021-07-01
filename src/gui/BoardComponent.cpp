@@ -12,11 +12,10 @@ constexpr int newButtonPad = 10;
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 {
     newProcButton.setButtonText ("+");
-    newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.4f));
+    newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.65f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=]
-    { showNewProcMenu(); };
+    newProcButton.onClick = [=] { showNewProcMenu(); };
 
     addChildComponent (infoComp);
 
@@ -158,5 +157,6 @@ void BoardComponent::showNewProcMenu() const
                        .withMinimumWidth (125)
                        .withStandardItemHeight (27);
 
+    menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
     menu.showMenuAsync (options);
 }

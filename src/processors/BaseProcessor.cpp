@@ -6,6 +6,7 @@ BaseProcessor::BaseProcessor (const String& name,
                                                  vts (*this, um, Identifier ("Parameters"), std::move (params))
 {
     onOffParam = vts.getRawParameterValue ("on_off");
+    uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>();
 }
 
 std::unique_ptr<XmlElement> BaseProcessor::toXML()

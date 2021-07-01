@@ -1,6 +1,7 @@
 #pragma once
 
 #include "JuceProcWrapper.h"
+#include "gui/utils/LookAndFeels.h"
 
 enum ProcessorType
 {
@@ -58,6 +59,8 @@ protected:
     ProcessorUIOptions uiOptions;
 
     std::atomic<float>* onOffParam = nullptr;
+
+    SharedResourcePointer<LNFAllocator> lnfAllocator;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)

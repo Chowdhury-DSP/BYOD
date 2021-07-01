@@ -1,6 +1,6 @@
 #include "BYOD.h"
 #include "gui/BoardViewport.h"
-#include "gui/utils/BottomBarLNF.h"
+#include "gui/utils/LookAndFeels.h"
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procStore (&undoManager),
@@ -31,13 +31,11 @@ AudioProcessorEditor* BYOD::createEditor()
 {
     auto builder = chowdsp::createGUIBuilder (magicState);
     builder->registerFactory ("Board", &BoardItem::factory);
-    builder->registerLookAndFeel ("BottomBar", std::make_unique<BottomBarLNF>());
+    builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
 
     // GUI trigger functions
-    magicState.addTrigger ("undo", [=]
-                           { undoManager.undo(); });
-    magicState.addTrigger ("redo", [=]
-                           { undoManager.redo(); });
+    magicState.addTrigger ("undo", [=] { undoManager.undo(); });
+    magicState.addTrigger ("redo", [=] { undoManager.redo(); });
 
     auto editor = new foleys::MagicPluginEditor (magicState, BinaryData::gui_xml, BinaryData::gui_xmlSize, std::move (builder));
 

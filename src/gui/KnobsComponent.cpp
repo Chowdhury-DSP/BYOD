@@ -2,8 +2,7 @@
 
 KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& c, std::function<void()> paramLambda) : colour (c)
 {
-    auto addSlider = [=, &vts] (AudioParameterFloat* param)
-    {
+    auto addSlider = [=, &vts] (AudioParameterFloat* param) {
         auto newSlide = std::make_unique<SliderWithAttachment>();
         addAndMakeVisible (newSlide->slider);
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, newSlide->slider);
@@ -18,13 +17,15 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
         sliders.add (std::move (newSlide));
     };
 
-    auto addBox = [=, &vts] (AudioParameterChoice* param)
-    {
+    auto addBox = [=, &vts] (AudioParameterChoice* param) {
         auto newBox = std::make_unique<BoxWithAttachment>();
         addAndMakeVisible (newBox->box);
         newBox->box.setName (param->name);
         newBox->box.addItemList (param->choices, 1);
         newBox->box.setSelectedItemIndex (0);
+        newBox->box.setColour (ComboBox::outlineColourId, colour);
+        newBox->box.setColour (ComboBox::textColourId, colour);
+        newBox->box.setColour (ComboBox::arrowColourId, colour);
         newBox->box.onChange = paramLambda;
 
         newBox->attachment = std::make_unique<ComboBoxAttachment> (vts, param->paramID, newBox->box);
@@ -32,8 +33,7 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
         boxes.add (std::move (newBox));
     };
 
-    auto addButton = [=, &vts] (AudioParameterBool* param)
-    {
+    auto addButton = [=, &vts] (AudioParameterBool* param) {
         if (param->paramID == "on_off")
             return;
 
@@ -67,8 +67,7 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (colour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, int offset = 0)
-    {
+    auto makeName = [&g] (Component& comp, String name, int offset = 0) {
         const int height = 20;
         g.setFont (Font (18.0f).boldened());
         Rectangle<int> nameBox (comp.getX(), comp.getY() - 22 + offset, comp.getWidth(), height);
