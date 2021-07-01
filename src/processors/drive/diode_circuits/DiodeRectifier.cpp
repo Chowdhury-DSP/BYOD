@@ -1,5 +1,5 @@
 #include "DiodeRectifier.h"
-#include "../../ParameterHelpers.h"
+#include "DiodeParameter.h"
 
 DiodeRectifier::DiodeRectifier (UndoManager* um) : BaseProcessor ("Diode Rectifier", createParameterLayout(), um)
 {
@@ -20,21 +20,8 @@ AudioProcessorValueTreeState::ParameterLayout DiodeRectifier::createParameterLay
     auto params = createBaseParams();
     createFreqParameter (params, "cutoff", "Cutoff", 200.0f, 20.0e3f, 2000.0f, 5000.0f);
     createPercentParameter (params, "drive", "Drive", 0.5f);
-
-    params.push_back (std::make_unique<AudioParameterChoice> ("diode",
-                                                              "Diodes",
-                                                              StringArray { "GZ34", "1N34", "1N4148" },
-                                                              0));
-
-    NormalisableRange<float> nDiodesRange { 0.3f, 3.0f };
-    nDiodesRange.setSkewForCentre (1.0f);
-    params.push_back (std::make_unique<VTSParam> ("num_diodes",
-                                                  "# Diodes",
-                                                  String(),
-                                                  nDiodesRange,
-                                                  1.0f,
-                                                  &floatValToString,
-                                                  &stringToFloatVal));
+    DiodeParameter::createDiodeParam (params, "diode");
+    DiodeParameter::createNDiodesParam (params, "num_diodes");
 
     return { params.begin(), params.end() };
 }
@@ -45,7 +32,7 @@ void DiodeRectifier::prepare (double sampleRate, int samplesPerBlock)
     for (int ch = 0; ch < 2; ++ch)
     {
         wdf[ch] = std::make_unique<DiodeRectifierWDF> ((float) sampleRate);
-        wdf[ch]->setParameters (*cutoffParam, DiodeRectifierWDF::getDiodeIs (diodeType), *nDiodesParam, true);
+        wdf[ch]->setParameters (*cutoffParam, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
     }
 
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
@@ -67,7 +54,7 @@ void DiodeRectifier::processAudio (AudioBuffer<float>& buffer)
     int diodeType = static_cast<int> (*diodeTypeParam);
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch]->setParameters (*cutoffParam, DiodeRectifierWDF::getDiodeIs (diodeType), *nDiodesParam);
+        wdf[ch]->setParameters (*cutoffParam, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam);
         auto* x = buffer.getWritePointer (ch);
         wdf[ch]->process (x, buffer.getNumSamples());
     }

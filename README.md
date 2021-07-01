@@ -13,9 +13,7 @@ processing blocks.
 
 ## TODO
 - New processors:
-  - tube screamer
   - klon drive stage
-  - bassman tone stack
   - hysteresis
   - wavefolder
   - tremolo

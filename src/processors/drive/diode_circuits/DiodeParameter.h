@@ -1,0 +1,46 @@
+#pragma once
+
+#include "../../ParameterHelpers.h"
+
+namespace DiodeParameter
+{
+using namespace ParameterHelpers;
+
+static inline float getDiodeIs (int diodeType)
+{
+    switch (diodeType)
+    {
+        case 0: // GZ34
+            return 2.52e-9f;
+        case 1: // 1N34
+            return 15.0e-6f;
+        case 2: // 1N4148
+            return 2.64e-9f;
+    }
+
+    jassertfalse;
+    return 1.0e-9f;
+}
+
+static inline void createDiodeParam (Params& params, const String& id)
+{
+    params.push_back (std::make_unique<AudioParameterChoice> (id,
+                                                              "Diodes",
+                                                              StringArray { "GZ34", "1N34", "1N4148" },
+                                                              0));
+}
+
+static inline void createNDiodesParam (Params& params, const String& id)
+{
+    NormalisableRange<float> nDiodesRange { 0.3f, 3.0f };
+    nDiodesRange.setSkewForCentre (1.0f);
+    params.push_back (std::make_unique<VTSParam> (id,
+                                                  "# Diodes",
+                                                  String(),
+                                                  nDiodesRange,
+                                                  1.0f,
+                                                  &floatValToString,
+                                                  &stringToFloatVal));
+}
+
+} // namespace DiodeParameter

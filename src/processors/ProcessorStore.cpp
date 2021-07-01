@@ -3,6 +3,7 @@
 #include "drive/RONN.h"
 #include "drive/diode_circuits/DiodeClipper.h"
 #include "drive/diode_circuits/DiodeRectifier.h"
+#include "drive/tube_screamer/TubeScreamer.h"
 #include "drive/zen_drive/ZenDrive.h"
 
 #include "tone/BassCleaner.h"
@@ -23,6 +24,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
     { "RONN", &processorFactory<RONN> },
+    { "Tube Screamer", &processorFactory<TubeScreamer> },
     { "Zen Drive", &processorFactory<ZenDrive> },
     { "Bass Cleaner", &processorFactory<BassCleaner> },
     { "High Cut", &processorFactory<HighCut> },
@@ -60,8 +62,7 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=]
-        { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }
