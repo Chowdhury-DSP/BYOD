@@ -7,6 +7,8 @@
 #include "drive/tube_screamer/TubeScreamer.h"
 #include "drive/zen_drive/ZenDrive.h"
 
+#include "other/Tremolo.h"
+
 #include "tone/BassCleaner.h"
 #include "tone/HighCut.h"
 #include "tone/TrebleBooster.h"
@@ -36,6 +38,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
+    { "Tremolo", &processorFactory<Tremolo> },
 };
 
 ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
