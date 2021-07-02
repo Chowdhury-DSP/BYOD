@@ -3,6 +3,7 @@
 #include "drive/RONN.h"
 #include "drive/diode_circuits/DiodeClipper.h"
 #include "drive/diode_circuits/DiodeRectifier.h"
+#include "drive/mxr_distortion/MXRDistortion.h"
 #include "drive/tube_screamer/TubeScreamer.h"
 #include "drive/zen_drive/ZenDrive.h"
 
@@ -24,6 +25,7 @@ static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 ProcessorStore::StoreMap ProcessorStore::store = {
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
+    { "MXR Distortion", &processorFactory<MXRDistortion> },
     { "RONN", &processorFactory<RONN> },
     { "Tube Screamer", &processorFactory<TubeScreamer> },
     { "Zen Drive", &processorFactory<ZenDrive> },
