@@ -21,6 +21,9 @@ elseif((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQU
         # These lines suppress some custom warnings.
         # Comment them out to be more strict.
         -Wno-shadow-field-in-constructor
+        # For XSIMD
+        -Wno-cast-align -Wno-shadow -Wno-implicit-int-conversion
+        -Wno-zero-as-null-pointer-constant -Wno-sign-conversion
         # Needed for ARM processor, OSX versions below 10.14
         -fno-aligned-allocation
     )
@@ -33,6 +36,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         -Wno-ignored-qualifiers -Wno-unused-function -Wno-pessimizing-move
         # From LV2 Wrapper
         -Wno-parentheses -Wno-deprecated-declarations -Wno-redundant-decls
+        # For XSIMD
+        -Wno-zero-as-null-pointer-constant
         # These lines suppress some custom warnings.
         # Comment them out to be more strict.
         -Wno-redundant-move

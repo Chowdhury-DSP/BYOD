@@ -28,10 +28,15 @@ endif()
 juce_add_plugin(BYOD
     COMPANY_NAME chowdsp
     PLUGIN_MANUFACTURER_CODE Chow
-    PLUGIN_CODE dqu0
+    PLUGIN_CODE Dqu0
     FORMATS ${JUCE_FORMATS}
     ProductName "BYOD"
     LV2_URI https://github.com/Chowdhury-DSP/BYOD
+    MICROPHONE_PERMISSION_ENABLED TRUE
+    NEEDS_STORE_KIT TRUE
+    REQUIRES_FULL_SCREEN TRUE
+    IPHONE_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+    IPAD_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
 )
 
 juce_generate_juce_header(BYOD)
@@ -51,4 +56,26 @@ if(MACOS_RELEASE)
     message(STATUS "Setting MacOS release flags...")
     set_target_properties(BYOD_Standalone PROPERTIES
         XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES)
+endif()
+
+if(IOS)
+    message(STATUS "Setting iOS-specific properties...")
+
+    foreach(target IN ITEMS BinaryData RTNeural juce_plugin_modules BYOD BYOD_Standalone BYOD_AUv3)
+        set_target_properties(${target}
+            PROPERTIES
+                RUNTIME_OUTPUT_DIRECTORY "./"
+                ARCHIVE_OUTPUT_DIRECTORY "./"
+                LIBRARY_OUTPUT_DIRECTORY "./")
+    endforeach()
+
+    set_target_properties(BYOD_Standalone PROPERTIES
+            XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)"
+            XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
+            XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
+
+    set_target_properties(BYOD_AUv3 PROPERTIES
+            XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)/ChowKick.app/PlugIns"
+            XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
+            XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
 endif()

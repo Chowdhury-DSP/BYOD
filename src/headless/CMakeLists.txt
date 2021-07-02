@@ -21,7 +21,6 @@ target_sources(BYOD_headless PRIVATE
 
 target_precompile_headers(BYOD_headless PRIVATE ../pch.h)
 get_target_property(juce_includes juce_plugin_modules INCLUDE_DIRECTORIES)
-message(STATUS "${juce_includes}")
 target_include_directories(BYOD_headless
     PRIVATE
     ../
