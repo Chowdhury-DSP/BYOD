@@ -8,8 +8,7 @@ InfoComponent::InfoComponent()
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, Colours::white);
-    xButton.onClick = [=]
-    { setVisible (false); };
+    xButton.onClick = [=] { setVisible (false); };
     addAndMakeVisible (xButton);
 }
 
@@ -32,7 +31,7 @@ void InfoComponent::paint (Graphics& g)
     g.setFont (Font (16.0f));
     auto authorsBounds = bounds.removeFromBottom (50).reduced (5);
     g.drawFittedText (authors, authorsBounds, Justification::centred, 5);
-    g.drawFittedText (description, bounds.reduced (20, 0), Justification::centred, 10);
+    g.drawFittedText (description, bounds.reduced (10, 0), Justification::centred, 10);
 }
 
 void InfoComponent::resized()
