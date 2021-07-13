@@ -20,14 +20,16 @@ private:
     std::atomic<float>* rateParam = nullptr;
     std::atomic<float>* waveParam = nullptr;
     std::atomic<float>* depthParam = nullptr;
-    
+
     chowdsp::StateVariableFilter<float> filter;
     chowdsp::SineWave<float> sine;
 
     AudioBuffer<float> waveBuffer;
     SmoothedValue<float, ValueSmoothingTypes::Linear> phaseSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> waveSmooth;
-    
+    SmoothedValue<float, ValueSmoothingTypes::Linear> depthGainSmooth;
+    SmoothedValue<float, ValueSmoothingTypes::Linear> depthAddSmooth;
+
     float fs = 48000.0f;
     float phase;
 

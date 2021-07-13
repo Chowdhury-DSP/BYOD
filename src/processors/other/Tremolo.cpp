@@ -1,5 +1,24 @@
 #include "Tremolo.h"
 
+namespace
+{
+template <typename SampleType, typename SmoothingType>
+static JUCE_VECTOR_CALLTYPE dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& block, SmoothedValue<SampleType, SmoothingType>& value) noexcept
+{
+    if (! value.isSmoothing())
+        return block.add (value.getTargetValue());
+
+    for (size_t i = 0; i < block.getNumSamples(); ++i)
+    {
+        const auto scaler = value.getNextValue();
+        for (size_t ch = 0; ch < block.getNumChannels(); ++ch)
+            block.getChannelPointer (ch)[i] += scaler;
+    }
+
+    return block;
+}
+} // namespace
+
 Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLayout(), um)
 {
     rateParam = vts.getRawParameterValue ("rate");
@@ -7,7 +26,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     depthParam = vts.getRawParameterValue ("depth");
 
     uiOptions.backgroundColour = Colours::orange.darker (0.1f);
-    uiOptions.powerColour = Colours::cyan;
+    uiOptions.powerColour = Colours::cyan.brighter();
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -16,10 +35,10 @@ AudioProcessorValueTreeState::ParameterLayout Tremolo::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    createFreqParameter (params, "rate", "Rate", 1.0f, 10.0f, 2.0f, 2.0f);
+    createFreqParameter (params, "rate", "Rate", 2.0f, 20.0f, 10.0f, 10.0f);
     createPercentParameter (params, "wave", "Wave", 0.5f);
     createPercentParameter (params, "depth", "Depth", 0.5f);
-    
+
     return { params.begin(), params.end() };
 }
 
@@ -27,14 +46,16 @@ void Tremolo::prepare (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec monoSpec { sampleRate, (uint32) samplesPerBlock, 1 };
     sine.prepare (monoSpec);
-    
+
     filter.prepare (monoSpec);
-    filter.setCutoffFrequency (1000.0f);
+    filter.setCutoffFrequency (250.0f);
 
     waveBuffer.setSize (1, samplesPerBlock);
     phaseSmooth.reset (sampleRate, 0.01);
     waveSmooth.reset (sampleRate, 0.01);
-    
+    depthGainSmooth.reset (sampleRate, 0.01);
+    depthAddSmooth.reset (sampleRate, 0.01);
+
     fs = (float) sampleRate;
     phase = 0.0f;
 }
@@ -99,15 +120,22 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     waveBuffer.setSize (1, numSamples, false, false, true);
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
-    
+
     // fill wave buffer (-1, 1)
     dsp::AudioBlock<float> waveBlock { waveBuffer };
     dsp::ProcessContextReplacing<float> waveCtx { waveBlock };
     fillWaveBuffer (waveBlock.getChannelPointer (0), numSamples, phase);
 
-    auto depthVal = depthParam->load(); // skew this?
-    waveBlock *= 0.5f * depthVal;
-    waveBlock += 1.0f - depthVal;
+    // shrink range to (0, 1)
+    waveBlock *= 0.5f;
+    waveBlock += 0.5f;
+
+    // apply depth parameter
+    auto depthVal = std::pow (depthParam->load(), 0.33f);
+    depthGainSmooth.setTargetValue (depthVal);
+    waveBlock.multiplyBy (depthGainSmooth);
+    depthAddSmooth.setTargetValue (1.0f - depthVal);
+    addSmoothed (waveBlock, depthAddSmooth);
     filter.process<decltype (waveCtx), chowdsp::StateVariableFilterType::Lowpass> (waveCtx);
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
