@@ -5,6 +5,11 @@ juce_add_binary_data(BinaryData SOURCES
     background.jpeg
     undo-solid.png
     redo-solid.png
+    LeftArrow.svg
+    RightArrow.svg
+
+    presets/Default.chowpreset
+    presets/ZenDrive.chowpreset
 )
 
 # Need to build BinaryData with -fPIC flag on Linux

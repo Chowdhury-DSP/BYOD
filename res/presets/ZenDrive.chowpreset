@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="ZenDrive" index="1">
+  <proc_chain>
+    <Zen_Drive>
+      <Parameters>
+        <PARAM id="gain" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="voice" value="0.5"/>
+      </Parameters>
+    </Zen_Drive>
+    <High_Cut>
+      <Parameters>
+        <PARAM id="cutoff" value="5000.0009765625"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </High_Cut>
+  </proc_chain>
+</Preset>

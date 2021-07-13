@@ -1,16 +1,24 @@
 #include "BYOD.h"
 #include "gui/BoardViewport.h"
 #include "gui/utils/LookAndFeels.h"
+#include "presets/PresetCompItem.h"
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procStore (&undoManager),
-               procs (procStore, vts)
+               procs (procStore, vts),
+               presetManager (&procs, vts)
 {
+    presetManager.hostUpdateFunc = [=] {
+        MessageManager::callAsync ([=] {
+            updateHostDisplay (AudioProcessorListener::ChangeDetails().withProgramChanged (true));
+        });
+    };
 }
 
 void BYOD::addParameters (Parameters& params)
 {
     ProcessorChain::createParameters (params);
+    PresetManager::addParameters (params);
 }
 
 void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -31,6 +39,7 @@ AudioProcessorEditor* BYOD::createEditor()
 {
     auto builder = chowdsp::createGUIBuilder (magicState);
     builder->registerFactory ("Board", &BoardItem::factory);
+    builder->registerFactory ("PresetsItem", &PresetCompItem::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
 
     // GUI trigger functions
@@ -76,6 +85,37 @@ void BYOD::setStateInformation (const void* data, int sizeInBytes)
 
     vts.replaceState (ValueTree::fromXml (*vtsXml));
     procs.loadProcChain (procChainXml);
+}
+
+int BYOD::getNumPrograms()
+{
+    return presetManager.getNumFactoryPresets();
+}
+
+int BYOD::getCurrentProgram()
+{
+    const auto curPresetIdx = presetManager.getSelectedPresetIdx();
+
+    if (curPresetIdx > presetManager.getNumFactoryPresets())
+        return 0;
+
+    return curPresetIdx;
+}
+
+void BYOD::setCurrentProgram (int index)
+{
+    if (index > presetManager.getNumPresets() || index < 0) // out of range!
+        return;
+
+    if (index == presetManager.getSelectedPresetIdx()) // no update needed!
+        return;
+
+    MessageManager::callAsync ([=] { presetManager.setPreset (index); });
+}
+
+const String BYOD::getProgramName (int index)
+{
+    return presetManager.getPresetName (index);
 }
 
 // This creates new instances of the plugin

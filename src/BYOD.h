@@ -1,5 +1,6 @@
 #pragma once
 
+#include "presets/PresetManager.h"
 #include "processors/ProcessorChain.h"
 #include "processors/ProcessorStore.h"
 
@@ -18,14 +19,21 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    int getNumPrograms() override;
+    int getCurrentProgram() override;
+    void setCurrentProgram (int index) override;
+    const String getProgramName (int index) override;
+
     ProcessorChain& getProcChain() { return procs; }
     AudioProcessorValueTreeState& getVTS() { return vts; }
+    PresetManager& getPresetManager() { return presetManager; }
 
 private:
     ProcessorStore procStore;
     ProcessorChain procs;
 
-    UndoManager undoManager;
+    PresetManager presetManager;
+    UndoManager undoManager { 300000 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BYOD)
 };

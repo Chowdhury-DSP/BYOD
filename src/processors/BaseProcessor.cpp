@@ -19,5 +19,5 @@ void BaseProcessor::fromXML (XmlElement* xml)
 {
     if (xml != nullptr)
         if (xml->hasTagName (vts.state.getType()))
-            vts.replaceState (ValueTree::fromXml (*xml));
+            vts.state = ValueTree::fromXml (*xml); // don't use `replaceState()` so that the UndoManager doesn't clear
 }

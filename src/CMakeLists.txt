@@ -8,6 +8,9 @@ target_sources(BYOD PRIVATE
     gui/KnobsComponent.cpp
     gui/ProcessorEditor.cpp
 
+    presets/PresetComp.cpp
+    presets/PresetManager.cpp
+
     processors/BaseProcessor.cpp
     processors/ProcessorChain.cpp
     processors/ProcessorChainActions.cpp
