@@ -8,8 +8,10 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procs (procStore, vts),
                presetManager (&procs, vts)
 {
-    presetManager.hostUpdateFunc = [=] {
-        MessageManager::callAsync ([=] { updateHostDisplay (AudioProcessorListener::ChangeDetails().withProgramChanged (true)); });
+    presetManager.hostUpdateFunc = [=]
+    {
+        MessageManager::callAsync ([=]
+                                   { updateHostDisplay (AudioProcessorListener::ChangeDetails().withProgramChanged (true)); });
     };
 }
 
@@ -41,8 +43,10 @@ AudioProcessorEditor* BYOD::createEditor()
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
 
     // GUI trigger functions
-    magicState.addTrigger ("undo", [=] { undoManager.undo(); });
-    magicState.addTrigger ("redo", [=] { undoManager.redo(); });
+    magicState.addTrigger ("undo", [=]
+                           { undoManager.undo(); });
+    magicState.addTrigger ("redo", [=]
+                           { undoManager.redo(); });
 
     auto editor = new foleys::MagicPluginEditor (magicState, BinaryData::gui_xml, BinaryData::gui_xmlSize, std::move (builder));
 
@@ -108,7 +112,8 @@ void BYOD::setCurrentProgram (int index)
     if (index == presetManager.getSelectedPresetIdx()) // no update needed!
         return;
 
-    MessageManager::callAsync ([=] { presetManager.setPreset (index); });
+    MessageManager::callAsync ([=]
+                               { presetManager.setPreset (index); });
 }
 
 const String BYOD::getProgramName (int index)

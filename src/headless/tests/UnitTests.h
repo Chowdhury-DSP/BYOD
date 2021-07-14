@@ -1,6 +1,6 @@
 #include "../../BYOD.h"
 
-static inline void doForAllProcessors (std::function<void(BaseProcessor*)> testFunc)
+static inline void doForAllProcessors (std::function<void (BaseProcessor*)> testFunc)
 {
     ProcessorStore procStore;
     for (auto [name, factory] : procStore.getStoreMap())

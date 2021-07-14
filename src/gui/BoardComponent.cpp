@@ -15,7 +15,8 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.65f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=] { showNewProcMenu(); };
+    newProcButton.onClick = [=]
+    { showNewProcMenu(); };
 
     addChildComponent (infoComp);
 

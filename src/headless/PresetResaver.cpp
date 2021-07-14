@@ -20,7 +20,7 @@ void PresetResaver::savePresets (const ArgumentList& args)
         ConsoleApplication::fail ("Incorrect presets directory! Unable to resave presets.");
 
     std::cout << "Resaving presets in directory: " << presetsDir.getFullPathName() << std::endl;
-/*
+    /*
     std::unique_ptr<BYOD> plugin (dynamic_cast<BYOD*> (createPluginFilterOfType (AudioProcessor::WrapperType::wrapperType_Standalone)));
     auto& stateManager = plugin->getStateManager();
 

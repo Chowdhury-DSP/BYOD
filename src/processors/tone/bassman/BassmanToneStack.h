@@ -7,11 +7,10 @@ using namespace chowdsp::WDF;
 class BassmanToneStack
 {
 public:
-    BassmanToneStack (double sr) :
-        Cap1 (250e-12, sr),
-        Cap2 (20e-9, sr),
-        Cap3 (20e-9, sr),
-        R (std::tie (S1, S3, S2, Cap2, Res4, Cap3))
+    BassmanToneStack (double sr) : Cap1 (250e-12, sr),
+                                   Cap2 (20e-9, sr),
+                                   Cap3 (20e-9, sr),
+                                   R (std::tie (S1, S3, S2, Cap2, Res4, Cap3))
     {
         pot1Smooth.reset (sr, 0.005);
         pot2Smooth.reset (sr, 0.005);
@@ -122,12 +121,7 @@ private:
     static constexpr double R2 = 1e6;
     static constexpr double R3 = 96e3; // modified from 25e3
 
-    wdft::RootRtypeAdaptor<double, S1Type,
-                                   SeriesRes,
-                                   S2Type,
-                                   Cap,
-                                   Res,
-                                   Cap> R;
+    wdft::RootRtypeAdaptor<double, S1Type, SeriesRes, S2Type, Cap, Res, Cap> R;
 
     SmoothedValue<double, ValueSmoothingTypes::Linear> pot1Smooth, pot2Smooth, pot3Smooth;
 
