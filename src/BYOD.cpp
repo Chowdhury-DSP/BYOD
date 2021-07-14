@@ -9,9 +9,7 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                presetManager (&procs, vts)
 {
     presetManager.hostUpdateFunc = [=] {
-        MessageManager::callAsync ([=] {
-            updateHostDisplay (AudioProcessorListener::ChangeDetails().withProgramChanged (true));
-        });
+        MessageManager::callAsync ([=] { updateHostDisplay (AudioProcessorListener::ChangeDetails().withProgramChanged (true)); });
     };
 }
 
