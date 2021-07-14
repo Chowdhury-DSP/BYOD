@@ -11,15 +11,6 @@ to purely digital creations, along with some musical
 tone-shaping filters, and a handful of other useful
 processing blocks.
 
-## TODO
-- New processors:
-  - klon drive stage
-  - hysteresis
-  - wavefolder
-  - tremolo
-  - envelope filter
-- expose processor parameters to DAW?
-
 ## Building
 
 To build from scratch, you must have CMake installed.
@@ -48,5 +39,5 @@ have contributed!
 
 ## License
 
-BYOD is open source, and is licensed under the BSD 3-clause license.
+BYOD is open source, and is licensed under the General Public License Version 3 (GPLv3).
 Enjoy!
