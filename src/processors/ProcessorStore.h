@@ -5,6 +5,7 @@
 class ProcessorStore
 {
     using StoreMap = std::map<String, std::function<BaseProcessor::Ptr (UndoManager*)>>;
+
 public:
     ProcessorStore (UndoManager* um = nullptr);
 

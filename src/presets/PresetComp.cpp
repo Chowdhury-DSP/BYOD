@@ -28,13 +28,15 @@ PresetComp::PresetComp (PresetManager& manager) : manager (manager),
     presetNameEditor.setMultiLine (false, false);
     presetNameEditor.setJustification (Justification::centred);
 
-    auto setupButton = [=, &manager] (DrawableButton& button, Drawable* image, int presetOffset) {
+    auto setupButton = [=, &manager] (DrawableButton& button, Drawable* image, int presetOffset)
+    {
         addAndMakeVisible (button);
         button.setImages (image, image, image);
         button.setWantsKeyboardFocus (false);
         button.setColour (ComboBox::outlineColourId, Colours::transparentBlack);
         button.setColour (TextButton::buttonColourId, Colours::transparentBlack);
-        button.onClick = [=, &manager] {
+        button.onClick = [=, &manager]
+        {
             auto idx = presetBox.getSelectedId() + presetOffset;
             while (idx <= 0)
                 idx += manager.getNumPresets();
@@ -136,12 +138,14 @@ void PresetComp::addPresetOptions()
 
     PopupMenu::Item saveItem { "Save" };
     saveItem.itemID = 1001;
-    saveItem.action = [=] { saveUserPreset(); };
+    saveItem.action = [=]
+    { saveUserPreset(); };
     menu->addItem (saveItem);
 
     PopupMenu::Item goToFolderItem { "Go to Preset folder..." };
     goToFolderItem.itemID = 1002;
-    goToFolderItem.action = [=] {
+    goToFolderItem.action = [=]
+    {
         presetUpdated();
         auto folder = manager.getUserPresetFolder();
         if (folder.isDirectory())
@@ -153,7 +157,11 @@ void PresetComp::addPresetOptions()
 
     PopupMenu::Item chooseFolderItem { "Choose Preset folder..." };
     chooseFolderItem.itemID = 1003;
-    chooseFolderItem.action = [=] { presetUpdated(); manager.chooseUserPresetFolder(); };
+    chooseFolderItem.action = [=]
+    {
+        presetUpdated();
+        manager.chooseUserPresetFolder();
+    };
     menu->addItem (chooseFolderItem);
 }
 
@@ -164,7 +172,8 @@ void PresetComp::saveUserPreset()
     presetNameEditor.setText ("MyPreset");
     presetNameEditor.setHighlightedRegion ({ 0, 10 });
 
-    presetNameEditor.onReturnKey = [=] {
+    presetNameEditor.onReturnKey = [=]
+    {
         auto presetName = presetNameEditor.getText();
         presetNameEditor.setVisible (false);
 

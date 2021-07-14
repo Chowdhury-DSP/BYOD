@@ -37,7 +37,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
       with:
-        submodules: true
+        submodules: recursive
 
     - name: Configure
       shell: bash
@@ -47,6 +47,10 @@ jobs:
       shell: bash
       run: cmake --build build --config Release --parallel
 
+    - name: Unit Tests
+      if: runner.os == 'Linux'
+      run: build/BYOD --unit-tests --all
+
     - name: Validate
-      if: runner.os == 'Windows'
+      if: runner.os == 'Windows' || runner.os == 'MacOS'
       run: bash validate.sh

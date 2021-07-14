@@ -35,33 +35,34 @@ public:
 
         float maxDiff = 0.0f;
         for (int i = 100; i < numParamVals * testBlockSize; ++i)
-            maxDiff = jmax (maxDiff, std::abs (testData[i] - testData[i-1]));
+            maxDiff = jmax (maxDiff, std::abs (testData[i] - testData[i - 1]));
 
         expectLessThan (maxDiff, 0.1f, "Parameter is not sufficiently smooth!");
     }
 
     void runTest() override
     {
-        doForAllProcessors ([=] (BaseProcessor* proc) {
-            beginTest (proc->getName() + " Test");
+        doForAllProcessors ([=] (BaseProcessor* proc)
+                            {
+                                beginTest (proc->getName() + " Test");
 
-            auto params = proc->getVTS().processor.getParameters();
-            for (auto* p : params)
-            {
-                auto* floatParam = dynamic_cast<AudioParameterFloat*> (p);
-                if (floatParam == nullptr) // no a float param!
-                    continue;
+                                auto params = proc->getVTS().processor.getParameters();
+                                for (auto* p : params)
+                                {
+                                    auto* floatParam = dynamic_cast<AudioParameterFloat*> (p);
+                                    if (floatParam == nullptr) // no a float param!
+                                        continue;
 
-                // reset all parameters to default
-                for (auto* dp : params)
-                    dp->setValueNotifyingHost (dp->getDefaultValue());
-                
-                std::cout << "  Testing parameter: " << floatParam->name << std::endl;
+                                    // reset all parameters to default
+                                    for (auto* dp : params)
+                                        dp->setValueNotifyingHost (dp->getDefaultValue());
 
-                proc->prepare (testSampleRate, testBlockSize);
-                testParameter (proc, floatParam);
-            }
-        });
+                                    std::cout << "  Testing parameter: " << floatParam->name << std::endl;
+
+                                    proc->prepare (testSampleRate, testBlockSize);
+                                    testParameter (proc, floatParam);
+                                }
+                            });
     }
 };
 

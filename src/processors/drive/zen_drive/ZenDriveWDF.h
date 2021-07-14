@@ -156,7 +156,7 @@ public:
             }
             return;
         }
-        
+
         if (voiceSmooth.isSmoothing())
         {
             for (int n = 0; n < numSamples; ++n)
@@ -166,7 +166,7 @@ public:
             }
             return;
         }
-        
+
         if (gainSmooth.isSmoothing())
         {
             for (int n = 0; n < numSamples; ++n)

@@ -71,7 +71,8 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=]
+        { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }
