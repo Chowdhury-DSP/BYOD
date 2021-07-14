@@ -13,8 +13,11 @@ public:
     double getTailLengthSeconds() const override { return 0.0; }
 
     void prepareToPlay (double /*sampleRate*/, int /*samplesPerBlock*/) override {}
-    void processBlock (AudioBuffer<float>&, MidiBuffer&) override {}
     void releaseResources() override {}
+
+    JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Woverloaded-virtual")
+    void processBlock (AudioBuffer<float>&, MidiBuffer&) override {}
+    JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
     bool acceptsMidi() const override { return false; }
     bool producesMidi() const override { return false; }
