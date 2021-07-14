@@ -48,5 +48,5 @@ jobs:
       run: cmake --build build --config Release --parallel
 
     - name: Validate
-      if: runner.os == 'Windows'
+      if: runner.os == 'Windows' || runner.os == 'MacOS'
       run: bash validate.sh
