@@ -49,5 +49,5 @@ void Hysteresis::processAudio (AudioBuffer<float>& buffer)
         hysteresisProc[ch].processBlock (x, buffer.getNumSamples());
     }
 
-    buffer.makeCopyOf (doubleBuffer);
+    buffer.makeCopyOf (doubleBuffer, true);
 }

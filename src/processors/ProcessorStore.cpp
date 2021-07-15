@@ -5,6 +5,7 @@
 #include "drive/diode_circuits/DiodeRectifier.h"
 #include "drive/hysteresis/Hysteresis.h"
 #include "drive/mxr_distortion/MXRDistortion.h"
+#include "drive/tube_amp/TubeAmp.h"
 #include "drive/tube_screamer/TubeScreamer.h"
 #include "drive/zen_drive/ZenDrive.h"
 
@@ -28,18 +29,22 @@ static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 ProcessorStore::StoreMap ProcessorStore::store = {
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
+    { "Dirty Tube", &processorFactory<TubeAmp> },
     { "Hysteresis", &processorFactory<Hysteresis> },
     { "MXR Distortion", &processorFactory<MXRDistortion> },
     { "RONN", &processorFactory<RONN> },
     { "Tube Screamer", &processorFactory<TubeScreamer> },
     { "Zen Drive", &processorFactory<ZenDrive> },
+
     { "Bass Cleaner", &processorFactory<BassCleaner> },
     { "Bassman Tone", &processorFactory<BassmanTone> },
     { "High Cut", &processorFactory<HighCut> },
     { "Treble Booster", &processorFactory<TrebleBooster> },
+
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
+
     { "Tremolo", &processorFactory<Tremolo> },
 };
 
@@ -71,8 +76,7 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=]
-        { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }

@@ -21,6 +21,7 @@ target_sources(BYOD PRIVATE
     processors/drive/hysteresis/Hysteresis.cpp
     processors/drive/hysteresis/HysteresisProcessing.cpp
     processors/drive/mxr_distortion/MXRDistortion.cpp
+    processors/drive/tube_amp/TubeAmp.cpp
     processors/drive/tube_screamer/TubeScreamer.cpp
     processors/drive/zen_drive/ZenDrive.cpp
     processors/drive/RONN.cpp

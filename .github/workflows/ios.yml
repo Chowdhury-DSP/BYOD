@@ -1,24 +1,24 @@
 name: CI-iOS
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-    paths-ignore:
-      - "manual/**"
-      - "sim/**"
-      - "*.sh"
-      - "*.md"
-  pull_request:
-    branches:
-      - main
-      - develop
-    paths-ignore:
-      - "manual/**"
-      - "sim/**"
-      - "*.sh"
-      - "*.md"
+  # push:
+  #   branches:
+  #     - main
+  #     - develop
+  #   paths-ignore:
+  #     - "manual/**"
+  #     - "sim/**"
+  #     - "*.sh"
+  #     - "*.md"
+  # pull_request:
+  #   branches:
+  #     - main
+  #     - develop
+  #   paths-ignore:
+  #     - "manual/**"
+  #     - "sim/**"
+  #     - "*.sh"
+  #     - "*.md"
   workflow_dispatch:
 
 jobs:
