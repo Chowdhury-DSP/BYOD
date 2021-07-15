@@ -11,6 +11,8 @@ to purely digital creations, along with some musical
 tone-shaping filters, and a handful of other useful
 processing blocks.
 
+**BYOD is currently in pre-release. More information will be made available soon!**
+
 ## Building
 
 To build from scratch, you must have CMake installed.
