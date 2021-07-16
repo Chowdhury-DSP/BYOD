@@ -26,6 +26,7 @@ target_sources(BYOD PRIVATE
     processors/drive/zen_drive/ZenDrive.cpp
     processors/drive/RONN.cpp
 
+    processors/other/EnvelopeFilter.cpp
     processors/other/Tremolo.cpp
 
     processors/tone/bassman/BassmanTone.cpp
