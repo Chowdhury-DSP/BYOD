@@ -2,8 +2,7 @@
 
 KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& c, std::function<void()> paramLambda) : colour (c)
 {
-    auto addSlider = [=, &vts] (AudioParameterFloat* param)
-    {
+    auto addSlider = [=, &vts] (AudioParameterFloat* param) {
         auto newSlide = std::make_unique<SliderWithAttachment>();
         addAndMakeVisible (newSlide->slider);
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, newSlide->slider);
@@ -18,8 +17,7 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
         sliders.add (std::move (newSlide));
     };
 
-    auto addBox = [=, &vts] (AudioParameterChoice* param)
-    {
+    auto addBox = [=, &vts] (AudioParameterChoice* param) {
         auto newBox = std::make_unique<BoxWithAttachment>();
         addAndMakeVisible (newBox->box);
         newBox->box.setName (param->name);
@@ -35,8 +33,7 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
         boxes.add (std::move (newBox));
     };
 
-    auto addButton = [=, &vts] (AudioParameterBool* param)
-    {
+    auto addButton = [=, &vts] (AudioParameterBool* param) {
         if (param->paramID == "on_off")
             return;
 
@@ -70,8 +67,10 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (colour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, int offset = 0)
-    {
+    auto makeName = [&g] (Component& comp, String name, int offset = 0) {
+        if (comp.getHeight() < 100)
+            return;
+
         const int height = 20;
         g.setFont (Font (18.0f).boldened());
         Rectangle<int> nameBox (comp.getX(), comp.getY() - 22 + offset, comp.getWidth(), height);
@@ -142,24 +141,6 @@ void KnobsComponent::resized()
         return;
     }
 
-    if (totalNumComponents == 3)
-    {
-        int compIdx = 0;
-        const int x = (getWidth() - 3 * compWidth) / 2;
-        const int y = 30;
-
-        for (auto* s : sliders)
-            s->slider.setBounds (x + (compIdx++) * compWidth, y, compWidth, compWidth);
-
-        for (auto* b : boxes)
-            b->box.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
-
-        for (auto* b : buttons)
-            b->button.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
-
-        return;
-    }
-
     if (totalNumComponents == 4)
     {
         int compIdx = 0;
@@ -169,6 +150,29 @@ void KnobsComponent::resized()
         bounds[1] = Rectangle<int> { 72, 80, 100, 100 };
         bounds[2] = Rectangle<int> { 144, 15, 100, 100 };
         bounds[3] = Rectangle<int> { 216, 80, 100, 100 };
+
+        for (auto* s : sliders)
+            s->slider.setBounds (bounds[compIdx++]);
+
+        for (auto* b : boxes)
+            b->box.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+
+        for (auto* b : buttons)
+            b->button.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+
+        return;
+    }
+
+    if (totalNumComponents == 5)
+    {
+        int compIdx = 0;
+
+        Rectangle<int> bounds[5];
+        bounds[0] = Rectangle<int> { 0, 15, 100, 100 };
+        bounds[1] = Rectangle<int> { 70, 80, 100, 100 };
+        bounds[2] = Rectangle<int> { 140, 15, 100, 100 };
+        bounds[3] = Rectangle<int> { 210, 80, 100, 100 };
+        bounds[4] = Rectangle<int> { 227, -25, 90, 50 };
 
         for (auto* s : sliders)
             s->slider.setBounds (bounds[compIdx++]);
