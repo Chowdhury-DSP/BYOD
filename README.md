@@ -11,7 +11,13 @@ to purely digital creations, along with some musical
 tone-shaping filters, and a handful of other useful
 processing blocks.
 
-**BYOD is currently in pre-release. More information will be made available soon!**
+BYOD is open to contributions! If you would like to
+add new guitar effect processors, please see
+[the documentation](./docs/CreatingANewProcessor.md).
+
+**BYOD is currently in pre-release. If you would like to try
+the latest Nightly Builds (potentially unstable),
+they can be downloaded [here](https://chowdsp.com/nightly.html#byod).**
 
 ## Building
 
