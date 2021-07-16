@@ -3,7 +3,7 @@
 namespace
 {
 template <typename SampleType, typename SmoothingType>
-static JUCE_VECTOR_CALLTYPE dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& block, SmoothedValue<SampleType, SmoothingType>& value) noexcept
+static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& block, SmoothedValue<SampleType, SmoothingType>& value) noexcept
 {
     if (! value.isSmoothing())
         return block.add (value.getTargetValue());
