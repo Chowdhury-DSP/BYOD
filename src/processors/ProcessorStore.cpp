@@ -9,6 +9,7 @@
 #include "drive/tube_screamer/TubeScreamer.h"
 #include "drive/zen_drive/ZenDrive.h"
 
+#include "other/EnvelopeFilter.h"
 #include "other/Tremolo.h"
 
 #include "tone/BassCleaner.h"
@@ -45,6 +46,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
 
+    { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Tremolo", &processorFactory<Tremolo> },
 };
 
