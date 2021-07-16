@@ -2,7 +2,8 @@
 
 KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& c, std::function<void()> paramLambda) : colour (c)
 {
-    auto addSlider = [=, &vts] (AudioParameterFloat* param) {
+    auto addSlider = [=, &vts] (AudioParameterFloat* param)
+    {
         auto newSlide = std::make_unique<SliderWithAttachment>();
         addAndMakeVisible (newSlide->slider);
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, newSlide->slider);
@@ -17,7 +18,8 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
         sliders.add (std::move (newSlide));
     };
 
-    auto addBox = [=, &vts] (AudioParameterChoice* param) {
+    auto addBox = [=, &vts] (AudioParameterChoice* param)
+    {
         auto newBox = std::make_unique<BoxWithAttachment>();
         addAndMakeVisible (newBox->box);
         newBox->box.setName (param->name);
@@ -33,7 +35,8 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
         boxes.add (std::move (newBox));
     };
 
-    auto addButton = [=, &vts] (AudioParameterBool* param) {
+    auto addButton = [=, &vts] (AudioParameterBool* param)
+    {
         if (param->paramID == "on_off")
             return;
 
@@ -67,7 +70,8 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (colour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, int offset = 0) {
+    auto makeName = [&g] (Component& comp, String name, int offset = 0)
+    {
         if (comp.getHeight() < 100)
             return;
 

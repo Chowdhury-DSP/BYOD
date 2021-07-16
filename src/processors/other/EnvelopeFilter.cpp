@@ -126,7 +126,8 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     auto freqModGain = 20.0f * senseParam->load();
     auto* levelPtr = levelBuffer.getReadPointer (0);
     FloatVectorOperations::clip (levelBuffer.getWritePointer (0), levelPtr, 0.0f, 2.0f, numSamples);
-    auto getModFreq = [=] (int i) -> float {
+    auto getModFreq = [=] (int i) -> float
+    {
         return jlimit (20.0f, 20.0e3f, filterFreqHz + freqModGain * levelPtr[i] * filterFreqHz);
     };
 
