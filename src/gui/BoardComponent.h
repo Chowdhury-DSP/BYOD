@@ -26,6 +26,8 @@ public:
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     void itemDropped (const SourceDetails& dragSourceDetails) override;
 
+    const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
+
 private:
     void showNewProcMenu() const;
     void refreshBoardSize();

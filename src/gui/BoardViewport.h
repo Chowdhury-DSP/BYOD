@@ -6,23 +6,16 @@
 class BoardViewport : public Viewport
 {
 public:
-    BoardViewport (ProcessorChain& procChain) : comp (procChain)
-    {
-        setViewedComponent (&comp, false);
+    BoardViewport (ProcessorChain& procChain);
+    ~BoardViewport();
 
-        getVerticalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFFD0592C));
-        getHorizontalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFFD0592C));
-
-        setScrollBarsShown (false, true);
-    }
-
-    void resized() override
-    {
-        comp.setBounds (0, 0, comp.getIdealWidth (getWidth()), getHeight());
-    }
+    void resized() override;
 
 private:
+    class ScrollLNF;
+
     BoardComponent comp;
+    std::unique_ptr<ScrollLNF> scrollLNF;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardViewport)
 };
