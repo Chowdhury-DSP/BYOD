@@ -1,7 +1,7 @@
 # BYOD (Build-Your-Own Distortion)
 
 ![CI](https://github.com/Chowdhury-DSP/BYOD/workflows/CI/badge.svg)
-[![License](https://img.shields.io/badge/License-BSD-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
+[![License](https://img.shields.io/badge/License-GPL3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 
 BYOD is a guitar distortion plugin with a customisable
 signal chain that allows users to create their own guitar
@@ -13,7 +13,7 @@ processing blocks.
 
 BYOD is open to contributions! If you would like to
 add new guitar effect processors, please see
-[the documentation](./docs/CreatingANewProcessor.md).
+[the documentation](./docs).
 
 **BYOD is currently in pre-release. If you would like to try
 the latest Nightly Builds (potentially unstable),
@@ -47,5 +47,6 @@ have contributed!
 
 ## License
 
-BYOD is open source, and is licensed under the General Public License Version 3 (GPLv3).
-Enjoy!
+BYOD is open source, and is dual-licensed  under the 
+General Public License Version 3. For more details, 
+please see the [licensing documentation](./docs/Licensing.md). Enjoy!
