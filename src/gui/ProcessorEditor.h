@@ -15,6 +15,7 @@ public:
     void mouseDrag (const MouseEvent& e) override;
 
     BaseProcessor* getProcPtr() const { return &proc; }
+    const ProcessorUIOptions& getUIOptions() const { return procUI; }
 
 private:
     BaseProcessor& proc;

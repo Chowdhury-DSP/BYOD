@@ -15,8 +15,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.65f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=]
-    { showNewProcMenu(); };
+    newProcButton.onClick = [=] { showNewProcMenu(); };
 
     addChildComponent (infoComp);
 
@@ -49,14 +48,14 @@ void BoardComponent::resized()
     for (auto* editor : processorEditors)
     {
         auto b = bounds.removeFromLeft (editorWidth + 2 * editorPad);
-        auto height = jmin (editorHeight, getHeight() - 2 * editorPad);
-        editor->setBounds (Rectangle<int> (editorWidth, height).withCentre (b.getCentre()));
+        auto height = jmin (editorHeight, getHeight() - 2 * (editorPad + yOffset));
+        editor->setBounds (Rectangle<int> (editorWidth, height).withCentre (b.getCentre().translated (0, -yOffset)));
     }
 
     // draw newProcButton
     {
         const auto centre = bounds.getCentre();
-        newProcButton.setBounds (Rectangle<int> (newButtonWidth, newButtonWidth).withCentre (centre));
+        newProcButton.setBounds (Rectangle<int> (newButtonWidth, newButtonWidth).withCentre (centre.translated (0, -yOffset)));
     }
 
     infoComp.setBounds (Rectangle<int> (jmin (400, getWidth()), jmin (250, getHeight())).withCentre (getLocalBounds().getCentre()));
