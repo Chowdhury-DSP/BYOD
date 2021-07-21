@@ -10,6 +10,7 @@ public:
     ~BoardViewport();
 
     void resized() override;
+    void scrollBarMoved (ScrollBar* scrollBarThatHasMoved, double newRangeStart) override;
 
 private:
     class ScrollLNF;

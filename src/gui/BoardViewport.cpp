@@ -9,60 +9,39 @@ public:
 
     void drawScrollbar (Graphics& g, ScrollBar& scrollbar, int x, int y, int width, int height, bool isScrollbarVertical, int thumbStartPosition, int thumbSize, bool isMouseOver, bool isMouseDown) override
     {
-        ignoreUnused (x, isMouseOver, isMouseDown, isScrollbarVertical);
+        ignoreUnused (isMouseOver, isMouseDown, isScrollbarVertical);
 
-        // get colour and name for each editor
-        Array<std::pair<Colour, String>> editorBarDetails;
-        editorBarDetails.ensureStorageAllocated (editors.size());
-        for (const auto* editor : editors)
-            editorBarDetails.add (std::make_pair (editor->getUIOptions().backgroundColour, editor->getProcPtr()->getName()));
+        g.setColour (Colours::black.withAlpha (0.4f));
+        Rectangle<int> backBounds { x, y, width, height };
+        g.fillRect (backBounds);
 
-        // paint colours
-        constexpr int fadeWidth = 35;
-        auto edWidth = width / editors.size();
-        for (int i = 0; i < editors.size(); ++i)
+        // show editor snapshots
+        constexpr float thumbThick = 3.0f;
+        const auto edWidth = (float) editors[0]->getWidth();
+        const auto edHeight = (float) editors[0]->getHeight();
+        const auto nEditors = editors.size();
+
+        const auto scaleFactor = float (height - 2.0f * thumbThick) / edHeight;
+        const auto snapWidth = int (edWidth * scaleFactor);
+        const auto snapXInc = snapWidth * nEditors < width ? snapWidth : int (float (width - snapWidth) / float (nEditors - 1));
+
+        g.setOpacity (1.0f);
+        int snapX = x;
+        for (int i = 0; i < nEditors; ++i)
         {
-            if (i + 1 == editors.size())
-            {
-                auto rect = Rectangle { edWidth * i + fadeWidth / 2, y, edWidth - fadeWidth / 2, height };
-                g.setColour (editorBarDetails[i].first);
-                g.fillRect (rect);
+            auto snapshot = editors[i]->createComponentSnapshot (editors[i]->getLocalBounds(), true, scaleFactor);
 
-                continue;
-            }
-
-            if (i == 0)
-            {
-                auto rect = Rectangle { edWidth * i, y, edWidth - fadeWidth / 2, height };
-                g.setColour (editorBarDetails[i].first);
-                g.fillRect (rect);
-            }
-            else
-            {
-                auto rect = Rectangle { edWidth * i + fadeWidth / 2, y, edWidth - fadeWidth, height };
-                g.setColour (editorBarDetails[i].first);
-                g.fillRect (rect);
-            }
-
-            auto gradRect = Rectangle { edWidth * (i + 1) - fadeWidth / 2, y, fadeWidth, height };
-            g.setGradientFill (ColourGradient::horizontal (editorBarDetails[i].first, editorBarDetails[i + 1].first, gradRect.toFloat()));
-            g.fillRect (gradRect);
-        }
-
-        // paint names
-        for (int i = 0; i < editors.size(); ++i)
-        {
-            g.setColour (editorBarDetails[i].first.contrasting());
-            g.setFont (18.0f);
-
-            auto rect = Rectangle { edWidth * i, y, edWidth, height };
-            g.drawFittedText (editorBarDetails[i].second, rect, Justification::centred, 1);
+            g.drawImageAt (snapshot, snapX, y + (int) thumbThick);
+            snapX += i < nEditors - 1 ? snapXInc : snapWidth;
         }
 
         // paint "thumb"
-        Rectangle<int> thumbBounds { thumbStartPosition, y, thumbSize, height };
+        const auto adjustedThumbX = int (((float) thumbStartPosition / (float) width) * (float) snapX);
+        const auto adjustedThumbWidth = int (((float) thumbSize / (float) width) * (float) snapX);
+
+        Rectangle<int> thumbBounds { adjustedThumbX, y, adjustedThumbWidth, height };
         g.setColour (scrollbar.findColour (ScrollBar::ColourIds::thumbColourId));
-        g.drawRoundedRectangle (thumbBounds.reduced (1).toFloat(), 4.0f, 5.0f);
+        g.drawRoundedRectangle (thumbBounds.reduced (1).toFloat(), thumbThick, thumbThick);
     }
 
 private:
@@ -76,7 +55,7 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     setViewedComponent (&comp, false);
     scrollLNF = std::make_unique<ScrollLNF> (comp.getEditors());
 
-    getHorizontalScrollBar().setColour (ScrollBar::thumbColourId, Colours::black.brighter (0.1f));
+    getHorizontalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFF0EDED4));
     getHorizontalScrollBar().setLookAndFeel (scrollLNF.get());
     setScrollBarsShown (false, true);
 }
@@ -89,5 +68,11 @@ BoardViewport::~BoardViewport()
 void BoardViewport::resized()
 {
     comp.setBounds (0, 0, comp.getIdealWidth (getWidth()), getHeight());
-    setScrollBarThickness (30);
+    setScrollBarThickness (BoardComponent::yOffset * 2);
+}
+
+void BoardViewport::scrollBarMoved (ScrollBar* scrollBarThatHasMoved, double newRangeStart)
+{
+    Viewport::scrollBarMoved (scrollBarThatHasMoved, newRangeStart);
+    getHorizontalScrollBar().repaint();
 }

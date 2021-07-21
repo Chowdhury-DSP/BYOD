@@ -28,6 +28,8 @@ public:
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
 
+    static constexpr auto yOffset = 35;
+
 private:
     void showNewProcMenu() const;
     void refreshBoardSize();

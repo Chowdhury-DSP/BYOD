@@ -44,19 +44,18 @@ void BoardComponent::paint (Graphics& g)
 void BoardComponent::resized()
 {
     auto bounds = getLocalBounds();
-    constexpr auto yOff = 15;
 
     for (auto* editor : processorEditors)
     {
         auto b = bounds.removeFromLeft (editorWidth + 2 * editorPad);
-        auto height = jmin (editorHeight, getHeight() - 2 * (editorPad + yOff));
-        editor->setBounds (Rectangle<int> (editorWidth, height).withCentre (b.getCentre().translated (0, -yOff)));
+        auto height = jmin (editorHeight, getHeight() - 2 * (editorPad + yOffset));
+        editor->setBounds (Rectangle<int> (editorWidth, height).withCentre (b.getCentre().translated (0, -yOffset)));
     }
 
     // draw newProcButton
     {
         const auto centre = bounds.getCentre();
-        newProcButton.setBounds (Rectangle<int> (newButtonWidth, newButtonWidth).withCentre (centre.translated (0, -yOff)));
+        newProcButton.setBounds (Rectangle<int> (newButtonWidth, newButtonWidth).withCentre (centre.translated (0, -yOffset)));
     }
 
     infoComp.setBounds (Rectangle<int> (jmin (400, getWidth()), jmin (250, getHeight())).withCentre (getLocalBounds().getCentre()));
