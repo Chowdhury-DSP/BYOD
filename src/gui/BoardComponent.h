@@ -26,6 +26,10 @@ public:
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     void itemDropped (const SourceDetails& dragSourceDetails) override;
 
+    const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
+
+    static constexpr auto yOffset = 35;
+
 private:
     void showNewProcMenu() const;
     void refreshBoardSize();

@@ -26,6 +26,7 @@ target_link_libraries(juce_plugin_modules
         BinaryData
         juce::juce_audio_utils
         juce::juce_audio_plugin_client
+        juce::juce_opengl
         foleys_gui_magic
         chowdsp_utils
         RTNeural
@@ -48,6 +49,7 @@ target_compile_definitions(juce_plugin_modules
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
         FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
         FOLEYS_ENABLE_BINARY_DATA=1
+        FOLEYS_ENABLE_OPEN_GL_CONTEXT=1
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
 )
