@@ -1,6 +1,7 @@
 #include "BYOD.h"
 #include "gui/BoardViewport.h"
 #include "gui/utils/LookAndFeels.h"
+#include "gui/utils/TextSliderItem.h"
 #include "presets/PresetCompItem.h"
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
@@ -8,10 +9,8 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procs (procStore, vts),
                presetManager (&procs, vts)
 {
-    presetManager.hostUpdateFunc = [=]
-    {
-        MessageManager::callAsync ([=]
-                                   { updateHostDisplay (AudioProcessorListener::ChangeDetails().withProgramChanged (true)); });
+    presetManager.hostUpdateFunc = [=] {
+        MessageManager::callAsync ([=] { updateHostDisplay (AudioProcessorListener::ChangeDetails().withProgramChanged (true)); });
     };
 }
 
@@ -40,13 +39,12 @@ AudioProcessorEditor* BYOD::createEditor()
     auto builder = chowdsp::createGUIBuilder (magicState);
     builder->registerFactory ("Board", &BoardItem::factory);
     builder->registerFactory ("PresetsItem", &PresetCompItem::factory);
+    builder->registerFactory ("TextSlider", &TextSliderItem::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
 
     // GUI trigger functions
-    magicState.addTrigger ("undo", [=]
-                           { undoManager.undo(); });
-    magicState.addTrigger ("redo", [=]
-                           { undoManager.redo(); });
+    magicState.addTrigger ("undo", [=] { undoManager.undo(); });
+    magicState.addTrigger ("redo", [=] { undoManager.redo(); });
 
     auto editor = new foleys::MagicPluginEditor (magicState, BinaryData::gui_xml, BinaryData::gui_xmlSize, std::move (builder));
 
@@ -112,8 +110,7 @@ void BYOD::setCurrentProgram (int index)
     if (index == presetManager.getSelectedPresetIdx()) // no update needed!
         return;
 
-    MessageManager::callAsync ([=]
-                               { presetManager.setPreset (index); });
+    MessageManager::callAsync ([=] { presetManager.setPreset (index); });
 }
 
 const String BYOD::getProgramName (int index)

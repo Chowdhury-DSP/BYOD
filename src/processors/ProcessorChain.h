@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DryWetProcessor.h"
 #include "ProcessorStore.h"
 
 class ProcessorChain
@@ -43,6 +44,13 @@ private:
     std::atomic<float>* oversamplingParam = nullptr;
     std::unique_ptr<dsp::Oversampling<float>> overSample[5];
     int prevOS = 0;
+
+    std::atomic<float>* inGainParam = nullptr;
+    std::atomic<float>* outGainParam = nullptr;
+    dsp::Gain<float> inGain, outGain;
+
+    std::atomic<float>* dryWetParam = nullptr;
+    DryWetProcessor dryWetMixer;
 
     friend class ProcChainActions;
     UndoManager* um;

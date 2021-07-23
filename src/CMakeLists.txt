@@ -13,6 +13,7 @@ target_sources(BYOD PRIVATE
     presets/PresetManager.cpp
 
     processors/BaseProcessor.cpp
+    processors/DryWetProcessor.cpp
     processors/ProcessorChain.cpp
     processors/ProcessorChainActions.cpp
     processors/ProcessorStore.cpp
