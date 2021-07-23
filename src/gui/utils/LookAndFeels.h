@@ -169,7 +169,8 @@ protected:
         label->setJustificationType (Justification::centred);
         label->setFont (Font (16.0f).boldened());
 
-        label->onEditorShow = [label] {
+        label->onEditorShow = [label]
+        {
             if (auto editor = label->getCurrentTextEditor())
             {
                 editor->setBounds (label->getLocalBounds());
