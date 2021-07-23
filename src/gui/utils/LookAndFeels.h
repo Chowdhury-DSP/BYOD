@@ -125,6 +125,67 @@ private:
 };
 
 //==================================================================
+/** Look and feel for the bottom bar section */
+class BottomBarLNF : public chowdsp::ChowLNF
+{
+public:
+    BottomBarLNF() = default;
+    virtual ~BottomBarLNF() = default;
+
+protected:
+    static constexpr float heightFrac = 0.5f;
+
+    int getNameWidth (int height, const String& text)
+    {
+        Font f = Font ((float) height * heightFrac);
+        return f.getStringWidth (text);
+    }
+
+    void drawRotarySlider (Graphics& g, int, int, int, int height, float, const float, const float, Slider& slider) override
+    {
+        g.setColour (Colours::white); // @TODO: make colour selectable
+        g.setFont (Font ((float) height * heightFrac).boldened());
+
+        String text = slider.getName() + ": ";
+        int width = getNameWidth (height, text);
+        g.drawFittedText (text, 0, 0, width, height, Justification::centred, 1);
+    }
+
+    Slider::SliderLayout getSliderLayout (Slider& slider) override
+    {
+        auto layout = LookAndFeel_V4::getSliderLayout (slider);
+        layout.textBoxBounds = slider.getLocalBounds()
+                                   .removeFromRight (slider.getWidth()
+                                                     - getNameWidth (slider.getHeight(), slider.getName() + ":_") + 3);
+        return layout;
+    }
+
+    Label* createSliderTextBox (Slider& slider) override
+    {
+        auto* label = LookAndFeel_V4::createSliderTextBox (slider);
+        label->setInterceptsMouseClicks (false, false);
+        label->setColour (Label::outlineColourId, Colours::transparentBlack);
+        label->setColour (Label::outlineWhenEditingColourId, Colours::transparentBlack);
+        label->setJustificationType (Justification::centred);
+        label->setFont (Font (16.0f).boldened());
+
+        label->onEditorShow = [label]
+        {
+            if (auto editor = label->getCurrentTextEditor())
+            {
+                editor->setBounds (label->getLocalBounds());
+                editor->setColour (CaretComponent::caretColourId, Colour (0xFFC954D4));
+                editor->setColour (TextEditor::backgroundColourId, Colours::transparentBlack);
+                editor->setJustification (Justification::left);
+                editor->applyFontToAllText (Font (14.0f).boldened());
+            }
+        };
+
+        return label;
+    }
+};
+
+//==================================================================
 class LNFAllocator
 {
 public:

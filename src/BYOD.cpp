@@ -1,6 +1,7 @@
 #include "BYOD.h"
 #include "gui/BoardViewport.h"
 #include "gui/utils/LookAndFeels.h"
+#include "gui/utils/TextSliderItem.h"
 #include "presets/PresetCompItem.h"
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
@@ -40,6 +41,7 @@ AudioProcessorEditor* BYOD::createEditor()
     auto builder = chowdsp::createGUIBuilder (magicState);
     builder->registerFactory ("Board", &BoardItem::factory);
     builder->registerFactory ("PresetsItem", &PresetCompItem::factory);
+    builder->registerFactory ("TextSlider", &TextSliderItem::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
 
     // GUI trigger functions

@@ -1,10 +1,14 @@
 #include "ProcessorChain.h"
+#include "ParameterHelpers.h"
 #include "ProcessorChainActions.h"
 
 namespace
 {
 const String monoModeTag = "mono_stereo";
 const String oversamplingTag = "oversampling";
+const String inGainTag = "in_gain";
+const String outGainTag = "out_gain";
+const String dryWetTag = "dry_wet";
 } // namespace
 
 ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store),
@@ -15,6 +19,9 @@ ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeSt
 
     monoModeParam = vts.getRawParameterValue (monoModeTag);
     oversamplingParam = vts.getRawParameterValue (oversamplingTag);
+    inGainParam = vts.getRawParameterValue (inGainTag);
+    outGainParam = vts.getRawParameterValue (outGainTag);
+    dryWetParam = vts.getRawParameterValue (dryWetTag);
 
     for (int i = 0; i < 5; ++i)
         overSample[i] = std::make_unique<dsp::Oversampling<float>> (2, i, dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
@@ -31,6 +38,11 @@ void ProcessorChain::createParameters (Parameters& params)
                                                               "Oversampling",
                                                               StringArray { "1x", "2x", "4x", "8x", "16x" },
                                                               1));
+
+    using namespace ParameterHelpers;
+    createGainDBParameter (params, inGainTag, "In Gain", -72.0f, 18.0f, 0.0f);
+    createGainDBParameter (params, outGainTag, "Out Gain", -72.0f, 18.0f, 0.0f);
+    createPercentParameter (params, dryWetTag, "Dry/Wet", 1.0f);
 }
 
 void ProcessorChain::initializeProcessors (int curOS)
@@ -56,6 +68,15 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
     for (int i = 0; i < 5; ++i)
         overSample[i]->initProcessing ((size_t) samplesPerBlock);
 
+    dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
+    for (auto* gain : { &inGain, &outGain })
+    {
+        gain->prepare (spec);
+        gain->setRampDurationSeconds (0.1);
+    }
+
+    dryWetMixer.prepare (spec);
+
     initializeProcessors (curOS);
 }
 
@@ -73,7 +94,16 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
         prevOS = curOS;
     }
 
+    // set input, output, and dry/wet
+    inGain.setGainDecibels (inGainParam->load());
+    outGain.setGainDecibels (outGainParam->load());
+    dryWetMixer.setDryWet (dryWetParam->load());
+
     dsp::AudioBlock<float> block (buffer);
+    dsp::ProcessContextReplacing<float> context (block);
+    inGain.process (context);
+    dryWetMixer.copyDryBuffer (buffer);
+
     auto osBlock = overSample[curOS]->processSamplesUp (block);
 
     // process mono or stereo buffer?
@@ -132,6 +162,10 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
     }
 
     overSample[curOS]->processSamplesDown (block);
+
+    auto latencySamples = overSample[curOS]->getLatencyInSamples();
+    dryWetMixer.processBlock (buffer, latencySamples);
+    outGain.process (context);
 }
 
 void ProcessorChain::addProcessor (BaseProcessor::Ptr newProc)
