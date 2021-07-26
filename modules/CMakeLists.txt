@@ -3,14 +3,6 @@ include(cmake/SubprojectVersion.cmake)
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 
-# add magic_enum
-include(cmake/CPM.cmake)
-CPMAddPackage(
-    NAME magic_enum
-    GITHUB_REPOSITORY Neargye/magic_enum
-    GIT_TAG v0.7.2
-)
-
 # add custom JUCE modules
 juce_add_modules(foleys_gui_magic)
 juce_add_modules(chowdsp_utils)
@@ -58,7 +50,7 @@ target_include_directories(juce_plugin_modules
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,INCLUDE_DIRECTORIES>
     PUBLIC
-        ${magic_enum_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/modules/magic_enum/include
         ${CMAKE_SOURCE_DIR}/modules/RTNeural
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/Eigen
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/xsimd/include

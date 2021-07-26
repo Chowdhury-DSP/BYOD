@@ -10,3 +10,6 @@
 [submodule "modules/RTNeural"]
 	path = modules/RTNeural
 	url = https://github.com/jatinchowdhury18/RTNeural
+[submodule "modules/magic_enum"]
+	path = modules/magic_enum
+	url = https://github.com/Neargye/magic_enum
