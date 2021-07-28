@@ -1,5 +1,6 @@
 #include "ProcessorStore.h"
 
+#include "drive/GuitarMLAmp.h"
 #include "drive/RONN.h"
 #include "drive/diode_circuits/DiodeClipper.h"
 #include "drive/diode_circuits/DiodeRectifier.h"
@@ -31,6 +32,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
     { "Dirty Tube", &processorFactory<TubeAmp> },
+    { "GuitarML", &processorFactory<GuitarMLAmp> },
     { "Hysteresis", &processorFactory<Hysteresis> },
     { "MXR Distortion", &processorFactory<MXRDistortion> },
     { "RONN", &processorFactory<RONN> },
@@ -78,8 +80,7 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=]
-        { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }
