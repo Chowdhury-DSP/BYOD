@@ -110,6 +110,16 @@ void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
         for (auto& model : models[ch])
             model.second.reset();
     }
+
+    dcBlocker.prepare (sampleRate, samplesPerBlock);
+
+    // pre-buffering
+    AudioBuffer<float> buffer (2, samplesPerBlock);
+    for (int i = 0; i < 5000; i += samplesPerBlock)
+    {
+        buffer.clear();
+        processAudio (buffer);
+    }
 }
 
 void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
@@ -130,4 +140,6 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         for (int n = 0; n < buffer.getNumSamples(); ++n)
             x[n] = model.forward (x + n) + x[n];
     }
+
+    dcBlocker.processAudio (buffer);
 }

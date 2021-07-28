@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../BaseProcessor.h"
+#include "../utility/DCBlocker.h"
 
 class GuitarMLAmp : public BaseProcessor
 {
@@ -22,6 +23,8 @@ private:
     std::atomic<float>* modelParam = nullptr;
     std::vector<String> modelTypes;
     std::map<String, ModelType> models[2];
+
+    DCBlocker dcBlocker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GuitarMLAmp)
 };
