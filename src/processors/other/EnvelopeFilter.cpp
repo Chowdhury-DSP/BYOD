@@ -31,11 +31,6 @@ EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor ("Envelope Filt
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-EnvelopeFilter::~EnvelopeFilter()
-{
-    std::cout << "Destructing..." << std::endl;
-}
-
 AudioProcessorValueTreeState::ParameterLayout EnvelopeFilter::createParameterLayout()
 {
     using namespace ParameterHelpers;

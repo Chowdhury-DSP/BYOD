@@ -8,6 +8,9 @@ juce_add_binary_data(BinaryData SOURCES
     LeftArrow.svg
     RightArrow.svg
 
+    guitar_ml_models/BluesJR_FullD.json
+    guitar_ml_models/TS9_FullD.json
+
     presets/Default.chowpreset
     presets/ZenDrive.chowpreset
 )

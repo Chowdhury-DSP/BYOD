@@ -26,6 +26,7 @@ target_sources(BYOD PRIVATE
     processors/drive/tube_amp/TubeAmp.cpp
     processors/drive/tube_screamer/TubeScreamer.cpp
     processors/drive/zen_drive/ZenDrive.cpp
+    processors/drive/GuitarMLAmp.cpp
     processors/drive/RONN.cpp
 
     processors/other/EnvelopeFilter.cpp
