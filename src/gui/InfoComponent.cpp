@@ -8,9 +8,14 @@ InfoComponent::InfoComponent()
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, Colours::white);
-    xButton.onClick = [=]
-    { setVisible (false); };
+    xButton.onClick = [=] {
+        setVisible (false);
+    };
     addAndMakeVisible (xButton);
+
+    linkButton.setButtonText ("Click for more information...");
+    linkButton.setColour (HyperlinkButton::textColourId, Colours::orangered.brighter());
+    addAndMakeVisible (linkButton);
 }
 
 void InfoComponent::paint (Graphics& g)
@@ -32,6 +37,10 @@ void InfoComponent::paint (Graphics& g)
     g.setFont (Font (16.0f));
     auto authorsBounds = bounds.removeFromBottom (50).reduced (5);
     g.drawFittedText (authors, authorsBounds, Justification::centred, 5);
+
+    if (linkButton.isVisible())
+        bounds.removeFromBottom (30);
+
     g.drawFittedText (description, bounds.reduced (10, 0), Justification::centred, 10);
 }
 
@@ -39,6 +48,9 @@ void InfoComponent::resized()
 {
     constexpr int xButtonSize = 27;
     xButton.setBounds (getWidth() - xButtonSize, 0, xButtonSize, xButtonSize);
+
+    linkButton.setFont (16.0f, false, Justification::centred);
+    linkButton.setBounds (0, getHeight() - 80, getWidth(), 30);
 }
 
 void InfoComponent::setInfoForProc (const String& name, const ProcessorUIOptions::ProcInfo& info)
@@ -57,5 +69,15 @@ void InfoComponent::setInfoForProc (const String& name, const ProcessorUIOptions
         }
 
         authors += info.authors[i] + ", ";
+    }
+
+    if (info.infoLink.isWellFormed())
+    {
+        linkButton.setURL (info.infoLink);
+        linkButton.setVisible (true);
+    }
+    else
+    {
+        linkButton.setVisible (false);
     }
 }

@@ -78,6 +78,7 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
     uiOptions.powerColour = Colours::cyan;
     uiOptions.info.description = "An implementation of the neural LSTM guitar amp modeller used by the GuitarML project.";
     uiOptions.info.authors = StringArray { "Keith Bloemer", "Jatin Chowdhury" };
+    uiOptions.info.infoLink = URL { "https://guitarml.com" };
 }
 
 AudioProcessorValueTreeState::ParameterLayout GuitarMLAmp::createParameterLayout()

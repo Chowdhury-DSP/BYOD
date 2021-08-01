@@ -22,6 +22,7 @@ struct ProcessorUIOptions
     {
         String description;
         StringArray authors;
+        URL infoLink = URL();
     } info;
 };
 

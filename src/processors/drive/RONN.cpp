@@ -39,8 +39,7 @@ Vec2 createRandomVec2<Orthogonal> (std::default_random_engine& generator, Orthog
 
     using namespace Eigen;
     const auto dim = jmax (size1, size2);
-    MatrixXf X = MatrixXf::Zero (dim, dim).unaryExpr ([&generator] (double)
-                                                      { return gaussian (generator); });
+    MatrixXf X = MatrixXf::Zero (dim, dim).unaryExpr ([&generator] (double) { return gaussian (generator); });
     MatrixXf XtX = X.transpose() * X;
     SelfAdjointEigenSolver<MatrixXf> es (XtX);
     MatrixXf S = es.operatorInverseSqrt();
@@ -104,6 +103,7 @@ RONN::RONN (UndoManager* um) : BaseProcessor ("RONN", createParameterLayout(), u
     uiOptions.powerColour = Colours::cyan;
     uiOptions.info.description = "RONN is a \"Randomised Overdrive Neural Network\", first proposed by Christian Steinmetz. This implementation uses a convolutional recurrent neural net.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+    uiOptions.info.infoLink = URL { "https://github.com/csteinmetz1/ronn" };
 }
 
 AudioProcessorValueTreeState::ParameterLayout RONN::createParameterLayout()
