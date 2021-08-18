@@ -18,6 +18,12 @@ target_sources(BYOD PRIVATE
     processors/ProcessorChainActions.cpp
     processors/ProcessorStore.cpp
 
+    processors/drive/centaur/Centaur.cpp
+    processors/drive/centaur/FeedForward2.cpp
+    processors/drive/centaur/GainStageProc.cpp
+    processors/drive/centaur/InputBufferProcessor.cpp
+    processors/drive/centaur/OutputStageProcessor.cpp
+    processors/drive/centaur/PreAmpStage.cpp
     processors/drive/diode_circuits/DiodeClipper.cpp
     processors/drive/diode_circuits/DiodeRectifier.cpp
     processors/drive/hysteresis/Hysteresis.cpp
