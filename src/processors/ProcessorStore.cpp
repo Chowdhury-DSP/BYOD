@@ -2,6 +2,7 @@
 
 #include "drive/GuitarMLAmp.h"
 #include "drive/RONN.h"
+#include "drive/centaur/Centaur.h"
 #include "drive/diode_circuits/DiodeClipper.h"
 #include "drive/diode_circuits/DiodeRectifier.h"
 #include "drive/hysteresis/Hysteresis.h"
@@ -29,6 +30,7 @@ static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 }
 
 ProcessorStore::StoreMap ProcessorStore::store = {
+    { "Centaur", &processorFactory<Centaur> },
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
     { "Dirty Tube", &processorFactory<TubeAmp> },
