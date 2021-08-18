@@ -62,11 +62,10 @@ void Centaur::processAudio (AudioBuffer<float>& buffer)
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
         auto* x = buffer.getWritePointer (ch);
-        
+
         outProc[ch].setLevel (*levelParam);
         outProc[ch].processBlock (x, numSamples);
     }
 
     dcBlocker.processAudio (buffer);
 }
-

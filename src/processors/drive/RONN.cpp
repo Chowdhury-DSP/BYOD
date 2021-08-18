@@ -39,7 +39,8 @@ Vec2 createRandomVec2<Orthogonal> (std::default_random_engine& generator, Orthog
 
     using namespace Eigen;
     const auto dim = jmax (size1, size2);
-    MatrixXf X = MatrixXf::Zero (dim, dim).unaryExpr ([&generator] (double) { return gaussian (generator); });
+    MatrixXf X = MatrixXf::Zero (dim, dim).unaryExpr ([&generator] (double)
+                                                      { return gaussian (generator); });
     MatrixXf XtX = X.transpose() * X;
     SelfAdjointEigenSolver<MatrixXf> es (XtX);
     MatrixXf S = es.operatorInverseSqrt();

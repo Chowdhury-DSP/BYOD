@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../../utility/DCBlocker.h"
 #include "GainStageProc.h"
 #include "InputBufferProcessor.h"
 #include "OutputStageProcessor.h"
-#include "../../utility/DCBlocker.h"
 
 class Centaur : public BaseProcessor
 {
