@@ -3,7 +3,7 @@
 namespace
 {
 constexpr double fs = 48000.0;
-constexpr int blockSize = 512;
+constexpr int blockSize = 511;
 }
 
 void processAudio (AudioBuffer<float>& buffer, SpringReverb& proc)
@@ -14,19 +14,6 @@ void processAudio (AudioBuffer<float>& buffer, SpringReverb& proc)
         AudioBuffer<float> shortBuffer (buffer.getArrayOfWritePointers(), 2, sampleIdx, blockSize);
         proc.processBlock (shortBuffer);
     }
-
-    while (true)
-    {
-        auto level = buffer.getRMSLevel (0, buffer.getNumSamples() - blockSize / 4, blockSize / 4);
-        if (level < 0.0001f)
-            break;
-
-        buffer.setSize (2, buffer.getNumSamples() + blockSize, true);
-        AudioBuffer<float> shortBuffer (buffer.getArrayOfWritePointers(), 2, sampleIdx, blockSize);
-        proc.processBlock (shortBuffer);
-
-        sampleIdx += blockSize;
-    }
 }
 
 int main (int /*argc*/, char* /*argv*/[])
@@ -36,13 +23,20 @@ int main (int /*argc*/, char* /*argv*/[])
     ScopedJuceInitialiser_GUI scopedJuce;
 
     // create impulse
-    AudioBuffer<float> audio (2, 2 * blockSize);
+    AudioBuffer<float> audio (2, int (5.0 * fs));
     audio.setSample (0, 0, 1.0f);
     audio.setSample (1, 0, 1.0f);
 
     // process
     SpringReverb proc;
     proc.prepare (fs, blockSize);
+    proc.setParams ({
+        .size = 0.0f,
+        .decay = 1.0f,
+        .reflections = 1.0f,
+        .spin = 0.5f,
+        .damping = 0.5f,
+    });
     processAudio (audio, proc);
 
     // write to file

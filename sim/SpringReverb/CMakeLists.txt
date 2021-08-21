@@ -17,7 +17,7 @@ add_custom_command(TARGET spring_reverb
 
 target_sources(spring_reverb PRIVATE
     main.cpp
-    SpringReverb.cpp
+    ../../src/processors/other/spring_reverb/SpringReverb.cpp
 )
 
 target_compile_definitions(spring_reverb
@@ -28,6 +28,12 @@ target_compile_definitions(spring_reverb
         JucePlugin_Name="spring_reverb"
         JucePlugin_Manufacturer="chowdsp"
         JucePlugin_VersionString="1.0.0"
+)
+
+target_include_directories(spring_reverb
+    PRIVATE
+        .
+        ../../src/processors/other/spring_reverb
 )
 
 target_link_libraries(spring_reverb

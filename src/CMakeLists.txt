@@ -37,6 +37,8 @@ target_sources(BYOD PRIVATE
 
     processors/other/EnvelopeFilter.cpp
     processors/other/Tremolo.cpp
+    processors/other/spring_reverb/SpringReverb.cpp
+    processors/other/spring_reverb/SpringReverbProcessor.cpp
 
     processors/tone/bassman/BassmanTone.cpp
     processors/tone/BassCleaner.cpp

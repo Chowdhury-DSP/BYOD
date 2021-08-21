@@ -192,4 +192,18 @@ void KnobsComponent::resized()
 
         return;
     }
+
+    if (totalNumComponents > 5)
+    {
+        auto width = (getWidth() - 10) / totalNumComponents;
+        int x = 5;
+        for (auto* s : sliders)
+        {
+            s->slider.setSliderStyle (Slider::SliderStyle::LinearVertical);
+            auto bounds = Rectangle { x + 2, 15, width - 4, getHeight() - 15 };
+            x += width;
+
+            s->slider.setBounds (bounds);
+        }
+    }
 }
