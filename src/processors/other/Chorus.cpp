@@ -44,7 +44,7 @@ void Chorus::prepare (double sampleRate, int samplesPerBlock)
     
     for (int i = 0; i < 4; ++i)
     {
-        delay[i].prepare (spec);
+        delay[i].prepare (monoSpec);
 
         for (int k = 0; k < 2; ++k)
         {
@@ -56,8 +56,9 @@ void Chorus::prepare (double sampleRate, int samplesPerBlock)
 
     dryWetMixer.prepare (spec);
     dryWetMixerMono.prepare (monoSpec);
+
     dcBlocker.prepare (spec);
-    dcBlocker.setCutoffFrequency (35.0f);
+    dcBlocker.setCutoffFrequency (60.0f);
 
     for (int ch = 0; ch < 2; ++ch)
     {
@@ -79,42 +80,41 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
         sineSmoothers[1][i].setTargetValue (*depthParam);
     }
 
+    dsp::AudioBlock<float> block { buffer };
+
     auto& dryWet = buffer.getNumChannels() == 1 ? dryWetMixerMono : dryWetMixer;
     dryWet.setWetMixProportion (*mixParam);
-    dryWet.pushDrySamples (dsp::AudioBlock<float> { buffer });
+    dryWet.pushDrySamples (block);
 
+    float del1 = delay1Ms * 0.001f * fs;
+    float del2 = delay2Ms * 0.001f * fs;
+    float del0 = 2.0f * (del1 + del2) + 15.0f;
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        fbSmooth[ch].setTargetValue (*fbParam);
-        float del1 = delay1Ms * 0.001f;
-        float del2 = delay2Ms * 0.001f;
-        float del0 = del1 + del2;
+        int chIdx = 2 * ch;
+        fbSmooth[ch].setTargetValue (0.49f * std::sqrt(0.25f * fbParam->load()));
 
         auto* x = buffer.getWritePointer (ch);
         for (int n = 0; n < buffer.getNumSamples(); ++n)
         {
-            x[n] = dsp::FastMathApproximations::tanh (x[n] * 0.75f + feedbackState[ch]);
-
-            float y = 0.0f;
+            float xIn = dsp::FastMathApproximations::tanh (x[n] * 0.75f + feedbackState[ch]);
+            
+            x[n] = 0.0f;
             for (int i = 0; i < 2; ++i)
             {
-                int chIdx = 2 * ch;
                 float tVal = del0;
                 tVal += del1 * sines[i][chIdx].processSample() * sineSmoothers[i][chIdx].getNextValue();
-                tVal += del2 * sines[i][chIdx+ 1].processSample() * sineSmoothers[i][chIdx + 1].getNextValue();
+                tVal += del2 * sines[i][chIdx + 1].processSample() * sineSmoothers[i][chIdx + 1].getNextValue();
 
-                int delayIdx = 2 * ch + i;
-                delay[delayIdx].setDelay (tVal);
-                delay[delayIdx].pushSample (0, x[n]);
-                y += delay[delayIdx].popSample (0);
+                delay[chIdx + i].setDelay (tVal);
+                delay[chIdx + i].pushSample (0, xIn);
+                x[n] += delay[chIdx + i].popSample (0);
             }
 
-            feedbackState[ch] = fbSmooth[ch].getNextValue() * y;
-            x[n] = dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, y);
+            feedbackState[ch] = fbSmooth[ch].getNextValue() * x[n];
+            feedbackState[ch] = dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, feedbackState[ch]);
         }
     }
 
-    buffer.applyGain (Decibels::decibelsToGain (-8.0f));
-
-    dryWet.mixWetSamples (dsp::AudioBlock<float> { buffer });
+    dryWet.mixWetSamples (block);
 }

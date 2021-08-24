@@ -26,7 +26,11 @@ private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> sineSmoothers[2][4];
     chowdsp::SineWave<float> sines[2][4];
 
-    chowdsp::BBD::BBDDelayWrapper<2048> delay[4];
+    using DelayType = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Sinc<float, 16>>;
+    std::array<DelayType, 4> delay {DelayType { 1 << 16}, DelayType { 1 << 16}, DelayType { 1 << 16}, DelayType { 1 << 16}};
+
+    // using DelayType = chowdsp::BBD::BBDDelayWrapper<8192>;
+    // std::array<DelayType, 4> delay;
     
     chowdsp::StateVariableFilter<float> dcBlocker;
 
