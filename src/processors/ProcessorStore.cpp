@@ -11,6 +11,7 @@
 #include "drive/tube_screamer/TubeScreamer.h"
 #include "drive/zen_drive/ZenDrive.h"
 
+#include "other/Chorus.h"
 #include "other/EnvelopeFilter.h"
 #include "other/Tremolo.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
@@ -55,6 +56,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
 
+    { "Chorus", &processorFactory<Chorus> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Tremolo", &processorFactory<Tremolo> },
     { "Spring Reverb", &processorFactory<SpringReverbProcessor> },

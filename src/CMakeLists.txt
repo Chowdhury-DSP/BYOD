@@ -35,6 +35,7 @@ target_sources(BYOD PRIVATE
     processors/drive/tube_screamer/TubeScreamer.cpp
     processors/drive/zen_drive/ZenDrive.cpp
 
+    processors/other/Chorus.cpp
     processors/other/EnvelopeFilter.cpp
     processors/other/Tremolo.cpp
     processors/other/spring_reverb/SpringReverb.cpp
