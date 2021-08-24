@@ -10,7 +10,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
                                                                                                        procChain (procs),
                                                                                                        procUI (proc.getUIOptions()),
                                                                                                        contrastColour (procUI.backgroundColour.contrasting()),
-                                                                                                       knobs (proc.getVTS(), contrastColour),
+                                                                                                       knobs (proc.getVTS(), contrastColour, procUI.powerColour),
                                                                                                        powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);

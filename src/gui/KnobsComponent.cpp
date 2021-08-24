@@ -1,6 +1,7 @@
 #include "KnobsComponent.h"
 
-KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& c, std::function<void()> paramLambda) : colour (c)
+KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac, std::function<void()> paramLambda)
+    : contrastColour (cc), accentColour (ac)
 {
     auto addSlider = [=, &vts] (AudioParameterFloat* param)
     {
@@ -10,9 +11,10 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
 
         newSlide->slider.setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         newSlide->slider.setName (param->name);
-        newSlide->slider.setTextBoxStyle (Slider::TextBoxBelow, false, 75, 16);
-        newSlide->slider.setColour (Slider::textBoxOutlineColourId, colour);
-        newSlide->slider.setColour (Slider::textBoxTextColourId, colour);
+        newSlide->slider.setTextBoxStyle (Slider::TextBoxBelow, false, 66, 16);
+        newSlide->slider.setColour (Slider::textBoxOutlineColourId, contrastColour);
+        newSlide->slider.setColour (Slider::textBoxTextColourId, contrastColour);
+        newSlide->slider.setColour (Slider::thumbColourId, accentColour);
         newSlide->slider.onValueChange = paramLambda;
 
         sliders.add (std::move (newSlide));
@@ -25,9 +27,9 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
         newBox->box.setName (param->name);
         newBox->box.addItemList (param->choices, 1);
         newBox->box.setSelectedItemIndex (0);
-        newBox->box.setColour (ComboBox::outlineColourId, colour);
-        newBox->box.setColour (ComboBox::textColourId, colour);
-        newBox->box.setColour (ComboBox::arrowColourId, colour);
+        newBox->box.setColour (ComboBox::outlineColourId, contrastColour);
+        newBox->box.setColour (ComboBox::textColourId, contrastColour);
+        newBox->box.setColour (ComboBox::arrowColourId, contrastColour);
         newBox->box.onChange = paramLambda;
 
         newBox->attachment = std::make_unique<ComboBoxAttachment> (vts, param->paramID, newBox->box);
@@ -69,10 +71,10 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
 
 void KnobsComponent::paint (Graphics& g)
 {
-    g.setColour (colour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, int offset = 0)
+    g.setColour (contrastColour.withAlpha (isEnabled() ? 1.0f : 0.6f));
+    auto makeName = [&g] (Component& comp, String name, bool isSlider, int offset = 0)
     {
-        if (comp.getHeight() < 100)
+        if (! isSlider)
             return;
 
         const int height = 20;
@@ -82,10 +84,10 @@ void KnobsComponent::paint (Graphics& g)
     };
 
     for (auto* s : sliders)
-        makeName (s->slider, s->slider.getName(), 6);
+        makeName (s->slider, s->slider.getName(), true, 6);
 
     for (auto* b : boxes)
-        makeName (b->box, b->box.getName());
+        makeName (b->box, b->box.getName(), false);
 }
 
 void KnobsComponent::resized()
@@ -99,7 +101,7 @@ void KnobsComponent::resized()
     {
         const int x = (getWidth() - compWidth) / 2;
         for (auto* s : sliders)
-            s->slider.setBounds (x, 15, compWidth, compWidth);
+            s->slider.setBounds (x, 15, compWidth - 5, compWidth - 5);
 
         for (auto* b : boxes)
             b->box.setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
@@ -172,11 +174,12 @@ void KnobsComponent::resized()
         int compIdx = 0;
 
         Rectangle<int> bounds[5];
-        bounds[0] = Rectangle<int> { 0, 15, 100, 100 };
-        bounds[1] = Rectangle<int> { 70, 80, 100, 100 };
-        bounds[2] = Rectangle<int> { 140, 15, 100, 100 };
-        bounds[3] = Rectangle<int> { 210, 80, 100, 100 };
-        bounds[4] = Rectangle<int> { 227, -25, 90, 50 };
+        const int sWidth = 90;
+        bounds[0] = Rectangle<int> { 0, 15, sWidth, sWidth };
+        bounds[1] = Rectangle<int> { 70, 80, sWidth, sWidth };
+        bounds[2] = Rectangle<int> { 140, 15, sWidth, sWidth };
+        bounds[3] = Rectangle<int> { 210, 80, sWidth, sWidth };
+        bounds[4] = Rectangle<int> { 230, -25, 90, 50 };
 
         for (auto* s : sliders)
             s->slider.setBounds (bounds[compIdx++]);
