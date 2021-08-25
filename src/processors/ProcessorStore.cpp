@@ -13,6 +13,7 @@
 
 #include "other/EnvelopeFilter.h"
 #include "other/Tremolo.h"
+#include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "tone/BassCleaner.h"
 #include "tone/HighCut.h"
@@ -52,6 +53,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
 
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Tremolo", &processorFactory<Tremolo> },
+    { "Spring Reverb", &processorFactory<SpringReverbProcessor> },
 };
 
 ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
