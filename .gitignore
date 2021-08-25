@@ -13,3 +13,7 @@ bin/
 *.log
 *.net
 *.op.raw
+
+# audio files
+*.wav
+*.asd
