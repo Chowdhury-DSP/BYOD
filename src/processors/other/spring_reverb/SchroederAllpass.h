@@ -2,7 +2,7 @@
 
 #include <pch.h>
 
-template <int order = 1>
+template <typename T = float, int order = 1>
 class SchroederAllpass
 {
 public:
@@ -12,7 +12,7 @@ public:
     {
         dsp::ProcessSpec spec { sampleRate, (uint32) 256, 1 };
         delay.prepare (spec);
-        
+
         nestedAllpass.prepare (sampleRate);
     }
 
@@ -22,7 +22,7 @@ public:
         nestedAllpass.reset();
     }
 
-    void setParams (float delaySamp, float feedback)
+    void setParams (float delaySamp, T feedback)
     {
         delay.setDelay (delaySamp);
         g = feedback;
@@ -30,7 +30,7 @@ public:
         nestedAllpass.setParams (delaySamp, feedback);
     }
 
-    inline float processSample (float x) noexcept
+    inline T processSample (T x) noexcept
     {
         auto delayOut = nestedAllpass.processSample (delay.popSample (0));
         x += g * delayOut;
@@ -39,15 +39,15 @@ public:
     }
 
 private:
-    chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Thiran> delay { 1 << 18 };
-    SchroederAllpass<order - 1> nestedAllpass;
-    float g = 0.0f;
+    chowdsp::DelayLine<T, chowdsp::DelayLineInterpolationTypes::Thiran> delay { 1 << 18 };
+    SchroederAllpass<T, order - 1> nestedAllpass;
+    T g = 0.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SchroederAllpass)
 };
 
-template<>
-class SchroederAllpass<1>
+template <typename T>
+class SchroederAllpass<T, 1>
 {
 public:
     SchroederAllpass() = default;
@@ -63,13 +63,13 @@ public:
         delay.reset();
     }
 
-    void setParams (float delaySamp, float feedback)
+    void setParams (float delaySamp, T feedback)
     {
         delay.setDelay (delaySamp);
         g = feedback;
     }
 
-    inline float processSample (float x) noexcept
+    inline T processSample (T x) noexcept
     {
         auto delayOut = delay.popSample (0);
         x += g * delayOut;
@@ -78,8 +78,8 @@ public:
     }
 
 private:
-    chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Thiran> delay { 1 << 18 };
-    float g;
+    chowdsp::DelayLine<T, chowdsp::DelayLineInterpolationTypes::Thiran> delay { 1 << 18 };
+    T g;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SchroederAllpass)
 };

@@ -29,13 +29,14 @@ private:
     chowdsp::StateVariableFilter<float> dcBlocker;
 
     static constexpr int allpassStages = 50;
-    using APFCascade = std::array<SchroederAllpass<2>, allpassStages>;
-    APFCascade ffAPFs;
-    APFCascade fbAPFs;
+    using Vec = dsp::SIMDRegister<float>;
+    using APFCascade = std::array<SchroederAllpass<Vec, 2>, allpassStages>;
+    APFCascade vecAPFs;
 
     Random rand;
     SmoothedValue<float, ValueSmoothingTypes::Linear> chaosSmooth;
 
+    float z[2];
     float fs = 48000.0f;
 
     chowdsp::StateVariableFilter<float> lpf;

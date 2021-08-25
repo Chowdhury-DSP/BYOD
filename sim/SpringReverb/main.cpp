@@ -3,7 +3,7 @@
 namespace
 {
 constexpr double fs = 48000.0;
-constexpr int blockSize = 511;
+constexpr int blockSize = 512;
 }
 
 void processAudio (AudioBuffer<float>& buffer, SpringReverb& proc)
@@ -31,12 +31,13 @@ int main (int /*argc*/, char* /*argv*/[])
     SpringReverb proc;
     proc.prepare (fs, blockSize);
     proc.setParams ({
-        .size = 0.0f,
-        .decay = 1.0f,
-        .reflections = 1.0f,
+        .size = 1.0f,
+        .decay = 0.75f,
+        .reflections = 0.5f,
         .spin = 0.5f,
         .damping = 0.5f,
-    });
+        .chaos = 0.0f,
+    }, blockSize);
     processAudio (audio, proc);
 
     // write to file

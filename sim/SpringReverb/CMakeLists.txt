@@ -38,6 +38,7 @@ target_include_directories(spring_reverb
 
 target_link_libraries(spring_reverb
     PRIVATE
+        juce_dsp
         chowdsp_utils
     PUBLIC
         juce::juce_recommended_config_flags
