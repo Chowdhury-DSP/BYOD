@@ -1,0 +1,33 @@
+#pragma once
+
+#include "../BaseProcessor.h"
+
+class LofiIrs : public BaseProcessor, private AudioProcessorValueTreeState::Listener
+{
+public:
+    LofiIrs (UndoManager* um = nullptr);
+    ~LofiIrs();
+
+    ProcessorType getProcessorType() const override { return Tone; }
+    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    void parameterChanged (const String& parameterID, float newValue) override;
+
+    void prepare (double sampleRate, int samplesPerBlock) override;
+    void processAudio (AudioBuffer<float>& buffer) override;
+
+private:
+    std::atomic<float>* mixParam = nullptr;
+    std::atomic<float>* gainParam = nullptr;
+
+    using IRType = std::pair<void*, size_t>;
+    std::unordered_map<String, IRType> irMap;
+
+    dsp::Convolution convolution;
+    dsp::Gain<float> gain;
+
+    dsp::DryWetMixer<float> dryWetMixer;
+    dsp::DryWetMixer<float> dryWetMixerMono;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LofiIrs)
+};

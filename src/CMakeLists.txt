@@ -18,6 +18,8 @@ target_sources(BYOD PRIVATE
     processors/ProcessorChainActions.cpp
     processors/ProcessorStore.cpp
 
+    processors/drive/GuitarMLAmp.cpp
+    processors/drive/RONN.cpp
     processors/drive/centaur/Centaur.cpp
     processors/drive/centaur/FeedForward2.cpp
     processors/drive/centaur/GainStageProc.cpp
@@ -32,18 +34,17 @@ target_sources(BYOD PRIVATE
     processors/drive/tube_amp/TubeAmp.cpp
     processors/drive/tube_screamer/TubeScreamer.cpp
     processors/drive/zen_drive/ZenDrive.cpp
-    processors/drive/GuitarMLAmp.cpp
-    processors/drive/RONN.cpp
 
     processors/other/EnvelopeFilter.cpp
     processors/other/Tremolo.cpp
     processors/other/spring_reverb/SpringReverb.cpp
     processors/other/spring_reverb/SpringReverbProcessor.cpp
 
-    processors/tone/bassman/BassmanTone.cpp
     processors/tone/BassCleaner.cpp
     processors/tone/HighCut.cpp
+    processors/tone/LofiIrs.cpp
     processors/tone/TrebleBooster.cpp
+    processors/tone/bassman/BassmanTone.cpp
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)
