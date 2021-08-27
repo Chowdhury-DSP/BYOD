@@ -70,6 +70,16 @@ void MyEffect::processAudio (AudioBuffer<float>& buffer)
 }
 ```
 
+If you don't want to write out all this template code,
+you may use the `scripts/new_proc.sh` script.
+```bash
+$ bash scripts/new_proc.sh <class_name> <processor_type> <processor_name>
+```
+Note that the `processor_type` must be one of `drive`,
+`tone`, `utility`, or `other` (note the lowercase). The
+`processor_name` parameter is only needed if it's different
+from the `class_name`.
+
 Finally, we'll need to add our new effect to the 
 `ProcessorStore`. In `ProcessorStore.cpp`, we need
 to include our new header `#include "other/MyEffect.h"`,
