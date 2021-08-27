@@ -15,5 +15,5 @@ bin/
 *.op.raw
 
 # audio files
-*.wav
+sim/**/*.wav
 *.asd
