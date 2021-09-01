@@ -55,6 +55,8 @@ public:
     AudioProcessorValueTreeState& getVTS() { return vts; }
     const ProcessorUIOptions& getUIOptions() const { return uiOptions; }
 
+    virtual void getCustomComponents (OwnedArray<Component>& /*customComps*/) {}
+
 protected:
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;

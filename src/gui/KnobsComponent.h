@@ -1,11 +1,11 @@
 #pragma once
 
-#include <pch.h>
+#include "processors/BaseProcessor.h"
 
 class KnobsComponent : public Component
 {
 public:
-    KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& contrastColour, const Colour& accentColour, std::function<void()> paramLambda = {});
+    KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& contrastColour, const Colour& accentColour, std::function<void()> paramLambda = {});
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -15,27 +15,25 @@ private:
     using ComboBoxAttachment = AudioProcessorValueTreeState::ComboBoxAttachment;
     using ButtonAttachment = AudioProcessorValueTreeState::ButtonAttachment;
 
-    struct SliderWithAttachment
+    struct SliderWithAttachment : public Slider
     {
-        Slider slider;
         std::unique_ptr<SliderAttachment> attachment;
     };
 
-    struct BoxWithAttachment
+    struct BoxWithAttachment : public ComboBox
     {
-        ComboBox box;
         std::unique_ptr<ComboBoxAttachment> attachment;
     };
 
-    struct ButtonWithAttachment
+    struct ButtonWithAttachment : public TextButton
     {
-        TextButton button;
         std::unique_ptr<ButtonAttachment> attachment;
     };
 
-    OwnedArray<SliderWithAttachment> sliders;
-    OwnedArray<BoxWithAttachment> boxes;
-    OwnedArray<ButtonWithAttachment> buttons;
+    OwnedArray<Slider> sliders;
+    OwnedArray<ComboBox> boxes;
+    OwnedArray<TextButton> buttons;
+    OwnedArray<Component> customComponents;
 
     const Colour& contrastColour;
     const Colour& accentColour;
