@@ -10,7 +10,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
                                                                                                        procChain (procs),
                                                                                                        procUI (proc.getUIOptions()),
                                                                                                        contrastColour (procUI.backgroundColour.contrasting()),
-                                                                                                       knobs (proc.getVTS(), contrastColour, procUI.powerColour),
+                                                                                                       knobs (baseProc, proc.getVTS(), contrastColour, procUI.powerColour),
                                                                                                        powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);
@@ -23,17 +23,14 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, contrastColour);
-    xButton.onClick = [=]
-    { MessageManager::callAsync ([=]
-                                 { procChain.removeProcessor (&proc); }); };
+    xButton.onClick = [=] { MessageManager::callAsync ([=] { procChain.removeProcessor (&proc); }); };
     addAndMakeVisible (xButton);
 
     auto infoSvg = Drawable::createFromImageData (BinaryData::info_svg, BinaryData::info_svgSize);
     infoSvg->replaceColour (Colours::black, contrastColour);
     infoButton.setImages (infoSvg.get());
     addAndMakeVisible (infoButton);
-    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)]
-    {
+    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)] {
         boardComp->showInfoComp (baseProc);
     };
 

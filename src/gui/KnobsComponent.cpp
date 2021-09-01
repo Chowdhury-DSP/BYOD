@@ -1,61 +1,78 @@
 #include "KnobsComponent.h"
+#include "processors/BaseProcessor.h"
 
-KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac, std::function<void()> paramLambda)
+KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac, std::function<void()> paramLambda)
     : contrastColour (cc), accentColour (ac)
 {
-    auto addSlider = [=, &vts] (AudioParameterFloat* param)
-    {
+    auto addSlider = [=, &vts] (AudioParameterFloat* param) {
         auto newSlide = std::make_unique<SliderWithAttachment>();
-        addAndMakeVisible (newSlide->slider);
-        newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, newSlide->slider);
+        addAndMakeVisible (newSlide.get());
+        newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, *newSlide.get());
 
-        newSlide->slider.setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
-        newSlide->slider.setName (param->name);
-        newSlide->slider.setTextBoxStyle (Slider::TextBoxBelow, false, 66, 16);
-        newSlide->slider.setColour (Slider::textBoxOutlineColourId, contrastColour);
-        newSlide->slider.setColour (Slider::textBoxTextColourId, contrastColour);
-        newSlide->slider.setColour (Slider::thumbColourId, accentColour);
-        newSlide->slider.onValueChange = paramLambda;
+        newSlide->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
+        newSlide->setName (param->name);
+        newSlide->setTextBoxStyle (Slider::TextBoxBelow, false, 66, 16);
+        newSlide->setColour (Slider::textBoxOutlineColourId, contrastColour);
+        newSlide->setColour (Slider::textBoxTextColourId, contrastColour);
+        newSlide->setColour (Slider::thumbColourId, accentColour);
+        newSlide->onValueChange = paramLambda;
 
         sliders.add (std::move (newSlide));
     };
 
-    auto addBox = [=, &vts] (AudioParameterChoice* param)
-    {
+    auto addBox = [=, &vts] (AudioParameterChoice* param) {
         auto newBox = std::make_unique<BoxWithAttachment>();
-        addAndMakeVisible (newBox->box);
-        newBox->box.setName (param->name);
-        newBox->box.addItemList (param->choices, 1);
-        newBox->box.setSelectedItemIndex (0);
-        newBox->box.setColour (ComboBox::outlineColourId, contrastColour);
-        newBox->box.setColour (ComboBox::textColourId, contrastColour);
-        newBox->box.setColour (ComboBox::arrowColourId, contrastColour);
-        newBox->box.onChange = paramLambda;
+        addAndMakeVisible (newBox.get());
+        newBox->setName (param->name);
+        newBox->addItemList (param->choices, 1);
+        newBox->setSelectedItemIndex (0);
+        newBox->setColour (ComboBox::outlineColourId, contrastColour);
+        newBox->setColour (ComboBox::textColourId, contrastColour);
+        newBox->setColour (ComboBox::arrowColourId, contrastColour);
+        newBox->onChange = paramLambda;
 
-        newBox->attachment = std::make_unique<ComboBoxAttachment> (vts, param->paramID, newBox->box);
+        newBox->attachment = std::make_unique<ComboBoxAttachment> (vts, param->paramID, *newBox.get());
 
         boxes.add (std::move (newBox));
     };
 
-    auto addButton = [=, &vts] (AudioParameterBool* param)
-    {
+    auto addButton = [=, &vts] (AudioParameterBool* param) {
         if (param->paramID == "on_off")
             return;
 
         auto newButton = std::make_unique<ButtonWithAttachment>();
-        addAndMakeVisible (newButton->button);
-        newButton->button.setButtonText (param->name);
-        newButton->button.setClickingTogglesState (true);
-        newButton->button.setColour (TextButton::buttonOnColourId, Colours::red);
-        newButton->button.onStateChange = paramLambda;
+        addAndMakeVisible (newButton.get());
+        newButton->setButtonText (param->name);
+        newButton->setClickingTogglesState (true);
+        newButton->setColour (TextButton::buttonOnColourId, Colours::red);
+        newButton->onStateChange = paramLambda;
 
-        newButton->attachment = std::make_unique<ButtonAttachment> (vts, param->paramID, newButton->button);
+        newButton->attachment = std::make_unique<ButtonAttachment> (vts, param->paramID, *newButton.get());
 
         buttons.add (std::move (newButton));
     };
 
+    baseProc.getCustomComponents (customComponents);
+
     for (auto* param : vts.processor.getParameters())
     {
+        if (auto* rangedParam = dynamic_cast<RangedAudioParameter*> (param))
+        {
+            bool found = false;
+            for (auto* comp : customComponents)
+            {
+                if (comp->getName().contains (rangedParam->paramID + "__"))
+                {
+                    comp->setName (rangedParam->name);
+                    found = true;
+                    break;
+                }
+            }
+
+            if (found)
+                continue;
+        }
+
         if (auto* paramFloat = dynamic_cast<AudioParameterFloat*> (param))
             addSlider (paramFloat);
 
@@ -66,14 +83,27 @@ KnobsComponent::KnobsComponent (AudioProcessorValueTreeState& vts, const Colour&
             addButton (paramBool);
     }
 
+    for (auto* comp : customComponents)
+    {
+        addAndMakeVisible (comp);
+        if (auto* boxComp = dynamic_cast<ComboBox*> (comp))
+        {
+            boxComp->setColour (ComboBox::outlineColourId, contrastColour);
+            boxComp->setColour (ComboBox::textColourId, contrastColour);
+            boxComp->setColour (ComboBox::arrowColourId, contrastColour);
+
+            customComponents.removeObject (comp, false);
+            boxes.add (boxComp);
+        }
+    }
+
     setSize (getWidth(), 100);
 }
 
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (contrastColour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, bool isSlider, int offset = 0)
-    {
+    auto makeName = [&g] (Component& comp, String name, bool isSlider, int offset = 0) {
         if (! isSlider)
             return;
 
@@ -84,10 +114,10 @@ void KnobsComponent::paint (Graphics& g)
     };
 
     for (auto* s : sliders)
-        makeName (s->slider, s->slider.getName(), true, 6);
+        makeName (*s, s->getName(), true, 6);
 
     for (auto* b : boxes)
-        makeName (b->box, b->box.getName(), false);
+        makeName (*b, b->getName(), false);
 }
 
 void KnobsComponent::resized()
@@ -101,13 +131,16 @@ void KnobsComponent::resized()
     {
         const int x = (getWidth() - compWidth) / 2;
         for (auto* s : sliders)
-            s->slider.setBounds (x, 15, compWidth - 5, compWidth - 5);
+            s->setBounds (x, 15, compWidth - 5, compWidth - 5);
 
         for (auto* b : boxes)
-            b->box.setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+            b->setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
 
         for (auto* b : buttons)
-            b->button.setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+            b->setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+
+        for (auto* c : customComponents)
+            c->setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
 
         return;
     }
@@ -118,13 +151,13 @@ void KnobsComponent::resized()
         const int x = (getWidth() - 2 * compWidth) / 2;
 
         for (auto* s : sliders)
-            s->slider.setBounds (x + (compIdx++) * compWidth, 15, compWidth, compWidth);
+            s->setBounds (x + (compIdx++) * compWidth, 15, compWidth, compWidth);
 
         for (auto* b : boxes)
-            b->box.setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+            b->setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
 
         for (auto* b : buttons)
-            b->button.setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+            b->setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
 
         return;
     }
@@ -136,13 +169,13 @@ void KnobsComponent::resized()
         const int y = 30;
 
         for (auto* s : sliders)
-            s->slider.setBounds (x + (compIdx++) * compWidth, y, compWidth, compWidth);
+            s->setBounds (x + (compIdx++) * compWidth, y, compWidth, compWidth);
 
         for (auto* b : boxes)
-            b->box.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
+            b->setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
 
         for (auto* b : buttons)
-            b->button.setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
+            b->setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
 
         return;
     }
@@ -158,13 +191,13 @@ void KnobsComponent::resized()
         bounds[3] = Rectangle<int> { 216, 80, 100, 100 };
 
         for (auto* s : sliders)
-            s->slider.setBounds (bounds[compIdx++]);
+            s->setBounds (bounds[compIdx++]);
 
         for (auto* b : boxes)
-            b->box.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+            b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
 
         for (auto* b : buttons)
-            b->button.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+            b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
 
         return;
     }
@@ -182,13 +215,13 @@ void KnobsComponent::resized()
         bounds[4] = Rectangle<int> { 230, -25, 90, 50 };
 
         for (auto* s : sliders)
-            s->slider.setBounds (bounds[compIdx++]);
+            s->setBounds (bounds[compIdx++]);
 
         for (auto* b : boxes)
-            b->box.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+            b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
 
         for (auto* b : buttons)
-            b->button.setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+            b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
 
         return;
     }
@@ -199,11 +232,11 @@ void KnobsComponent::resized()
         int x = 5;
         for (auto* s : sliders)
         {
-            s->slider.setSliderStyle (Slider::SliderStyle::LinearVertical);
+            s->setSliderStyle (Slider::SliderStyle::LinearVertical);
             auto bounds = Rectangle { x + 2, 15, width - 4, getHeight() - 15 };
             x += width;
 
-            s->slider.setBounds (bounds);
+            s->setBounds (bounds);
         }
     }
 }
