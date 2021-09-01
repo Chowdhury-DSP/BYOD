@@ -23,14 +23,17 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, contrastColour);
-    xButton.onClick = [=] { MessageManager::callAsync ([=] { procChain.removeProcessor (&proc); }); };
+    xButton.onClick = [=]
+    { MessageManager::callAsync ([=]
+                                 { procChain.removeProcessor (&proc); }); };
     addAndMakeVisible (xButton);
 
     auto infoSvg = Drawable::createFromImageData (BinaryData::info_svg, BinaryData::info_svgSize);
     infoSvg->replaceColour (Colours::black, contrastColour);
     infoButton.setImages (infoSvg.get());
     addAndMakeVisible (infoButton);
-    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)] {
+    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)]
+    {
         boardComp->showInfoComp (baseProc);
     };
 
