@@ -32,8 +32,8 @@ AmpIRs::AmpIRs (UndoManager* um) : BaseProcessor ("Amp IRs", createParameterLayo
 
     parameterChanged (irTag, vts.getRawParameterValue (irTag)->load());
 
-    uiOptions.backgroundColour = Colours::darkcyan.brighter (0.15f);
-    uiOptions.powerColour = Colours::red.brighter (0.35f);
+    uiOptions.backgroundColour = Colours::darkcyan.brighter (0.1f);
+    uiOptions.powerColour = Colours::red.brighter (0.0f);
     uiOptions.info.description = "A collection of impulse responses from guitar cabinets.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -82,12 +82,14 @@ void AmpIRs::loadIRFromFile (const File& file)
     {
         irFiles.removeAllInstancesOf (file);
         AlertWindow::showMessageBoxAsync (AlertWindow::AlertIconType::WarningIcon, "IR File Not Found!", "The following IR file was not found: " + file.getFullPathName());
+        vts.getParameter (irTag)->setValueNotifyingHost (0.0f);
+        curFile = File();
         return;
     }
 
     irFiles.addIfNotAlreadyThere (file);
     curFile = file;
-    listeners.call (&Listener::irChanged);
+    listeners.call (&AmpIRListener::irChanged);
     vts.getParameter (irTag)->setValueNotifyingHost (1.0f);
 
     ScopedLock sl (irMutex);
@@ -153,7 +155,8 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
               storedParameter (parameter),
               attachment (
                   parameter,
-                  [this] (float f) { setValue (f); },
+                  [this] (float f)
+                  { setValue (f); },
                   undoManager)
         {
             sendInitialUpdate();
@@ -200,7 +203,7 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
         bool ignoreCallbacks = false;
     };
 
-    struct IRComboBox : public ComboBox, private AmpIRs::Listener
+    struct IRComboBox : public ComboBox, private AmpIRs::AmpIRListener
     {
         IRComboBox (AudioProcessorValueTreeState& vts, const String& paramID, AmpIRs& airs) : ampIRs (airs)
         {
@@ -209,12 +212,12 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
             refreshBox();
 
             setName (irTag + "__box");
-            ampIRs.addListener (this);
+            ampIRs.addAmpIRListener (this);
         }
 
         ~IRComboBox()
         {
-            ampIRs.removeListener (this);
+            ampIRs.removeAmpIRListener (this);
         }
 
         void irChanged() override { refreshBox(); }
@@ -236,7 +239,8 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
                     fileItem.text = file.getFileName();
                     fileItem.itemID = menuIdx++;
                     fileItem.isTicked = file == ampIRs.curFile;
-                    fileItem.action = [=] {
+                    fileItem.action = [=]
+                    {
                         ampIRs.loadIRFromFile (file);
                     };
                     menu->addItem (fileItem);
@@ -251,7 +255,8 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
             PopupMenu::Item customItem;
             customItem.text = "Custom";
             customItem.itemID = menuIdx++;
-            customItem.action = [=] {
+            customItem.action = [=]
+            {
                 FileChooser nativeFileChooser ("Custom IR", File(), "*.wav");
                 if (nativeFileChooser.browseForFileToOpen())
                 {

@@ -5,7 +5,7 @@
 class AmpIRs : public BaseProcessor, private AudioProcessorValueTreeState::Listener
 {
     CREATE_LISTENER (
-        Listener,
+        AmpIRListener,
         listeners,
         virtual void irChanged() {})
 public:
