@@ -15,6 +15,7 @@
 #include "other/Tremolo.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
+#include "tone/AmpIRs.h"
 #include "tone/BassCleaner.h"
 #include "tone/HighCut.h"
 #include "tone/LofiIrs.h"
@@ -46,6 +47,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Bass Cleaner", &processorFactory<BassCleaner> },
     { "Bassman Tone", &processorFactory<BassmanTone> },
     { "High Cut", &processorFactory<HighCut> },
+    { "Amp IRs", &processorFactory<AmpIRs> },
     { "LoFi IRs", &processorFactory<LofiIrs> },
     { "Treble Booster", &processorFactory<TrebleBooster> },
 
@@ -86,8 +88,7 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=]
-        { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }

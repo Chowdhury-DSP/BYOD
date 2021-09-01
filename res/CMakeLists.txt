@@ -11,6 +11,10 @@ juce_add_binary_data(BinaryData SOURCES
     guitar_ml_models/BluesJR_FullD.json
     guitar_ml_models/TS9_FullD.json
 
+    "amp_irs/Fender.wav"
+    "amp_irs/Marshall.wav"
+    "amp_irs/Bogner.wav"
+
     "lofi_irs/Casio 1.wav"
     "lofi_irs/Casio 2.wav"
     "lofi_irs/Cassette Speaker.wav"
