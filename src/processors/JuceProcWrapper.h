@@ -19,21 +19,21 @@ public:
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override {}
     JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
-    bool acceptsMidi() const override { return false; }
-    bool producesMidi() const override { return false; }
+    bool acceptsMidi() const final { return false; }
+    bool producesMidi() const final { return false; }
 
-    AudioProcessorEditor* createEditor() override { return nullptr; }
-    bool hasEditor() const override { return false; }
+    AudioProcessorEditor* createEditor() final { return nullptr; }
+    bool hasEditor() const final { return false; }
 
-    int getNumPrograms() override { return 0; }
-    void setCurrentProgram (int /*index*/) override {}
-    int getCurrentProgram() override { return 0; }
+    int getNumPrograms() final { return 0; }
+    void setCurrentProgram (int /*index*/) final {}
+    int getCurrentProgram() final { return 0; }
 
-    const String getProgramName (int /*index*/) override { return {}; }
-    void changeProgramName (int /*index*/, const String& /*newName*/) override {}
+    const String getProgramName (int /*index*/) final { return {}; }
+    void changeProgramName (int /*index*/, const String& /*newName*/) final {}
 
-    void getStateInformation (MemoryBlock& /*destData*/) override {}
-    void setStateInformation (const void* /*data*/, int /*sizeInBytes*/) override {}
+    void getStateInformation (MemoryBlock& /*destData*/) final {}
+    void setStateInformation (const void* /*data*/, int /*sizeInBytes*/) final {}
 
 private:
     String name;
