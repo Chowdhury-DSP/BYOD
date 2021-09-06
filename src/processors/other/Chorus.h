@@ -23,19 +23,26 @@ private:
     dsp::DryWetMixer<float> dryWetMixer;
     dsp::DryWetMixer<float> dryWetMixerMono;
 
-    SmoothedValue<float, ValueSmoothingTypes::Linear> sineSmoothers[2][4];
-    chowdsp::SineWave<float> sines[2][4];
+    static constexpr int delaysPerChannel = 2;
 
-    using DelayType = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Sinc<float, 16>>;
-    std::array<DelayType, 4> delay {DelayType { 1 << 16}, DelayType { 1 << 16}, DelayType { 1 << 16}, DelayType { 1 << 16}};
+    SmoothedValue<float, ValueSmoothingTypes::Linear> slowSmooth[2];
+    SmoothedValue<float, ValueSmoothingTypes::Linear> fastSmooth[2];
 
-    // using DelayType = chowdsp::BBD::BBDDelayWrapper<8192>;
-    // std::array<DelayType, 4> delay;
-    
-    chowdsp::StateVariableFilter<float> dcBlocker;
+    chowdsp::SineWave<float> slowLFOs[2][delaysPerChannel];
+    chowdsp::SineWave<float> fastLFOs[2][delaysPerChannel];
+
+    using DelayType = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th>;
+    DelayType delay[2][delaysPerChannel] {
+        { DelayType { 1 << 16 },
+          DelayType { 1 << 16 } },
+        { DelayType { 1 << 16 },
+          DelayType { 1 << 16 } },
+    };
+    chowdsp::StateVariableFilter<float> aaFilter;
 
     float feedbackState[2];
     SmoothedValue<float, ValueSmoothingTypes::Linear> fbSmooth[2];
+    chowdsp::StateVariableFilter<float> dcBlocker;
 
     float fs = 48000.0f;
 
