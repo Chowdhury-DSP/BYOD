@@ -104,7 +104,7 @@ RONN::RONN (UndoManager* um) : BaseProcessor ("RONN", createParameterLayout(), u
     uiOptions.powerColour = Colours::cyan;
     uiOptions.info.description = "RONN is a \"Randomised Overdrive Neural Network\", first proposed by Christian Steinmetz. This implementation uses a convolutional recurrent neural net.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
-    uiOptions.info.infoLink = URL { "https://github.com/csteinmetz1/ronn" };
+    uiOptions.info.infoLink = "https://github.com/csteinmetz1/ronn";
 }
 
 AudioProcessorValueTreeState::ParameterLayout RONN::createParameterLayout()

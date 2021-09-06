@@ -72,9 +72,10 @@ void InfoComponent::setInfoForProc (const String& name, const ProcessorUIOptions
         authors += info.authors[i] + ", ";
     }
 
-    if (info.infoLink.isWellFormed())
+    auto url = URL::createWithoutParsing (info.infoLink);
+    if (url.isWellFormed())
     {
-        linkButton.setURL (info.infoLink);
+        linkButton.setURL (url);
         linkButton.setVisible (true);
     }
     else

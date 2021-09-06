@@ -8,7 +8,7 @@ Centaur::Centaur (UndoManager* um) : BaseProcessor ("Centaur", createParameterLa
     uiOptions.powerColour = Colour (0xFF14CBF2).brighter (0.5f);
     uiOptions.info.description = "Emulation of the Klon Centaur overdrive pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
-    uiOptions.info.infoLink = URL { "https://github.com/jatinchowdhury18/KlonCentaur" };
+    uiOptions.info.infoLink = "https://github.com/jatinchowdhury18/KlonCentaur";
 }
 
 AudioProcessorValueTreeState::ParameterLayout Centaur::createParameterLayout()

@@ -11,7 +11,7 @@ BassmanTone::BassmanTone (UndoManager* um) : BaseProcessor ("Bassman Tone", crea
     uiOptions.powerColour = Colours::yellow.brighter();
     uiOptions.info.description = "Virtual analog emulation of the Fender Bassman tone stack.";
     uiOptions.info.authors = StringArray { "Samuel Schachter", "Jatin Chowdhury" };
-    uiOptions.info.infoLink = URL { "https://github.com/schachtersam32/WaveDigitalFilters_Sharc" };
+    uiOptions.info.infoLink = "https://github.com/schachtersam32/WaveDigitalFilters_Sharc";
 }
 
 AudioProcessorValueTreeState::ParameterLayout BassmanTone::createParameterLayout()
