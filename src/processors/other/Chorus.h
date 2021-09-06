@@ -32,12 +32,11 @@ private:
     chowdsp::SineWave<float> fastLFOs[2][delaysPerChannel];
 
     using DelayType = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th>;
-    DelayType delay[2][delaysPerChannel] {
-        { DelayType { 1 << 16 },
-          DelayType { 1 << 16 } },
-        { DelayType { 1 << 16 },
-          DelayType { 1 << 16 } },
+    std::array<std::array<DelayType, delaysPerChannel>, 2> delay {
+        std::array<DelayType, delaysPerChannel> { DelayType { 1 << 16 }, DelayType { 1 << 16 } },
+        std::array<DelayType, delaysPerChannel> { DelayType { 1 << 16 }, DelayType { 1 << 16 } },
     };
+
     chowdsp::StateVariableFilter<float> aaFilter;
 
     float feedbackState[2];
