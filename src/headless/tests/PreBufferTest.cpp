@@ -35,18 +35,16 @@ public:
 
     void runTest() override
     {
-        doForAllProcessors ([=] (BaseProcessor* proc)
-                            {
-                                beginTest (proc->getName() + " Test");
+        runTestForAllProcessors (this, [=] (BaseProcessor* proc)
+                                 {
+                                     proc->prepare (testSampleRate, testBlockSize);
 
-                                proc->prepare (testSampleRate, testBlockSize);
+                                     AudioBuffer<float> buffer (1, testBlockSize);
+                                     buffer.clear();
+                                     proc->processAudio (buffer);
 
-                                AudioBuffer<float> buffer (1, testBlockSize);
-                                buffer.clear();
-                                proc->processAudio (buffer);
-
-                                testBuffer (buffer.getReadPointer (0));
-                            });
+                                     testBuffer (buffer.getReadPointer (0));
+                                 });
     }
 };
 

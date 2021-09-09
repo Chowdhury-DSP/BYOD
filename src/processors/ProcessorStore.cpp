@@ -12,6 +12,7 @@
 #include "drive/zen_drive/ZenDrive.h"
 
 #include "other/Chorus.h"
+#include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
 #include "other/Tremolo.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
@@ -57,6 +58,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "DC Blocker", &processorFactory<DCBlocker> },
 
     { "Chorus", &processorFactory<Chorus> },
+    { "Delay", &processorFactory<Delay> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Tremolo", &processorFactory<Tremolo> },
     { "Spring Reverb", &processorFactory<SpringReverbProcessor> },

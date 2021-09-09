@@ -42,27 +42,25 @@ public:
 
     void runTest() override
     {
-        doForAllProcessors ([=] (BaseProcessor* proc)
-                            {
-                                beginTest (proc->getName() + " Test");
+        runTestForAllProcessors (this, [=] (BaseProcessor* proc)
+                                 {
+                                     auto params = proc->getVTS().processor.getParameters();
+                                     for (auto* p : params)
+                                     {
+                                         auto* floatParam = dynamic_cast<AudioParameterFloat*> (p);
+                                         if (floatParam == nullptr) // no a float param!
+                                             continue;
 
-                                auto params = proc->getVTS().processor.getParameters();
-                                for (auto* p : params)
-                                {
-                                    auto* floatParam = dynamic_cast<AudioParameterFloat*> (p);
-                                    if (floatParam == nullptr) // no a float param!
-                                        continue;
+                                         // reset all parameters to default
+                                         for (auto* dp : params)
+                                             dp->setValueNotifyingHost (dp->getDefaultValue());
 
-                                    // reset all parameters to default
-                                    for (auto* dp : params)
-                                        dp->setValueNotifyingHost (dp->getDefaultValue());
+                                         std::cout << "  Testing parameter: " << floatParam->name << std::endl;
 
-                                    std::cout << "  Testing parameter: " << floatParam->name << std::endl;
-
-                                    proc->prepare (testSampleRate, testBlockSize);
-                                    testParameter (proc, floatParam);
-                                }
-                            });
+                                         proc->prepare (testSampleRate, testBlockSize);
+                                         testParameter (proc, floatParam);
+                                     }
+                                 });
     }
 };
 

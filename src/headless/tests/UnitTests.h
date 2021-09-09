@@ -1,11 +1,19 @@
 #include "../../BYOD.h"
 
-static inline void doForAllProcessors (std::function<void (BaseProcessor*)> testFunc)
+static inline void runTestForAllProcessors (UnitTest* ut, std::function<void (BaseProcessor*)> testFunc)
 {
     ProcessorStore procStore;
     for (auto [name, factory] : procStore.getStoreMap())
     {
         auto proc = factory (nullptr);
+        ut->beginTest (proc->getName() + " Test");
+
+        if (proc->getTestsToSkip().contains (ut->getName()))
+        {
+            std::cout << "Skipping " << ut->getName() << " for processor: " << proc->getName() << std::endl;
+            continue;
+        }
+
         testFunc (proc.get());
     }
 }
