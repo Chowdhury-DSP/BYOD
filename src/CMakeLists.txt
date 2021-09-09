@@ -36,6 +36,7 @@ target_sources(BYOD PRIVATE
     processors/drive/zen_drive/ZenDrive.cpp
 
     processors/other/Chorus.cpp
+    processors/other/Delay.cpp
     processors/other/EnvelopeFilter.cpp
     processors/other/Tremolo.cpp
     processors/other/spring_reverb/SpringReverb.cpp
