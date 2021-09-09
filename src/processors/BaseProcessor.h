@@ -55,7 +55,11 @@ public:
     AudioProcessorValueTreeState& getVTS() { return vts; }
     const ProcessorUIOptions& getUIOptions() const { return uiOptions; }
 
+    /** if your processor has custom UI componenets, create them here! */
     virtual void getCustomComponents (OwnedArray<Component>& /*customComps*/) {}
+
+    /** if your processor can't pass a unit test (for a justifiable reason) say so here! */
+    virtual StringArray getTestsToSkip() const { return {}; }
 
 protected:
     AudioProcessorValueTreeState vts;

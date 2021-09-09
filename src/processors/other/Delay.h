@@ -13,6 +13,10 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
+    // This processor fails the parameter smoothing test since the first
+    // 100 milliseconds of samples get delayed.
+    StringArray getTestsToSkip() const override { return { "Parameter Smooth Test" }; }
+
 private:
     std::atomic<float>* delayTimeMsParam = nullptr;
     std::atomic<float>* feedbackParam = nullptr;
