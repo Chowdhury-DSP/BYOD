@@ -20,7 +20,7 @@ Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus", createParameterLayou
 
     uiOptions.backgroundColour = Colours::purple.brighter (0.25f);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
-    uiOptions.info.description = "A chorus effect using modulated delay lines. Note that this effect works best in stereo.";
+    uiOptions.info.description = "A chorus effect using BBD-emulated delay lines. Note that this effect works best in stereo.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
@@ -86,6 +86,7 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
         {
             slowLFOs[ch][i].setFrequency (slowRate);
             fastLFOs[ch][i].setFrequency (fastRate);
+            delay[ch][i].setFilterFreq (10000.0f);
         }
     }
 
