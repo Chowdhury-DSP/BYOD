@@ -4,12 +4,13 @@
 Delay::Delay (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
 {
     delayTimeMsParam = vts.getRawParameterValue ("time_ms");
+    freqParam = vts.getRawParameterValue ("freq");
     feedbackParam = vts.getRawParameterValue ("feedback");
     mixParam = vts.getRawParameterValue ("mix");
 
     uiOptions.backgroundColour = Colours::cyan.darker (0.1f);
     uiOptions.powerColour = Colours::gold;
-    uiOptions.info.description = "A simple delay effect with feedback.";
+    uiOptions.info.description = "A BBD emulation delay effect with feedback.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
@@ -18,7 +19,7 @@ AudioProcessorValueTreeState::ParameterLayout Delay::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    NormalisableRange timeRangeMs { 0.0f, 2000.0f };
+    NormalisableRange timeRangeMs { 0.1f, 2000.0f };
     timeRangeMs.setSkewForCentre (200.0f);
     params.push_back (std::make_unique<VTSParam> ("time_ms",
                                                   "Delay Time",
@@ -28,6 +29,7 @@ AudioProcessorValueTreeState::ParameterLayout Delay::createParameterLayout()
                                                   timeMsValToString,
                                                   stringToTimeMsVal));
 
+    createFreqParameter (params, "freq", "Cutoff", 500.0f, 10000.0f, 4000.0f, 10000.0f);
     createPercentParameter (params, "feedback", "Feedback", 0.0f);
     createPercentParameter (params, "mix", "Mix", 0.5f);
 
@@ -48,6 +50,7 @@ void Delay::prepare (double sampleRate, int samplesPerBlock)
     dryWetMixerMono.prepare (monoSpec);
 
     delaySmooth.reset (sampleRate, 0.1);
+    freqSmooth.reset (sampleRate, 0.1);
     for (int ch = 0; ch < 2; ++ch)
         fbSmooth[ch].reset (sampleRate, 0.01);
 }
@@ -63,8 +66,9 @@ void Delay::processAudio (AudioBuffer<float>& buffer)
     dryWet.setWetMixProportion (*mixParam);
     dryWet.pushDrySamples (block);
 
-    auto fbTarget = std::pow (feedbackParam->load() * 0.95f, 0.9f);
+    auto fbTarget = std::pow (feedbackParam->load() * 0.67f, 0.9f);
     delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f);
+    freqSmooth.setTargetValue (*freqParam);
 
     if (delaySmooth.isSmoothing())
     {
@@ -74,6 +78,7 @@ void Delay::processAudio (AudioBuffer<float>& buffer)
             for (int n = 0; n < numSamples; ++n)
             {
                 delayLine.setDelay (delaySmooth.getNextValue());
+                delayLine.setFilterFreq (freqSmooth.getNextValue());
 
                 auto y = delayLine.popSample (0);
                 delayLine.pushSample (0, x[n] + y * fbSmooth[0].getNextValue());
@@ -87,6 +92,7 @@ void Delay::processAudio (AudioBuffer<float>& buffer)
             for (int n = 0; n < numSamples; ++n)
             {
                 delayLine.setDelay (delaySmooth.getNextValue());
+                delayLine.setFilterFreq (freqSmooth.getNextValue());
 
                 auto y = delayLine.popSample (0);
                 delayLine.pushSample (0, xL[n] + y * fbSmooth[0].getNextValue());
@@ -101,6 +107,7 @@ void Delay::processAudio (AudioBuffer<float>& buffer)
     else
     {
         delayLine.setDelay (delaySmooth.getTargetValue());
+        delayLine.setFilterFreq (freqSmooth.getTargetValue());
 
         for (int ch = 0; ch < numChannels; ++ch)
         {

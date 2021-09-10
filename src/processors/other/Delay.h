@@ -19,18 +19,18 @@ public:
 
 private:
     std::atomic<float>* delayTimeMsParam = nullptr;
+    std::atomic<float>* freqParam = nullptr;
     std::atomic<float>* feedbackParam = nullptr;
     std::atomic<float>* mixParam = nullptr;
 
     dsp::DryWetMixer<float> dryWetMixer;
     dsp::DryWetMixer<float> dryWetMixerMono;
 
-    using DelayType = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th>;
-    DelayType delayLine { 1 << 18 };
-    // using DelayType = chowdsp::BBD::BBDDelayWrapper<16384>;
-    // DelayType delayLine;
+    using DelayType = chowdsp::BBD::BBDDelayWrapper<4 * 16384>;
+    DelayType delayLine;
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> delaySmooth;
+    SmoothedValue<float, ValueSmoothingTypes::Linear> freqSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> fbSmooth[2];
 
     float fs = 48000.0f;
