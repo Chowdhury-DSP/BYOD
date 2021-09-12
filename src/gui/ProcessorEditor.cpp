@@ -82,11 +82,8 @@ void ProcessorEditor::resized()
     infoButton.setBounds (getWidth() - infoButtonSize, getHeight() - infoButtonSize, infoButtonSize, infoButtonSize);
 }
 
-void ProcessorEditor::mouseDrag (const MouseEvent&)
+void ProcessorEditor::mouseDrag (const MouseEvent& e)
 {
-    if (auto* dragC = DragAndDropContainer::findParentDragContainerFor (this))
-    {
-        if (! dragC->isDragAndDropActive())
-            dragC->startDragging ("ProcessorEditor", this);
-    }
+    const auto relE = e.getEventRelativeTo (getParentComponent());
+    setTopLeftPosition (relE.getPosition());
 }

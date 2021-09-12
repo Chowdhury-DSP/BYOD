@@ -18,12 +18,17 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.onClick = [=]
     { showNewProcMenu(); };
 
+    setSize (800, 800);
+
     addChildComponent (infoComp);
 
     for (auto* p : procs.getProcessors())
         processorAdded (p);
 
     procChain.addListener (this);
+
+    addAndMakeVisible (inputEditor);
+    addAndMakeVisible (outputEditor);
 }
 
 BoardComponent::~BoardComponent()
@@ -44,21 +49,11 @@ void BoardComponent::paint (Graphics& g)
 
 void BoardComponent::resized()
 {
-    auto bounds = getLocalBounds();
+    auto centreEditorHeight = (getHeight() - editorHeight) / 2;
+    inputEditor.setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
+    outputEditor.setBounds (getWidth() - (editorWidth / 2 + editorPad), centreEditorHeight, editorWidth / 2, editorHeight);
 
-    for (auto* editor : processorEditors)
-    {
-        auto b = bounds.removeFromLeft (editorWidth + 2 * editorPad);
-        auto height = jmin (editorHeight, getHeight() - 2 * (editorPad + yOffset));
-        editor->setBounds (Rectangle<int> (editorWidth, height).withCentre (b.getCentre().translated (0, -yOffset)));
-    }
-
-    // draw newProcButton
-    {
-        const auto centre = bounds.getCentre();
-        newProcButton.setBounds (Rectangle<int> (newButtonWidth, newButtonWidth).withCentre (centre.translated (0, -yOffset)));
-    }
-
+    newProcButton.setBounds (getWidth() - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, getWidth()), jmin (250, getHeight())).withCentre (getLocalBounds().getCentre()));
 }
 
@@ -76,6 +71,9 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
     addAndMakeVisible (newEditor);
+
+    auto centre = getLocalBounds().getCentre();
+    newEditor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
 
     refreshBoardSize();
 }
@@ -104,38 +102,6 @@ void BoardComponent::showInfoComp (const BaseProcessor& proc)
     infoComp.setInfoForProc (proc.getName(), proc.getUIOptions().info);
     infoComp.setVisible (true);
     infoComp.toFront (true);
-}
-
-bool BoardComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
-{
-    return processorEditors.contains (dynamic_cast<ProcessorEditor*> (dragSourceDetails.sourceComponent.get()));
-}
-
-void BoardComponent::itemDropped (const SourceDetails& dragSourceDetails)
-{
-    const auto dragX = dragSourceDetails.localPosition.x;
-    if (dragX < 0 || dragX > getWidth())
-        return;
-
-    int lastX = 0;
-    for (const auto* editor : processorEditors)
-    {
-        auto newX = editor->getRight();
-        if (dragX >= lastX && dragX < newX)
-        {
-            auto* draggedEditor = dynamic_cast<ProcessorEditor*> (dragSourceDetails.sourceComponent.get());
-            procChain.moveProcessor (draggedEditor->getProcPtr(), editor->getProcPtr());
-            return;
-        }
-
-        lastX = newX;
-    }
-
-    if (lastX > 0)
-    {
-        auto* draggedEditor = dynamic_cast<ProcessorEditor*> (dragSourceDetails.sourceComponent.get());
-        procChain.moveProcessor (draggedEditor->getProcPtr(), nullptr);
-    }
 }
 
 void BoardComponent::showNewProcMenu() const

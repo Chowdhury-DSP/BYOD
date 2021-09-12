@@ -2,12 +2,11 @@
 
 #include "../processors/ProcessorChain.h"
 #include "InfoComponent.h"
+#include "InputEditor.h"
 #include "ProcessorEditor.h"
 #include "utils/LookAndFeels.h"
 
 class BoardComponent : public Component,
-                       public DragAndDropContainer,
-                       public DragAndDropTarget,
                        private ProcessorChain::Listener
 {
 public:
@@ -23,9 +22,6 @@ public:
     void processorMoved (int procToMove, int procInSlot) override;
     void showInfoComp (const BaseProcessor& proc);
 
-    bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
-    void itemDropped (const SourceDetails& dragSourceDetails) override;
-
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
 
     static constexpr auto yOffset = 35;
@@ -39,6 +35,9 @@ private:
     TextButton newProcButton;
     OwnedArray<ProcessorEditor> processorEditors;
     InfoComponent infoComp;
+
+    InputEditor inputEditor;
+    OutputEditor outputEditor;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;
 
