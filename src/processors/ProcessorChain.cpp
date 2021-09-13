@@ -4,7 +4,6 @@
 
 namespace
 {
-const String monoModeTag = "mono_stereo";
 const String oversamplingTag = "oversampling";
 const String inGainTag = "in_gain";
 const String outGainTag = "out_gain";
@@ -17,7 +16,6 @@ ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeSt
     using namespace std::placeholders;
     procStore.addProcessorCallback = std::bind (&ProcessorChain::addProcessor, this, _1);
 
-    monoModeParam = vts.getRawParameterValue (monoModeTag);
     oversamplingParam = vts.getRawParameterValue (oversamplingTag);
     inGainParam = vts.getRawParameterValue (inGainTag);
     outGainParam = vts.getRawParameterValue (outGainTag);
@@ -29,11 +27,6 @@ ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeSt
 
 void ProcessorChain::createParameters (Parameters& params)
 {
-    params.push_back (std::make_unique<AudioParameterChoice> (monoModeTag,
-                                                              "Mono/Stereo",
-                                                              StringArray { "Mono", "Stereo" },
-                                                              0));
-
     params.push_back (std::make_unique<AudioParameterChoice> (oversamplingTag,
                                                               "Oversampling",
                                                               StringArray { "1x", "2x", "4x", "8x", "16x" },
@@ -51,6 +44,8 @@ void ProcessorChain::initializeProcessors (int curOS)
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
+    inputProcessor.prepare (osSampleRate, osSamplesPerBlock);
+
     for (auto* processor : procs)
         processor->prepare (osSampleRate, osSamplesPerBlock);
 }
@@ -60,8 +55,7 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
     mySampleRate = sampleRate;
     mySamplesPerBlock = samplesPerBlock;
 
-    monoBuffer.setSize (1, samplesPerBlock * 16); // allocate extra space for upsampled buffers
-    stereoBuffer.setSize (2, samplesPerBlock * 16);
+    inputBuffer.setSize (2, samplesPerBlock * 16); // allocate extra space for upsampled buffers
 
     int curOS = static_cast<int> (*oversamplingParam);
     prevOS = curOS;
@@ -109,29 +103,15 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
     // process mono or stereo buffer?
     const auto osNumSamples = (int) osBlock.getNumSamples();
     const auto numChannels = buffer.getNumChannels();
-    const auto useMono = monoModeParam->load() == 0.0f;
 
-    if (useMono)
-    {
-        monoBuffer.setSize (1, osNumSamples, false, false, true);
-        monoBuffer.clear();
-        monoBuffer.copyFrom (0, 0, osBlock.getChannelPointer (0), osNumSamples);
+    inputBuffer.setSize (2, osNumSamples, false, false, true);
+    inputBuffer.clear();
 
-        for (int ch = 1; ch < numChannels; ++ch)
-            monoBuffer.addFrom (0, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
+    for (int ch = 0; ch < numChannels; ++ch)
+        inputBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
 
-        monoBuffer.applyGain (1.0f / (float) numChannels);
-    }
-    else
-    {
-        stereoBuffer.setSize (2, osNumSamples, false, false, true);
-        stereoBuffer.clear();
-
-        for (int ch = 0; ch < numChannels; ++ch)
-            stereoBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
-    }
-
-    auto& processBuffer = useMono ? monoBuffer : stereoBuffer;
+    inputProcessor.processAudio (inputBuffer);
+    auto& processBuffer = inputProcessor.getOutputBuffer();
 
     for (auto* processor : procs)
     {
@@ -145,7 +125,7 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
     }
 
     // go back to original block of data
-    if (useMono)
+    if (processBuffer.getNumChannels() == 1)
     {
         auto processedData = processBuffer.getReadPointer (0);
         for (int ch = 0; ch < numChannels; ++ch)

@@ -36,7 +36,8 @@ private:
     OwnedArray<ProcessorEditor> processorEditors;
     InfoComponent infoComp;
 
-    InputEditor inputEditor;
+    std::unique_ptr<ProcessorEditor> inputEditor;
+    // InputEditor inputEditor;
     OutputEditor outputEditor;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;

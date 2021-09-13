@@ -3,6 +3,8 @@
 #include "DryWetProcessor.h"
 #include "ProcessorStore.h"
 
+#include "utility/InputProcessor.h"
+
 class ProcessorChain
 {
     CREATE_LISTENER (
@@ -27,6 +29,8 @@ public:
     ProcessorStore& getProcStore() { return procStore; }
     const SpinLock& getProcChainLock() const { return processingLock; }
 
+    InputProcessor& getInputProcessor() { return inputProcessor; }
+
 private:
     void initializeProcessors (int curOS);
 
@@ -37,9 +41,8 @@ private:
     ProcessorStore& procStore;
     SpinLock processingLock;
 
-    std::atomic<float>* monoModeParam = nullptr;
-    AudioBuffer<float> monoBuffer;
-    AudioBuffer<float> stereoBuffer;
+    InputProcessor inputProcessor;
+    AudioBuffer<float> inputBuffer;
 
     std::atomic<float>* oversamplingParam = nullptr;
     std::unique_ptr<dsp::Oversampling<float>> overSample[5];

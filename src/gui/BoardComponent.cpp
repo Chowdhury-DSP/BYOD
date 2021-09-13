@@ -18,6 +18,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.onClick = [=]
     { showNewProcMenu(); };
 
+    inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, this);
+    addAndMakeVisible (inputEditor.get());
+
+    addAndMakeVisible (outputEditor);
+
     setSize (800, 800);
 
     addChildComponent (infoComp);
@@ -26,9 +31,6 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
         processorAdded (p);
 
     procChain.addListener (this);
-
-    addAndMakeVisible (inputEditor);
-    addAndMakeVisible (outputEditor);
 }
 
 BoardComponent::~BoardComponent()
@@ -50,7 +52,7 @@ void BoardComponent::paint (Graphics& g)
 void BoardComponent::resized()
 {
     auto centreEditorHeight = (getHeight() - editorHeight) / 2;
-    inputEditor.setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
+    inputEditor->setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
     outputEditor.setBounds (getWidth() - (editorWidth / 2 + editorPad), centreEditorHeight, editorWidth / 2, editorHeight);
 
     newProcButton.setBounds (getWidth() - newButtonWidth, 0, newButtonWidth, newButtonWidth);
