@@ -106,11 +106,8 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (contrastColour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, bool isSlider, int offset = 0)
+    auto makeName = [&g] (Component& comp, String name, int offset = 0)
     {
-        if (! isSlider)
-            return;
-
         const int height = 20;
         g.setFont (Font (18.0f).boldened());
         Rectangle<int> nameBox (comp.getX(), comp.getY() - 22 + offset, comp.getWidth(), height);
@@ -118,10 +115,10 @@ void KnobsComponent::paint (Graphics& g)
     };
 
     for (auto* s : sliders)
-        makeName (*s, s->getName(), true, 6);
+        makeName (*s, s->getName(), 6);
 
     for (auto* b : boxes)
-        makeName (*b, b->getName(), false);
+        makeName (*b, b->getName());
 }
 
 void KnobsComponent::resized()
