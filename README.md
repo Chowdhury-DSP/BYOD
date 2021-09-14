@@ -33,7 +33,14 @@ $ git submodule update --init --recursive
 
 # build with CMake
 $ cmake -Bbuild
-$ cmake --build build --config Release
+$ cmake --build build --parallel 4
+```
+
+If you'd like to make an optimized "release" build, it
+is suggested to use some slightly different build commands:
+```bash
+$ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
+$ cmake --build build --config Release --parallel 4
 ```
 
 ## Credits:
