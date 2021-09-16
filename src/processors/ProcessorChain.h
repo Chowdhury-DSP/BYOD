@@ -4,6 +4,7 @@
 #include "ProcessorStore.h"
 
 #include "utility/InputProcessor.h"
+#include "utility/OutputProcessor.h"
 
 class ProcessorChain
 {
@@ -30,9 +31,11 @@ public:
     const SpinLock& getProcChainLock() const { return processingLock; }
 
     InputProcessor& getInputProcessor() { return inputProcessor; }
+    OutputProcessor& getOutputProcessor() { return outputProcessor; }
 
 private:
     void initializeProcessors (int curOS);
+    void runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed);
 
     double mySampleRate = 48000.0;
     int mySamplesPerBlock = 512;
@@ -40,9 +43,11 @@ private:
     OwnedArray<BaseProcessor> procs;
     ProcessorStore& procStore;
     SpinLock processingLock;
+    UndoManager* um;
 
     InputProcessor inputProcessor;
     AudioBuffer<float> inputBuffer;
+    OutputProcessor outputProcessor;
 
     std::atomic<float>* oversamplingParam = nullptr;
     std::unique_ptr<dsp::Oversampling<float>> overSample[5];
@@ -56,7 +61,6 @@ private:
     DryWetProcessor dryWetMixer;
 
     friend class ProcChainActions;
-    UndoManager* um;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

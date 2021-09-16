@@ -2,10 +2,18 @@
 
 BaseProcessor::BaseProcessor (const String& name,
                               AudioProcessorValueTreeState::ParameterLayout params,
-                              UndoManager* um) : JuceProcWrapper (name),
-                                                 vts (*this, um, Identifier ("Parameters"), std::move (params))
+                              UndoManager* um,
+                              int nInputs,
+                              int nOutputs) : JuceProcWrapper (name),
+                                              vts (*this, um, Identifier ("Parameters"), std::move (params)),
+                                              numInputs (nInputs),
+                                              numOutputs (nOutputs)
 {
     onOffParam = vts.getRawParameterValue ("on_off");
+
+    outputProcessors.resize (numOutputs);
+    bufferArray.resize (numOutputs);
+
     uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>();
 }
 

@@ -6,7 +6,7 @@
 class InputProcessor : public BaseProcessor
 {
 public:
-    InputProcessor (UndoManager* um = nullptr) : BaseProcessor ("Input", createParameterLayout(), um)
+    InputProcessor (UndoManager* um = nullptr) : BaseProcessor ("Input", createParameterLayout(), um, 0, 1)
     {
         monoModeParam = vts.getRawParameterValue ("mono_stereo");
 
@@ -57,12 +57,9 @@ public:
         }
     }
 
-    AudioBuffer<float>& getOutputBuffer() { return *outputBuffer; }
-
 private:
     std::atomic<float>* monoModeParam = nullptr;
 
-    AudioBuffer<float>* outputBuffer = nullptr;
     AudioBuffer<float> monoBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputProcessor)

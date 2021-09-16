@@ -39,11 +39,33 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
 
     if (procUI.lnf != nullptr)
         setLookAndFeel (procUI.lnf);
+
+    for (int i = 0; i < baseProc.getNumInputs(); ++i)
+    {
+        auto newPort = inputPorts.add (std::make_unique<Port>());
+        newPort->setInputOutput (true);
+        addAndMakeVisible (newPort);
+        newPort->addPortListener (this);
+    }
+
+    for (int i = 0; i < baseProc.getNumOutputs(); ++i)
+    {
+        auto newPort = outputPorts.add (std::make_unique<Port>());
+        newPort->setInputOutput (false);
+        addAndMakeVisible (newPort);
+        newPort->addPortListener (this);
+    }
 }
 
 ProcessorEditor::~ProcessorEditor()
 {
     setLookAndFeel (nullptr);
+
+    for (auto* port : inputPorts)
+        port->removePortListener (this);
+
+    for (auto* port : outputPorts)
+        port->removePortListener (this);
 }
 
 void ProcessorEditor::paint (Graphics& g)
@@ -72,18 +94,72 @@ void ProcessorEditor::paint (Graphics& g)
 
 void ProcessorEditor::resized()
 {
-    knobs.setBounds (5, 35, getWidth() - 10, getHeight() - 40);
+    const auto width = getWidth();
+    const auto height = getHeight();
+    knobs.setBounds (5, 35, width - 10, height - 40);
 
     constexpr int xButtonSize = 27;
-    powerButton.setBounds (getWidth() - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
-    xButton.setBounds (getWidth() - xButtonSize, 0, xButtonSize, xButtonSize);
+    powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
+    xButton.setBounds (width - xButtonSize, 0, xButtonSize, xButtonSize);
 
     constexpr int infoButtonSize = 20;
-    infoButton.setBounds (getWidth() - infoButtonSize, getHeight() - infoButtonSize, infoButtonSize, infoButtonSize);
+    infoButton.setBounds (width - infoButtonSize, height - infoButtonSize, infoButtonSize, infoButtonSize);
+
+    const int portDim = height / 10;
+    auto placePorts = [=] (int x, auto& ports)
+    {
+        const auto nPorts = ports.size();
+        if (nPorts == 0)
+            return;
+
+        const auto yPad = height / nPorts;
+        int y = yPad / 2;
+        for (auto* port : ports)
+        {
+            port->setBounds (x, y, portDim, portDim);
+            y += yPad;
+        }
+    };
+
+    placePorts (-portDim / 2, inputPorts);
+    placePorts (width - portDim / 2, outputPorts);
 }
 
 void ProcessorEditor::mouseDrag (const MouseEvent& e)
 {
     const auto relE = e.getEventRelativeTo (getParentComponent());
     setTopLeftPosition (relE.getPosition());
+    getParentComponent()->repaint();
+}
+
+void ProcessorEditor::createCable (Port* origin, const MouseEvent& e)
+{
+    portListeners.call (&PortListener::createCable, this, outputPorts.indexOf (origin), e);
+}
+
+void ProcessorEditor::refreshCable (const MouseEvent& e)
+{
+    portListeners.call (&PortListener::refreshCable, e);
+}
+
+void ProcessorEditor::releaseCable (const MouseEvent& e)
+{
+    portListeners.call (&PortListener::releaseCable, e);
+}
+
+void ProcessorEditor::destroyCable (Port* origin)
+{
+    portListeners.call (&PortListener::destroyCable, this, inputPorts.indexOf (origin));
+}
+
+Point<int> ProcessorEditor::getPortLocation (int portIndex, bool isInput) const
+{
+    if (isInput)
+    {
+        jassert (portIndex < inputPorts.size());
+        return inputPorts[portIndex]->getBounds().getCentre();
+    }
+
+    jassert (portIndex < outputPorts.size());
+    return outputPorts[portIndex]->getBounds().getCentre();
 }

@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../processors/ProcessorChain.h"
+#include "Cable.h"
 #include "InfoComponent.h"
-#include "InputEditor.h"
 #include "ProcessorEditor.h"
 #include "utils/LookAndFeels.h"
 
 class BoardComponent : public Component,
-                       private ProcessorChain::Listener
+                       private ProcessorChain::Listener,
+                       private ProcessorEditor::PortListener
 {
 public:
     BoardComponent (ProcessorChain& procs);
@@ -23,6 +24,12 @@ public:
     void showInfoComp (const BaseProcessor& proc);
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
+    ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
+
+    void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e) override;
+    void refreshCable (const MouseEvent& e) override;
+    void releaseCable (const MouseEvent& e) override;
+    void destroyCable (ProcessorEditor* origin, int portIndex) override;
 
     static constexpr auto yOffset = 35;
 
@@ -37,8 +44,10 @@ private:
     InfoComponent infoComp;
 
     std::unique_ptr<ProcessorEditor> inputEditor;
-    // InputEditor inputEditor;
-    OutputEditor outputEditor;
+    std::unique_ptr<ProcessorEditor> outputEditor;
+
+    OwnedArray<Cable> cables;
+    std::unique_ptr<MouseEvent> cableMouse;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;
 

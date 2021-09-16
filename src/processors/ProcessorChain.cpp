@@ -11,7 +11,9 @@ const String dryWetTag = "dry_wet";
 } // namespace
 
 ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store),
-                                                                                            um (vts.undoManager)
+                                                                                            um (vts.undoManager),
+                                                                                            inputProcessor (um),
+                                                                                            outputProcessor (um)
 {
     using namespace std::placeholders;
     procStore.addProcessorCallback = std::bind (&ProcessorChain::addProcessor, this, _1);
@@ -45,6 +47,7 @@ void ProcessorChain::initializeProcessors (int curOS)
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
     inputProcessor.prepare (osSampleRate, osSamplesPerBlock);
+    outputProcessor.prepare (osSampleRate, osSamplesPerBlock);
 
     for (auto* processor : procs)
         processor->prepare (osSampleRate, osSamplesPerBlock);
@@ -72,6 +75,54 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
     dryWetMixer.prepare (spec);
 
     initializeProcessors (curOS);
+}
+
+void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed)
+{
+    int nextNumProcs = 0;
+    const int numOutputs = proc->getNumOutputs();
+    for (int i = 0; i < numOutputs; ++i)
+    {
+        const int numOutProcs = proc->getNumOutputProcessors (i);
+        for (int j = 0; j < numOutProcs; ++j)
+            nextNumProcs += 1;
+    }
+
+    if (proc == &outputProcessor)
+    {
+        proc->processAudio (buffer);
+        outProcessed = true;
+        return;
+    }
+
+    if (nextNumProcs == 0)
+        return;
+
+    proc->processAudio (buffer);
+    auto* outBuffer = &proc->getOutputBuffer();
+    if (outBuffer == nullptr)
+        outBuffer = &buffer;
+
+    for (int i = numOutputs - 1; i >= 0; --i)
+    {
+        const int numOutProcs = proc->getNumOutputProcessors (i);
+        for (int j = numOutProcs - 1; j >= 0; --j)
+        {
+            auto* nextProc = proc->getOutputProcessor (i, j);
+            if (nextNumProcs == 1)
+            {
+                runProcessor (nextProc, *outBuffer, outProcessed);
+            }
+            else
+            {
+                auto& nextBuffer = nextProc->getInputBuffer();
+                nextBuffer.makeCopyOf (*outBuffer, true);
+                runProcessor (nextProc, nextBuffer, outProcessed);
+            }
+
+            nextNumProcs -= 1;
+        }
+    }
 }
 
 void ProcessorChain::processAudio (AudioBuffer<float> buffer)
@@ -110,35 +161,20 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
     for (int ch = 0; ch < numChannels; ++ch)
         inputBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
 
-    inputProcessor.processAudio (inputBuffer);
-    auto& processBuffer = inputProcessor.getOutputBuffer();
+    bool outProcessed = false;
+    runProcessor (&inputProcessor, inputBuffer, outProcessed);
 
-    for (auto* processor : procs)
+    if (outProcessed)
     {
-        if (processor->isBypassed())
-        {
-            processor->processAudioBypassed (processBuffer);
-            continue;
-        }
-
-        processor->processAudio (processBuffer);
-    }
-
-    // go back to original block of data
-    if (processBuffer.getNumChannels() == 1)
-    {
-        auto processedData = processBuffer.getReadPointer (0);
+        auto& outBuffer = outputProcessor.getOutputBuffer();
         for (int ch = 0; ch < numChannels; ++ch)
             FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
-                                         processedData,
+                                         outBuffer.getReadPointer (ch),
                                          osNumSamples);
     }
     else
     {
-        for (int ch = 0; ch < numChannels; ++ch)
-            FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
-                                         processBuffer.getReadPointer (ch),
-                                         osNumSamples);
+        osBlock.clear();
     }
 
     overSample[curOS]->processSamplesDown (block);

@@ -20,8 +20,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, this);
     addAndMakeVisible (inputEditor.get());
+    inputEditor->addPortListener (this);
 
-    addAndMakeVisible (outputEditor);
+    outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain, this);
+    addAndMakeVisible (outputEditor.get());
+    outputEditor->addPortListener (this);
 
     setSize (800, 800);
 
@@ -35,6 +38,8 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 
 BoardComponent::~BoardComponent()
 {
+    inputEditor->removePortListener (this);
+    outputEditor->removePortListener (this);
     procChain.removeListener (this);
 }
 
@@ -46,14 +51,35 @@ int BoardComponent::getIdealWidth (int parentWidth) const
 
 void BoardComponent::paint (Graphics& g)
 {
-    ignoreUnused (g);
+    g.setColour (Colours::red);
+    for (auto* cable : cables)
+    {
+        auto* startEditor = findEditorForProcessor (cable->startProc);
+        auto startPortLocation = startEditor->getPortLocation (cable->startIdx, false);
+        startPortLocation += startEditor->getBounds().getTopLeft();
+
+        if (cable->endProc != nullptr)
+        {
+            auto* endEditor = findEditorForProcessor (cable->endProc);
+            auto endPortLocation = endEditor->getPortLocation (cable->endIdx, true);
+            endPortLocation += endEditor->getBounds().getTopLeft();
+
+            auto cableLine = Line (startPortLocation.toFloat(), endPortLocation.toFloat());
+            g.drawLine (cableLine, 5.0f);
+        }
+        else if (cableMouse != nullptr)
+        {
+            auto cableLine = Line (startPortLocation.toFloat(), cableMouse->getPosition().toFloat());
+            g.drawLine (cableLine, 5.0f);
+        }
+    }
 }
 
 void BoardComponent::resized()
 {
     auto centreEditorHeight = (getHeight() - editorHeight) / 2;
     inputEditor->setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
-    outputEditor.setBounds (getWidth() - (editorWidth / 2 + editorPad), centreEditorHeight, editorWidth / 2, editorHeight);
+    outputEditor->setBounds (getWidth() - (editorWidth / 2 + editorPad), centreEditorHeight, editorWidth / 2, editorHeight);
 
     newProcButton.setBounds (getWidth() - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, getWidth()), jmin (250, getHeight())).withCentre (getLocalBounds().getCentre()));
@@ -78,19 +104,17 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     newEditor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
 
     refreshBoardSize();
+
+    newEditor->addPortListener (this);
 }
 
 void BoardComponent::processorRemoved (const BaseProcessor* proc)
 {
-    for (auto* editor : processorEditors)
-    {
-        if (editor->getProcPtr() == proc)
-        {
-            processorEditors.removeObject (editor);
-            refreshBoardSize();
-            return;
-        }
-    }
+    auto* editor = findEditorForProcessor (proc);
+    editor->removePortListener (this);
+    processorEditors.removeObject (editor);
+
+    refreshBoardSize();
 }
 
 void BoardComponent::processorMoved (int procToMove, int procInSlot)
@@ -128,4 +152,97 @@ void BoardComponent::showNewProcMenu() const
 
     menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
     menu.showMenuAsync (options);
+}
+
+ProcessorEditor* BoardComponent::findEditorForProcessor (const BaseProcessor* proc) const
+{
+    for (auto* editor : processorEditors)
+        if (editor->getProcPtr() == proc)
+            return editor;
+
+    if (inputEditor->getProcPtr() == proc)
+        return inputEditor.get();
+
+    if (outputEditor->getProcPtr() == proc)
+        return outputEditor.get();
+
+    jassertfalse;
+    return nullptr;
+}
+
+void BoardComponent::createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e)
+{
+    cables.add (std::make_unique<Cable> (origin->getProcPtr(), portIndex));
+    cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
+    repaint();
+}
+
+void BoardComponent::refreshCable (const MouseEvent& e)
+{
+    cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
+    repaint();
+}
+
+void BoardComponent::releaseCable (const MouseEvent& e)
+{
+    cableMouse.reset();
+
+    // check if we're releasing near an output port
+    auto relMouse = e.getEventRelativeTo (this);
+    auto mousePos = relMouse.getPosition();
+
+    auto tryToConnectToEditor = [=] (ProcessorEditor* editor) -> bool
+    {
+        int numPorts = editor->getProcPtr()->getNumInputs();
+        for (int i = 0; i < numPorts; ++i)
+        {
+            auto portLocation = editor->getPortLocation (i, true);
+            portLocation += editor->getBounds().getTopLeft();
+            auto distanceFromPort = mousePos.getDistanceFrom (portLocation);
+            if (distanceFromPort < 25)
+            {
+                auto* cable = cables.getLast();
+                auto* endProc = editor->getProcPtr();
+
+                cable->startProc->addOutputProcessor (endProc, i);
+
+                cable->endProc = editor->getProcPtr();
+                cable->endIdx = i;
+                repaint();
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    for (auto* editor : processorEditors)
+    {
+        if (tryToConnectToEditor (editor))
+            return;
+    }
+
+    if (tryToConnectToEditor (outputEditor.get()))
+        return;
+
+    // not being connected... trash the latest cable
+    cables.removeObject (cables.getLast());
+
+    repaint();
+}
+
+void BoardComponent::destroyCable (ProcessorEditor* origin, int portIndex)
+{
+    const auto* proc = origin->getProcPtr();
+    for (auto* cable : cables)
+    {
+        if (cable->endProc == proc && cable->endIdx == portIndex)
+        {
+            cable->startProc->removeOutputProcessor (cable->endProc, cable->startIdx);
+            cables.removeObject (cable);
+            break;
+        }
+    }
+
+    repaint();
 }

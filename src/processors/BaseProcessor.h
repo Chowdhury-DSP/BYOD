@@ -33,13 +33,16 @@ public:
 
     BaseProcessor (const String& name,
                    AudioProcessorValueTreeState::ParameterLayout params,
-                   UndoManager* um = nullptr);
+                   UndoManager* um = nullptr,
+                   int nInputs = 1,
+                   int nOutputs = 1);
 
     // metadata
     virtual ProcessorType getProcessorType() const = 0;
     const String getName() const override { return JuceProcWrapper::getName(); }
 
     // audio processing methods
+    void prepareInputBuffer (int numSamples) { inputBuffer.setSize (2, numSamples); }
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
 
@@ -61,11 +64,30 @@ public:
     /** if your processor can't pass a unit test (for a justifiable reason) say so here! */
     virtual StringArray getTestsToSkip() const { return {}; }
 
+    AudioBuffer<float>& getInputBuffer() { return inputBuffer; }
+    AudioBuffer<float>& getOutputBuffer() { return *outputBuffer; }
+    BaseProcessor* getOutputProcessor (int portIdx, int connectionIdx) { return outputProcessors[portIdx][connectionIdx]; }
+    int getNumOutputProcessors (int portIdx) const { return outputProcessors[portIdx].size(); }
+
+    void addOutputProcessor (BaseProcessor* proc, int portIdx) { outputProcessors[portIdx].addIfNotAlreadyThere (proc); }
+    void removeOutputProcessor (BaseProcessor* proc, int portIdx) { outputProcessors[portIdx].remove (outputProcessors[portIdx].indexOf (proc)); }
+
+    int getNumInputs() const noexcept { return numInputs; }
+    int getNumOutputs() const noexcept { return numOutputs; }
+
 protected:
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
 
     std::atomic<float>* onOffParam = nullptr;
+
+    const int numInputs;
+    const int numOutputs;
+
+    std::vector<Array<BaseProcessor*>> outputProcessors;
+    Array<AudioBuffer<float>> bufferArray;
+    AudioBuffer<float>* outputBuffer = nullptr;
+    AudioBuffer<float> inputBuffer;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;
 
