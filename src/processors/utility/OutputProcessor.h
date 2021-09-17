@@ -33,7 +33,7 @@ public:
         if (numChannels == 1)
         {
             auto processedData = buffer.getReadPointer (0);
-            for (int ch = 0; ch < numChannels; ++ch)
+            for (int ch = 0; ch < stereoBuffer.getNumChannels(); ++ch)
                 FloatVectorOperations::copy (stereoBuffer.getWritePointer (ch),
                                              processedData,
                                              numSamples);

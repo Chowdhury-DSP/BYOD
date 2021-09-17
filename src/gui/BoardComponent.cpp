@@ -95,12 +95,15 @@ void BoardComponent::paint (Graphics& g)
 
 void BoardComponent::resized()
 {
-    auto centreEditorHeight = (getHeight() - editorHeight) / 2;
-    inputEditor->setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
-    outputEditor->setBounds (getWidth() - (editorWidth / 2 + editorPad), centreEditorHeight, editorWidth / 2, editorHeight);
+    const auto width = getWidth();
+    const auto height = getHeight();
 
-    newProcButton.setBounds (getWidth() - newButtonWidth, 0, newButtonWidth, newButtonWidth);
-    infoComp.setBounds (Rectangle<int> (jmin (400, getWidth()), jmin (250, getHeight())).withCentre (getLocalBounds().getCentre()));
+    auto centreEditorHeight = (height - editorHeight) / 2;
+    inputEditor->setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
+    outputEditor->setBounds (width - (editorWidth / 2 + editorPad), centreEditorHeight, editorWidth / 2, editorHeight);
+
+    newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
+    infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
 }
 
 void BoardComponent::refreshBoardSize()

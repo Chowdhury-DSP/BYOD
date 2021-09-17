@@ -8,6 +8,17 @@ const String oversamplingTag = "oversampling";
 const String inGainTag = "in_gain";
 const String outGainTag = "out_gain";
 const String dryWetTag = "dry_wet";
+
+[[maybe_unused]] void printBufferLevels (const AudioBuffer<float>& buffer)
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        auto level = buffer.getRMSLevel (ch, 0, numSamples);
+        std::cout << "Level for channel: " << ch << ": " << level << std::endl;
+    }
+}
 } // namespace
 
 ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store),
