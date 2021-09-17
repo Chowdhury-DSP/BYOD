@@ -228,6 +228,18 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
     um->perform (new AddOrRemoveProcessor (*this, procToRemove));
 }
 
+void ProcessorChain::addConnection (ConnectionInfo&& info)
+{
+    um->beginNewTransaction();
+    um->perform (new AddOrRemoveConnection (*this, std::move (info)));
+}
+
+void ProcessorChain::removeConnection (ConnectionInfo&& info)
+{
+    um->beginNewTransaction();
+    um->perform (new AddOrRemoveConnection (*this, std::move (info), true));
+}
+
 std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");

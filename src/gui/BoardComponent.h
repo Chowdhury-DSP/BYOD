@@ -23,6 +23,8 @@ public:
     void processorAdded (BaseProcessor* newProc) override;
     void processorRemoved (const BaseProcessor* proc) override;
     void refreshConnections() override;
+    void connectionAdded (const ConnectionInfo& info) override;
+    void connectionRemoved (const ConnectionInfo& info) override;
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
@@ -50,6 +52,7 @@ private:
 
     OwnedArray<Cable> cables;
     std::unique_ptr<MouseEvent> cableMouse;
+    bool ignoreConnectionCallbacks = false;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;
 

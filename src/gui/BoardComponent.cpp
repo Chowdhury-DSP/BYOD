@@ -14,6 +14,30 @@ Point<int> getPortLocation (ProcessorEditor* editor, int portIdx, bool isInput)
     auto portLocation = editor->getPortLocation (portIdx, isInput);
     return portLocation + editor->getBounds().getTopLeft();
 }
+
+void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
+{
+    for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+    {
+        auto numConnections = proc->getNumOutputProcessors (portIdx);
+        for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+        {
+            auto* endProc = proc->getOutputProcessor (portIdx, cIdx);
+            int endPort = 0; // @TODO: do better when we have processors with multiple inputs
+            cables.add (std::make_unique<Cable> (proc, portIdx, endProc, endPort));
+        }
+    }
+}
+
+ConnectionInfo cableToConnection (const Cable& cable)
+{
+    return { cable.startProc, cable.startIdx, cable.endProc, cable.endIdx };
+}
+
+std::unique_ptr<Cable> connectionToCable (const ConnectionInfo& connection)
+{
+    return std::make_unique<Cable> (connection.startProc, connection.startPort, connection.endProc, connection.endPort);
+}
 } // namespace
 
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
@@ -123,12 +147,15 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
     addAndMakeVisible (newEditor);
 
+    addConnectionsForProcessor (cables, newProc);
+
     auto centre = getLocalBounds().getCentre();
     newEditor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
 
-    refreshBoardSize();
-
     newEditor->addPortListener (this);
+
+    refreshBoardSize();
+    repaint();
 }
 
 void BoardComponent::processorRemoved (const BaseProcessor* proc)
@@ -151,25 +178,39 @@ void BoardComponent::refreshConnections()
 {
     cables.clear();
 
-    auto addConnections = [=] (BaseProcessor* proc)
-    {
-        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
-        {
-            auto numConnections = proc->getNumOutputProcessors (portIdx);
-            for (int cIdx = 0; cIdx < numConnections; ++cIdx)
-            {
-                auto* endProc = proc->getOutputProcessor (portIdx, cIdx);
-                std::cout << "Creating cable from " << proc->getName() << " to " << endProc->getName() << std::endl;
-                int endPort = 0; // @TODO: do better when we have processors with multiple inputs
-                cables.add (std::make_unique<Cable> (proc, portIdx, endProc, endPort));
-            }
-        }
-    };
-
     for (auto* proc : procChain.getProcessors())
-        addConnections (proc);
+        addConnectionsForProcessor (cables, proc);
 
-    addConnections (&procChain.getInputProcessor());
+    addConnectionsForProcessor (cables, &procChain.getInputProcessor());
+
+    repaint();
+}
+
+void BoardComponent::connectionAdded (const ConnectionInfo& info)
+{
+    if (ignoreConnectionCallbacks)
+        return;
+
+    cables.add (connectionToCable (info));
+    repaint();
+}
+
+void BoardComponent::connectionRemoved (const ConnectionInfo& info)
+{
+    if (ignoreConnectionCallbacks)
+        return;
+
+    for (auto* cable : cables)
+    {
+        if (cable->startProc == info.startProc
+            && cable->startIdx == info.startPort
+            && cable->endProc == info.endProc
+            && cable->endIdx == info.endPort)
+        {
+            cables.removeObject (cable);
+            break;
+        }
+    }
 
     repaint();
 }
@@ -246,12 +287,12 @@ void BoardComponent::releaseCable (const MouseEvent& e)
     if (editor != nullptr)
     {
         auto* cable = cables.getLast();
-        auto* endProc = editor->getProcPtr();
-
-        cable->startProc->addOutputProcessor (endProc, portIdx);
-
         cable->endProc = editor->getProcPtr();
         cable->endIdx = portIdx;
+
+        const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
+        auto connection = cableToConnection (*cable);
+        procChain.addConnection (std::move (connection));
 
         repaint();
         return;
@@ -270,8 +311,10 @@ void BoardComponent::destroyCable (ProcessorEditor* origin, int portIndex)
     {
         if (cable->endProc == proc && cable->endIdx == portIndex)
         {
-            cable->startProc->removeOutputProcessor (cable->endProc, cable->startIdx);
+            const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
+            procChain.removeConnection (cableToConnection (*cable));
             cables.removeObject (cable);
+
             break;
         }
     }

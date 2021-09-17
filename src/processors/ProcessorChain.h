@@ -6,6 +6,14 @@
 #include "utility/InputProcessor.h"
 #include "utility/OutputProcessor.h"
 
+struct ConnectionInfo
+{
+    BaseProcessor* startProc;
+    int startPort;
+    BaseProcessor* endProc;
+    int endPort;
+};
+
 class ProcessorChain
 {
     // clang-format off
@@ -14,7 +22,9 @@ class ProcessorChain
         listeners,
         virtual void processorAdded (BaseProcessor* /*proc*/) {}\
         virtual void processorRemoved (const BaseProcessor* /*proc*/) {}\
-        virtual void refreshConnections () {}\
+        virtual void refreshConnections() {}\
+        virtual void connectionAdded (const ConnectionInfo& /*info*/) {}\
+        virtual void connectionRemoved (const ConnectionInfo& /*info*/) {}\
     )
     // clang-format on
 public:
@@ -27,6 +37,9 @@ public:
     void addProcessor (BaseProcessor::Ptr newProc);
     void removeProcessor (BaseProcessor* procToRemove);
     OwnedArray<BaseProcessor>& getProcessors() { return procs; }
+
+    void addConnection (ConnectionInfo&& info);
+    void removeConnection (ConnectionInfo&& info);
 
     std::unique_ptr<XmlElement> saveProcChain();
     void loadProcChain (XmlElement* xml);

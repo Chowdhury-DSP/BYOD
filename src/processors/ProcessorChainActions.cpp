@@ -28,6 +28,18 @@ public:
         chain.procs.removeObject (procToRemove, false);
     }
 
+    static void addConnection (ProcessorChain& chain, const ConnectionInfo info)
+    {
+        info.startProc->addOutputProcessor (info.endProc, info.startPort);
+        chain.listeners.call (&ProcessorChain::Listener::connectionAdded, info);
+    }
+
+    static void removeConnection (ProcessorChain& chain, const ConnectionInfo info)
+    {
+        info.startProc->removeOutputProcessor (info.endProc, info.startPort);
+        chain.listeners.call (&ProcessorChain::Listener::connectionRemoved, info);
+    }
+
 private:
     ProcChainActions() {} // static use only!
 };
@@ -78,6 +90,41 @@ bool AddOrRemoveProcessor::undo()
 
         ProcChainActions::removeProcessor (chain, actionProcPtr);
         actionProc.reset (actionProcPtr);
+    }
+
+    return true;
+}
+
+//=========================================================
+AddOrRemoveConnection::AddOrRemoveConnection (ProcessorChain& procChain, ConnectionInfo&& cInfo, bool removing) : chain (procChain),
+                                                                                                                  info (cInfo),
+                                                                                                                  isRemoving (removing)
+{
+}
+
+bool AddOrRemoveConnection::perform()
+{
+    if (isRemoving)
+    {
+        ProcChainActions::removeConnection (chain, info);
+    }
+    else
+    {
+        ProcChainActions::addConnection (chain, info);
+    }
+
+    return true;
+}
+
+bool AddOrRemoveConnection::undo()
+{
+    if (isRemoving)
+    {
+        ProcChainActions::addConnection (chain, info);
+    }
+    else
+    {
+        ProcChainActions::removeConnection (chain, info);
     }
 
     return true;

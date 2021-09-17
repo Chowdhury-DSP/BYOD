@@ -20,3 +20,20 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AddOrRemoveProcessor)
 };
+
+class AddOrRemoveConnection : public UndoableAction
+{
+public:
+    AddOrRemoveConnection (ProcessorChain& procChain, ConnectionInfo&& info, bool removing = false);
+
+    bool perform() override;
+    bool undo() override;
+    int getSizeInUnits() override { return (int) sizeof (*this); }
+
+private:
+    ProcessorChain& chain;
+    const ConnectionInfo info;
+    const bool isRemoving;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AddOrRemoveConnection)
+};
