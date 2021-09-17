@@ -7,6 +7,13 @@ constexpr int editorHeight = 220;
 constexpr int editorPad = 10;
 constexpr int newButtonWidth = 40;
 constexpr int newButtonPad = 10;
+constexpr int portDistanceLimit = 25;
+
+Point<int> getPortLocation (ProcessorEditor* editor, int portIdx, bool isInput)
+{
+    auto portLocation = editor->getPortLocation (portIdx, isInput);
+    return portLocation + editor->getBounds().getTopLeft();
+}
 } // namespace
 
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
@@ -55,21 +62,32 @@ void BoardComponent::paint (Graphics& g)
     for (auto* cable : cables)
     {
         auto* startEditor = findEditorForProcessor (cable->startProc);
-        auto startPortLocation = startEditor->getPortLocation (cable->startIdx, false);
-        startPortLocation += startEditor->getBounds().getTopLeft();
+        auto startPortLocation = getPortLocation (startEditor, cable->startIdx, false);
 
         if (cable->endProc != nullptr)
         {
             auto* endEditor = findEditorForProcessor (cable->endProc);
-            auto endPortLocation = endEditor->getPortLocation (cable->endIdx, true);
-            endPortLocation += endEditor->getBounds().getTopLeft();
+            auto endPortLocation = getPortLocation (endEditor, cable->endIdx, true);
 
             auto cableLine = Line (startPortLocation.toFloat(), endPortLocation.toFloat());
             g.drawLine (cableLine, 5.0f);
         }
         else if (cableMouse != nullptr)
         {
-            auto cableLine = Line (startPortLocation.toFloat(), cableMouse->getPosition().toFloat());
+            auto mousePos = cableMouse->getPosition();
+            auto [editor, portIdx] = getNearestInputPort (mousePos);
+            if (editor != nullptr)
+            {
+                Graphics::ScopedSaveState graphicsState (g);
+                g.setColour (Colours::orangered);
+                g.setOpacity (0.75f);
+
+                auto endPortLocation = getPortLocation (editor, portIdx, true);
+                auto glowBounds = (Rectangle (portDistanceLimit, portDistanceLimit) * 2).withCentre (endPortLocation);
+                g.fillEllipse (glowBounds.toFloat());
+            }
+
+            auto cableLine = Line (startPortLocation.toFloat(), mousePos.toFloat());
             g.drawLine (cableLine, 5.0f);
         }
     }
@@ -191,39 +209,20 @@ void BoardComponent::releaseCable (const MouseEvent& e)
     auto relMouse = e.getEventRelativeTo (this);
     auto mousePos = relMouse.getPosition();
 
-    auto tryToConnectToEditor = [=] (ProcessorEditor* editor) -> bool
+    auto [editor, portIdx] = getNearestInputPort (mousePos);
+    if (editor != nullptr)
     {
-        int numPorts = editor->getProcPtr()->getNumInputs();
-        for (int i = 0; i < numPorts; ++i)
-        {
-            auto portLocation = editor->getPortLocation (i, true);
-            portLocation += editor->getBounds().getTopLeft();
-            auto distanceFromPort = mousePos.getDistanceFrom (portLocation);
-            if (distanceFromPort < 25)
-            {
-                auto* cable = cables.getLast();
-                auto* endProc = editor->getProcPtr();
+        auto* cable = cables.getLast();
+        auto* endProc = editor->getProcPtr();
 
-                cable->startProc->addOutputProcessor (endProc, i);
+        cable->startProc->addOutputProcessor (endProc, portIdx);
 
-                cable->endProc = editor->getProcPtr();
-                cable->endIdx = i;
-                repaint();
-                return true;
-            }
-        }
+        cable->endProc = editor->getProcPtr();
+        cable->endIdx = portIdx;
 
-        return false;
-    };
-
-    for (auto* editor : processorEditors)
-    {
-        if (tryToConnectToEditor (editor))
-            return;
-    }
-
-    if (tryToConnectToEditor (outputEditor.get()))
+        repaint();
         return;
+    }
 
     // not being connected... trash the latest cable
     cables.removeObject (cables.getLast());
@@ -245,4 +244,34 @@ void BoardComponent::destroyCable (ProcessorEditor* origin, int portIndex)
     }
 
     repaint();
+}
+
+std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Point<int>& pos) const
+{
+    auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
+    int minDistance = -1;
+
+    auto checkPorts = [&] (ProcessorEditor* editor)
+    {
+        int numPorts = editor->getProcPtr()->getNumInputs();
+        for (int i = 0; i < numPorts; ++i)
+        {
+            auto portLocation = getPortLocation (editor, i, true);
+            auto distanceFromPort = pos.getDistanceFrom (portLocation);
+
+            bool isClosest = (distanceFromPort < portDistanceLimit && minDistance < 0) || distanceFromPort < minDistance;
+            if (isClosest)
+            {
+                minDistance = distanceFromPort;
+                result = std::make_pair (editor, i);
+            }
+        }
+    };
+
+    for (auto* editor : processorEditors)
+        checkPorts (editor);
+
+    checkPorts (outputEditor.get());
+
+    return result;
 }
