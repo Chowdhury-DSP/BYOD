@@ -22,7 +22,6 @@ public:
 
     void processorAdded (BaseProcessor* newProc) override;
     void processorRemoved (const BaseProcessor* proc) override;
-    void processorMoved (int procToMove, int procInSlot) override;
     void refreshConnections() override;
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }

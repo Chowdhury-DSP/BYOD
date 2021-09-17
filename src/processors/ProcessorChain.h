@@ -14,7 +14,6 @@ class ProcessorChain
         listeners,
         virtual void processorAdded (BaseProcessor* /*proc*/) {}\
         virtual void processorRemoved (const BaseProcessor* /*proc*/) {}\
-        virtual void processorMoved (int /*procToMove*/, int /*procInSlot*/) {}\
         virtual void refreshConnections () {}\
     )
     // clang-format on
@@ -27,7 +26,6 @@ public:
 
     void addProcessor (BaseProcessor::Ptr newProc);
     void removeProcessor (BaseProcessor* procToRemove);
-    void moveProcessor (const BaseProcessor* procToMove, const BaseProcessor* procInSlot);
     OwnedArray<BaseProcessor>& getProcessors() { return procs; }
 
     std::unique_ptr<XmlElement> saveProcChain();

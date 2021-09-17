@@ -228,18 +228,6 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
     um->perform (new AddOrRemoveProcessor (*this, procToRemove));
 }
 
-void ProcessorChain::moveProcessor (const BaseProcessor* procToMove, const BaseProcessor* procInSlot)
-{
-    if (procToMove == procInSlot)
-        return;
-
-    auto indexToMove = procs.indexOf (procToMove);
-    auto slotIndex = procInSlot == nullptr ? procs.size() - 1 : procs.indexOf (procInSlot);
-
-    um->beginNewTransaction();
-    um->perform (new MoveProcessor (*this, indexToMove, slotIndex));
-}
-
 std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");

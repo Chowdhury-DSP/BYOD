@@ -147,12 +147,6 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
     repaint();
 }
 
-void BoardComponent::processorMoved (int procToMove, int procInSlot)
-{
-    processorEditors.move (procToMove, procInSlot);
-    resized();
-}
-
 void BoardComponent::refreshConnections()
 {
     cables.clear();

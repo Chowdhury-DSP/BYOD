@@ -28,12 +28,6 @@ public:
         chain.procs.removeObject (procToRemove, false);
     }
 
-    static void moveProcessor (ProcessorChain& chain, int indexToMove, int slotIndex)
-    {
-        chain.procs.move (indexToMove, slotIndex);
-        chain.listeners.call (&ProcessorChain::Listener::processorMoved, indexToMove, slotIndex);
-    }
-
 private:
     ProcChainActions() {} // static use only!
 };
@@ -87,32 +81,4 @@ bool AddOrRemoveProcessor::undo()
     }
 
     return true;
-}
-
-//=========================================================
-MoveProcessor::MoveProcessor (ProcessorChain& procChain, int indexToMove, int slotIndex) : chain (procChain),
-                                                                                           startIndex (indexToMove),
-                                                                                           endIndex (slotIndex)
-{
-}
-
-bool MoveProcessor::perform()
-{
-    ProcChainActions::moveProcessor (chain, startIndex, endIndex);
-    return true;
-}
-
-bool MoveProcessor::undo()
-{
-    ProcChainActions::moveProcessor (chain, endIndex, startIndex);
-    return true;
-}
-
-UndoableAction* MoveProcessor::createCoalescedAction (UndoableAction* nextAction)
-{
-    if (auto* next = dynamic_cast<MoveProcessor*> (nextAction))
-        if (&(next->chain) == &chain && next->startIndex == endIndex)
-            return new MoveProcessor (chain, startIndex, next->endIndex);
-
-    return nullptr;
 }
