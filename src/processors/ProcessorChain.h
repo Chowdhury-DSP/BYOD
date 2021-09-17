@@ -8,10 +8,16 @@
 
 class ProcessorChain
 {
+    // clang-format off
     CREATE_LISTENER (
         Listener,
         listeners,
-        virtual void processorAdded (BaseProcessor* /*proc*/) {} virtual void processorRemoved (const BaseProcessor* /*proc*/) {} virtual void processorMoved (int /*procToMove*/, int /*procInSlot*/) {})
+        virtual void processorAdded (BaseProcessor* /*proc*/) {}\
+        virtual void processorRemoved (const BaseProcessor* /*proc*/) {}\
+        virtual void processorMoved (int /*procToMove*/, int /*procInSlot*/) {}\
+        virtual void refreshConnections () {}\
+    )
+    // clang-format on
 public:
     ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts);
 

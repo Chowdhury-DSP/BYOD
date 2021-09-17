@@ -41,6 +41,8 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
         processorAdded (p);
 
     procChain.addListener (this);
+
+    refreshConnections();
 }
 
 BoardComponent::~BoardComponent()
@@ -149,6 +151,33 @@ void BoardComponent::processorMoved (int procToMove, int procInSlot)
 {
     processorEditors.move (procToMove, procInSlot);
     resized();
+}
+
+void BoardComponent::refreshConnections()
+{
+    cables.clear();
+
+    auto addConnections = [=] (BaseProcessor* proc)
+    {
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            auto numConnections = proc->getNumOutputProcessors (portIdx);
+            for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+            {
+                auto* endProc = proc->getOutputProcessor (portIdx, cIdx);
+                std::cout << "Creating cable from " << proc->getName() << " to " << endProc->getName() << std::endl;
+                int endPort = 0; // @TODO: do better when we have processors with multiple inputs
+                cables.add (std::make_unique<Cable> (proc, portIdx, endProc, endPort));
+            }
+        }
+    };
+
+    for (auto* proc : procChain.getProcessors())
+        addConnections (proc);
+
+    addConnections (&procChain.getInputProcessor());
+
+    repaint();
 }
 
 void BoardComponent::showInfoComp (const BaseProcessor& proc)

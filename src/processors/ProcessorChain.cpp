@@ -19,6 +19,26 @@ const String dryWetTag = "dry_wet";
         std::cout << "Level for channel: " << ch << ": " << level << std::endl;
     }
 }
+
+String getPortTag (int portIdx)
+{
+    return "port_" + String (portIdx);
+}
+
+String getConnectionTag (int connectionIdx)
+{
+    return "connection_" + String (connectionIdx);
+}
+
+String getProcessorTagName (const BaseProcessor* proc)
+{
+    return proc->getName().replaceCharacter (' ', '_');
+}
+
+String getProcessorName (const String& tag)
+{
+    return tag.replaceCharacter ('_', ' ');
+}
 } // namespace
 
 ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store),
@@ -116,6 +136,7 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
 
     for (int i = numOutputs - 1; i >= 0; --i)
     {
+        // @TODO: this approach won't really work when we have processors with multiple inputs...
         const int numOutProcs = proc->getNumOutputProcessors (i);
         for (int j = numOutProcs - 1; j >= 0; --j)
         {
@@ -222,12 +243,45 @@ void ProcessorChain::moveProcessor (const BaseProcessor* procToMove, const BaseP
 std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");
-    for (auto* proc : procs)
+
+    auto saveProcessor = [&] (BaseProcessor* proc)
     {
-        auto procXml = std::make_unique<XmlElement> (proc->getName().replaceCharacter (' ', '_'));
+        auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
+
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            auto numOutputs = proc->getNumOutputProcessors (portIdx);
+            if (numOutputs == 0)
+                continue;
+
+            auto portElement = std::make_unique<XmlElement> (getPortTag (portIdx));
+            for (int cIdx = 0; cIdx < numOutputs; ++cIdx)
+            {
+                if (const auto* connectedProc = proc->getOutputProcessor (portIdx, cIdx))
+                {
+                    auto processorIdx = procs.indexOf (connectedProc);
+
+                    if (processorIdx == -1)
+                    {
+                        // there can only be one!
+                        jassert (connectedProc == &outputProcessor);
+                    }
+
+                    portElement->setAttribute (getConnectionTag (cIdx), processorIdx);
+                }
+            }
+
+            procXml->addChildElement (portElement.release());
+        }
+
         xml->addChildElement (procXml.release());
-    }
+    };
+
+    for (auto* proc : procs)
+        saveProcessor (proc);
+
+    saveProcessor (&inputProcessor);
 
     return std::move (xml);
 }
@@ -239,18 +293,74 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
     while (! procs.isEmpty())
         um->perform (new AddOrRemoveProcessor (*this, procs.getLast()));
 
+    using PortMap = std::vector<int>;
+    using ProcConnectionMap = std::unordered_map<int, PortMap>;
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
+    {
+        if (procXml->getNumChildElements() > 0)
+            newProc->fromXML (procXml->getChildElement (0));
+
+        ProcConnectionMap connectionMap;
+        for (int portIdx = 0; portIdx < newProc->getNumOutputs(); ++portIdx)
+        {
+            if (auto* portElement = procXml->getChildByName (getPortTag (portIdx)))
+            {
+                auto numConnections = portElement->getNumAttributes();
+                std::vector<int> portConnections (numConnections);
+                for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+                {
+                    auto attributeName = portElement->getAttributeName (cIdx);
+                    auto processorIdx = portElement->getIntAttribute (attributeName);
+                    portConnections[cIdx] = processorIdx;
+                }
+
+                connectionMap.insert ({ portIdx, std::move (portConnections) });
+            }
+        }
+
+        int procIdx = newProc == &inputProcessor ? -1 : procs.size();
+        connectionMaps.insert ({ procIdx, std::move (connectionMap) });
+    };
+
+    std::unordered_map<int, ProcConnectionMap> connectionMaps;
     for (auto* procXml : xml->getChildIterator())
     {
-        auto newProc = procStore.createProcByName (procXml->getTagName().replaceCharacter ('_', ' '));
+        auto procName = getProcessorName (procXml->getTagName());
+        if (procName == inputProcessor.getName())
+        {
+            loadProcessorState (procXml, &inputProcessor, connectionMaps);
+            continue;
+        }
+
+        auto newProc = procStore.createProcByName (procName);
         if (newProc == nullptr)
         {
             jassertfalse;
             continue;
         }
 
-        if (procXml->getNumChildElements() > 0)
-            newProc->fromXML (procXml->getChildElement (0));
-
+        loadProcessorState (procXml, newProc.get(), connectionMaps);
         um->perform (new AddOrRemoveProcessor (*this, std::move (newProc)));
     }
+
+    // wait until all the processors are created before connecting them
+    for (auto [procIdx, connectionMap] : connectionMaps)
+    {
+        auto* proc = procIdx >= 0 ? procs[(int) procIdx] : &inputProcessor;
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            if (connectionMap.find (portIdx) == connectionMap.end())
+                continue; // no connections!
+
+            const auto& connections = connectionMap.at (portIdx);
+            for (auto cIdx : connections)
+            {
+                std::cout << cIdx << std::endl;
+                auto* procToConnect = cIdx >= 0 ? procs[cIdx] : &outputProcessor;
+                proc->addOutputProcessor (procToConnect, portIdx);
+            }
+        }
+    }
+
+    listeners.call (&Listener::refreshConnections);
 }

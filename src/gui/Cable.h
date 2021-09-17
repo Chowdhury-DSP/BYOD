@@ -9,6 +9,13 @@ struct Cable
     {
     }
 
+    Cable (BaseProcessor* start, int startPort, BaseProcessor* end, int endPort) : startProc (start),
+                                                                                   startIdx (startPort),
+                                                                                   endProc (end),
+                                                                                   endIdx (endPort)
+    {
+    }
+
     BaseProcessor* startProc = nullptr;
     int startIdx;
 

@@ -18,10 +18,12 @@ public:
     void resized() override;
 
     int getIdealWidth (int parentWidth = -1) const;
+    void showInfoComp (const BaseProcessor& proc);
+
     void processorAdded (BaseProcessor* newProc) override;
     void processorRemoved (const BaseProcessor* proc) override;
     void processorMoved (int procToMove, int procInSlot) override;
-    void showInfoComp (const BaseProcessor& proc);
+    void refreshConnections() override;
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
