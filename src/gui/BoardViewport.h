@@ -10,13 +10,9 @@ public:
     ~BoardViewport();
 
     void resized() override;
-    void scrollBarMoved (ScrollBar* scrollBarThatHasMoved, double newRangeStart) override;
 
 private:
-    class ScrollLNF;
-
     BoardComponent comp;
-    std::unique_ptr<ScrollLNF> scrollLNF;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardViewport)
 };
