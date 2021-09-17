@@ -131,11 +131,18 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
 
 void BoardComponent::processorRemoved (const BaseProcessor* proc)
 {
+    for (int i = cables.size() - 1; i >= 0; --i)
+    {
+        if (cables[i]->startProc == proc || cables[i]->endProc == proc)
+            cables.remove (i);
+    }
+
     auto* editor = findEditorForProcessor (proc);
     editor->removePortListener (this);
     processorEditors.removeObject (editor);
 
     refreshBoardSize();
+    repaint();
 }
 
 void BoardComponent::processorMoved (int procToMove, int procInSlot)
