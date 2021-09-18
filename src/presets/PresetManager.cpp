@@ -132,16 +132,17 @@ File PresetManager::getUserPresetConfigFile() const
 
 void PresetManager::chooseUserPresetFolder()
 {
-    FileChooser chooser ("Choose preset folder");
-    if (chooser.browseForDirectory())
-    {
-        auto result = chooser.getResult();
-        auto config = getUserPresetConfigFile();
-        config.deleteFile();
-        config.create();
-        config.replaceWithText (result.getFullPathName());
-        updateUserPresets();
-    }
+    constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectDirectories;
+    fileChooser = std::make_shared<FileChooser> ("Choose preset folder");
+    fileChooser->launchAsync (flags, [=] (const FileChooser& fc)
+                              {
+                                  auto result = fc.getResult();
+                                  auto config = getUserPresetConfigFile();
+                                  config.deleteFile();
+                                  config.create();
+                                  config.replaceWithText (result.getFullPathName());
+                                  updateUserPresets();
+                              });
 }
 
 void PresetManager::loadPresetFolder (PopupMenu& menu, File& directory)

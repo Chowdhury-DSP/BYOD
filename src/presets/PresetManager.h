@@ -56,5 +56,7 @@ private:
     std::future<void> loadingFuture;
     ListenerList<Listener> listeners;
 
+    std::shared_ptr<FileChooser> fileChooser;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };
