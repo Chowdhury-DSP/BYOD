@@ -15,20 +15,6 @@ Point<int> getPortLocation (ProcessorEditor* editor, int portIdx, bool isInput)
     return portLocation + editor->getBounds().getTopLeft();
 }
 
-void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
-{
-    for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
-    {
-        auto numConnections = proc->getNumOutputProcessors (portIdx);
-        for (int cIdx = 0; cIdx < numConnections; ++cIdx)
-        {
-            auto* endProc = proc->getOutputProcessor (portIdx, cIdx);
-            int endPort = 0; // @TODO: do better when we have processors with multiple inputs
-            cables.add (std::make_unique<Cable> (proc, portIdx, endProc, endPort));
-        }
-    }
-}
-
 ConnectionInfo cableToConnection (const Cable& cable)
 {
     return { cable.startProc, cable.startIdx, cable.endProc, cable.endIdx };
@@ -37,6 +23,19 @@ ConnectionInfo cableToConnection (const Cable& cable)
 std::unique_ptr<Cable> connectionToCable (const ConnectionInfo& connection)
 {
     return std::make_unique<Cable> (connection.startProc, connection.startPort, connection.endProc, connection.endPort);
+}
+
+void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
+{
+    for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+    {
+        auto numConnections = proc->getNumOutputConnections (portIdx);
+        for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+        {
+            const auto& connection = proc->getOutputConnection (portIdx, cIdx);
+            cables.add (connectionToCable (connection));
+        }
+    }
 }
 } // namespace
 
@@ -357,6 +356,16 @@ std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Poin
         checkPorts (editor);
 
     checkPorts (outputEditor.get());
+
+    if (result.first == nullptr)
+        return result;
+
+    for (auto* cable : cables)
+    {
+        // the closest port is already connected!
+        if (cable->endProc == result.first->getProcPtr() && cable->endIdx == result.second)
+            return std::make_pair<ProcessorEditor*, int> (nullptr, 0);
+    }
 
     return result;
 }

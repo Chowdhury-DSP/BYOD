@@ -30,6 +30,11 @@ String getConnectionTag (int connectionIdx)
     return "connection_" + String (connectionIdx);
 }
 
+String getConnectionEndTag (int connectionIdx)
+{
+    return "connection_end_" + String (connectionIdx);
+}
+
 String getProcessorTagName (const BaseProcessor* proc)
 {
     return proc->getName().replaceCharacter (' ', '_');
@@ -114,7 +119,7 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     const int numOutputs = proc->getNumOutputs();
     for (int i = 0; i < numOutputs; ++i)
     {
-        const int numOutProcs = proc->getNumOutputProcessors (i);
+        const int numOutProcs = proc->getNumOutputConnections (i);
         for (int j = 0; j < numOutProcs; ++j)
             nextNumProcs += 1;
     }
@@ -137,7 +142,7 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     for (int i = numOutputs - 1; i >= 0; --i)
     {
         // @TODO: this approach won't really work when we have processors with multiple inputs...
-        const int numOutProcs = proc->getNumOutputProcessors (i);
+        const int numOutProcs = proc->getNumOutputConnections (i);
         for (int j = numOutProcs - 1; j >= 0; --j)
         {
             auto* nextProc = proc->getOutputProcessor (i, j);
@@ -230,14 +235,12 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
     {
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
-            int numConnections = proc->getNumOutputProcessors (portIdx);
+            int numConnections = proc->getNumOutputConnections (portIdx);
             for (int cIdx = 0; cIdx < numConnections; ++cIdx)
             {
-                if (proc->getOutputProcessor (portIdx, cIdx) == procToRemove)
-                {
-                    ConnectionInfo info { proc, portIdx, procToRemove, 0 }; // @TODO: fix for multi-input
-                    um->perform (new AddOrRemoveConnection (*this, std::move (info), true));
-                }
+                auto connection = proc->getOutputConnection (portIdx, cIdx);
+                if (connection.endProc == procToRemove)
+                    um->perform (new AddOrRemoveConnection (*this, std::move (connection), true));
             }
         }
     };
@@ -278,25 +281,24 @@ std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
-            auto numOutputs = proc->getNumOutputProcessors (portIdx);
+            auto numOutputs = proc->getNumOutputConnections (portIdx);
             if (numOutputs == 0)
                 continue;
 
             auto portElement = std::make_unique<XmlElement> (getPortTag (portIdx));
             for (int cIdx = 0; cIdx < numOutputs; ++cIdx)
             {
-                if (const auto* connectedProc = proc->getOutputProcessor (portIdx, cIdx))
+                auto& connection = proc->getOutputConnection (portIdx, cIdx);
+                auto processorIdx = procs.indexOf (connection.endProc);
+
+                if (processorIdx == -1)
                 {
-                    auto processorIdx = procs.indexOf (connectedProc);
-
-                    if (processorIdx == -1)
-                    {
-                        // there can only be one!
-                        jassert (connectedProc == &outputProcessor);
-                    }
-
-                    portElement->setAttribute (getConnectionTag (cIdx), processorIdx);
+                    // there can only be one!
+                    jassert (connection.endProc == &outputProcessor);
                 }
+
+                portElement->setAttribute (getConnectionTag (cIdx), processorIdx);
+                portElement->setAttribute (getConnectionEndTag (cIdx), connection.endPort);
             }
 
             procXml->addChildElement (portElement.release());
@@ -320,16 +322,15 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
     while (! procs.isEmpty())
         um->perform (new AddOrRemoveProcessor (*this, procs.getLast()));
 
-    auto numInputConnections = inputProcessor.getNumOutputProcessors (0);
+    auto numInputConnections = inputProcessor.getNumOutputConnections (0);
     while (numInputConnections > 0)
     {
-        auto* endProc = inputProcessor.getOutputProcessor (0, numInputConnections - 1);
-        ConnectionInfo info { &inputProcessor, 0, endProc, 0 }; // @TODO: make better for multi-input
-        um->perform (new AddOrRemoveConnection (*this, std::move (info), true));
-        numInputConnections = inputProcessor.getNumOutputProcessors (0);
+        auto connection = inputProcessor.getOutputConnection (0, numInputConnections - 1);
+        um->perform (new AddOrRemoveConnection (*this, std::move (connection), true));
+        numInputConnections = inputProcessor.getNumOutputConnections (0);
     }
 
-    using PortMap = std::vector<int>;
+    using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
     auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
     {
@@ -341,13 +342,13 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
         {
             if (auto* portElement = procXml->getChildByName (getPortTag (portIdx)))
             {
-                auto numConnections = portElement->getNumAttributes();
-                std::vector<int> portConnections (numConnections);
+                auto numConnections = portElement->getNumAttributes() / 2;
+                PortMap portConnections (numConnections);
                 for (int cIdx = 0; cIdx < numConnections; ++cIdx)
                 {
-                    auto attributeName = portElement->getAttributeName (cIdx);
-                    auto processorIdx = portElement->getIntAttribute (attributeName);
-                    portConnections[cIdx] = processorIdx;
+                    auto processorIdx = portElement->getIntAttribute (getConnectionTag (cIdx));
+                    auto endPort = portElement->getIntAttribute (getConnectionEndTag (cIdx));
+                    portConnections[cIdx] = std::make_pair (processorIdx, endPort);
                 }
 
                 connectionMap.insert ({ portIdx, std::move (portConnections) });
@@ -389,10 +390,10 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
                 continue; // no connections!
 
             const auto& connections = connectionMap.at (portIdx);
-            for (auto cIdx : connections)
+            for (auto [cIdx, endPort] : connections)
             {
                 auto* procToConnect = cIdx >= 0 ? procs[cIdx] : &outputProcessor;
-                ConnectionInfo info { proc, portIdx, procToConnect, 0 }; // @TODO: we need to save endIdx somewhere...
+                ConnectionInfo info { proc, portIdx, procToConnect, endPort };
                 um->perform (new AddOrRemoveConnection (*this, std::move (info)));
             }
         }

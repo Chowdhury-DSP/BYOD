@@ -26,6 +26,15 @@ struct ProcessorUIOptions
     } info;
 };
 
+class BaseProcessor;
+struct ConnectionInfo
+{
+    BaseProcessor* startProc;
+    int startPort;
+    BaseProcessor* endProc;
+    int endPort;
+};
+
 class BaseProcessor : private JuceProcWrapper
 {
 public:
@@ -66,11 +75,12 @@ public:
 
     AudioBuffer<float>& getInputBuffer() { return inputBuffer; }
     AudioBuffer<float>& getOutputBuffer() { return *outputBuffer; }
-    BaseProcessor* getOutputProcessor (int portIdx, int connectionIdx) { return outputProcessors[portIdx][connectionIdx]; }
-    int getNumOutputProcessors (int portIdx) const { return outputProcessors[portIdx].size(); }
+    BaseProcessor* getOutputProcessor (int portIdx, int connectionIdx) { return outputConnections[portIdx][connectionIdx].endProc; }
+    const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[portIdx].getReference (connectionIdx); }
+    int getNumOutputConnections (int portIdx) const { return outputConnections[portIdx].size(); }
 
-    void addOutputProcessor (BaseProcessor* proc, int portIdx) { outputProcessors[portIdx].addIfNotAlreadyThere (proc); }
-    void removeOutputProcessor (BaseProcessor* proc, int portIdx) { outputProcessors[portIdx].remove (outputProcessors[portIdx].indexOf (proc)); }
+    void addConnection (ConnectionInfo&& info);
+    void removeConnection (const ConnectionInfo& info);
 
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }
@@ -92,7 +102,7 @@ private:
     const int numInputs;
     const int numOutputs;
 
-    std::vector<Array<BaseProcessor*>> outputProcessors;
+    std::vector<Array<ConnectionInfo>> outputConnections;
     Array<AudioBuffer<float>> bufferArray;
     AudioBuffer<float> inputBuffer;
 

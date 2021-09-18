@@ -6,14 +6,6 @@
 #include "utility/InputProcessor.h"
 #include "utility/OutputProcessor.h"
 
-struct ConnectionInfo
-{
-    BaseProcessor* startProc;
-    int startPort;
-    BaseProcessor* endProc;
-    int endPort;
-};
-
 class ProcessorChain
 {
     // clang-format off

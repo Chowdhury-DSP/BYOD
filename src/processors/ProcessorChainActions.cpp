@@ -28,15 +28,15 @@ public:
         chain.procs.removeObject (procToRemove, false);
     }
 
-    static void addConnection (ProcessorChain& chain, const ConnectionInfo info)
+    static void addConnection (ProcessorChain& chain, const ConnectionInfo& info)
     {
-        info.startProc->addOutputProcessor (info.endProc, info.startPort);
+        info.startProc->addConnection (ConnectionInfo (info));
         chain.listeners.call (&ProcessorChain::Listener::connectionAdded, info);
     }
 
-    static void removeConnection (ProcessorChain& chain, const ConnectionInfo info)
+    static void removeConnection (ProcessorChain& chain, const ConnectionInfo& info)
     {
-        info.startProc->removeOutputProcessor (info.endProc, info.startPort);
+        info.startProc->removeConnection (info);
         chain.listeners.call (&ProcessorChain::Listener::connectionRemoved, info);
     }
 

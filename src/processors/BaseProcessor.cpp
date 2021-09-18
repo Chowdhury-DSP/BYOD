@@ -11,7 +11,7 @@ BaseProcessor::BaseProcessor (const String& name,
 {
     onOffParam = vts.getRawParameterValue ("on_off");
 
-    outputProcessors.resize (numOutputs);
+    outputConnections.resize (numOutputs);
     bufferArray.resize (numOutputs);
 
     uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>();
@@ -39,6 +39,27 @@ void BaseProcessor::fromXML (XmlElement* xml)
             auto xPos = (float) xml->getDoubleAttribute ("x_pos");
             auto yPos = (float) xml->getDoubleAttribute ("y_pos");
             editorPosition = Point { xPos, yPos };
+        }
+    }
+}
+
+void BaseProcessor::addConnection (ConnectionInfo&& info)
+{
+    jassert (info.startProc == this);
+    outputConnections[info.startPort].add (info);
+}
+
+void BaseProcessor::removeConnection (const ConnectionInfo& info)
+{
+    jassert (info.startProc == this);
+
+    auto& connections = outputConnections[info.startPort];
+    for (int cIdx = 0; cIdx < connections.size(); ++cIdx)
+    {
+        if (connections[cIdx].endProc == info.endProc && connections[cIdx].endPort == info.endPort)
+        {
+            connections.remove (cIdx);
+            break;
         }
     }
 }
