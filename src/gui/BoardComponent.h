@@ -40,6 +40,7 @@ private:
     void showNewProcMenu() const;
     void refreshBoardSize();
     std::pair<ProcessorEditor*, int> getNearestInputPort (const Point<int>& pos) const;
+    void setEditorPosition (ProcessorEditor* editor);
 
     ProcessorChain& procChain;
 

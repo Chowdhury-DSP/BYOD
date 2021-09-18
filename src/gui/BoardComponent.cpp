@@ -127,6 +127,9 @@ void BoardComponent::resized()
     inputEditor->setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
     outputEditor->setBounds (width - (editorWidth / 2 + editorPad), centreEditorHeight, editorWidth / 2, editorHeight);
 
+    for (auto* editor : processorEditors)
+        setEditorPosition (editor);
+
     newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
 }
@@ -147,18 +150,7 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     addAndMakeVisible (newEditor);
 
     addConnectionsForProcessor (cables, newProc);
-
-    auto position = newProc->getPosition (getBounds());
-    if (position == Point (0, 0)) // no position set yet
-    {
-        auto centre = getLocalBounds().getCentre();
-        newEditor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
-        newProc->setPosition (newEditor->getBounds().getTopLeft(), getBounds());
-    }
-    else
-    {
-        newEditor->setBounds (Rectangle (editorWidth, editorHeight).withPosition (position));
-    }
+    setEditorPosition (newEditor);
 
     newEditor->addPortListener (this);
 
@@ -368,4 +360,20 @@ std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Poin
     }
 
     return result;
+}
+
+void BoardComponent::setEditorPosition (ProcessorEditor* editor)
+{
+    auto* proc = editor->getProcPtr();
+    auto position = proc->getPosition (getBounds());
+    if (position == Point (0, 0)) // no position set yet
+    {
+        auto centre = getLocalBounds().getCentre();
+        editor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
+        proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
+    }
+    else
+    {
+        editor->setBounds (Rectangle (editorWidth, editorHeight).withPosition (position));
+    }
 }
