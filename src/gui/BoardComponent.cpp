@@ -149,8 +149,17 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
 
     addConnectionsForProcessor (cables, newProc);
 
-    auto centre = getLocalBounds().getCentre();
-    newEditor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
+    auto position = newProc->getPosition (getBounds());
+    if (position == Point (0, 0)) // no position set yet
+    {
+        auto centre = getLocalBounds().getCentre();
+        newEditor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
+        newProc->setPosition (newEditor->getBounds().getTopLeft(), getBounds());
+    }
+    else
+    {
+        newEditor->setBounds (Rectangle (editorWidth, editorHeight).withPosition (position));
+    }
 
     newEditor->addPortListener (this);
 

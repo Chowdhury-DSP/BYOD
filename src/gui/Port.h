@@ -21,8 +21,12 @@ public:
 
     void paint (Graphics& g) override
     {
+        auto portBounds = getLocalBounds().toFloat();
         g.setColour (isInput ? Colours::black : Colours::darkgrey);
-        g.fillEllipse (getLocalBounds().toFloat());
+        g.fillEllipse (portBounds);
+
+        g.setColour (Colours::lightgrey);
+        g.drawEllipse (portBounds.reduced (1.0f), 1.0f);
     }
 
     void mouseDown (const MouseEvent& e) override

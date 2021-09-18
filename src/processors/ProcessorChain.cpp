@@ -225,6 +225,33 @@ void ProcessorChain::addProcessor (BaseProcessor::Ptr newProc)
 void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
 {
     um->beginNewTransaction();
+
+    auto removeConnections = [=] (BaseProcessor* proc)
+    {
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            int numConnections = proc->getNumOutputProcessors (portIdx);
+            for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+            {
+                if (proc->getOutputProcessor (portIdx, cIdx) == procToRemove)
+                {
+                    ConnectionInfo info { proc, portIdx, procToRemove, 0 }; // @TODO: fix for multi-input
+                    um->perform (new AddOrRemoveConnection (*this, std::move (info), true));
+                }
+            }
+        }
+    };
+
+    for (auto* proc : procs)
+    {
+        if (proc == procToRemove)
+            continue;
+
+        removeConnections (proc);
+    }
+
+    removeConnections (&inputProcessor);
+
     um->perform (new AddOrRemoveProcessor (*this, procToRemove));
 }
 
@@ -293,6 +320,15 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
     while (! procs.isEmpty())
         um->perform (new AddOrRemoveProcessor (*this, procs.getLast()));
 
+    auto numInputConnections = inputProcessor.getNumOutputProcessors (0);
+    while (numInputConnections > 0)
+    {
+        auto* endProc = inputProcessor.getOutputProcessor (0, numInputConnections - 1);
+        ConnectionInfo info { &inputProcessor, 0, endProc, 0 }; // @TODO: make better for multi-input
+        um->perform (new AddOrRemoveConnection (*this, std::move (info), true));
+        numInputConnections = inputProcessor.getNumOutputProcessors (0);
+    }
+
     using PortMap = std::vector<int>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
     auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
@@ -355,9 +391,9 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
             const auto& connections = connectionMap.at (portIdx);
             for (auto cIdx : connections)
             {
-                std::cout << cIdx << std::endl;
                 auto* procToConnect = cIdx >= 0 ? procs[cIdx] : &outputProcessor;
-                proc->addOutputProcessor (procToConnect, portIdx);
+                ConnectionInfo info { proc, portIdx, procToConnect, 0 }; // @TODO: we need to save endIdx somewhere...
+                um->perform (new AddOrRemoveConnection (*this, std::move (info)));
             }
         }
     }

@@ -105,7 +105,7 @@ void ProcessorEditor::resized()
     constexpr int infoButtonSize = 20;
     infoButton.setBounds (width - infoButtonSize, height - infoButtonSize, infoButtonSize, infoButtonSize);
 
-    const int portDim = height / 10;
+    const int portDim = height / 8;
     auto placePorts = [=] (int x, auto& ports)
     {
         const auto nPorts = ports.size();
@@ -128,8 +128,18 @@ void ProcessorEditor::resized()
 void ProcessorEditor::mouseDrag (const MouseEvent& e)
 {
     const auto relE = e.getEventRelativeTo (getParentComponent());
-    setTopLeftPosition (relE.getPosition());
-    getParentComponent()->repaint();
+
+    if (auto* parent = getParentComponent())
+    {
+        auto parentBounds = parent->getBounds();
+        proc.setPosition (relE.getPosition(), parentBounds);
+        setTopLeftPosition (proc.getPosition (parentBounds));
+        getParentComponent()->repaint();
+    }
+    else
+    {
+        jassertfalse;
+    }
 }
 
 void ProcessorEditor::createCable (Port* origin, const MouseEvent& e)

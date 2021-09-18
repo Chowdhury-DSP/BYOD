@@ -75,10 +75,18 @@ public:
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }
 
+    void setPosition (Point<int> pos, Rectangle<int> parentBounds);
+    Point<int> getPosition (Rectangle<int> parentBounds);
+
 protected:
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
 
+    AudioBuffer<float>* outputBuffer = nullptr;
+
+    SharedResourcePointer<LNFAllocator> lnfAllocator;
+
+private:
     std::atomic<float>* onOffParam = nullptr;
 
     const int numInputs;
@@ -86,11 +94,9 @@ protected:
 
     std::vector<Array<BaseProcessor*>> outputProcessors;
     Array<AudioBuffer<float>> bufferArray;
-    AudioBuffer<float>* outputBuffer = nullptr;
     AudioBuffer<float> inputBuffer;
 
-    SharedResourcePointer<LNFAllocator> lnfAllocator;
+    Point<float> editorPosition;
 
-private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };
