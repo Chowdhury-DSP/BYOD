@@ -1,14 +1,14 @@
 #pragma once
 
 #include "../processors/ProcessorChain.h"
+#include "Cable.h"
 #include "InfoComponent.h"
 #include "ProcessorEditor.h"
 #include "utils/LookAndFeels.h"
 
 class BoardComponent : public Component,
-                       public DragAndDropContainer,
-                       public DragAndDropTarget,
-                       private ProcessorChain::Listener
+                       private ProcessorChain::Listener,
+                       private ProcessorEditor::PortListener
 {
 public:
     BoardComponent (ProcessorChain& procs);
@@ -18,27 +18,42 @@ public:
     void resized() override;
 
     int getIdealWidth (int parentWidth = -1) const;
-    void processorAdded (BaseProcessor* newProc) override;
-    void processorRemoved (const BaseProcessor* proc) override;
-    void processorMoved (int procToMove, int procInSlot) override;
     void showInfoComp (const BaseProcessor& proc);
 
-    bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
-    void itemDropped (const SourceDetails& dragSourceDetails) override;
+    void processorAdded (BaseProcessor* newProc) override;
+    void processorRemoved (const BaseProcessor* proc) override;
+    void refreshConnections() override;
+    void connectionAdded (const ConnectionInfo& info) override;
+    void connectionRemoved (const ConnectionInfo& info) override;
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
+    ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
+
+    void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e) override;
+    void refreshCable (const MouseEvent& e) override;
+    void releaseCable (const MouseEvent& e) override;
+    void destroyCable (ProcessorEditor* origin, int portIndex) override;
 
     static constexpr auto yOffset = 35;
 
 private:
     void showNewProcMenu() const;
     void refreshBoardSize();
+    std::pair<ProcessorEditor*, int> getNearestInputPort (const Point<int>& pos) const;
+    void setEditorPosition (ProcessorEditor* editor);
 
     ProcessorChain& procChain;
 
     TextButton newProcButton;
     OwnedArray<ProcessorEditor> processorEditors;
     InfoComponent infoComp;
+
+    std::unique_ptr<ProcessorEditor> inputEditor;
+    std::unique_ptr<ProcessorEditor> outputEditor;
+
+    OwnedArray<Cable> cables;
+    std::unique_ptr<MouseEvent> cableMouse;
+    bool ignoreConnectionCallbacks = false;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;
 

@@ -3,12 +3,22 @@
 #include "DryWetProcessor.h"
 #include "ProcessorStore.h"
 
+#include "utility/InputProcessor.h"
+#include "utility/OutputProcessor.h"
+
 class ProcessorChain
 {
+    // clang-format off
     CREATE_LISTENER (
         Listener,
         listeners,
-        virtual void processorAdded (BaseProcessor* /*proc*/) {} virtual void processorRemoved (const BaseProcessor* /*proc*/) {} virtual void processorMoved (int /*procToMove*/, int /*procInSlot*/) {})
+        virtual void processorAdded (BaseProcessor* /*proc*/) {}\
+        virtual void processorRemoved (const BaseProcessor* /*proc*/) {}\
+        virtual void refreshConnections() {}\
+        virtual void connectionAdded (const ConnectionInfo& /*info*/) {}\
+        virtual void connectionRemoved (const ConnectionInfo& /*info*/) {}\
+    )
+    // clang-format on
 public:
     ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts);
 
@@ -18,8 +28,10 @@ public:
 
     void addProcessor (BaseProcessor::Ptr newProc);
     void removeProcessor (BaseProcessor* procToRemove);
-    void moveProcessor (const BaseProcessor* procToMove, const BaseProcessor* procInSlot);
     OwnedArray<BaseProcessor>& getProcessors() { return procs; }
+
+    void addConnection (ConnectionInfo&& info);
+    void removeConnection (ConnectionInfo&& info);
 
     std::unique_ptr<XmlElement> saveProcChain();
     void loadProcChain (XmlElement* xml);
@@ -27,8 +39,12 @@ public:
     ProcessorStore& getProcStore() { return procStore; }
     const SpinLock& getProcChainLock() const { return processingLock; }
 
+    InputProcessor& getInputProcessor() { return inputProcessor; }
+    OutputProcessor& getOutputProcessor() { return outputProcessor; }
+
 private:
     void initializeProcessors (int curOS);
+    void runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed);
 
     double mySampleRate = 48000.0;
     int mySamplesPerBlock = 512;
@@ -36,10 +52,11 @@ private:
     OwnedArray<BaseProcessor> procs;
     ProcessorStore& procStore;
     SpinLock processingLock;
+    UndoManager* um;
 
-    std::atomic<float>* monoModeParam = nullptr;
-    AudioBuffer<float> monoBuffer;
-    AudioBuffer<float> stereoBuffer;
+    InputProcessor inputProcessor;
+    AudioBuffer<float> inputBuffer;
+    OutputProcessor outputProcessor;
 
     std::atomic<float>* oversamplingParam = nullptr;
     std::unique_ptr<dsp::Oversampling<float>> overSample[5];
@@ -53,7 +70,6 @@ private:
     DryWetProcessor dryWetMixer;
 
     friend class ProcChainActions;
-    UndoManager* um;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

@@ -28,10 +28,16 @@ public:
         chain.procs.removeObject (procToRemove, false);
     }
 
-    static void moveProcessor (ProcessorChain& chain, int indexToMove, int slotIndex)
+    static void addConnection (ProcessorChain& chain, const ConnectionInfo& info)
     {
-        chain.procs.move (indexToMove, slotIndex);
-        chain.listeners.call (&ProcessorChain::Listener::processorMoved, indexToMove, slotIndex);
+        info.startProc->addConnection (ConnectionInfo (info));
+        chain.listeners.call (&ProcessorChain::Listener::connectionAdded, info);
+    }
+
+    static void removeConnection (ProcessorChain& chain, const ConnectionInfo& info)
+    {
+        info.startProc->removeConnection (info);
+        chain.listeners.call (&ProcessorChain::Listener::connectionRemoved, info);
     }
 
 private:
@@ -90,29 +96,36 @@ bool AddOrRemoveProcessor::undo()
 }
 
 //=========================================================
-MoveProcessor::MoveProcessor (ProcessorChain& procChain, int indexToMove, int slotIndex) : chain (procChain),
-                                                                                           startIndex (indexToMove),
-                                                                                           endIndex (slotIndex)
+AddOrRemoveConnection::AddOrRemoveConnection (ProcessorChain& procChain, ConnectionInfo&& cInfo, bool removing) : chain (procChain),
+                                                                                                                  info (cInfo),
+                                                                                                                  isRemoving (removing)
 {
 }
 
-bool MoveProcessor::perform()
+bool AddOrRemoveConnection::perform()
 {
-    ProcChainActions::moveProcessor (chain, startIndex, endIndex);
+    if (isRemoving)
+    {
+        ProcChainActions::removeConnection (chain, info);
+    }
+    else
+    {
+        ProcChainActions::addConnection (chain, info);
+    }
+
     return true;
 }
 
-bool MoveProcessor::undo()
+bool AddOrRemoveConnection::undo()
 {
-    ProcChainActions::moveProcessor (chain, endIndex, startIndex);
+    if (isRemoving)
+    {
+        ProcChainActions::addConnection (chain, info);
+    }
+    else
+    {
+        ProcChainActions::removeConnection (chain, info);
+    }
+
     return true;
-}
-
-UndoableAction* MoveProcessor::createCoalescedAction (UndoableAction* nextAction)
-{
-    if (auto* next = dynamic_cast<MoveProcessor*> (nextAction))
-        if (&(next->chain) == &chain && next->startIndex == endIndex)
-            return new MoveProcessor (chain, startIndex, next->endIndex);
-
-    return nullptr;
 }

@@ -26,6 +26,15 @@ struct ProcessorUIOptions
     } info;
 };
 
+class BaseProcessor;
+struct ConnectionInfo
+{
+    BaseProcessor* startProc;
+    int startPort;
+    BaseProcessor* endProc;
+    int endPort;
+};
+
 class BaseProcessor : private JuceProcWrapper
 {
 public:
@@ -33,13 +42,16 @@ public:
 
     BaseProcessor (const String& name,
                    AudioProcessorValueTreeState::ParameterLayout params,
-                   UndoManager* um = nullptr);
+                   UndoManager* um = nullptr,
+                   int nInputs = 1,
+                   int nOutputs = 1);
 
     // metadata
     virtual ProcessorType getProcessorType() const = 0;
     const String getName() const override { return JuceProcWrapper::getName(); }
 
     // audio processing methods
+    void prepareInputBuffer (int numSamples) { inputBuffer.setSize (2, numSamples); }
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
 
@@ -61,14 +73,40 @@ public:
     /** if your processor can't pass a unit test (for a justifiable reason) say so here! */
     virtual StringArray getTestsToSkip() const { return {}; }
 
+    AudioBuffer<float>& getInputBuffer() { return inputBuffer; }
+    AudioBuffer<float>& getOutputBuffer() { return *outputBuffer; }
+    BaseProcessor* getOutputProcessor (int portIdx, int connectionIdx) { return outputConnections[portIdx][connectionIdx].endProc; }
+    const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[portIdx].getReference (connectionIdx); }
+    int getNumOutputConnections (int portIdx) const { return outputConnections[portIdx].size(); }
+
+    void addConnection (ConnectionInfo&& info);
+    void removeConnection (const ConnectionInfo& info);
+
+    int getNumInputs() const noexcept { return numInputs; }
+    int getNumOutputs() const noexcept { return numOutputs; }
+
+    void setPosition (Point<int> pos, Rectangle<int> parentBounds);
+    Point<int> getPosition (Rectangle<int> parentBounds);
+
 protected:
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
 
-    std::atomic<float>* onOffParam = nullptr;
+    AudioBuffer<float>* outputBuffer = nullptr;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;
 
 private:
+    std::atomic<float>* onOffParam = nullptr;
+
+    const int numInputs;
+    const int numOutputs;
+
+    std::vector<Array<ConnectionInfo>> outputConnections;
+    Array<AudioBuffer<float>> bufferArray;
+    AudioBuffer<float> inputBuffer;
+
+    Point<float> editorPosition;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };

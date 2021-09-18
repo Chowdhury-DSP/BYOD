@@ -4,20 +4,56 @@
 
 namespace
 {
-const String monoModeTag = "mono_stereo";
 const String oversamplingTag = "oversampling";
 const String inGainTag = "in_gain";
 const String outGainTag = "out_gain";
 const String dryWetTag = "dry_wet";
+
+[[maybe_unused]] void printBufferLevels (const AudioBuffer<float>& buffer)
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        auto level = buffer.getRMSLevel (ch, 0, numSamples);
+        std::cout << "Level for channel: " << ch << ": " << level << std::endl;
+    }
+}
+
+String getPortTag (int portIdx)
+{
+    return "port_" + String (portIdx);
+}
+
+String getConnectionTag (int connectionIdx)
+{
+    return "connection_" + String (connectionIdx);
+}
+
+String getConnectionEndTag (int connectionIdx)
+{
+    return "connection_end_" + String (connectionIdx);
+}
+
+String getProcessorTagName (const BaseProcessor* proc)
+{
+    return proc->getName().replaceCharacter (' ', '_');
+}
+
+String getProcessorName (const String& tag)
+{
+    return tag.replaceCharacter ('_', ' ');
+}
 } // namespace
 
 ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store),
-                                                                                            um (vts.undoManager)
+                                                                                            um (vts.undoManager),
+                                                                                            inputProcessor (um),
+                                                                                            outputProcessor (um)
 {
     using namespace std::placeholders;
     procStore.addProcessorCallback = std::bind (&ProcessorChain::addProcessor, this, _1);
 
-    monoModeParam = vts.getRawParameterValue (monoModeTag);
     oversamplingParam = vts.getRawParameterValue (oversamplingTag);
     inGainParam = vts.getRawParameterValue (inGainTag);
     outGainParam = vts.getRawParameterValue (outGainTag);
@@ -29,11 +65,6 @@ ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeSt
 
 void ProcessorChain::createParameters (Parameters& params)
 {
-    params.push_back (std::make_unique<AudioParameterChoice> (monoModeTag,
-                                                              "Mono/Stereo",
-                                                              StringArray { "Mono", "Stereo" },
-                                                              0));
-
     params.push_back (std::make_unique<AudioParameterChoice> (oversamplingTag,
                                                               "Oversampling",
                                                               StringArray { "1x", "2x", "4x", "8x", "16x" },
@@ -51,6 +82,9 @@ void ProcessorChain::initializeProcessors (int curOS)
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
+    inputProcessor.prepare (osSampleRate, osSamplesPerBlock);
+    outputProcessor.prepare (osSampleRate, osSamplesPerBlock);
+
     for (auto* processor : procs)
         processor->prepare (osSampleRate, osSamplesPerBlock);
 }
@@ -60,8 +94,7 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
     mySampleRate = sampleRate;
     mySamplesPerBlock = samplesPerBlock;
 
-    monoBuffer.setSize (1, samplesPerBlock * 16); // allocate extra space for upsampled buffers
-    stereoBuffer.setSize (2, samplesPerBlock * 16);
+    inputBuffer.setSize (2, samplesPerBlock * 16); // allocate extra space for upsampled buffers
 
     int curOS = static_cast<int> (*oversamplingParam);
     prevOS = curOS;
@@ -78,6 +111,55 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
     dryWetMixer.prepare (spec);
 
     initializeProcessors (curOS);
+}
+
+void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed)
+{
+    int nextNumProcs = 0;
+    const int numOutputs = proc->getNumOutputs();
+    for (int i = 0; i < numOutputs; ++i)
+    {
+        const int numOutProcs = proc->getNumOutputConnections (i);
+        for (int j = 0; j < numOutProcs; ++j)
+            nextNumProcs += 1;
+    }
+
+    if (proc == &outputProcessor)
+    {
+        proc->processAudio (buffer);
+        outProcessed = true;
+        return;
+    }
+
+    if (nextNumProcs == 0)
+        return;
+
+    proc->processAudio (buffer);
+    auto* outBuffer = &proc->getOutputBuffer();
+    if (outBuffer == nullptr)
+        outBuffer = &buffer;
+
+    for (int i = numOutputs - 1; i >= 0; --i)
+    {
+        // @TODO: this approach won't really work when we have processors with multiple inputs...
+        const int numOutProcs = proc->getNumOutputConnections (i);
+        for (int j = numOutProcs - 1; j >= 0; --j)
+        {
+            auto* nextProc = proc->getOutputProcessor (i, j);
+            if (nextNumProcs == 1)
+            {
+                runProcessor (nextProc, *outBuffer, outProcessed);
+            }
+            else
+            {
+                auto& nextBuffer = nextProc->getInputBuffer();
+                nextBuffer.makeCopyOf (*outBuffer, true);
+                runProcessor (nextProc, nextBuffer, outProcessed);
+            }
+
+            nextNumProcs -= 1;
+        }
+    }
 }
 
 void ProcessorChain::processAudio (AudioBuffer<float> buffer)
@@ -109,56 +191,27 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
     // process mono or stereo buffer?
     const auto osNumSamples = (int) osBlock.getNumSamples();
     const auto numChannels = buffer.getNumChannels();
-    const auto useMono = monoModeParam->load() == 0.0f;
 
-    if (useMono)
+    inputBuffer.setSize (2, osNumSamples, false, false, true);
+    inputBuffer.clear();
+
+    for (int ch = 0; ch < numChannels; ++ch)
+        inputBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
+
+    bool outProcessed = false;
+    runProcessor (&inputProcessor, inputBuffer, outProcessed);
+
+    if (outProcessed)
     {
-        monoBuffer.setSize (1, osNumSamples, false, false, true);
-        monoBuffer.clear();
-        monoBuffer.copyFrom (0, 0, osBlock.getChannelPointer (0), osNumSamples);
-
-        for (int ch = 1; ch < numChannels; ++ch)
-            monoBuffer.addFrom (0, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
-
-        monoBuffer.applyGain (1.0f / (float) numChannels);
-    }
-    else
-    {
-        stereoBuffer.setSize (2, osNumSamples, false, false, true);
-        stereoBuffer.clear();
-
-        for (int ch = 0; ch < numChannels; ++ch)
-            stereoBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
-    }
-
-    auto& processBuffer = useMono ? monoBuffer : stereoBuffer;
-
-    for (auto* processor : procs)
-    {
-        if (processor->isBypassed())
-        {
-            processor->processAudioBypassed (processBuffer);
-            continue;
-        }
-
-        processor->processAudio (processBuffer);
-    }
-
-    // go back to original block of data
-    if (useMono)
-    {
-        auto processedData = processBuffer.getReadPointer (0);
+        auto& outBuffer = outputProcessor.getOutputBuffer();
         for (int ch = 0; ch < numChannels; ++ch)
             FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
-                                         processedData,
+                                         outBuffer.getReadPointer (ch),
                                          osNumSamples);
     }
     else
     {
-        for (int ch = 0; ch < numChannels; ++ch)
-            FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
-                                         processBuffer.getReadPointer (ch),
-                                         osNumSamples);
+        osBlock.clear();
     }
 
     overSample[curOS]->processSamplesDown (block);
@@ -177,30 +230,87 @@ void ProcessorChain::addProcessor (BaseProcessor::Ptr newProc)
 void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
 {
     um->beginNewTransaction();
+
+    auto removeConnections = [=] (BaseProcessor* proc)
+    {
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            int numConnections = proc->getNumOutputConnections (portIdx);
+            for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+            {
+                auto connection = proc->getOutputConnection (portIdx, cIdx);
+                if (connection.endProc == procToRemove)
+                    um->perform (new AddOrRemoveConnection (*this, std::move (connection), true));
+            }
+        }
+    };
+
+    for (auto* proc : procs)
+    {
+        if (proc == procToRemove)
+            continue;
+
+        removeConnections (proc);
+    }
+
+    removeConnections (&inputProcessor);
+
     um->perform (new AddOrRemoveProcessor (*this, procToRemove));
 }
 
-void ProcessorChain::moveProcessor (const BaseProcessor* procToMove, const BaseProcessor* procInSlot)
+void ProcessorChain::addConnection (ConnectionInfo&& info)
 {
-    if (procToMove == procInSlot)
-        return;
-
-    auto indexToMove = procs.indexOf (procToMove);
-    auto slotIndex = procInSlot == nullptr ? procs.size() - 1 : procs.indexOf (procInSlot);
-
     um->beginNewTransaction();
-    um->perform (new MoveProcessor (*this, indexToMove, slotIndex));
+    um->perform (new AddOrRemoveConnection (*this, std::move (info)));
+}
+
+void ProcessorChain::removeConnection (ConnectionInfo&& info)
+{
+    um->beginNewTransaction();
+    um->perform (new AddOrRemoveConnection (*this, std::move (info), true));
 }
 
 std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");
-    for (auto* proc : procs)
+
+    auto saveProcessor = [&] (BaseProcessor* proc)
     {
-        auto procXml = std::make_unique<XmlElement> (proc->getName().replaceCharacter (' ', '_'));
+        auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
+
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            auto numOutputs = proc->getNumOutputConnections (portIdx);
+            if (numOutputs == 0)
+                continue;
+
+            auto portElement = std::make_unique<XmlElement> (getPortTag (portIdx));
+            for (int cIdx = 0; cIdx < numOutputs; ++cIdx)
+            {
+                auto& connection = proc->getOutputConnection (portIdx, cIdx);
+                auto processorIdx = procs.indexOf (connection.endProc);
+
+                if (processorIdx == -1)
+                {
+                    // there can only be one!
+                    jassert (connection.endProc == &outputProcessor);
+                }
+
+                portElement->setAttribute (getConnectionTag (cIdx), processorIdx);
+                portElement->setAttribute (getConnectionEndTag (cIdx), connection.endPort);
+            }
+
+            procXml->addChildElement (portElement.release());
+        }
+
         xml->addChildElement (procXml.release());
-    }
+    };
+
+    for (auto* proc : procs)
+        saveProcessor (proc);
+
+    saveProcessor (&inputProcessor);
 
     return std::move (xml);
 }
@@ -212,18 +322,82 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
     while (! procs.isEmpty())
         um->perform (new AddOrRemoveProcessor (*this, procs.getLast()));
 
+    auto numInputConnections = inputProcessor.getNumOutputConnections (0);
+    while (numInputConnections > 0)
+    {
+        auto connection = inputProcessor.getOutputConnection (0, numInputConnections - 1);
+        um->perform (new AddOrRemoveConnection (*this, std::move (connection), true));
+        numInputConnections = inputProcessor.getNumOutputConnections (0);
+    }
+
+    using PortMap = std::vector<std::pair<int, int>>;
+    using ProcConnectionMap = std::unordered_map<int, PortMap>;
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
+    {
+        if (procXml->getNumChildElements() > 0)
+            newProc->fromXML (procXml->getChildElement (0));
+
+        ProcConnectionMap connectionMap;
+        for (int portIdx = 0; portIdx < newProc->getNumOutputs(); ++portIdx)
+        {
+            if (auto* portElement = procXml->getChildByName (getPortTag (portIdx)))
+            {
+                auto numConnections = portElement->getNumAttributes() / 2;
+                PortMap portConnections (numConnections);
+                for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+                {
+                    auto processorIdx = portElement->getIntAttribute (getConnectionTag (cIdx));
+                    auto endPort = portElement->getIntAttribute (getConnectionEndTag (cIdx));
+                    portConnections[cIdx] = std::make_pair (processorIdx, endPort);
+                }
+
+                connectionMap.insert ({ portIdx, std::move (portConnections) });
+            }
+        }
+
+        int procIdx = newProc == &inputProcessor ? -1 : procs.size();
+        connectionMaps.insert ({ procIdx, std::move (connectionMap) });
+    };
+
+    std::unordered_map<int, ProcConnectionMap> connectionMaps;
     for (auto* procXml : xml->getChildIterator())
     {
-        auto newProc = procStore.createProcByName (procXml->getTagName().replaceCharacter ('_', ' '));
+        auto procName = getProcessorName (procXml->getTagName());
+        if (procName == inputProcessor.getName())
+        {
+            loadProcessorState (procXml, &inputProcessor, connectionMaps);
+            continue;
+        }
+
+        auto newProc = procStore.createProcByName (procName);
         if (newProc == nullptr)
         {
             jassertfalse;
             continue;
         }
 
-        if (procXml->getNumChildElements() > 0)
-            newProc->fromXML (procXml->getChildElement (0));
-
+        loadProcessorState (procXml, newProc.get(), connectionMaps);
         um->perform (new AddOrRemoveProcessor (*this, std::move (newProc)));
     }
+
+    // wait until all the processors are created before connecting them
+    for (auto [procIdx, connectionMap] : connectionMaps)
+    {
+        auto* proc = procIdx >= 0 ? procs[(int) procIdx] : &inputProcessor;
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            if (connectionMap.find (portIdx) == connectionMap.end())
+                continue; // no connections!
+
+            const auto& connections = connectionMap.at (portIdx);
+            for (auto [cIdx, endPort] : connections)
+            {
+                auto* procToConnect = cIdx >= 0 ? procs[cIdx] : &outputProcessor;
+                ConnectionInfo info { proc, portIdx, procToConnect, endPort };
+                um->perform (new AddOrRemoveConnection (*this, std::move (info)));
+            }
+        }
+    }
+
+    listeners.call (&Listener::refreshConnections);
 }

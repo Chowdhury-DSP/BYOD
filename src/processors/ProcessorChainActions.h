@@ -21,19 +21,19 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AddOrRemoveProcessor)
 };
 
-class MoveProcessor : public UndoableAction
+class AddOrRemoveConnection : public UndoableAction
 {
 public:
-    MoveProcessor (ProcessorChain& procChain, int indexToMove, int slotIndex);
+    AddOrRemoveConnection (ProcessorChain& procChain, ConnectionInfo&& info, bool removing = false);
 
     bool perform() override;
     bool undo() override;
     int getSizeInUnits() override { return (int) sizeof (*this); }
-    UndoableAction* createCoalescedAction (UndoableAction* nextAction) override;
 
 private:
     ProcessorChain& chain;
-    const int startIndex, endIndex;
+    const ConnectionInfo info;
+    const bool isRemoving;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MoveProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AddOrRemoveConnection)
 };
