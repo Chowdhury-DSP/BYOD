@@ -4,8 +4,7 @@
 KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac, std::function<void()> paramLambda)
     : contrastColour (cc), accentColour (ac)
 {
-    auto addSlider = [=, &vts] (AudioParameterFloat* param)
-    {
+    auto addSlider = [=, &vts] (AudioParameterFloat* param) {
         auto newSlide = std::make_unique<SliderWithAttachment>();
         addAndMakeVisible (newSlide.get());
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, *newSlide.get());
@@ -21,8 +20,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         sliders.add (std::move (newSlide));
     };
 
-    auto addBox = [=, &vts] (AudioParameterChoice* param)
-    {
+    auto addBox = [=, &vts] (AudioParameterChoice* param) {
         auto newBox = std::make_unique<BoxWithAttachment>();
         addAndMakeVisible (newBox.get());
         newBox->setName (param->name);
@@ -38,8 +36,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         boxes.add (std::move (newBox));
     };
 
-    auto addButton = [=, &vts] (AudioParameterBool* param)
-    {
+    auto addButton = [=, &vts] (AudioParameterBool* param) {
         if (param->paramID == "on_off")
             return;
 
@@ -106,8 +103,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (contrastColour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, int offset = 0)
-    {
+    auto makeName = [&g] (Component& comp, String name, int offset = 0) {
         const int height = 20;
         g.setFont (Font (18.0f).boldened());
         Rectangle<int> nameBox (comp.getX(), comp.getY() - 22 + offset, comp.getWidth(), height);
@@ -131,17 +127,20 @@ void KnobsComponent::resized()
     if (totalNumComponents == 1)
     {
         const int x = (getWidth() - compWidth) / 2;
-        for (auto* s : sliders)
-            s->setBounds (x, 15, compWidth - 5, compWidth - 5);
+        if (sliders.size() > 0)
+            sliders[0]->setBounds (x, 15, compWidth - 5, compWidth - 5);
 
-        for (auto* b : boxes)
-            b->setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+        if (boxes.size() > 0)
+        {
+            compWidth = getWidth() - 30;
+            boxes[0]->setBounds (Rectangle (compWidth, 30).withCentre (getLocalBounds().getCentre()));
+        }
 
-        for (auto* b : buttons)
-            b->setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+        if (buttons.size() > 0)
+            buttons[0]->setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
 
-        for (auto* c : customComponents)
-            c->setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+        if (customComponents.size() > 0)
+            customComponents[0]->setBounds (x, 15 + (compHeight - 30) / 2, compWidth / -5, 30);
 
         return;
     }

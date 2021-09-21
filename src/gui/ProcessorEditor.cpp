@@ -23,17 +23,14 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, contrastColour);
-    xButton.onClick = [=]
-    { MessageManager::callAsync ([=]
-                                 { procChain.removeProcessor (&proc); }); };
+    xButton.onClick = [=] { MessageManager::callAsync ([=] { procChain.removeProcessor (&proc); }); };
     addAndMakeVisible (xButton);
 
     auto infoSvg = Drawable::createFromImageData (BinaryData::info_svg, BinaryData::info_svgSize);
     infoSvg->replaceColour (Colours::black, contrastColour);
     infoButton.setImages (infoSvg.get());
     addAndMakeVisible (infoButton);
-    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)]
-    {
+    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)] {
         boardComp->showInfoComp (baseProc);
     };
 
@@ -98,16 +95,19 @@ void ProcessorEditor::resized()
     const auto height = getHeight();
     knobs.setBounds (5, 35, width - 10, height - 40);
 
-    constexpr int xButtonSize = 27;
-    powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
-    xButton.setBounds (width - xButtonSize, 0, xButtonSize, xButtonSize);
+    bool isIOProcessor = typeid (proc) == typeid (InputProcessor) || typeid (proc) == typeid (OutputProcessor);
+    if (! isIOProcessor)
+    {
+        constexpr int xButtonSize = 27;
+        powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
+        xButton.setBounds (width - xButtonSize, 0, xButtonSize, xButtonSize);
 
-    constexpr int infoButtonSize = 20;
-    infoButton.setBounds (width - infoButtonSize, height - infoButtonSize, infoButtonSize, infoButtonSize);
+        constexpr int infoButtonSize = 20;
+        infoButton.setBounds (width - infoButtonSize, height - infoButtonSize, infoButtonSize, infoButtonSize);
+    }
 
     const int portDim = height / 8;
-    auto placePorts = [=] (int x, auto& ports)
-    {
+    auto placePorts = [=] (int x, auto& ports) {
         const auto nPorts = ports.size();
         if (nPorts == 0)
             return;

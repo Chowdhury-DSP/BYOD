@@ -45,8 +45,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.65f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=]
-    { showNewProcMenu(); };
+    newProcButton.onClick = [=] { showNewProcMenu(); };
 
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, this);
     addAndMakeVisible (inputEditor.get());
@@ -125,7 +124,7 @@ void BoardComponent::resized()
 
     auto centreEditorHeight = (height - editorHeight) / 2;
     inputEditor->setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
-    outputEditor->setBounds (width - (editorWidth / 2 + editorPad), centreEditorHeight, editorWidth / 2, editorHeight);
+    outputEditor->setBounds (width - (editorWidth / 3 + editorPad), centreEditorHeight, editorWidth / 3, editorHeight);
 
     for (auto* editor : processorEditors)
         setEditorPosition (editor);
@@ -327,8 +326,7 @@ std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Poin
     auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
     int minDistance = -1;
 
-    auto checkPorts = [&] (ProcessorEditor* editor)
-    {
+    auto checkPorts = [&] (ProcessorEditor* editor) {
         int numPorts = editor->getProcPtr()->getNumInputs();
         for (int i = 0; i < numPorts; ++i)
         {
