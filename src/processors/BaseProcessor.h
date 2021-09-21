@@ -51,7 +51,7 @@ public:
     const String getName() const override { return JuceProcWrapper::getName(); }
 
     // audio processing methods
-    void prepareInputBuffer (int numSamples) { inputBuffer.setSize (2, numSamples); }
+    void prepareInputBuffers (int numSamples);
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
 
@@ -73,11 +73,18 @@ public:
     /** if your processor can't pass a unit test (for a justifiable reason) say so here! */
     virtual StringArray getTestsToSkip() const { return {}; }
 
-    AudioBuffer<float>& getInputBuffer() { return inputBuffer; }
+    AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float>& getOutputBuffer() { return *outputBuffer; }
+
     BaseProcessor* getOutputProcessor (int portIdx, int connectionIdx) { return outputConnections[portIdx][connectionIdx].endProc; }
     const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[portIdx].getReference (connectionIdx); }
+
     int getNumOutputConnections (int portIdx) const { return outputConnections[portIdx].size(); }
+    int getNumInputConnections() const { return inputsConnected.size(); };
+
+    int getNextInputIdx() { return inputsConnected[inputIdx++]; }
+    int getNumInputsReady() const { return inputIdx; }
+    void clearInputIdx() { inputIdx = 0; }
 
     void addConnection (ConnectionInfo&& info);
     void removeConnection (const ConnectionInfo& info);
@@ -93,6 +100,7 @@ protected:
     ProcessorUIOptions uiOptions;
 
     AudioBuffer<float>* outputBuffer = nullptr;
+    Array<int> inputsConnected;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;
 
@@ -104,7 +112,8 @@ private:
 
     std::vector<Array<ConnectionInfo>> outputConnections;
     Array<AudioBuffer<float>> bufferArray;
-    AudioBuffer<float> inputBuffer;
+    Array<AudioBuffer<float>> inputBuffers;
+    int inputIdx = 0;
 
     Point<float> editorPosition;
 

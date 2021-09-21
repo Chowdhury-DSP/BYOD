@@ -27,6 +27,7 @@
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
 #include "utility/DCBlocker.h"
+#include "utility/Mixer.h"
 
 template <typename ProcType>
 static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
@@ -56,6 +57,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
+    { "Mixer", &processorFactory<Mixer> },
 
     { "Chorus", &processorFactory<Chorus> },
     { "Delay", &processorFactory<Delay> },
@@ -92,8 +94,7 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=]
-        { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }

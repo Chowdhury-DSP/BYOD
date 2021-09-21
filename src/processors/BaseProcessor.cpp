@@ -14,7 +14,19 @@ BaseProcessor::BaseProcessor (const String& name,
     outputConnections.resize (numOutputs);
     bufferArray.resize (numOutputs);
 
+    inputBuffers.resize (numInputs);
+    inputsConnected.resize (0);
+
     uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>();
+}
+
+void BaseProcessor::prepareInputBuffers (int numSamples)
+{
+    for (auto& b : inputBuffers)
+    {
+        b.setSize (2, numSamples);
+        b.clear();
+    }
 }
 
 std::unique_ptr<XmlElement> BaseProcessor::toXML()
@@ -47,6 +59,7 @@ void BaseProcessor::addConnection (ConnectionInfo&& info)
 {
     jassert (info.startProc == this);
     outputConnections[info.startPort].add (info);
+    info.endProc->inputsConnected.addIfNotAlreadyThere (info.endPort);
 }
 
 void BaseProcessor::removeConnection (const ConnectionInfo& info)
@@ -59,6 +72,8 @@ void BaseProcessor::removeConnection (const ConnectionInfo& info)
         if (connections[cIdx].endProc == info.endProc && connections[cIdx].endPort == info.endPort)
         {
             connections.remove (cIdx);
+            info.endProc->inputsConnected.removeFirstMatchingValue (info.endPort);
+            info.endProc->inputBuffers[info.endPort].clear();
             break;
         }
     }
