@@ -82,7 +82,8 @@ void ProcessorChain::initializeProcessors (int curOS)
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
-    auto prepProcessor = [=] (BaseProcessor& proc) {
+    auto prepProcessor = [=] (BaseProcessor& proc)
+    {
         proc.prepare (osSampleRate, osSamplesPerBlock);
         proc.prepareInputBuffers (osSamplesPerBlock);
     };
@@ -144,7 +145,8 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     if (outBuffer == nullptr)
         outBuffer = &buffer;
 
-    auto processBuffer = [&] (BaseProcessor* nextProc) {
+    auto processBuffer = [&] (BaseProcessor* nextProc)
+    {
         int nextNumInputs = nextProc->getNumInputs();
         if (nextNumProcs == 1 && nextNumInputs == 1)
         {
@@ -259,7 +261,8 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
 {
     um->beginNewTransaction();
 
-    auto removeConnections = [=] (BaseProcessor* proc) {
+    auto removeConnections = [=] (BaseProcessor* proc)
+    {
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
             int numConnections = proc->getNumOutputConnections (portIdx);
@@ -301,7 +304,8 @@ std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");
 
-    auto saveProcessor = [&] (BaseProcessor* proc) {
+    auto saveProcessor = [&] (BaseProcessor* proc)
+    {
         auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
 
@@ -358,7 +362,8 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps) {
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
+    {
         if (procXml->getNumChildElements() > 0)
             newProc->fromXML (procXml->getChildElement (0));
 
