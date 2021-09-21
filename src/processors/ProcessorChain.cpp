@@ -82,11 +82,17 @@ void ProcessorChain::initializeProcessors (int curOS)
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
-    inputProcessor.prepare (osSampleRate, osSamplesPerBlock);
-    outputProcessor.prepare (osSampleRate, osSamplesPerBlock);
+    auto prepProcessor = [=] (BaseProcessor& proc)
+    {
+        proc.prepare (osSampleRate, osSamplesPerBlock);
+        proc.prepareInputBuffers (osSamplesPerBlock);
+    };
+
+    prepProcessor (inputProcessor);
+    prepProcessor (outputProcessor);
 
     for (auto* processor : procs)
-        processor->prepare (osSampleRate, osSamplesPerBlock);
+        prepProcessor (*processor);
 }
 
 void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
@@ -139,23 +145,47 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     if (outBuffer == nullptr)
         outBuffer = &buffer;
 
+    auto processBuffer = [&] (BaseProcessor* nextProc)
+    {
+        int nextNumInputs = nextProc->getNumInputs();
+        if (nextNumProcs == 1 && nextNumInputs == 1)
+        {
+            runProcessor (nextProc, *outBuffer, outProcessed);
+        }
+        else if (nextNumProcs > 1 && nextNumInputs == 1)
+        {
+            auto& nextBuffer = nextProc->getInputBuffer();
+            nextBuffer.makeCopyOf (*outBuffer, true);
+            runProcessor (nextProc, nextBuffer, outProcessed);
+        }
+        else
+        {
+            int inputIdx = nextProc->getNextInputIdx();
+            auto& nextBuffer = nextProc->getInputBuffer (inputIdx);
+            nextBuffer.makeCopyOf (*outBuffer, true);
+
+            if (nextProc->getNumInputsReady() < nextProc->getNumInputConnections())
+                return; // not all the inputs are ready yet...
+
+            runProcessor (nextProc, nextBuffer, outProcessed);
+            nextProc->clearInputIdx();
+
+            // for (int i = 0; i < nextNumInputs; ++i)
+            // {
+            //     auto& bufferToClear = nextProc->getInputBuffer (i);
+            //     if (&bufferToClear != &nextProc->getOutputBuffer())
+            //         bufferToClear.clear();
+            // }
+        }
+    };
+
     for (int i = numOutputs - 1; i >= 0; --i)
     {
-        // @TODO: this approach won't really work when we have processors with multiple inputs...
         const int numOutProcs = proc->getNumOutputConnections (i);
         for (int j = numOutProcs - 1; j >= 0; --j)
         {
             auto* nextProc = proc->getOutputProcessor (i, j);
-            if (nextNumProcs == 1)
-            {
-                runProcessor (nextProc, *outBuffer, outProcessed);
-            }
-            else
-            {
-                auto& nextBuffer = nextProc->getInputBuffer();
-                nextBuffer.makeCopyOf (*outBuffer, true);
-                runProcessor (nextProc, nextBuffer, outProcessed);
-            }
+            processBuffer (nextProc);
 
             nextNumProcs -= 1;
         }
@@ -236,7 +266,7 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
             int numConnections = proc->getNumOutputConnections (portIdx);
-            for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+            for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
             {
                 auto connection = proc->getOutputConnection (portIdx, cIdx);
                 if (connection.endProc == procToRemove)

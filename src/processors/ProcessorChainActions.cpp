@@ -10,6 +10,7 @@ public:
         int curOS = static_cast<int> (*chain.oversamplingParam);
         auto osFactor = (int) chain.overSample[curOS]->getOversamplingFactor();
         newProc->prepare (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
+        newProc->prepareInputBuffers (osFactor * chain.mySamplesPerBlock);
 
         SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
         auto* newProcPtr = chain.procs.add (std::move (newProc));
