@@ -48,6 +48,8 @@ target_sources(BYOD PRIVATE
     processors/tone/LofiIrs.cpp
     processors/tone/TrebleBooster.cpp
     processors/tone/bassman/BassmanTone.cpp
+
+    processors/utility/Mixer.cpp
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)

@@ -38,11 +38,11 @@ public:
                                              processedData,
                                              numSamples);
 
-            outputBuffer = &stereoBuffer;
+            outputBuffers.getReference (0) = &stereoBuffer;
         }
         else
         {
-            outputBuffer = &buffer;
+            outputBuffers.getReference (0) = &buffer;
         }
     }
 

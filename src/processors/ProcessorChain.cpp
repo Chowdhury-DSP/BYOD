@@ -82,8 +82,7 @@ void ProcessorChain::initializeProcessors (int curOS)
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
-    auto prepProcessor = [=] (BaseProcessor& proc)
-    {
+    auto prepProcessor = [=] (BaseProcessor& proc) {
         proc.prepare (osSampleRate, osSamplesPerBlock);
         proc.prepareInputBuffers (osSamplesPerBlock);
     };
@@ -141,51 +140,44 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
         return;
 
     proc->processAudio (buffer);
-    auto* outBuffer = &proc->getOutputBuffer();
-    if (outBuffer == nullptr)
-        outBuffer = &buffer;
 
-    auto processBuffer = [&] (BaseProcessor* nextProc)
-    {
+    auto processBuffer = [&] (BaseProcessor* nextProc, AudioBuffer<float>& nextBuffer) {
         int nextNumInputs = nextProc->getNumInputs();
         if (nextNumProcs == 1 && nextNumInputs == 1)
         {
-            runProcessor (nextProc, *outBuffer, outProcessed);
+            runProcessor (nextProc, nextBuffer, outProcessed);
         }
         else if (nextNumProcs > 1 && nextNumInputs == 1)
         {
-            auto& nextBuffer = nextProc->getInputBuffer();
-            nextBuffer.makeCopyOf (*outBuffer, true);
-            runProcessor (nextProc, nextBuffer, outProcessed);
+            auto& copyNextBuffer = nextProc->getInputBuffer();
+            copyNextBuffer.makeCopyOf (nextBuffer, true);
+            runProcessor (nextProc, copyNextBuffer, outProcessed);
         }
         else
         {
             int inputIdx = nextProc->getNextInputIdx();
-            auto& nextBuffer = nextProc->getInputBuffer (inputIdx);
-            nextBuffer.makeCopyOf (*outBuffer, true);
+            auto& copyNextBuffer = nextProc->getInputBuffer (inputIdx);
+            copyNextBuffer.makeCopyOf (nextBuffer, true);
 
             if (nextProc->getNumInputsReady() < nextProc->getNumInputConnections())
                 return; // not all the inputs are ready yet...
 
-            runProcessor (nextProc, nextBuffer, outProcessed);
+            runProcessor (nextProc, copyNextBuffer, outProcessed);
             nextProc->clearInputIdx();
-
-            // for (int i = 0; i < nextNumInputs; ++i)
-            // {
-            //     auto& bufferToClear = nextProc->getInputBuffer (i);
-            //     if (&bufferToClear != &nextProc->getOutputBuffer())
-            //         bufferToClear.clear();
-            // }
         }
     };
 
     for (int i = numOutputs - 1; i >= 0; --i)
     {
+        auto* outBuffer = proc->getOutputBuffer (i);
+        if (outBuffer == nullptr)
+            outBuffer = &buffer;
+
         const int numOutProcs = proc->getNumOutputConnections (i);
         for (int j = numOutProcs - 1; j >= 0; --j)
         {
             auto* nextProc = proc->getOutputProcessor (i, j);
-            processBuffer (nextProc);
+            processBuffer (nextProc, *outBuffer);
 
             nextNumProcs -= 1;
         }
@@ -233,7 +225,7 @@ void ProcessorChain::processAudio (AudioBuffer<float> buffer)
 
     if (outProcessed)
     {
-        auto& outBuffer = outputProcessor.getOutputBuffer();
+        auto& outBuffer = *outputProcessor.getOutputBuffer();
         for (int ch = 0; ch < numChannels; ++ch)
             FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
                                          outBuffer.getReadPointer (ch),
@@ -261,8 +253,7 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
 {
     um->beginNewTransaction();
 
-    auto removeConnections = [=] (BaseProcessor* proc)
-    {
+    auto removeConnections = [=] (BaseProcessor* proc) {
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
             int numConnections = proc->getNumOutputConnections (portIdx);
@@ -304,8 +295,7 @@ std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");
 
-    auto saveProcessor = [&] (BaseProcessor* proc)
-    {
+    auto saveProcessor = [&] (BaseProcessor* proc) {
         auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
 
@@ -362,8 +352,7 @@ void ProcessorChain::loadProcChain (XmlElement* xml)
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
-    {
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps) {
         if (procXml->getNumChildElements() > 0)
             newProc->fromXML (procXml->getChildElement (0));
 
