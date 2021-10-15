@@ -1,4 +1,5 @@
 #include "Mixer.h"
+#include "../ParameterHelpers.h"
 
 Mixer::Mixer (UndoManager* um) : BaseProcessor ("Mixer", createParameterLayout(), um, numIns, 1)
 {
@@ -90,15 +91,15 @@ void Mixer::processAudio (AudioBuffer<float>& buffer)
     if (numInputsProcessed == 0)
     {
         buffer.clear();
-        outputBuffer = &buffer;
+        outputBuffers.getReference (0) = &buffer;
     }
     else if (numInputsProcessed == 1)
     {
         buffer.makeCopyOf (*outBuffer, true);
-        outputBuffer = &buffer;
+        outputBuffers.getReference (0) = &buffer;
     }
     else
     {
-        outputBuffer = outBuffer;
+        outputBuffers.getReference (0) = outBuffer;
     }
 }

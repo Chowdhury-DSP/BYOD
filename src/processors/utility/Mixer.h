@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../BaseProcessor.h"
-#include "../ParameterHelpers.h"
 
 class Mixer : public BaseProcessor
 {

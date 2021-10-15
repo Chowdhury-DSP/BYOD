@@ -74,7 +74,7 @@ public:
     virtual StringArray getTestsToSkip() const { return {}; }
 
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
-    AudioBuffer<float>& getOutputBuffer() { return *outputBuffer; }
+    AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
 
     BaseProcessor* getOutputProcessor (int portIdx, int connectionIdx) { return outputConnections[portIdx][connectionIdx].endProc; }
     const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[portIdx].getReference (connectionIdx); }
@@ -99,7 +99,7 @@ protected:
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
 
-    AudioBuffer<float>* outputBuffer = nullptr;
+    Array<AudioBuffer<float>*> outputBuffers;
     Array<int> inputsConnected;
 
     SharedResourcePointer<LNFAllocator> lnfAllocator;
@@ -111,7 +111,6 @@ private:
     const int numOutputs;
 
     std::vector<Array<ConnectionInfo>> outputConnections;
-    Array<AudioBuffer<float>> bufferArray;
     Array<AudioBuffer<float>> inputBuffers;
     int inputIdx = 0;
 

@@ -49,11 +49,11 @@ public:
 
             monoBuffer.applyGain (1.0f / (float) numChannels);
 
-            outputBuffer = &monoBuffer;
+            outputBuffers.getReference (0) = &monoBuffer;
         }
         else
         {
-            outputBuffer = &buffer;
+            outputBuffers.getReference (0) = &buffer;
         }
     }
 
