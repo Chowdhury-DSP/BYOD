@@ -28,6 +28,7 @@
 #include "utility/DCBias.h"
 #include "utility/DCBlocker.h"
 #include "utility/Mixer.h"
+#include "utility/StereoSplitter.h"
 
 template <typename ProcType>
 static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
@@ -58,6 +59,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
     { "Mixer", &processorFactory<Mixer> },
+    { "Stereo Splitter", &processorFactory<StereoSplitter> },
 
     { "Chorus", &processorFactory<Chorus> },
     { "Delay", &processorFactory<Delay> },
