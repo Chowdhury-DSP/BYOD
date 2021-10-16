@@ -70,10 +70,6 @@ void StereoSplitter::processAudio (AudioBuffer<float>& buffer)
 
             buffers[0].addFrom (0, 0, buffer, 0, 0, numSamples);
             buffers[1].addFrom (0, 0, buffer, 0, 0, numSamples);
-
-            constexpr float minus3dBGain = 1.0f / MathConstants<float>::sqrt2;
-            buffers[0].applyGain (minus3dBGain);
-            buffers[1].applyGain (minus3dBGain);
         }
     }
     else

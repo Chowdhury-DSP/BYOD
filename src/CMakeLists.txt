@@ -50,6 +50,7 @@ target_sources(BYOD PRIVATE
     processors/tone/bassman/BassmanTone.cpp
 
     processors/utility/Mixer.cpp
+    processors/utility/StereoMerger.cpp
     processors/utility/StereoSplitter.cpp
 )
 

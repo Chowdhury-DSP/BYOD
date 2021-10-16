@@ -28,6 +28,7 @@
 #include "utility/DCBias.h"
 #include "utility/DCBlocker.h"
 #include "utility/Mixer.h"
+#include "utility/StereoMerger.h"
 #include "utility/StereoSplitter.h"
 
 template <typename ProcType>
@@ -59,6 +60,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
     { "Mixer", &processorFactory<Mixer> },
+    { "Stereo Merger", &processorFactory<StereoMerger> },
     { "Stereo Splitter", &processorFactory<StereoSplitter> },
 
     { "Chorus", &processorFactory<Chorus> },
@@ -96,8 +98,7 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=]
-        { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }
