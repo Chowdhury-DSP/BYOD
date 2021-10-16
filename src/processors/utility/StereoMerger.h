@@ -2,10 +2,10 @@
 
 #include "../BaseProcessor.h"
 
-class StereoSplitter : public BaseProcessor
+class StereoMerger : public BaseProcessor
 {
 public:
-    StereoSplitter (UndoManager* um);
+    StereoMerger (UndoManager* um);
 
     ProcessorType getProcessorType() const override { return Utility; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -16,7 +16,7 @@ public:
 private:
     std::atomic<float>* modeParam = nullptr;
 
-    AudioBuffer<float> buffers[2];
+    AudioBuffer<float> stereoBuffer;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StereoSplitter)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StereoMerger)
 };

@@ -27,7 +27,9 @@
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
 #include "utility/DCBlocker.h"
+#include "utility/FreqBandSplitter.h"
 #include "utility/Mixer.h"
+#include "utility/StereoMerger.h"
 #include "utility/StereoSplitter.h"
 
 template <typename ProcType>
@@ -58,7 +60,9 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
+    { "Frequency Splitter", &processorFactory<FreqBandSplitter> },
     { "Mixer", &processorFactory<Mixer> },
+    { "Stereo Merger", &processorFactory<StereoMerger> },
     { "Stereo Splitter", &processorFactory<StereoSplitter> },
 
     { "Chorus", &processorFactory<Chorus> },

@@ -49,7 +49,10 @@ target_sources(BYOD PRIVATE
     processors/tone/TrebleBooster.cpp
     processors/tone/bassman/BassmanTone.cpp
 
+    processors/utility/FreqBandSplitter.cpp
     processors/utility/Mixer.cpp
+    processors/utility/StereoMerger.cpp
+    processors/utility/StereoSplitter.cpp
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)
