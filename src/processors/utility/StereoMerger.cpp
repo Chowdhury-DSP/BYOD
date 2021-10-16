@@ -38,7 +38,8 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
     stereoBuffer.setSize (2, numSamples, false, false, true);
     stereoBuffer.clear();
 
-    auto makeBufferMono = [=] (AudioBuffer<float>& b) {
+    auto makeBufferMono = [=] (AudioBuffer<float>& b)
+    {
         const auto nChannels = b.getNumChannels();
 
         if (nChannels == 1)
