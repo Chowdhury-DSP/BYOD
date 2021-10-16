@@ -36,9 +36,6 @@ void FreqBandSplitter::prepare (double sampleRate, int samplesPerBlock)
 
 void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
 {
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
-
     for (auto filt : { &lowCrossLPF1, &lowCrossLPF2, &lowCrossHPF1, &lowCrossHPF2 })
         filt->setCutoffFrequency (*crossLowParam);
 
