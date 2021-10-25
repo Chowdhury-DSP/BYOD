@@ -39,8 +39,10 @@ AudioProcessorEditor* BYOD::createEditor()
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
 
     // GUI trigger functions
-    magicState.addTrigger ("undo", [=] { undoManager.undo(); });
-    magicState.addTrigger ("redo", [=] { undoManager.redo(); });
+    magicState.addTrigger ("undo", [=]
+                           { undoManager.undo(); });
+    magicState.addTrigger ("redo", [=]
+                           { undoManager.redo(); });
 
     auto editor = new foleys::MagicPluginEditor (magicState, BinaryData::gui_xml, BinaryData::gui_xmlSize, std::move (builder));
 
