@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Centaur" plugin="BYOD" vendor="CHOW" category="" version="0.2.0">
+  <proc_chain>
+    <Centaur>
+      <Parameters x_pos="0.2083704322576523" y_pos="0.2785571217536926">
+        <PARAM id="gain" value="0.5"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Centaur>
+    <Treble_Booster>
+      <Parameters x_pos="0.5601068735122681" y_pos="0.2805611193180084">
+        <PARAM id="boost" value="0.25"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Treble_Booster>
+    <Input>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="mono_stereo" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+  </proc_chain>
+</Preset>

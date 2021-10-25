@@ -2,24 +2,18 @@
 #include "gui/BoardViewport.h"
 #include "gui/utils/LookAndFeels.h"
 #include "gui/utils/TextSliderItem.h"
-#include "presets/PresetCompItem.h"
+#include "presets/PresetManager.h"
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procStore (&undoManager),
-               procs (procStore, vts),
-               presetManager (&procs, vts)
+               procs (procStore, vts)
 {
-    presetManager.hostUpdateFunc = [=]
-    {
-        MessageManager::callAsync ([=]
-                                   { updateHostDisplay (AudioProcessorListener::ChangeDetails().withProgramChanged (true)); });
-    };
+    presetManager = std::make_unique<PresetManager> (&procs, vts);
 }
 
 void BYOD::addParameters (Parameters& params)
 {
     ProcessorChain::createParameters (params);
-    PresetManager::addParameters (params);
 }
 
 void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -40,15 +34,13 @@ AudioProcessorEditor* BYOD::createEditor()
 {
     auto builder = chowdsp::createGUIBuilder (magicState);
     builder->registerFactory ("Board", &BoardItem::factory);
-    builder->registerFactory ("PresetsItem", &PresetCompItem::factory);
+    builder->registerFactory ("PresetsItem", &chowdsp::PresetsItem<BYOD>::factory);
     builder->registerFactory ("TextSlider", &TextSliderItem::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
 
     // GUI trigger functions
-    magicState.addTrigger ("undo", [=]
-                           { undoManager.undo(); });
-    magicState.addTrigger ("redo", [=]
-                           { undoManager.redo(); });
+    magicState.addTrigger ("undo", [=] { undoManager.undo(); });
+    magicState.addTrigger ("redo", [=] { undoManager.redo(); });
 
     auto editor = new foleys::MagicPluginEditor (magicState, BinaryData::gui_xml, BinaryData::gui_xmlSize, std::move (builder));
 
@@ -67,6 +59,7 @@ void BYOD::getStateInformation (MemoryBlock& destData)
     auto state = vts.copyState();
     xml->addChildElement (state.createXml().release());
     xml->addChildElement (procs.saveProcChain().release());
+    xml->addChildElement (presetManager->saveXmlState().release());
 
     copyXmlToBinary (*xml, destData);
 }
@@ -89,38 +82,7 @@ void BYOD::setStateInformation (const void* data, int sizeInBytes)
 
     vts.replaceState (ValueTree::fromXml (*vtsXml));
     procs.loadProcChain (procChainXml);
-}
-
-int BYOD::getNumPrograms()
-{
-    return presetManager.getNumFactoryPresets();
-}
-
-int BYOD::getCurrentProgram()
-{
-    const auto curPresetIdx = presetManager.getSelectedPresetIdx();
-
-    if (curPresetIdx > presetManager.getNumFactoryPresets())
-        return 0;
-
-    return curPresetIdx;
-}
-
-void BYOD::setCurrentProgram (int index)
-{
-    if (index > presetManager.getNumPresets() || index < 0) // out of range!
-        return;
-
-    if (index == presetManager.getSelectedPresetIdx()) // no update needed!
-        return;
-
-    MessageManager::callAsync ([=]
-                               { presetManager.setPreset (index); });
-}
-
-const String BYOD::getProgramName (int index)
-{
-    return presetManager.getPresetName (index);
+    presetManager->loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
 }
 
 // This creates new instances of the plugin
