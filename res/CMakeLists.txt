@@ -26,6 +26,7 @@ juce_add_binary_data(BinaryData SOURCES
     "lofi_irs/Yamaha 3.wav"
     "lofi_irs/Yamaha 4.wav"
 
+    presets/Centaur.chowpreset
     presets/Default.chowpreset
     presets/ZenDrive.chowpreset
 )
