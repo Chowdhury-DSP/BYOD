@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Default" index="0">
-  <proc_chain/>
+<Preset name="Default" plugin="BYOD" vendor="CHOW" category="" version="0.2.0">
+  <proc_chain>
+    <Input>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="mono_stereo" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Input>
+  </proc_chain>
 </Preset>

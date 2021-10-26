@@ -34,7 +34,7 @@ public:
     void removeConnection (ConnectionInfo&& info);
 
     std::unique_ptr<XmlElement> saveProcChain();
-    void loadProcChain (XmlElement* xml);
+    void loadProcChain (const XmlElement* xml);
 
     ProcessorStore& getProcStore() { return procStore; }
     const SpinLock& getProcChainLock() const { return processingLock; }

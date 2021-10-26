@@ -339,7 +339,7 @@ std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
     return std::move (xml);
 }
 
-void ProcessorChain::loadProcChain (XmlElement* xml)
+void ProcessorChain::loadProcChain (const XmlElement* xml)
 {
     um->beginNewTransaction();
 
