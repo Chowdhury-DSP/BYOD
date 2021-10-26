@@ -25,7 +25,8 @@ void SpringReverb::prepare (double sampleRate, int samplesPerBlock)
 
 void SpringReverb::setParams (const Params& params, int numSamples)
 {
-    auto msToSamples = [=] (float ms) {
+    auto msToSamples = [=] (float ms)
+    {
         return (ms / 1000.0f) * fs;
     };
 
@@ -67,19 +68,22 @@ void SpringReverb::processBlock (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    auto doSpringInput = [=] (int ch, float input) -> float {
+    auto doSpringInput = [=] (int ch, float input) -> float
+    {
         auto output = std::tanh (input - feedbackGain * delay.popSample (ch));
         return dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, output);
     };
 
-    auto doAPFProcess = [&]() {
+    auto doAPFProcess = [&]()
+    {
         auto yVec = Vec::fromRawArray (simdReg);
         for (auto& apf : vecAPFs)
             yVec = apf.processSample (yVec);
         yVec.copyToRawArray (simdReg);
     };
 
-    auto doSpringOutput = [&] (int ch) {
+    auto doSpringOutput = [&] (int ch)
+    {
         auto chIdx = 2 * ch;
         delay.pushSample (ch, simdReg[1 + chIdx]);
 
