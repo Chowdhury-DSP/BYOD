@@ -25,14 +25,14 @@ void SpringReverb::prepare (double sampleRate, int samplesPerBlock)
 
 void SpringReverb::setParams (const Params& params, int numSamples)
 {
-    auto msToSamples = [=] (float ms)
-    {
+    auto msToSamples = [=] (float ms) {
         return (ms / 1000.0f) * fs;
     };
 
     constexpr float lowT60 = 0.5f;
     constexpr float highT60 = 4.5f;
-    float t60Seconds = lowT60 * std::pow (highT60 / lowT60, params.decay - 0.7f * (1.0f - std::pow (params.size, 2.0f)));
+    const auto decayCorr = 0.7f * (1.0f - params.size * params.size);
+    float t60Seconds = lowT60 * std::pow (highT60 / lowT60, 0.95f * params.decay - decayCorr);
 
     float delaySamples = 1000.0f + std::pow (params.size * 0.099f, 1.0f) * fs;
     chaosSmooth.setTargetValue (rand.nextFloat() * delaySamples * 0.07f);
@@ -44,14 +44,15 @@ void SpringReverb::setParams (const Params& params, int numSamples)
     auto apfG = 0.5f - 0.4f * params.spin;
     float apfGVec alignas (16)[4] = { apfG, -apfG, apfG, -apfG };
     for (auto& apf : vecAPFs)
-        apf.setParams (msToSamples (0.35f + params.size), Vec::fromRawArray (apfGVec));
+        apf.setParams (msToSamples (0.35f + 3.0f * params.size), Vec::fromRawArray (apfGVec));
 
     constexpr float dampFreqLow = 4000.0f;
     constexpr float dampFreqHigh = 18000.0f;
     auto dampFreq = dampFreqLow * std::pow (dampFreqHigh / dampFreqLow, 1.0f - params.damping);
     lpf.setCutoffFrequency (dampFreq);
 
-    reflectionNetwork.setParams (params.size, t60Seconds, params.reflections * 0.5f, params.damping);
+    auto reflSkew = 0.95f * params.reflections * params.reflections;
+    reflectionNetwork.setParams (params.size, t60Seconds, reflSkew, params.damping);
 }
 
 void SpringReverb::processBlock (AudioBuffer<float>& buffer)
@@ -66,22 +67,19 @@ void SpringReverb::processBlock (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    auto doSpringInput = [=] (int ch, float input) -> float
-    {
+    auto doSpringInput = [=] (int ch, float input) -> float {
         auto output = std::tanh (input - feedbackGain * delay.popSample (ch));
         return dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, output);
     };
 
-    auto doAPFProcess = [&]()
-    {
+    auto doAPFProcess = [&]() {
         auto yVec = Vec::fromRawArray (simdReg);
         for (auto& apf : vecAPFs)
             yVec = apf.processSample (yVec);
         yVec.copyToRawArray (simdReg);
     };
 
-    auto doSpringOutput = [&] (int ch)
-    {
+    auto doSpringOutput = [&] (int ch) {
         auto chIdx = 2 * ch;
         delay.pushSample (ch, simdReg[1 + chIdx]);
 
