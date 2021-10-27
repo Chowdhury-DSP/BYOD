@@ -36,8 +36,8 @@ public:
 
         using namespace chowdsp::SIMDUtils;
         auto delaySamplesVec = VecType::fromRawArray (delaySamples);
-        feedback = powSIMD (VecType (0.001f), delaySamplesVec / VecType (t60 * fs));
-        feedback *= mix * (0.5f * (0.33f + 1.67f * reverbSize));
+        feedback = powSIMD (VecType (0.001f * std::pow (10.0f, mix)), delaySamplesVec / VecType (t60 * fs));
+        feedback *= 0.23f * mix * (0.735f + 0.235f * reverbSize);
 
         float dampDB = -3.0f - 9.0f * damping;
         shelfFilter.calcCoefs (1.0f, Decibels::decibelsToGain (dampDB), 800.0f, fs);

@@ -24,7 +24,7 @@ AudioProcessorValueTreeState::ParameterLayout SpringReverbProcessor::createParam
 
     createPercentParameter (params, "size", "Size", 0.5f);
     createPercentParameter (params, "decay", "Decay", 0.5f);
-    createPercentParameter (params, "reflect", "Reflect", 0.5f);
+    createPercentParameter (params, "reflect", "Refl.", 0.5f);
     createPercentParameter (params, "spin", "Spin", 0.5f);
     createPercentParameter (params, "damping", "Damp", 0.5f);
     createPercentParameter (params, "chaos", "Chaos", 0.0f);
