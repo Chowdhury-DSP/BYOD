@@ -38,8 +38,8 @@ AudioProcessorValueTreeState::ParameterLayout EnvelopeFilter::createParameterLay
 
     createPercentParameter (params, "res", "Resonance", 0.5f);
     createFreqParameter (params, "freq", "Freq.", 100.0f, 1000.0f, 250.0f, 250.0f);
-    createPercentParameter (params, "sense", "Sensitivity", 0.5f);
     createPercentParameter (params, "speed", "Speed", 0.5f);
+    createPercentParameter (params, "sense", "Sensitivity", 0.5f);
 
     params.push_back (std::make_unique<AudioParameterChoice> ("filter_type",
                                                               "Type",

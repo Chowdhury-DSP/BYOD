@@ -2,8 +2,8 @@
 
 namespace
 {
-constexpr int editorWidth = 330;
-constexpr int editorHeight = 220;
+constexpr int editorWidth = 270;
+constexpr int editorHeight = 180;
 constexpr int editorPad = 10;
 constexpr int newButtonWidth = 40;
 constexpr int newButtonPad = 10;
@@ -42,7 +42,7 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 {
     newProcButton.setButtonText ("+");
-    newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.65f));
+    newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.35f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
     newProcButton.onClick = [=]
@@ -368,7 +368,10 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor)
     auto position = proc->getPosition (getBounds());
     if (position == Point (0, 0)) // no position set yet
     {
-        auto centre = getLocalBounds().getCentre();
+        auto b = getLocalBounds()
+                     .withWidth (getWidth() / 2)
+                     .withHeight (getHeight() / 2);
+        auto centre = b.getCentre();
         editor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
         proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
     }

@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    SharedResourcePointer<LNFAllocator> lnfAllocator;
+    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
     bool isDragging = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TextSlider)
