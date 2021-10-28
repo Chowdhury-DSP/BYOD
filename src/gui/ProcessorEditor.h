@@ -24,6 +24,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    void mouseDown (const MouseEvent& e) override;
     void mouseDrag (const MouseEvent& e) override;
 
     BaseProcessor* getProcPtr() const { return &proc; }
@@ -50,6 +51,8 @@ private:
 
     OwnedArray<Port> inputPorts;
     OwnedArray<Port> outputPorts;
+
+    Point<int> mouseDownOffset;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)
 };

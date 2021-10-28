@@ -5,7 +5,7 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     setViewedComponent (&comp, false);
 
     getHorizontalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFF0EDED4));
-    setScrollBarsShown (false, true);
+    setScrollBarsShown (false, false);
 }
 
 BoardViewport::~BoardViewport()

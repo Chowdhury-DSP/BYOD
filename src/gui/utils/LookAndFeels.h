@@ -141,8 +141,7 @@ protected:
         label->setJustificationType (Justification::centred);
         label->setFont (Font (16.0f).boldened());
 
-        label->onEditorShow = [label]
-        {
+        label->onEditorShow = [label] {
             if (auto editor = label->getCurrentTextEditor())
             {
                 editor->setBounds (label->getLocalBounds());
@@ -155,52 +154,4 @@ protected:
 
         return label;
     }
-};
-
-//==================================================================
-class LNFAllocator
-{
-public:
-    LNFAllocator()
-    {
-        lnfs.ensureStorageAllocated (24);
-    }
-
-    ~LNFAllocator()
-    {
-        LookAndFeel::setDefaultLookAndFeel (nullptr);
-    }
-
-    LookAndFeel* addLookAndFeel (LookAndFeel* laf)
-    {
-        jassert (laf != nullptr);
-        jassert (! lnfs.contains (laf));
-
-        return lnfs.add (laf);
-    }
-
-    template <typename LookAndFeelSubclass>
-    bool containsLookAndFeelType() const
-    {
-        for (auto* l : lnfs)
-            if (dynamic_cast<LookAndFeelSubclass*> (l) != nullptr)
-                return true;
-
-        return false;
-    }
-
-    template <typename LookAndFeelSubclass>
-    LookAndFeelSubclass* getLookAndFeel()
-    {
-        for (auto* l : lnfs)
-            if (auto* result = dynamic_cast<LookAndFeelSubclass*> (l))
-                return result;
-
-        return static_cast<LookAndFeelSubclass*> (lnfs.add (std::make_unique<LookAndFeelSubclass>()));
-    }
-
-private:
-    OwnedArray<LookAndFeel> lnfs;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LNFAllocator)
 };

@@ -23,17 +23,14 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, contrastColour);
-    xButton.onClick = [=]
-    { MessageManager::callAsync ([=]
-                                 { procChain.removeProcessor (&proc); }); };
+    xButton.onClick = [=] { MessageManager::callAsync ([=] { procChain.removeProcessor (&proc); }); };
     addAndMakeVisible (xButton);
 
     auto infoSvg = Drawable::createFromImageData (BinaryData::info_svg, BinaryData::info_svgSize);
     infoSvg->replaceColour (Colours::black, contrastColour);
     infoButton.setImages (infoSvg.get());
     addAndMakeVisible (infoButton);
-    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)]
-    {
+    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)] {
         boardComp->showInfoComp (baseProc);
     };
 
@@ -89,7 +86,7 @@ void ProcessorEditor::paint (Graphics& g)
 
     g.setColour (contrastColour);
     g.setFont (Font (25.0f).boldened());
-    g.drawFittedText (proc.getName(), 5, 0, getWidth() - 50, 30, Justification::centredLeft, 1);
+    g.drawFittedText (proc.getName(), 5, 0, jmax (getWidth() - 50, 100), 30, Justification::centredLeft, 1);
 }
 
 void ProcessorEditor::resized()
@@ -110,8 +107,7 @@ void ProcessorEditor::resized()
     }
 
     const int portDim = height / 8;
-    auto placePorts = [=] (int x, auto& ports)
-    {
+    auto placePorts = [=] (int x, auto& ports) {
         const auto nPorts = ports.size();
         if (nPorts == 0)
             return;
@@ -129,6 +125,11 @@ void ProcessorEditor::resized()
     placePorts (width - portDim / 2, outputPorts);
 }
 
+void ProcessorEditor::mouseDown (const MouseEvent& e)
+{
+    mouseDownOffset = e.getEventRelativeTo (this).getPosition();
+}
+
 void ProcessorEditor::mouseDrag (const MouseEvent& e)
 {
     const auto relE = e.getEventRelativeTo (getParentComponent());
@@ -136,7 +137,7 @@ void ProcessorEditor::mouseDrag (const MouseEvent& e)
     if (auto* parent = getParentComponent())
     {
         auto parentBounds = parent->getBounds();
-        proc.setPosition (relE.getPosition(), parentBounds);
+        proc.setPosition (relE.getPosition() - mouseDownOffset, parentBounds);
         setTopLeftPosition (proc.getPosition (parentBounds));
         getParentComponent()->repaint();
     }

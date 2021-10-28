@@ -2,8 +2,8 @@
 
 namespace
 {
-constexpr int editorWidth = 330;
-constexpr int editorHeight = 220;
+constexpr int editorWidth = 270;
+constexpr int editorHeight = 180;
 constexpr int editorPad = 10;
 constexpr int newButtonWidth = 40;
 constexpr int newButtonPad = 10;
@@ -42,11 +42,10 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 {
     newProcButton.setButtonText ("+");
-    newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.65f));
+    newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.35f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=]
-    { showNewProcMenu(); };
+    newProcButton.onClick = [=] { showNewProcMenu(); };
 
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, this);
     addAndMakeVisible (inputEditor.get());
@@ -327,8 +326,7 @@ std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Poin
     auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
     int minDistance = -1;
 
-    auto checkPorts = [&] (ProcessorEditor* editor)
-    {
+    auto checkPorts = [&] (ProcessorEditor* editor) {
         int numPorts = editor->getProcPtr()->getNumInputs();
         for (int i = 0; i < numPorts; ++i)
         {
@@ -368,7 +366,10 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor)
     auto position = proc->getPosition (getBounds());
     if (position == Point (0, 0)) // no position set yet
     {
-        auto centre = getLocalBounds().getCentre();
+        auto b = getLocalBounds()
+                     .withWidth (getWidth() / 2)
+                     .withHeight (getHeight() / 2);
+        auto centre = b.getCentre();
         editor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
         proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
     }

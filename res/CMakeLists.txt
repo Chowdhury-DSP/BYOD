@@ -1,12 +1,12 @@
 juce_add_binary_data(BinaryData SOURCES
     gui.xml
-    PowerButton.svg
-    info.svg
-    background.jpeg
-    undo-solid.png
-    redo-solid.png
-    LeftArrow.svg
-    RightArrow.svg
+    
+    ui_assets/PowerButton.svg
+    ui_assets/info.svg
+    ui_assets/undo-solid.png
+    ui_assets/redo-solid.png
+    ui_assets/LeftArrow.svg
+    ui_assets/RightArrow.svg
 
     guitar_ml_models/BluesJR_FullD.json
     guitar_ml_models/TS9_FullD.json
