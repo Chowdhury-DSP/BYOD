@@ -1,11 +1,15 @@
 #include "KnobsComponent.h"
 #include "processors/BaseProcessor.h"
 
+namespace
+{
+constexpr int nameHeight = 16;
+}
+
 KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac, std::function<void()> paramLambda)
     : contrastColour (cc), accentColour (ac)
 {
-    auto addSlider = [=, &vts] (AudioParameterFloat* param)
-    {
+    auto addSlider = [=, &vts] (AudioParameterFloat* param) {
         auto newSlide = std::make_unique<SliderWithAttachment>();
         addAndMakeVisible (newSlide.get());
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, *newSlide.get());
@@ -21,8 +25,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         sliders.add (std::move (newSlide));
     };
 
-    auto addBox = [=, &vts] (AudioParameterChoice* param)
-    {
+    auto addBox = [=, &vts] (AudioParameterChoice* param) {
         auto newBox = std::make_unique<BoxWithAttachment>();
         addAndMakeVisible (newBox.get());
         newBox->setName (param->name);
@@ -38,8 +41,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         boxes.add (std::move (newBox));
     };
 
-    auto addButton = [=, &vts] (AudioParameterBool* param)
-    {
+    auto addButton = [=, &vts] (AudioParameterBool* param) {
         if (param->paramID == "on_off")
             return;
 
@@ -106,11 +108,9 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (contrastColour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, int offset = 0)
-    {
-        const int height = 20;
-        g.setFont (Font (18.0f).boldened());
-        Rectangle<int> nameBox (comp.getX(), comp.getY() - 22 + offset, comp.getWidth(), height);
+    auto makeName = [&g] (Component& comp, String name, int offset = 0) {
+        g.setFont (Font ((float) nameHeight - 2.0f).boldened());
+        Rectangle<int> nameBox (comp.getX(), comp.getY() - 22 + offset, comp.getWidth(), nameHeight);
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
 
@@ -125,7 +125,7 @@ void KnobsComponent::resized()
 {
     int totalNumComponents = sliders.size() + boxes.size() + buttons.size();
 
-    int compHeight = getHeight() - 20;
+    int compHeight = getHeight() - nameHeight;
     int compWidth = totalNumComponents > 1 ? (getWidth() - 10) / totalNumComponents : compHeight;
 
     if (totalNumComponents == 1)
@@ -189,16 +189,20 @@ void KnobsComponent::resized()
         int compIdx = 0;
 
         Rectangle<int> bounds[4];
-        bounds[0] = Rectangle<int> { 0, 15, 100, 100 };
-        bounds[1] = Rectangle<int> { 72, 80, 100, 100 };
-        bounds[2] = Rectangle<int> { 144, 15, 100, 100 };
-        bounds[3] = Rectangle<int> { 216, 80, 100, 100 };
+        constexpr int sWidth = 80;
+        bounds[0] = Rectangle<int> { 0, 20, sWidth, sWidth };
+        bounds[1] = Rectangle<int> { 60, 40, sWidth, sWidth };
+        bounds[2] = Rectangle<int> { 120, 20, sWidth, sWidth };
+        bounds[3] = Rectangle<int> { 180, 40, sWidth, sWidth };
 
         for (auto* s : sliders)
+        {
             s->setBounds (bounds[compIdx++]);
+            s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 15, 16);
+        }
 
         for (auto* b : boxes)
-            b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+            b->setBounds (bounds[compIdx++].withHeight (30).translated (-5, 62));
 
         for (auto* b : buttons)
             b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
@@ -211,18 +215,21 @@ void KnobsComponent::resized()
         int compIdx = 0;
 
         Rectangle<int> bounds[5];
-        const int sWidth = 90;
-        bounds[0] = Rectangle<int> { 0, 15, sWidth, sWidth };
-        bounds[1] = Rectangle<int> { 70, 80, sWidth, sWidth };
-        bounds[2] = Rectangle<int> { 140, 15, sWidth, sWidth };
-        bounds[3] = Rectangle<int> { 210, 80, sWidth, sWidth };
-        bounds[4] = Rectangle<int> { 230, -25, 90, 50 };
+        constexpr int sWidth = 75;
+        bounds[0] = Rectangle<int> { 0, 65, sWidth, sWidth };
+        bounds[1] = Rectangle<int> { 58, 15, sWidth, sWidth };
+        bounds[2] = Rectangle<int> { 115, 65, sWidth, sWidth };
+        bounds[3] = Rectangle<int> { 180, 65, sWidth, sWidth };
+        bounds[4] = Rectangle<int> { 145, 25, 90, 30 };
 
         for (auto* s : sliders)
+        {
             s->setBounds (bounds[compIdx++]);
+            s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 10, 16);
+        }
 
         for (auto* b : boxes)
-            b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+            b->setBounds (bounds[compIdx++].withHeight (25));
 
         for (auto* b : buttons)
             b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
@@ -237,6 +244,7 @@ void KnobsComponent::resized()
         for (auto* s : sliders)
         {
             s->setSliderStyle (Slider::SliderStyle::LinearVertical);
+            s->setTextBoxStyle (Slider::TextBoxBelow, false, width - 2, 14);
             auto bounds = Rectangle { x + 2, 15, width - 4, getHeight() - 15 };
             x += width;
 

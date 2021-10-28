@@ -55,7 +55,7 @@ private:
     std::unique_ptr<MouseEvent> cableMouse;
     bool ignoreConnectionCallbacks = false;
 
-    SharedResourcePointer<LNFAllocator> lnfAllocator;
+    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardComponent)
 };
