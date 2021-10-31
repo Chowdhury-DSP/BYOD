@@ -5,7 +5,20 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     setViewedComponent (&comp, false);
 
     getHorizontalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFF0EDED4));
-    setScrollBarsShown (false, false);
+    getVerticalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFF0EDED4));
+
+    addAndMakeVisible (plusButton);
+    addAndMakeVisible (minusButton);
+
+    plusButton.onClick = [=] {
+        scaleFactor *= 1.5f;
+        resized();
+    };
+
+    minusButton.onClick = [=] {
+        scaleFactor /= 1.5f;
+        resized();
+    };
 }
 
 BoardViewport::~BoardViewport()
@@ -15,6 +28,24 @@ BoardViewport::~BoardViewport()
 
 void BoardViewport::resized()
 {
-    comp.setBounds (0, 0, comp.getIdealWidth (getWidth()), getHeight());
-    setScrollBarThickness (BoardComponent::yOffset * 2);
+    if (true) // (scaleFactor == 1.0f)
+    {
+        comp.setBounds (0, 0, getWidth(), getHeight());
+    }
+    else if (scaleFactor < 1.0f)
+    {
+        comp.setBounds (0, 0, getWidth(), getHeight());
+        comp.setTransform (AffineTransform::scale (scaleFactor));
+    }
+    else
+    {
+    }
+
+    // comp.setScaleFactor (scaleFactor);
+
+    // comp.setBounds (0, 0, getAdjustedDim (getWidth()), getAdjustedDim (getHeight()));
+    // setScrollBarThickness (BoardComponent::yOffset / 2);
+
+    plusButton.setBounds (0, getHeight() - 30, 30, 30);
+    minusButton.setBounds (30, getHeight() - 30, 30, 30);
 }
