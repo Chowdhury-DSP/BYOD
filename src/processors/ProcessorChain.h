@@ -28,6 +28,7 @@ public:
 
     void addProcessor (BaseProcessor::Ptr newProc);
     void removeProcessor (BaseProcessor* procToRemove);
+    void replaceProcessor (BaseProcessor::Ptr newProc, BaseProcessor* procToReplace);
     OwnedArray<BaseProcessor>& getProcessors() { return procs; }
 
     void addConnection (ConnectionInfo&& info);
