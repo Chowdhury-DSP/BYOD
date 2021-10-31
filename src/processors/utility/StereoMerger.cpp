@@ -38,8 +38,7 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
     stereoBuffer.setSize (2, numSamples, false, false, true);
     stereoBuffer.clear();
 
-    auto makeBufferMono = [=] (AudioBuffer<float>& b)
-    {
+    auto makeBufferMono = [=] (AudioBuffer<float>& b) {
         const auto nChannels = b.getNumChannels();
 
         if (nChannels == 1)
@@ -91,6 +90,33 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
 
     if (isInput0Connected && isInput1Connected)
         stereoBuffer.applyGain (0.5f);
+
+    outputBuffers.getReference (0) = &stereoBuffer;
+}
+
+void StereoMerger::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+
+    stereoBuffer.setSize (2, numSamples, false, false, true);
+    stereoBuffer.clear();
+
+    bool isInput0Connected = inputsConnected.contains (0);
+    bool isInput1Connected = inputsConnected.contains (1);
+
+    if (! isInput0Connected && ! isInput1Connected)
+    {
+        buffer.clear();
+        outputBuffers.getReference (0) = &buffer;
+        return;
+    }
+
+    auto& inBuffer = getInputBuffer (isInput0Connected ? 0 : 1);
+    for (int ch = 0; ch < 2; ++ch)
+    {
+        auto sourceCh = inBuffer.getNumChannels() == 1 ? 0 : ch;
+        stereoBuffer.addFrom (ch, 0, inBuffer, sourceCh, 0, numSamples);
+    }
 
     outputBuffers.getReference (0) = &stereoBuffer;
 }

@@ -77,3 +77,12 @@ void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
     for (int i = 0; i < numOuts; ++i)
         outputBuffers.getReference (i) = &buffers[i];
 }
+
+void FreqBandSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    for (auto& b : buffers)
+        b.makeCopyOf (buffer, true);
+
+    for (int i = 0; i < numOuts; ++i)
+        outputBuffers.getReference (i) = &buffers[i];
+}
