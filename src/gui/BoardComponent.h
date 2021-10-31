@@ -17,7 +17,6 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-    int getIdealWidth (int parentWidth = -1) const;
     void showInfoComp (const BaseProcessor& proc);
 
     void processorAdded (BaseProcessor* newProc) override;
@@ -38,7 +37,6 @@ public:
 
 private:
     void showNewProcMenu() const;
-    void refreshBoardSize();
     std::pair<ProcessorEditor*, int> getNearestInputPort (const Point<int>& pos) const;
     void setEditorPosition (ProcessorEditor* editor);
 

@@ -78,7 +78,8 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
     {
         auto proc = procFactory (undoManager);
         jassert (name == proc->getName());
-        procTypeStore[name] = proc->getProcessorType();
+
+        procTypeStore[name] = { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() };
     }
 }
 
@@ -94,7 +95,8 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
 {
     for (auto& procDesc : store)
     {
-        if (procTypeStore[procDesc.first] != type)
+        const auto& procInfo = procTypeStore[procDesc.first];
+        if (procInfo.type != type)
             continue;
 
         PopupMenu::Item item;
@@ -102,6 +104,30 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         item.text = procDesc.first;
         item.action = [=]
         { addProcessorCallback (procDesc.second (undoManager)); };
+
+        menu.addItem (item);
+    }
+}
+
+void ProcessorStore::createProcReplaceList (PopupMenu& menu, int& menuID, ProcessorType type, BaseProcessor* procToReplace)
+{
+    for (auto& procDesc : store)
+    {
+        const auto& procInfo = procTypeStore[procDesc.first];
+        if (procInfo.type != type)
+            continue;
+
+        if (procInfo.numInputs != procToReplace->getNumInputs())
+            continue;
+
+        if (procInfo.numOutputs != procToReplace->getNumOutputs())
+            continue;
+
+        PopupMenu::Item item;
+        item.itemID = ++menuID;
+        item.text = procDesc.first;
+        item.action = [=]
+        { replaceProcessorCallback (procDesc.second (undoManager), procToReplace); };
 
         menu.addItem (item);
     }

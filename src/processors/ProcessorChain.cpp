@@ -53,6 +53,7 @@ ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeSt
 {
     using namespace std::placeholders;
     procStore.addProcessorCallback = std::bind (&ProcessorChain::addProcessor, this, _1);
+    procStore.replaceProcessorCallback = std::bind (&ProcessorChain::replaceProcessor, this, _1, _2);
 
     oversamplingParam = vts.getRawParameterValue (oversamplingTag);
     inGainParam = vts.getRawParameterValue (inGainTag);
@@ -283,6 +284,69 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
     removeConnections (&inputProcessor);
 
     um->perform (new AddOrRemoveProcessor (*this, procToRemove));
+}
+
+void ProcessorChain::replaceProcessor (BaseProcessor::Ptr newProc, BaseProcessor* procToReplace)
+{
+    const auto numInputs = newProc->getNumInputs();
+    const auto numOutputs = newProc->getNumOutputs();
+
+    // 1-to-1 replacement requires the same I/O channels!
+    jassert (numInputs == procToReplace->getNumInputs());
+    jassert (numOutputs == procToReplace->getNumOutputs());
+
+    um->beginNewTransaction();
+
+    auto swapConnections = [&] (BaseProcessor* proc)
+    {
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            int numConnections = proc->getNumOutputConnections (portIdx);
+            for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
+            {
+                auto connection = proc->getOutputConnection (portIdx, cIdx);
+                if (connection.endProc == procToReplace)
+                {
+                    auto newConnection = connection;
+                    newConnection.endProc = newProc.get();
+
+                    um->perform (new AddOrRemoveConnection (*this, std::move (connection), true));
+                    um->perform (new AddOrRemoveConnection (*this, std::move (newConnection)));
+                }
+            }
+        }
+    };
+
+    // swap all incoming connections to proc to replace
+    for (auto* proc : procs)
+    {
+        if (proc == procToReplace)
+            continue;
+
+        swapConnections (proc);
+    }
+
+    swapConnections (&inputProcessor);
+
+    // swap all outgoing connections from proc to replace
+    for (int portIdx = 0; portIdx < procToReplace->getNumOutputs(); ++portIdx)
+    {
+        int numConnections = procToReplace->getNumOutputConnections (portIdx);
+        for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
+        {
+            auto connection = procToReplace->getOutputConnection (portIdx, cIdx);
+            auto newConnection = connection;
+            newConnection.startProc = newProc.get();
+
+            um->perform (new AddOrRemoveConnection (*this, std::move (connection), true));
+            um->perform (new AddOrRemoveConnection (*this, std::move (newConnection)));
+        }
+    }
+
+    newProc->setPosition (*procToReplace);
+
+    um->perform (new AddOrRemoveProcessor (*this, std::move (newProc)));
+    um->perform (new AddOrRemoveProcessor (*this, procToReplace));
 }
 
 void ProcessorChain::addConnection (ConnectionInfo&& info)

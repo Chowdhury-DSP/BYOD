@@ -3,6 +3,7 @@ juce_add_binary_data(BinaryData SOURCES
     
     ui_assets/PowerButton.svg
     ui_assets/info.svg
+    ui_assets/swap.svg
     ui_assets/undo-solid.png
     ui_assets/redo-solid.png
     ui_assets/LeftArrow.svg
