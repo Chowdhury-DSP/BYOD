@@ -103,3 +103,19 @@ void Mixer::processAudio (AudioBuffer<float>& buffer)
         outputBuffers.getReference (0) = outBuffer;
     }
 }
+
+void Mixer::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    for (int i = 0; i < numIns; ++i)
+    {
+        if (inputsConnected.contains (i))
+        {
+            auto& inBuffer = getInputBuffer (i);
+            outputBuffers.getReference (0) = &inBuffer;
+            return;
+        }
+    }
+
+    buffer.clear();
+    outputBuffers.getReference (0) = &buffer;
+}

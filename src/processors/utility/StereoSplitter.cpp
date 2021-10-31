@@ -80,3 +80,26 @@ void StereoSplitter::processAudio (AudioBuffer<float>& buffer)
     outputBuffers.getReference (0) = &buffers[0];
     outputBuffers.getReference (1) = &buffers[1];
 }
+
+void StereoSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    for (auto& b : buffers)
+        b.setSize (1, numSamples, false, false, true);
+
+    if (numChannels == 1)
+    {
+        buffers[0].copyFrom (0, 0, buffer, 0, 0, numSamples);
+        buffers[1].copyFrom (0, 0, buffer, 0, 0, numSamples);
+    }
+    else if (numChannels == 2)
+    {
+        buffers[0].copyFrom (0, 0, buffer, 0, 0, numSamples);
+        buffers[1].copyFrom (0, 0, buffer, 1, 0, numSamples);
+    }
+
+    outputBuffers.getReference (0) = &buffers[0];
+    outputBuffers.getReference (1) = &buffers[1];
+}
