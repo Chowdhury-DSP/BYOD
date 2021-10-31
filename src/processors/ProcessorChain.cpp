@@ -140,7 +140,10 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     if (nextNumProcs == 0)
         return;
 
-    proc->processAudio (buffer);
+    if (proc->isBypassed())
+        proc->processAudioBypassed (buffer);
+    else
+        proc->processAudio (buffer);
 
     auto processBuffer = [&] (BaseProcessor* nextProc, AudioBuffer<float>& nextBuffer)
     {

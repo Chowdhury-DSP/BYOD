@@ -12,6 +12,7 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+    void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
     static constexpr int numOuts = 3;
