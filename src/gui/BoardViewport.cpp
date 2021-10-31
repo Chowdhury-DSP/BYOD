@@ -11,12 +11,14 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     // addAndMakeVisible (plusButton);
     // addAndMakeVisible (minusButton);
 
-    plusButton.onClick = [=] {
+    plusButton.onClick = [=]
+    {
         scaleFactor *= 1.5f;
         resized();
     };
 
-    minusButton.onClick = [=] {
+    minusButton.onClick = [=]
+    {
         scaleFactor /= 1.5f;
         resized();
     };

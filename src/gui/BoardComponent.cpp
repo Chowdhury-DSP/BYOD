@@ -45,7 +45,8 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=] { showNewProcMenu(); };
+    newProcButton.onClick = [=]
+    { showNewProcMenu(); };
 
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, this);
     addAndMakeVisible (inputEditor.get());
@@ -311,7 +312,8 @@ std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Poin
     auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
     int minDistance = -1;
 
-    auto checkPorts = [&] (ProcessorEditor* editor) {
+    auto checkPorts = [&] (ProcessorEditor* editor)
+    {
         int numPorts = editor->getProcPtr()->getNumInputs();
         for (int i = 0; i < numPorts; ++i)
         {

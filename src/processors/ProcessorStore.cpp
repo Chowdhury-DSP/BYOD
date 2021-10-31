@@ -102,7 +102,8 @@ void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=] { addProcessorCallback (procDesc.second (undoManager)); };
+        item.action = [=]
+        { addProcessorCallback (procDesc.second (undoManager)); };
 
         menu.addItem (item);
     }
@@ -125,7 +126,8 @@ void ProcessorStore::createProcReplaceList (PopupMenu& menu, int& menuID, Proces
         PopupMenu::Item item;
         item.itemID = ++menuID;
         item.text = procDesc.first;
-        item.action = [=] { replaceProcessorCallback (procDesc.second (undoManager), procToReplace); };
+        item.action = [=]
+        { replaceProcessorCallback (procDesc.second (undoManager), procToReplace); };
 
         menu.addItem (item);
     }
