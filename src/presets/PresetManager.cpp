@@ -7,8 +7,8 @@ static String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
 static String presetTag = "preset";
 } // namespace
 
-PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vts) : chowdsp::PresetManager (vts),
-                                                                                          procChain (chain)
+PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
+                                                                                              procChain (chain)
 {
     setUserPresetConfigFile (userPresetPath);
     setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });

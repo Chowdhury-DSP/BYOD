@@ -42,7 +42,7 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 {
     newProcButton.setButtonText ("+");
-    newProcButton.setColour (TextButton::buttonColourId, Colours::black.withAlpha (0.35f));
+    newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
     newProcButton.onClick = [=]
@@ -83,7 +83,9 @@ int BoardComponent::getIdealWidth (int parentWidth) const
 
 void BoardComponent::paint (Graphics& g)
 {
-    g.setColour (Colours::red);
+    const Colour baseColour = Colour (0xFFD0592C);
+
+    g.setColour (baseColour.brighter (0.1f));
     for (auto* cable : cables)
     {
         auto* startEditor = findEditorForProcessor (cable->startProc);
@@ -104,8 +106,8 @@ void BoardComponent::paint (Graphics& g)
             if (editor != nullptr)
             {
                 Graphics::ScopedSaveState graphicsState (g);
-                g.setColour (Colours::orangered);
-                g.setOpacity (0.75f);
+                g.setColour (baseColour.darker (0.1f));
+                g.setOpacity (0.5f);
 
                 auto endPortLocation = getPortLocation (editor, portIdx, true);
                 auto glowBounds = (Rectangle (portDistanceLimit, portDistanceLimit) * 2).withCentre (endPortLocation);
