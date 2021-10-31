@@ -11,15 +11,24 @@ public:
 
     BaseProcessor::Ptr createProcByName (const String& name);
     void createProcList (PopupMenu& menu, int& menuID, ProcessorType type);
+    void createProcReplaceList (PopupMenu& menu, int& menuID, ProcessorType type, BaseProcessor* procToReplace);
 
     StoreMap& getStoreMap() { return store; }
 
     std::function<void (BaseProcessor::Ptr)> addProcessorCallback = nullptr;
+    std::function<void (BaseProcessor::Ptr, BaseProcessor*)> replaceProcessorCallback = nullptr;
 
 private:
     static StoreMap store;
 
-    std::unordered_map<String, ProcessorType> procTypeStore;
+    struct ProcInfo
+    {
+        ProcessorType type;
+        int numInputs;
+        int numOutputs;
+    };
+
+    std::unordered_map<String, ProcInfo> procTypeStore;
     UndoManager* undoManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorStore)

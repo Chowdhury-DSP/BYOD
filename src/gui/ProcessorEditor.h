@@ -38,6 +38,8 @@ public:
     Point<int> getPortLocation (int portIndex, bool isInput) const;
 
 private:
+    void createReplaceProcMenu();
+
     BaseProcessor& proc;
     ProcessorChain& procChain;
 
@@ -47,12 +49,15 @@ private:
     KnobsComponent knobs;
     PowerButton powerButton;
     TextButton xButton;
+    DrawableButton swapButton { "", DrawableButton::ButtonStyle::ImageFitted };
     DrawableButton infoButton { "", DrawableButton::ButtonStyle::ImageFitted };
 
     OwnedArray<Port> inputPorts;
     OwnedArray<Port> outputPorts;
 
     Point<int> mouseDownOffset;
+
+    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)
 };

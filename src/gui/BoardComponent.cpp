@@ -45,8 +45,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=]
-    { showNewProcMenu(); };
+    newProcButton.onClick = [=] { showNewProcMenu(); };
 
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, this);
     addAndMakeVisible (inputEditor.get());
@@ -75,15 +74,10 @@ BoardComponent::~BoardComponent()
     procChain.removeListener (this);
 }
 
-int BoardComponent::getIdealWidth (int parentWidth) const
-{
-    int idealWidth = processorEditors.size() * (editorWidth + 2 * editorPad) + newButtonWidth + 2 * newButtonPad;
-    return jmax (idealWidth, parentWidth < 0 ? getParentWidth() : parentWidth);
-}
-
 void BoardComponent::paint (Graphics& g)
 {
     const Colour baseColour = Colour (0xFFD0592C);
+    const float cableThickness = 5.0f;
 
     g.setColour (baseColour.brighter (0.1f));
     for (auto* cable : cables)
@@ -97,7 +91,7 @@ void BoardComponent::paint (Graphics& g)
             auto endPortLocation = getPortLocation (endEditor, cable->endIdx, true);
 
             auto cableLine = Line (startPortLocation.toFloat(), endPortLocation.toFloat());
-            g.drawLine (cableLine, 5.0f);
+            g.drawLine (cableLine, cableThickness);
         }
         else if (cableMouse != nullptr)
         {
@@ -115,7 +109,7 @@ void BoardComponent::paint (Graphics& g)
             }
 
             auto cableLine = Line (startPortLocation.toFloat(), mousePos.toFloat());
-            g.drawLine (cableLine, 5.0f);
+            g.drawLine (cableLine, cableThickness);
         }
     }
 }
@@ -136,16 +130,6 @@ void BoardComponent::resized()
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
 }
 
-void BoardComponent::refreshBoardSize()
-{
-    auto newWidth = getIdealWidth();
-    auto oldWidth = getWidth();
-    setSize (newWidth, getHeight());
-
-    if (newWidth == oldWidth)
-        resized();
-}
-
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
@@ -156,7 +140,6 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
 
     newEditor->addPortListener (this);
 
-    refreshBoardSize();
     repaint();
 }
 
@@ -172,7 +155,6 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
     editor->removePortListener (this);
     processorEditors.removeObject (editor);
 
-    refreshBoardSize();
     repaint();
 }
 
@@ -329,8 +311,7 @@ std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Poin
     auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
     int minDistance = -1;
 
-    auto checkPorts = [&] (ProcessorEditor* editor)
-    {
+    auto checkPorts = [&] (ProcessorEditor* editor) {
         int numPorts = editor->getProcPtr()->getNumInputs();
         for (int i = 0; i < numPorts; ++i)
         {

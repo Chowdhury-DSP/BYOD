@@ -14,6 +14,11 @@ public:
 private:
     BoardComponent comp;
 
+    TextButton plusButton { "+" };
+    TextButton minusButton { "-" };
+
+    float scaleFactor = 1.0f;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardViewport)
 };
 

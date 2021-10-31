@@ -53,6 +53,7 @@ ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeSt
 {
     using namespace std::placeholders;
     procStore.addProcessorCallback = std::bind (&ProcessorChain::addProcessor, this, _1);
+    procStore.replaceProcessorCallback = std::bind (&ProcessorChain::replaceProcessor, this, _1, _2);
 
     oversamplingParam = vts.getRawParameterValue (oversamplingTag);
     inGainParam = vts.getRawParameterValue (inGainTag);
@@ -82,8 +83,7 @@ void ProcessorChain::initializeProcessors (int curOS)
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
-    auto prepProcessor = [=] (BaseProcessor& proc)
-    {
+    auto prepProcessor = [=] (BaseProcessor& proc) {
         proc.prepare (osSampleRate, osSamplesPerBlock);
         proc.prepareInputBuffers (osSamplesPerBlock);
     };
@@ -145,8 +145,7 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     else
         proc->processAudio (buffer);
 
-    auto processBuffer = [&] (BaseProcessor* nextProc, AudioBuffer<float>& nextBuffer)
-    {
+    auto processBuffer = [&] (BaseProcessor* nextProc, AudioBuffer<float>& nextBuffer) {
         int nextNumInputs = nextProc->getNumInputs();
         if (nextNumProcs == 1 && nextNumInputs == 1)
         {
@@ -258,8 +257,7 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
 {
     um->beginNewTransaction();
 
-    auto removeConnections = [=] (BaseProcessor* proc)
-    {
+    auto removeConnections = [=] (BaseProcessor* proc) {
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
             int numConnections = proc->getNumOutputConnections (portIdx);
@@ -285,6 +283,68 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
     um->perform (new AddOrRemoveProcessor (*this, procToRemove));
 }
 
+void ProcessorChain::replaceProcessor (BaseProcessor::Ptr newProc, BaseProcessor* procToReplace)
+{
+    const auto numInputs = newProc->getNumInputs();
+    const auto numOutputs = newProc->getNumOutputs();
+
+    // 1-to-1 replacement requires the same I/O channels!
+    jassert (numInputs == procToReplace->getNumInputs());
+    jassert (numOutputs == procToReplace->getNumOutputs());
+
+    um->beginNewTransaction();
+
+    auto swapConnections = [&] (BaseProcessor* proc) {
+        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+        {
+            int numConnections = proc->getNumOutputConnections (portIdx);
+            for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
+            {
+                auto connection = proc->getOutputConnection (portIdx, cIdx);
+                if (connection.endProc == procToReplace)
+                {
+                    auto newConnection = connection;
+                    newConnection.endProc = newProc.get();
+
+                    um->perform (new AddOrRemoveConnection (*this, std::move (connection), true));
+                    um->perform (new AddOrRemoveConnection (*this, std::move (newConnection)));
+                }
+            }
+        }
+    };
+
+    // swap all incoming connections to proc to replace
+    for (auto* proc : procs)
+    {
+        if (proc == procToReplace)
+            continue;
+
+        swapConnections (proc);
+    }
+
+    swapConnections (&inputProcessor);
+
+    // swap all outgoing connections from proc to replace
+    for (int portIdx = 0; portIdx < procToReplace->getNumOutputs(); ++portIdx)
+    {
+        int numConnections = procToReplace->getNumOutputConnections (portIdx);
+        for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
+        {
+            auto connection = procToReplace->getOutputConnection (portIdx, cIdx);
+            auto newConnection = connection;
+            newConnection.startProc = newProc.get();
+
+            um->perform (new AddOrRemoveConnection (*this, std::move (connection), true));
+            um->perform (new AddOrRemoveConnection (*this, std::move (newConnection)));
+        }
+    }
+
+    newProc->setPosition (*procToReplace);
+
+    um->perform (new AddOrRemoveProcessor (*this, std::move (newProc)));
+    um->perform (new AddOrRemoveProcessor (*this, procToReplace));
+}
+
 void ProcessorChain::addConnection (ConnectionInfo&& info)
 {
     um->beginNewTransaction();
@@ -301,8 +361,7 @@ std::unique_ptr<XmlElement> ProcessorChain::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");
 
-    auto saveProcessor = [&] (BaseProcessor* proc)
-    {
+    auto saveProcessor = [&] (BaseProcessor* proc) {
         auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
 
@@ -359,8 +418,7 @@ void ProcessorChain::loadProcChain (const XmlElement* xml)
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
-    {
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps) {
         if (procXml->getNumChildElements() > 0)
             newProc->fromXML (procXml->getChildElement (0));
 

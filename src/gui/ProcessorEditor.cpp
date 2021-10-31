@@ -23,17 +23,20 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, contrastColour);
-    xButton.onClick = [=]
-    { MessageManager::callAsync ([=]
-                                 { procChain.removeProcessor (&proc); }); };
+    xButton.onClick = [=] { MessageManager::callAsync ([=] { procChain.removeProcessor (&proc); }); };
     addAndMakeVisible (xButton);
+
+    auto swapSvg = Drawable::createFromImageData (BinaryData::swap_svg, BinaryData::swap_svgSize);
+    swapSvg->replaceColour (Colours::black, contrastColour);
+    swapButton.setImages (swapSvg.get());
+    addAndMakeVisible (swapButton);
+    swapButton.onClick = [=] { createReplaceProcMenu(); };
 
     auto infoSvg = Drawable::createFromImageData (BinaryData::info_svg, BinaryData::info_svgSize);
     infoSvg->replaceColour (Colours::black, contrastColour);
     infoButton.setImages (infoSvg.get());
     addAndMakeVisible (infoButton);
-    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)]
-    {
+    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)] {
         boardComp->showInfoComp (baseProc);
     };
 
@@ -66,6 +69,30 @@ ProcessorEditor::~ProcessorEditor()
 
     for (auto* port : outputPorts)
         port->removePortListener (this);
+}
+
+void ProcessorEditor::createReplaceProcMenu()
+{
+    auto& procStore = procChain.getProcStore();
+
+    int menuID = 0;
+    PopupMenu menu;
+    for (auto type : { Drive, Tone, Utility, Other })
+    {
+        PopupMenu subMenu;
+        procStore.createProcReplaceList (subMenu, menuID, type, &proc);
+
+        auto typeName = std::string (magic_enum::enum_name (type));
+        menu.addSubMenu (String (typeName), subMenu);
+    }
+
+    auto options = PopupMenu::Options()
+                       .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
+                       .withMinimumWidth (125)
+                       .withStandardItemHeight (27);
+
+    menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
+    menu.showMenuAsync (options);
 }
 
 void ProcessorEditor::paint (Graphics& g)
@@ -102,6 +129,7 @@ void ProcessorEditor::resized()
     if (! isIOProcessor)
     {
         constexpr int xButtonSize = 27;
+        swapButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (4));
         powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
         xButton.setBounds (width - xButtonSize, 0, xButtonSize, xButtonSize);
 
@@ -110,8 +138,7 @@ void ProcessorEditor::resized()
     }
 
     const int portDim = height / 8;
-    auto placePorts = [=] (int x, auto& ports)
-    {
+    auto placePorts = [=] (int x, auto& ports) {
         const auto nPorts = ports.size();
         if (nPorts == 0)
             return;
