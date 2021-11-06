@@ -350,7 +350,7 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor)
 {
     auto* proc = editor->getProcPtr();
     auto position = proc->getPosition (getBounds());
-    if (position == Point (0, 0)) // no position set yet
+    if (position == Point (0, 0) && getWidth() > 0 && getHeight() > 0) // no position set yet
     {
         auto b = getLocalBounds()
                      .withWidth (getWidth() / 2)
