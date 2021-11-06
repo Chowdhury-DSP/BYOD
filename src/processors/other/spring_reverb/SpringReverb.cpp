@@ -1,8 +1,15 @@
 #include "SpringReverb.h"
 
+namespace
+{
+constexpr float smallShakeSeconds = 0.004f;
+constexpr float largeShakeSeconds = 0.008f;
+} // namespace
+
 void SpringReverb::prepare (double sampleRate, int samplesPerBlock)
 {
     fs = (float) sampleRate;
+    maxBlockSize = samplesPerBlock;
 
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
     delay.prepare (spec);
@@ -21,6 +28,9 @@ void SpringReverb::prepare (double sampleRate, int samplesPerBlock)
 
     z[0] = 0.0f;
     z[1] = 0.0f;
+
+    shakeCounter = -1;
+    shakeBuffer.setSize (1, int (fs * largeShakeSeconds) + maxBlockSize);
 }
 
 void SpringReverb::setParams (const Params& params, int numSamples)
@@ -29,6 +39,26 @@ void SpringReverb::setParams (const Params& params, int numSamples)
     {
         return (ms / 1000.0f) * fs;
     };
+
+    if (params.shake && shakeCounter < 0) // start shaking
+    {
+        float shakeAmount = rand.nextFloat();
+        // float shakeSeconds = smallShakeSeconds * std::pow (largeShakeSeconds / smallShakeSeconds, shakeAmount);
+        float shakeSeconds = smallShakeSeconds + (largeShakeSeconds - smallShakeSeconds) * shakeAmount;
+        shakeCounter = int (fs * shakeSeconds);
+
+        shakeBuffer.setSize (1, shakeCounter + maxBlockSize, false, false, true);
+        shakeBuffer.clear();
+        auto* shakeBufferPtr = shakeBuffer.getWritePointer (0);
+        for (int i = 0; i < shakeCounter; ++i)
+            shakeBufferPtr[i] = std::sin (MathConstants<float>::twoPi * (float) i / (2.0f * (float) shakeCounter));
+
+        shakeBuffer.applyGain (2.0f);
+    }
+    else if (! params.shake && shakeCounter == 0) // reset shake for next time
+    {
+        shakeCounter = -1;
+    }
 
     constexpr float lowT60 = 0.5f;
     constexpr float highT60 = 4.5f;
@@ -58,15 +88,25 @@ void SpringReverb::setParams (const Params& params, int numSamples)
 
 void SpringReverb::processBlock (AudioBuffer<float>& buffer)
 {
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    // add shakeBuffer
+    if (shakeCounter > 0)
+    {
+        int startSample = shakeBuffer.getNumSamples() - shakeCounter - maxBlockSize;
+        for (int ch = 0; ch < numChannels; ++ch)
+            buffer.addFrom (ch, 0, shakeBuffer, 0, startSample, numSamples);
+
+        shakeCounter = jmax (shakeCounter - numSamples, 0);
+    }
+
     // SIMD register for parallel allpass filter
     // format:
     //   [0]: y_left (feedforward path output)
     //   [1]: z_left (feedback path)
     //   [2-3]: equivalents for right channel, or zeros
     float simdReg alignas (16)[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
 
     auto doSpringInput = [=] (int ch, float input) -> float
     {

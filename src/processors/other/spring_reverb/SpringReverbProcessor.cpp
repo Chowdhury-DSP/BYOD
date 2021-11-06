@@ -9,6 +9,7 @@ SpringReverbProcessor::SpringReverbProcessor (UndoManager* um) : BaseProcessor (
     spinParam = vts.getRawParameterValue ("spin");
     dampParam = vts.getRawParameterValue ("damping");
     chaosParam = vts.getRawParameterValue ("chaos");
+    shakeParam = vts.getRawParameterValue ("shake");
     mixParam = vts.getRawParameterValue ("mix");
 
     uiOptions.backgroundColour = Colours::orange.darker (0.2f);
@@ -28,6 +29,7 @@ AudioProcessorValueTreeState::ParameterLayout SpringReverbProcessor::createParam
     createPercentParameter (params, "spin", "Spin", 0.5f);
     createPercentParameter (params, "damping", "Damp", 0.5f);
     createPercentParameter (params, "chaos", "Chaos", 0.0f);
+    createPercentParameter (params, "shake", "Shake", 0.0f);
     createPercentParameter (params, "mix", "Mix", 0.5f);
 
     return { params.begin(), params.end() };
@@ -56,6 +58,7 @@ void SpringReverbProcessor::processAudio (AudioBuffer<float>& buffer)
                           spinParam->load(),
                           dampParam->load(),
                           chaosParam->load(),
+                          shakeParam->load() > 0.5f,
                       },
                       buffer.getNumSamples());
 
