@@ -353,9 +353,14 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor)
     if (position == Point (0, 0)) // no position set yet
     {
         auto b = getLocalBounds()
-                     .withWidth (getWidth() / 2)
-                     .withHeight (getHeight() / 2);
-        auto centre = b.getCentre();
+                     .withWidth (getWidth() * 2 / 3)
+                     .withHeight (getHeight() * 2 / 3);
+
+        auto randX = proportionOfWidth (0.1f);
+        auto randY = proportionOfHeight (0.1f);
+        auto& rand = Random::getSystemRandom();
+        auto centre = b.getCentre() + Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
+
         editor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
         proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
     }
