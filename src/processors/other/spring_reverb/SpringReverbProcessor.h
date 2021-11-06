@@ -21,6 +21,7 @@ private:
     std::atomic<float>* spinParam = nullptr;
     std::atomic<float>* dampParam = nullptr;
     std::atomic<float>* chaosParam = nullptr;
+    std::atomic<float>* shakeParam = nullptr;
     std::atomic<float>* mixParam = nullptr;
 
     SpringReverb reverb;
