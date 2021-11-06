@@ -4,7 +4,7 @@ namespace
 {
 constexpr float smallShakeSeconds = 0.004f;
 constexpr float largeShakeSeconds = 0.008f;
-}
+} // namespace
 
 void SpringReverb::prepare (double sampleRate, int samplesPerBlock)
 {
