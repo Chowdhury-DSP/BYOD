@@ -288,12 +288,9 @@ void ProcessorChain::removeProcessor (BaseProcessor* procToRemove)
 
 void ProcessorChain::replaceProcessor (BaseProcessor::Ptr newProc, BaseProcessor* procToReplace)
 {
-    const auto numInputs = newProc->getNumInputs();
-    const auto numOutputs = newProc->getNumOutputs();
-
     // 1-to-1 replacement requires the same I/O channels!
-    jassert (numInputs == procToReplace->getNumInputs());
-    jassert (numOutputs == procToReplace->getNumOutputs());
+    jassert (newProc->getNumInputs() == procToReplace->getNumInputs());
+    jassert (newProc->getNumOutputs() == procToReplace->getNumOutputs());
 
     um->beginNewTransaction();
 

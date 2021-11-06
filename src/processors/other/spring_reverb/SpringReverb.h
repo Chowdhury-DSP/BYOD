@@ -16,6 +16,7 @@ public:
         float spin = 0.5f;
         float damping = 0.5f;
         float chaos = 0.0f;
+        bool shake = false;
     };
 
     void prepare (double sampleRate, int samplesPerBlock);
@@ -38,10 +39,14 @@ private:
 
     float z[2];
     float fs = 48000.0f;
+    int maxBlockSize = 256;
 
     chowdsp::StateVariableFilter<float> lpf;
 
     ReflectionNetwork reflectionNetwork; // early reflections
+
+    int shakeCounter = -1;
+    AudioBuffer<float> shakeBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpringReverb)
 };

@@ -6,7 +6,6 @@ constexpr int editorWidth = 270;
 constexpr int editorHeight = 180;
 constexpr int editorPad = 10;
 constexpr int newButtonWidth = 40;
-constexpr int newButtonPad = 10;
 constexpr int portDistanceLimit = 25;
 
 Point<int> getPortLocation (ProcessorEditor* editor, int portIdx, bool isInput)
