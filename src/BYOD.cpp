@@ -82,9 +82,9 @@ void BYOD::setStateInformation (const void* data, int sizeInBytes)
     if (procChainXml == nullptr) // invalid procChain XML
         return;
 
+    presetManager->loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
     vts.replaceState (ValueTree::fromXml (*vtsXml));
     procs.loadProcChain (procChainXml);
-    presetManager->loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
 }
 
 // This creates new instances of the plugin

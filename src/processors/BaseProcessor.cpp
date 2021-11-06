@@ -82,6 +82,12 @@ void BaseProcessor::removeConnection (const ConnectionInfo& info)
 
 void BaseProcessor::setPosition (Point<int> pos, Rectangle<int> parentBounds)
 {
+    if (parentBounds.getWidth() <= 0 || parentBounds.getHeight() <= 0)
+        return; // out of bounds!
+
+    if (pos.x <= 0 || pos.y <= 0)
+        return; // out of bounds!
+
     editorPosition = pos.toFloat() / Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() };
 }
 
