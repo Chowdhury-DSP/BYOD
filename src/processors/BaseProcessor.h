@@ -96,6 +96,8 @@ public:
     void setPosition (const BaseProcessor& other) { editorPosition = other.editorPosition; }
     Point<int> getPosition (Rectangle<int> parentBounds);
 
+    const auto& getParameters() const { return AudioProcessor::getParameters(); }
+
 protected:
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;

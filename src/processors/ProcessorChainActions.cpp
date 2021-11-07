@@ -15,15 +15,27 @@ public:
         SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
         auto* newProcPtr = chain.procs.add (std::move (newProc));
 
+        for (auto* param : newProcPtr->getParameters())
+        {
+            if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
+                newProcPtr->getVTS().addParameterListener (paramCast->paramID, &chain);
+        }
+
         chain.listeners.call (&ProcessorChain::Listener::processorAdded, newProcPtr);
         return newProcPtr;
     }
 
-    static void removeProcessor (ProcessorChain& chain, const BaseProcessor* procToRemove)
+    static void removeProcessor (ProcessorChain& chain, BaseProcessor* procToRemove)
     {
         DBG (String ("Removing processor: ") + procToRemove->getName());
 
         chain.listeners.call (&ProcessorChain::Listener::processorRemoved, procToRemove);
+
+        for (auto* param : procToRemove->getParameters())
+        {
+            if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
+                procToRemove->getVTS().removeParameterListener (paramCast->paramID, &chain);
+        }
 
         SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
         chain.procs.removeObject (procToRemove, false);
@@ -41,6 +53,14 @@ public:
         chain.listeners.call (&ProcessorChain::Listener::connectionRemoved, info);
     }
 
+    static bool getPresetWasDirty (ProcessorChain& chain)
+    {
+        if (chain.presetManager == nullptr)
+            return true;
+
+        return chain.presetManager->getIsDirty();
+    }
+
 private:
     ProcChainActions() {} // static use only!
 };
@@ -48,13 +68,15 @@ private:
 //=========================================================
 AddOrRemoveProcessor::AddOrRemoveProcessor (ProcessorChain& procChain, BaseProcessor::Ptr newProc) : chain (procChain),
                                                                                                      actionProc (std::move (newProc)),
-                                                                                                     isRemoving (false)
+                                                                                                     isRemoving (false),
+                                                                                                     wasDirty (ProcChainActions::getPresetWasDirty (chain))
 {
 }
 
 AddOrRemoveProcessor::AddOrRemoveProcessor (ProcessorChain& procChain, BaseProcessor* procToRemove) : chain (procChain),
                                                                                                       actionProcPtr (procToRemove),
-                                                                                                      isRemoving (true)
+                                                                                                      isRemoving (true),
+                                                                                                      wasDirty (ProcChainActions::getPresetWasDirty (chain))
 {
 }
 
@@ -73,6 +95,9 @@ bool AddOrRemoveProcessor::perform()
 
         actionProcPtr = ProcChainActions::addProcessor (chain, std::move (actionProc));
     }
+
+    if (! wasDirty)
+        chain.presetManager->setIsDirty (true);
 
     return true;
 }
@@ -93,13 +118,17 @@ bool AddOrRemoveProcessor::undo()
         actionProc.reset (actionProcPtr);
     }
 
+    if (! wasDirty)
+        chain.presetManager->setIsDirty (false);
+
     return true;
 }
 
 //=========================================================
 AddOrRemoveConnection::AddOrRemoveConnection (ProcessorChain& procChain, ConnectionInfo&& cInfo, bool removing) : chain (procChain),
                                                                                                                   info (cInfo),
-                                                                                                                  isRemoving (removing)
+                                                                                                                  isRemoving (removing),
+                                                                                                                  wasDirty (ProcChainActions::getPresetWasDirty (chain))
 {
 }
 
@@ -114,6 +143,9 @@ bool AddOrRemoveConnection::perform()
         ProcChainActions::addConnection (chain, info);
     }
 
+    if (! wasDirty)
+        chain.presetManager->setIsDirty (true);
+
     return true;
 }
 
@@ -127,6 +159,9 @@ bool AddOrRemoveConnection::undo()
     {
         ProcChainActions::removeConnection (chain, info);
     }
+
+    if (! wasDirty)
+        chain.presetManager->setIsDirty (false);
 
     return true;
 }

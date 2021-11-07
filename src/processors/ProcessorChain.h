@@ -6,7 +6,7 @@
 #include "utility/InputProcessor.h"
 #include "utility/OutputProcessor.h"
 
-class ProcessorChain
+class ProcessorChain : private AudioProcessorValueTreeState::Listener
 {
     // clang-format off
     CREATE_LISTENER (
@@ -20,7 +20,7 @@ class ProcessorChain
     )
     // clang-format on
 public:
-    ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts);
+    ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts, std::unique_ptr<chowdsp::PresetManager>& presetMgr);
 
     static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);
@@ -46,6 +46,7 @@ public:
 private:
     void initializeProcessors (int curOS);
     void runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed);
+    void parameterChanged (const juce::String& parameterID, float newValue) override;
 
     double mySampleRate = 48000.0;
     int mySamplesPerBlock = 512;
@@ -70,7 +71,11 @@ private:
     std::atomic<float>* dryWetParam = nullptr;
     DryWetProcessor dryWetMixer;
 
+    std::unique_ptr<chowdsp::PresetManager>& presetManager;
+
     friend class ProcChainActions;
+    friend class AddOrRemoveProcessor;
+    friend class AddOrRemoveConnection;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

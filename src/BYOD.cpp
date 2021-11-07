@@ -6,7 +6,7 @@
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procStore (&undoManager),
-               procs (procStore, vts)
+               procs (procStore, vts, presetManager)
 {
     presetManager = std::make_unique<PresetManager> (&procs, vts);
 }
