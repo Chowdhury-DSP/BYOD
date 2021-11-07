@@ -17,6 +17,7 @@ private:
     BaseProcessor::Ptr actionProc;
     BaseProcessor* actionProcPtr;
     const bool isRemoving;
+    const bool wasDirty;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AddOrRemoveProcessor)
 };
@@ -34,6 +35,7 @@ private:
     ProcessorChain& chain;
     const ConnectionInfo info;
     const bool isRemoving;
+    const bool wasDirty;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AddOrRemoveConnection)
 };

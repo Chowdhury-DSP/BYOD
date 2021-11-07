@@ -356,8 +356,8 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor)
                      .withWidth (getWidth() * 2 / 3)
                      .withHeight (getHeight() * 2 / 3);
 
-        auto randX = proportionOfWidth (0.1f);
-        auto randY = proportionOfHeight (0.1f);
+        auto randX = jmax (proportionOfWidth (0.1f), 1);
+        auto randY = jmax (proportionOfHeight (0.1f), 1);
         auto& rand = Random::getSystemRandom();
         auto centre = b.getCentre() + Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
 

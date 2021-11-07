@@ -46,10 +46,13 @@ String getProcessorName (const String& tag)
 }
 } // namespace
 
-ProcessorChain::ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts) : procStore (store),
-                                                                                            um (vts.undoManager),
-                                                                                            inputProcessor (um),
-                                                                                            outputProcessor (um)
+ProcessorChain::ProcessorChain (ProcessorStore& store,
+                                AudioProcessorValueTreeState& vts,
+                                std::unique_ptr<chowdsp::PresetManager>& presetMgr) : procStore (store),
+                                                                                      um (vts.undoManager),
+                                                                                      inputProcessor (um),
+                                                                                      outputProcessor (um),
+                                                                                      presetManager (presetMgr)
 {
     using namespace std::placeholders;
     procStore.addProcessorCallback = std::bind (&ProcessorChain::addProcessor, this, _1);
@@ -488,4 +491,12 @@ void ProcessorChain::loadProcChain (const XmlElement* xml)
     }
 
     listeners.call (&Listener::refreshConnections);
+}
+
+void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, float /*newValue*/)
+{
+    jassert (presetManager != nullptr);
+
+    if (! presetManager->getIsDirty())
+        presetManager->setIsDirty (true);
 }
