@@ -48,7 +48,7 @@ private:
 
     KnobsComponent knobs;
     PowerButton powerButton;
-    TextButton xButton;
+    DrawableButton xButton { "", DrawableButton::ButtonStyle::ImageFitted };
     DrawableButton swapButton { "", DrawableButton::ButtonStyle::ImageFitted };
     DrawableButton infoButton { "", DrawableButton::ButtonStyle::ImageFitted };
 
