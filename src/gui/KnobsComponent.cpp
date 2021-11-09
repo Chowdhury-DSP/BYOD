@@ -3,7 +3,7 @@
 
 namespace
 {
-constexpr int nameHeight = 16;
+constexpr float nameHeightScale = 0.115f;
 }
 
 KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac, std::function<void()> paramLambda)
@@ -111,10 +111,13 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
 void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (contrastColour.withAlpha (isEnabled() ? 1.0f : 0.6f));
-    auto makeName = [&g] (Component& comp, String name, int offset = 0)
+
+    const auto nameHeight = proportionOfHeight (nameHeightScale);
+    const auto nameOffset = proportionOfHeight (0.157f);
+    auto makeName = [&g, nameHeight, nameOffset] (Component& comp, String name, int offset = 0)
     {
         g.setFont (Font ((float) nameHeight - 2.0f).boldened());
-        Rectangle<int> nameBox (comp.getX(), comp.getY() - 22 + offset, comp.getWidth(), nameHeight);
+        Rectangle<int> nameBox (comp.getX(), comp.getY() - nameOffset + offset, comp.getWidth(), nameHeight);
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
 
@@ -129,26 +132,29 @@ void KnobsComponent::resized()
 {
     int totalNumComponents = sliders.size() + boxes.size() + buttons.size();
 
+    const auto nameHeight = proportionOfHeight (nameHeightScale);
     int compHeight = getHeight() - nameHeight;
     int compWidth = totalNumComponents > 1 ? (getWidth() - 10) / totalNumComponents : compHeight;
 
     if (totalNumComponents == 1)
     {
         const int x = (getWidth() - compWidth) / 2;
+        const auto yPad = proportionOfHeight (0.107f);
+        const auto yDim = proportionOfHeight (0.214f);
         if (sliders.size() > 0)
-            sliders[0]->setBounds (x, 15, compWidth - 5, compWidth - 5);
+            sliders[0]->setBounds (x, yPad, compWidth - 5, compWidth - 5);
 
         if (boxes.size() > 0)
         {
-            compWidth = getWidth() - 30;
-            boxes[0]->setBounds (Rectangle (compWidth, 30).withCentre (getLocalBounds().getCentre()));
+            compWidth = getWidth() - yDim;
+            boxes[0]->setBounds (Rectangle (compWidth, yDim).withCentre (getLocalBounds().getCentre()));
         }
 
         if (buttons.size() > 0)
-            buttons[0]->setBounds (x, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+            buttons[0]->setBounds (x, yPad + (compHeight - yDim) / 2, compWidth - 5, yDim);
 
         if (customComponents.size() > 0)
-            customComponents[0]->setBounds (x, 15 + (compHeight - 30) / 2, compWidth / -5, 30);
+            customComponents[0]->setBounds (x, yPad + (compHeight - yDim) / 2, compWidth / -5, yDim);
 
         return;
     }
@@ -157,15 +163,17 @@ void KnobsComponent::resized()
     {
         int compIdx = 0;
         const int x = (getWidth() - 2 * compWidth) / 2;
+        const auto yPad = proportionOfHeight (0.107f);
+        const auto yDim = proportionOfHeight (0.214f);
 
         for (auto* s : sliders)
-            s->setBounds (x + (compIdx++) * compWidth, 15, compWidth, compWidth);
+            s->setBounds (x + (compIdx++) * compWidth, yPad, compWidth, compWidth);
 
         for (auto* b : boxes)
-            b->setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+            b->setBounds (x + (compIdx++) * compWidth, yPad + (compHeight - yDim) / 2, compWidth - 5, yDim);
 
         for (auto* b : buttons)
-            b->setBounds (x + (compIdx++) * compWidth, 15 + (compHeight - 30) / 2, compWidth - 5, 30);
+            b->setBounds (x + (compIdx++) * compWidth, yPad + (compHeight - yDim) / 2, compWidth - 5, yDim);
 
         return;
     }
@@ -174,16 +182,16 @@ void KnobsComponent::resized()
     {
         int compIdx = 0;
         const int x = (getWidth() - 3 * compWidth) / 2;
-        const int y = 30;
+        const auto yDim = proportionOfHeight (0.214f);
 
         for (auto* s : sliders)
-            s->setBounds (x + (compIdx++) * compWidth, y, compWidth, compWidth);
+            s->setBounds (x + (compIdx++) * compWidth, yDim, compWidth, compWidth);
 
         for (auto* b : boxes)
-            b->setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
+            b->setBounds (x + (compIdx++) * compWidth, yDim + (compHeight - 2 * yDim) / 2, compWidth - 5, yDim);
 
         for (auto* b : buttons)
-            b->setBounds (x + (compIdx++) * compWidth, y + (compHeight - 60) / 2, compWidth - 5, 30);
+            b->setBounds (x + (compIdx++) * compWidth, yDim + (compHeight - 2 * yDim) / 2, compWidth - 5, yDim);
 
         return;
     }
@@ -193,11 +201,13 @@ void KnobsComponent::resized()
         int compIdx = 0;
 
         Rectangle<int> bounds[4];
-        constexpr int sWidth = 80;
-        bounds[0] = Rectangle<int> { 0, 20, sWidth, sWidth };
-        bounds[1] = Rectangle<int> { 60, 40, sWidth, sWidth };
-        bounds[2] = Rectangle<int> { 120, 20, sWidth, sWidth };
-        bounds[3] = Rectangle<int> { 180, 40, sWidth, sWidth };
+        const int sWidth = proportionOfWidth (0.308f);
+        const int xOff = proportionOfWidth (0.231f);
+        const int yOff = proportionOfHeight (0.143f);
+        bounds[0] = Rectangle<int> { 0, yOff, sWidth, sWidth };
+        bounds[1] = Rectangle<int> { xOff, 2 * yOff, sWidth, sWidth };
+        bounds[2] = Rectangle<int> { 2 * xOff, yOff, sWidth, sWidth };
+        bounds[3] = Rectangle<int> { 3 * xOff, 2 * yOff, sWidth, sWidth };
 
         for (auto* s : sliders)
         {
@@ -205,11 +215,12 @@ void KnobsComponent::resized()
             s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 15, 16);
         }
 
+        const auto yDim = proportionOfHeight (0.214f);
         for (auto* b : boxes)
-            b->setBounds (bounds[compIdx++].withHeight (30).translated (-5, 62));
+            b->setBounds (bounds[compIdx++].withHeight (yDim).translated (-5, 2 * yDim));
 
         for (auto* b : buttons)
-            b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+            b->setBounds (bounds[compIdx++].withHeight (yDim).translated (0, yDim * 10 / 6));
 
         return;
     }
@@ -219,12 +230,23 @@ void KnobsComponent::resized()
         int compIdx = 0;
 
         Rectangle<int> bounds[5];
-        constexpr int sWidth = 75;
-        bounds[0] = Rectangle<int> { 0, 65, sWidth, sWidth };
-        bounds[1] = Rectangle<int> { 58, 15, sWidth, sWidth };
-        bounds[2] = Rectangle<int> { 115, 65, sWidth, sWidth };
-        bounds[3] = Rectangle<int> { 180, 65, sWidth, sWidth };
-        bounds[4] = Rectangle<int> { 145, 25, 90, 30 };
+        const int sWidth = proportionOfWidth (0.288f);
+        const int y1 = proportionOfHeight (0.464f);
+        const int y2 = proportionOfHeight (0.107f);
+        const int y3 = proportionOfHeight (0.179f);
+        const int x1 = proportionOfWidth (0.223f);
+        const int x2 = proportionOfWidth (0.442f);
+        const int x3 = proportionOfWidth (0.692f);
+        const int x4 = proportionOfWidth (0.558f);
+
+        const int xDim = proportionOfWidth (0.346f);
+        const int yDim = proportionOfHeight (0.214f);
+
+        bounds[0] = Rectangle<int> { 0, y1, sWidth, sWidth };
+        bounds[1] = Rectangle<int> { x1, y2, sWidth, sWidth };
+        bounds[2] = Rectangle<int> { x2, y1, sWidth, sWidth };
+        bounds[3] = Rectangle<int> { x3, y1, sWidth, sWidth };
+        bounds[4] = Rectangle<int> { x4, y3, xDim, yDim };
 
         for (auto* s : sliders)
         {
@@ -233,10 +255,10 @@ void KnobsComponent::resized()
         }
 
         for (auto* b : boxes)
-            b->setBounds (bounds[compIdx++].withHeight (25));
+            b->setBounds (bounds[compIdx++].withHeight (yDim * 5 / 6));
 
         for (auto* b : buttons)
-            b->setBounds (bounds[compIdx++].withHeight (30).translated (0, 50));
+            b->setBounds (bounds[compIdx++].withHeight (yDim).translated (0, yDim * 10 / 6));
 
         return;
     }
@@ -244,12 +266,13 @@ void KnobsComponent::resized()
     if (totalNumComponents > 5)
     {
         auto width = (getWidth() - 10) / totalNumComponents;
-        int x = 5;
+        int x = proportionOfWidth (0.019f);
+        const auto yPad = proportionOfHeight (0.107f);
         for (auto* s : sliders)
         {
             s->setSliderStyle (Slider::SliderStyle::LinearVertical);
             s->setTextBoxStyle (Slider::TextBoxBelow, false, width - 2, 14);
-            auto bounds = Rectangle { x + 2, 15, width - 4, getHeight() - 15 };
+            auto bounds = Rectangle { x + 2, yPad, width - 4, getHeight() - yPad };
             x += width;
 
             s->setBounds (bounds);
