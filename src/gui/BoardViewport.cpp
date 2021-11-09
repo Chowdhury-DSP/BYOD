@@ -8,20 +8,25 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     getVerticalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFF0EDED4));
     setScrollBarsShown (true, true);
 
-    // addAndMakeVisible (plusButton);
-    // addAndMakeVisible (minusButton);
+    addAndMakeVisible (plusButton);
+    addAndMakeVisible (minusButton);
 
     plusButton.onClick = [=]
     {
-        scaleFactor *= 1.5f;
+        scaleFactor *= 1.1f;
+        scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
         resized();
     };
 
     minusButton.onClick = [=]
     {
-        scaleFactor /= 1.5f;
+        scaleFactor /= 1.1f;
+        scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
         resized();
     };
+
+    scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
+    addAndMakeVisible (scaleLabel);
 }
 
 BoardViewport::~BoardViewport()
@@ -31,21 +36,10 @@ BoardViewport::~BoardViewport()
 
 void BoardViewport::resized()
 {
-    if (scaleFactor == 1.0f)
-    {
-        comp.setBounds (0, 0, getWidth(), getHeight());
-    }
-    else if (scaleFactor < 1.0f)
-    {
-        comp.setBounds (0, 0, getWidth(), getHeight());
-        comp.setTransform (AffineTransform::scale (scaleFactor));
-    }
-    else
-    {
-        comp.setBounds (0, 0, getWidth(), getHeight());
-        comp.setTransform (AffineTransform::scale (scaleFactor));
-    }
+    comp.setScaleFactor (scaleFactor);
+    comp.setBounds (0, 0, getWidth(), getHeight());
 
     plusButton.setBounds (0, getHeight() - 30, 30, 30);
     minusButton.setBounds (30, getHeight() - 30, 30, 30);
+    scaleLabel.setBounds (60, getHeight() - 30, 100, 30);
 }

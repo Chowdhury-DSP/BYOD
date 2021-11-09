@@ -19,21 +19,22 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     powerButton.setEnableDisableComps ({ &knobs });
     powerButton.attachButton (proc.getVTS(), "on_off");
 
-    xButton.setButtonText ("x");
-    xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
-    xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
-    xButton.setColour (TextButton::textColourOffId, contrastColour);
+    auto xSvg = Drawable::createFromImageData (BinaryData::xsolid_svg, BinaryData::xsolid_svgSize);
+    xSvg->replaceColour (Colours::white, contrastColour);
+    xButton.setImages (xSvg.get());
+    addAndMakeVisible (xButton);
     xButton.onClick = [=]
     { MessageManager::callAsync ([=]
                                  { procChain.removeProcessor (&proc); }); };
-    addAndMakeVisible (xButton);
 
     auto swapSvg = Drawable::createFromImageData (BinaryData::swap_svg, BinaryData::swap_svgSize);
     swapSvg->replaceColour (Colours::black, contrastColour);
     swapButton.setImages (swapSvg.get());
-    addAndMakeVisible (swapButton);
     swapButton.onClick = [=]
     { createReplaceProcMenu(); };
+    
+    if (proc.getNumInputs() == 1 && proc.getNumOutputs() == 1)
+        addAndMakeVisible (swapButton);
 
     auto infoSvg = Drawable::createFromImageData (BinaryData::info_svg, BinaryData::info_svgSize);
     infoSvg->replaceColour (Colours::black, contrastColour);
@@ -118,30 +119,37 @@ void ProcessorEditor::paint (Graphics& g)
         procUI.backgroundImage->drawWithin (g, backgroundBounds.toFloat(), RectanglePlacement::stretchToFit, 1.0f);
     }
 
+    auto fontHeight = proportionOfHeight (0.139f);
+    auto nameHeight = proportionOfHeight (0.167f);
+
     g.setColour (contrastColour);
-    g.setFont (Font (25.0f).boldened());
-    g.drawFittedText (proc.getName(), 5, 0, jmax (getWidth() - 50, 100), 30, Justification::centredLeft, 1);
+    g.setFont (Font ((float) fontHeight).boldened());
+    g.drawFittedText (proc.getName(), 5, 0, jmax (getWidth() - 50, 100), nameHeight, Justification::centredLeft, 1);
 }
 
 void ProcessorEditor::resized()
 {
     const auto width = getWidth();
     const auto height = getHeight();
-    knobs.setBounds (5, 35, width - 10, height - 40);
+
+    const auto knobsPad = proportionOfWidth (0.015f);
+    auto nameHeight = proportionOfHeight (0.167f);
+    knobs.setBounds (knobsPad, nameHeight, width - 2 * knobsPad, height - (nameHeight + knobsPad));
 
     bool isIOProcessor = typeid (proc) == typeid (InputProcessor) || typeid (proc) == typeid (OutputProcessor);
     if (! isIOProcessor)
     {
-        constexpr int xButtonSize = 27;
-        swapButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (4));
+        const auto xButtonSize = proportionOfWidth (0.1f);
+        const auto xButtonPad = proportionOfWidth (0.015f);
+        swapButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
         powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
-        xButton.setBounds (width - xButtonSize, 0, xButtonSize, xButtonSize);
+        xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
 
-        constexpr int infoButtonSize = 20;
-        infoButton.setBounds (width - infoButtonSize, height - infoButtonSize, infoButtonSize, infoButtonSize);
+        const auto infoButtonSize = proportionOfWidth (0.074f);
+        infoButton.setBounds (0, height - infoButtonSize, infoButtonSize, infoButtonSize);
     }
 
-    const int portDim = height / 8;
+    const int portDim = proportionOfHeight (0.15f);
     auto placePorts = [=] (int x, auto& ports)
     {
         const auto nPorts = ports.size();

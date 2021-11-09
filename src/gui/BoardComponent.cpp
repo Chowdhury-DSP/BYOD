@@ -8,6 +8,11 @@ constexpr int editorPad = 10;
 constexpr int newButtonWidth = 40;
 constexpr int portDistanceLimit = 25;
 
+constexpr int getScaleDim (int dim, float scaleFactor)
+{
+    return int ((float) dim * scaleFactor);
+}
+
 Point<int> getPortLocation (ProcessorEditor* editor, int portIdx, bool isInput)
 {
     auto portLocation = editor->getPortLocation (portIdx, isInput);
@@ -114,20 +119,30 @@ void BoardComponent::paint (Graphics& g)
     }
 }
 
+void BoardComponent::setScaleFactor (float newScaleFactor)
+{
+    scaleFactor = newScaleFactor;
+    resized();
+}
+
 void BoardComponent::resized()
 {
     const auto width = getWidth();
     const auto height = getHeight();
 
-    auto centreEditorHeight = (height - editorHeight) / 2;
-    inputEditor->setBounds (editorPad, centreEditorHeight, editorWidth / 2, editorHeight);
-    outputEditor->setBounds (width - (editorWidth / 3 + editorPad), centreEditorHeight, editorWidth / 3, editorHeight);
+    const auto thisEditorWidth = getScaleDim (editorWidth, scaleFactor);
+    const auto thisEditorHeight = getScaleDim (editorHeight, scaleFactor);
+    auto centreEditorHeight = (height - thisEditorHeight) / 2;
+    inputEditor->setBounds (editorPad, centreEditorHeight, thisEditorWidth / 2, thisEditorHeight);
+    outputEditor->setBounds (width - (thisEditorWidth / 3 + editorPad), centreEditorHeight, thisEditorWidth / 3, thisEditorHeight);
 
     for (auto* editor : processorEditors)
         setEditorPosition (editor);
 
     newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
+
+    repaint();
 }
 
 void BoardComponent::processorAdded (BaseProcessor* newProc)
@@ -348,6 +363,9 @@ std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Poin
 
 void BoardComponent::setEditorPosition (ProcessorEditor* editor)
 {
+    const auto thisEditorWidth = getScaleDim (editorWidth, scaleFactor);
+    const auto thisEditorHeight = getScaleDim (editorHeight, scaleFactor);
+
     auto* proc = editor->getProcPtr();
     auto position = proc->getPosition (getBounds());
     if (position == Point (0, 0) && getWidth() > 0 && getHeight() > 0) // no position set yet
@@ -361,11 +379,11 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor)
         auto& rand = Random::getSystemRandom();
         auto centre = b.getCentre() + Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
 
-        editor->setBounds (Rectangle (editorWidth, editorHeight).withCentre (centre));
+        editor->setBounds (Rectangle (thisEditorWidth, thisEditorHeight).withCentre (centre));
         proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
     }
     else
     {
-        editor->setBounds (Rectangle (editorWidth, editorHeight).withPosition (position));
+        editor->setBounds (Rectangle (thisEditorWidth, thisEditorHeight).withPosition (position));
     }
 }

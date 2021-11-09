@@ -16,6 +16,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    void setScaleFactor (float newScaleFactor);
 
     void showInfoComp (const BaseProcessor& proc);
 
@@ -52,6 +53,8 @@ private:
     OwnedArray<Cable> cables;
     std::unique_ptr<MouseEvent> cableMouse;
     bool ignoreConnectionCallbacks = false;
+
+    float scaleFactor = 1.0f;
 
     SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
 

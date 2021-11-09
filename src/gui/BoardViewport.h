@@ -17,6 +17,8 @@ private:
     TextButton plusButton { "+" };
     TextButton minusButton { "-" };
 
+    Label scaleLabel;
+
     float scaleFactor = 1.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardViewport)
