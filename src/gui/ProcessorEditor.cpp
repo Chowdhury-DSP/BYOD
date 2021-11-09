@@ -32,7 +32,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     swapButton.setImages (swapSvg.get());
     swapButton.onClick = [=]
     { createReplaceProcMenu(); };
-    
+
     if (proc.getNumInputs() == 1 && proc.getNumOutputs() == 1)
         addAndMakeVisible (swapButton);
 
