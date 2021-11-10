@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pch.h>
 #include <cmath>
+#include <pch.h>
 
 #define HYSTERESIS_USE_SIMD 1
 

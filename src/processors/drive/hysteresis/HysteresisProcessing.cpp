@@ -51,7 +51,7 @@ void HysteresisProcessing::processBlock (double* bufferLeft, double* bufferRight
 
     bool needsSmoothing = driveSmooth.isSmoothing() || widthSmooth.isSmoothing() || satSmooth.isSmoothing();
 
-    double stereoVec alignas(16)[2];
+    double stereoVec alignas (16)[2];
 
     if (needsSmoothing)
     {
