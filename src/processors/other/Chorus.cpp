@@ -70,17 +70,20 @@ void Chorus::prepare (double sampleRate, int samplesPerBlock)
     aaFilter.setCutoffFrequency (12000.0f);
 
     dryWetMixer.prepare (spec);
-    dryWetMixerMono.prepare (monoSpec);
 
     dcBlocker.prepare (spec);
     dcBlocker.setCutoffFrequency (60.0f);
+
+    stereoBuffer.setSize (2, samplesPerBlock);
 }
 
 void Chorus::processAudio (AudioBuffer<float>& buffer)
 {
+    const auto numSamples = buffer.getNumSamples();
+
     auto slowRate = rate1Low * std::pow (rate1High / rate1Low, *rateParam);
     auto fastRate = rate2Low * std::pow (rate2High / rate2Low, *rateParam);
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+    for (int ch = 0; ch < 2; ++ch)
     {
         for (int i = 0; i < delaysPerChannel; ++i)
         {
@@ -90,21 +93,30 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
         }
     }
 
-    dsp::AudioBlock<float> block { buffer };
+    // always have a stereo output!
+    auto& processBuffer = buffer;
+    if (buffer.getNumChannels() == 1)
+    {
+        stereoBuffer.setSize (2, numSamples, false, false, true);
+        stereoBuffer.copyFrom (0, 0, buffer, 0, 0, numSamples);
+        stereoBuffer.copyFrom (1, 0, buffer, 0, 0, numSamples);
+        processBuffer = stereoBuffer;
+    }
 
-    auto& dryWet = buffer.getNumChannels() == 1 ? dryWetMixerMono : dryWetMixer;
-    dryWet.setWetMixProportion (*mixParam);
-    dryWet.pushDrySamples (block);
+    dsp::AudioBlock<float> block { processBuffer };
 
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+    dryWetMixer.setWetMixProportion (*mixParam);
+    dryWetMixer.pushDrySamples (block);
+
+    for (int ch = 0; ch < processBuffer.getNumChannels(); ++ch)
     {
         fbSmooth[ch].setTargetValue (0.45f * std::sqrt (fbParam->load()));
 
         slowSmooth[ch].setTargetValue (delay1Ms * 0.001f * fs * *depthParam);
         fastSmooth[ch].setTargetValue (delay2Ms * 0.001f * fs * *depthParam);
 
-        auto* x = buffer.getWritePointer (ch);
-        for (int n = 0; n < buffer.getNumSamples(); ++n)
+        auto* x = processBuffer.getWritePointer (ch);
+        for (int n = 0; n < numSamples; ++n)
         {
             auto xIn = std::tanh (x[n] * 0.75f - feedbackState[ch]);
 
@@ -129,5 +141,7 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
         }
     }
 
-    dryWet.mixWetSamples (block);
+    dryWetMixer.mixWetSamples (block);
+
+    outputBuffers.getReference (0) = &processBuffer;
 }

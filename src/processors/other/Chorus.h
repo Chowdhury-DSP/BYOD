@@ -21,7 +21,6 @@ private:
     std::atomic<float>* mixParam = nullptr;
 
     dsp::DryWetMixer<float> dryWetMixer;
-    dsp::DryWetMixer<float> dryWetMixerMono;
 
     static constexpr int delaysPerChannel = 2;
 
@@ -41,6 +40,7 @@ private:
     chowdsp::StateVariableFilter<float> dcBlocker;
 
     float fs = 48000.0f;
+    AudioBuffer<float> stereoBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Chorus)
 };
