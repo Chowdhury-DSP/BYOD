@@ -1,7 +1,6 @@
-#ifndef HYSTERESISPROCESSING_H_INCLUDED
-#define HYSTERESISPROCESSING_H_INCLUDED
+#pragma once
 
-#include <pch.h>
+#include "HysteresisOps.h"
 
 /*
     Hysteresis processing for a model of an analog tape machine.
@@ -18,44 +17,54 @@ public:
 
     void setParameters (float drive, float width, float sat);
 
-    void processBlock (double* buffer, const int numSamples);
+    void processBlock (double* bufferL, double* bufferR, const int numSamples);
+
+private:
+    // newton-raphson solvers
+    template <int nIterations, typename Float>
+    inline Float NRSolver (Float H, Float H_d) noexcept
+    {
+        using namespace chowdsp::SIMDUtils;
+
+        Float M = M_n1;
+        const Float last_dMdt = HysteresisOps::hysteresisFunc (M_n1, H_n1, H_d_n1, hpState);
+
+        Float dMdt;
+        Float dMdtPrime;
+        Float deltaNR;
+        for (int n = 0; n < nIterations; ++n)
+        {
+            dMdt = HysteresisOps::hysteresisFunc (M, H, H_d, hpState);
+            dMdtPrime = HysteresisOps::hysteresisFuncPrime (H_d, dMdt, hpState);
+            deltaNR = (M - M_n1 - (Float) Talpha * (dMdt + last_dMdt)) / (Float (1.0) - (Float) Talpha * dMdtPrime);
+            M -= deltaNR;
+        }
+
+        return M;
+    }
+
+    void cook (float drive, float width, float sat);
+
+    SmoothedValue<float, ValueSmoothingTypes::Linear> driveSmooth, satSmooth, widthSmooth;
 
     // parameter values
     double fs = 48000.0;
     double T = 1.0 / fs;
     double Talpha = T / 1.9;
-    double M_s = 1.0;
-    double a = M_s / 4.0;
-    const double alpha = 1.6e-3;
-    double k = 0.47875;
-    double c = 1.7e-1;
     double upperLim = 20.0;
 
-    // Save calculations
-    double nc = 1 - c;
-    double M_s_oa = M_s / a;
-    double M_s_oa_talpha = alpha * M_s / a;
-    double M_s_oa_tc = c * M_s / a;
-    double M_s_oa_tc_talpha = alpha * c * M_s / a;
-    double M_s_oaSq_tc_talpha = alpha * c * M_s / (a * a);
-    double M_s_oaSq_tc_talphaSq = alpha * alpha * c * M_s / (a * a);
-
     // state variables
+#if HYSTERESIS_USE_SIMD
+    dsp::SIMDRegister<double> M_n1 = 0.0;
+    dsp::SIMDRegister<double> H_n1 = 0.0;
+    dsp::SIMDRegister<double> H_d_n1 = 0.0;
+#else
     double M_n1 = 0.0;
     double H_n1 = 0.0;
     double H_d_n1 = 0.0;
+#endif
 
-    // temp vars
-    double Q, M_diff, delta, delta_M, L_prime, kap1, f1Denom, f1, f2, f3;
-    double coth = 0.0;
-    bool nearZero = false;
-
-private:
-    void cook (float drive, float width, float sat);
-
-    SmoothedValue<float, ValueSmoothingTypes::Linear> driveSmooth, satSmooth, widthSmooth;
+    HysteresisOps::HysteresisState hpState;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HysteresisProcessing)
 };
-
-#endif

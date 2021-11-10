@@ -27,11 +27,8 @@ AudioProcessorValueTreeState::ParameterLayout Hysteresis::createParameterLayout(
 
 void Hysteresis::prepare (double sampleRate, int samplesPerBlock)
 {
-    for (int ch = 0; ch < 2; ++ch)
-    {
-        hysteresisProc[ch].reset();
-        hysteresisProc[ch].setSampleRate (sampleRate);
-    }
+    hysteresisProc.reset();
+    hysteresisProc.setSampleRate (sampleRate);
 
     doubleBuffer.setSize (2, samplesPerBlock);
 }
@@ -41,13 +38,12 @@ void Hysteresis::processAudio (AudioBuffer<float>& buffer)
     buffer.applyGain (2.0f);
 
     doubleBuffer.makeCopyOf (buffer, true);
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
-    {
-        auto* x = doubleBuffer.getWritePointer (ch);
 
-        hysteresisProc[ch].setParameters (driveParam->load(), widthParam->load(), satParam->load());
-        hysteresisProc[ch].processBlock (x, buffer.getNumSamples());
-    }
+    auto* leftPtr = doubleBuffer.getWritePointer (0);
+    auto* rightPtr = doubleBuffer.getNumChannels() > 1 ? doubleBuffer.getWritePointer (1) : leftPtr;
+
+    hysteresisProc.setParameters (driveParam->load(), widthParam->load(), satParam->load());
+    hysteresisProc.processBlock (leftPtr, rightPtr, buffer.getNumSamples());
 
     buffer.makeCopyOf (doubleBuffer, true);
 }

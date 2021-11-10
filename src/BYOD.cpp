@@ -27,6 +27,7 @@ void BYOD::releaseResources()
 
 void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
+    buffer.copyFrom (0, 0, buffer, 1, 0, buffer.getNumSamples());
     procs.processAudio (buffer);
 }
 
