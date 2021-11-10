@@ -19,7 +19,7 @@ private:
     std::atomic<float>* driveParam = nullptr;
     std::atomic<float>* widthParam = nullptr;
 
-    HysteresisProcessing hysteresisProc[2];
+    HysteresisProcessing hysteresisProc;
     AudioBuffer<double> doubleBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Hysteresis)
