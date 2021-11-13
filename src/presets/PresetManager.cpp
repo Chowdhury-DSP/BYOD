@@ -28,5 +28,6 @@ std::unique_ptr<XmlElement> PresetManager::savePresetState()
 
 void PresetManager::loadPresetState (const XmlElement* xml)
 {
-    MessageManager::callAsync ([=] { procChain->loadProcChain (xml); });
+    MessageManager::callAsync ([=]
+                               { procChain->loadProcChain (xml); });
 }
