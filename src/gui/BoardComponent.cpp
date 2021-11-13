@@ -49,8 +49,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
     addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=]
-    { showNewProcMenu(); };
+    newProcButton.onClick = [=] { showNewProcMenu(); };
 
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, this);
     addAndMakeVisible (inputEditor.get());
@@ -147,6 +146,7 @@ void BoardComponent::resized()
 
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
+    MessageManagerLock mml;
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
     addAndMakeVisible (newEditor);
 
@@ -168,9 +168,11 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
 
     auto* editor = findEditorForProcessor (proc);
     editor->removePortListener (this);
-    processorEditors.removeObject (editor);
 
-    repaint();
+    MessageManager::callAsync ([=] {
+        processorEditors.removeObject (editor);
+        repaint();
+    });
 }
 
 void BoardComponent::refreshConnections()
@@ -182,7 +184,7 @@ void BoardComponent::refreshConnections()
 
     addConnectionsForProcessor (cables, &procChain.getInputProcessor());
 
-    repaint();
+    MessageManager::callAsync ([=] { repaint(); });
 }
 
 void BoardComponent::connectionAdded (const ConnectionInfo& info)
@@ -191,7 +193,8 @@ void BoardComponent::connectionAdded (const ConnectionInfo& info)
         return;
 
     cables.add (connectionToCable (info));
-    repaint();
+
+    MessageManager::callAsync ([=] { repaint(); });
 }
 
 void BoardComponent::connectionRemoved (const ConnectionInfo& info)
@@ -211,7 +214,7 @@ void BoardComponent::connectionRemoved (const ConnectionInfo& info)
         }
     }
 
-    repaint();
+    MessageManager::callAsync ([=] { repaint(); });
 }
 
 void BoardComponent::showInfoComp (const BaseProcessor& proc)
@@ -326,8 +329,7 @@ std::pair<ProcessorEditor*, int> BoardComponent::getNearestInputPort (const Poin
     auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
     int minDistance = -1;
 
-    auto checkPorts = [&] (ProcessorEditor* editor)
-    {
+    auto checkPorts = [&] (ProcessorEditor* editor) {
         int numPorts = editor->getProcPtr()->getNumInputs();
         for (int i = 0; i < numPorts; ++i)
         {
