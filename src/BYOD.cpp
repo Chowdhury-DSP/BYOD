@@ -44,7 +44,11 @@ AudioProcessorEditor* BYOD::createEditor()
     magicState.addTrigger ("redo", [=]
                            { undoManager.redo(); });
 
+#if JUCE_IOS
+    auto editor = new foleys::MagicPluginEditor (magicState, BinaryData::gui_ios_xml, BinaryData::gui_ios_xmlSize, std::move (builder));
+#else
     auto editor = new foleys::MagicPluginEditor (magicState, BinaryData::gui_xml, BinaryData::gui_xmlSize, std::move (builder));
+#endif
 
     // we need to set resize limits for StandalonePluginHolder
     editor->setResizeLimits (10, 10, 2000, 2000);
