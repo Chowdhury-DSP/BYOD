@@ -14,6 +14,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
                                                                                                        powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);
+    setBroughtToFrontOnMouseClick (true);
 
     addAndMakeVisible (powerButton);
     powerButton.setEnableDisableComps ({ &knobs });
