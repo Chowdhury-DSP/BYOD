@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # install functions
 install_pluginval_linux()
 {
