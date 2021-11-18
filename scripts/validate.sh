@@ -42,7 +42,7 @@ echo "Pluginval installed at ${pluginval}"
 # run
 for plugin in "${plugins[@]}"; do
     echo "Validating ${plugin}"
-    $pluginval --strictness-level 8 --validate-in-process --validate $plugin
+    $pluginval --strictness-level 8 --validate-in-process --validate $plugin --repeat 5
 done
 
 # clean up

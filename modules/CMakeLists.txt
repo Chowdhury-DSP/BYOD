@@ -43,7 +43,7 @@ target_compile_definitions(juce_plugin_modules
         JucePlugin_Manufacturer="chowdsp"
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
-        JUCE_MODAL_LOOPS_PERMITTED=0
+        JUCE_MODAL_LOOPS_PERMITTED=1
         FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
         FOLEYS_ENABLE_BINARY_DATA=1
         FOLEYS_ENABLE_OPEN_GL_CONTEXT=1
