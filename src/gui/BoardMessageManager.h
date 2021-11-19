@@ -12,7 +12,7 @@ public:
     void timerCallback() override
     {
         ScopedLock sl (crit);
-        
+
         while (! messageBuffer.empty())
         {
             messageBuffer.front()();
@@ -35,7 +35,7 @@ public:
 
 private:
     std::queue<MessageType> messageBuffer;
-    
+
     CriticalSection crit;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardMessageManager)

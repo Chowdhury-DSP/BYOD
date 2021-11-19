@@ -159,23 +159,24 @@ void BoardComponent::resized()
 
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
-    messager->pushMessage ([=] {
-        if (! procChain.getProcessors().contains (newProc))
-        {
-            jassertfalse;
-            return;
-        }
+    messager->pushMessage ([=]
+                           {
+                               if (! procChain.getProcessors().contains (newProc))
+                               {
+                                   jassertfalse;
+                                   return;
+                               }
 
-        auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
-        addAndMakeVisible (newEditor);
+                               auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
+                               addAndMakeVisible (newEditor);
 
-        addConnectionsForProcessor (cables, newProc);
-        setEditorPosition (newEditor);
+                               addConnectionsForProcessor (cables, newProc);
+                               setEditorPosition (newEditor);
 
-        newEditor->addPortListener (this);
+                               newEditor->addPortListener (this);
 
-        repaint();
-    });
+                               repaint();
+                           });
 }
 
 void BoardComponent::processorPrepareToRemove (const BaseProcessor* proc)
@@ -192,12 +193,13 @@ void BoardComponent::processorPrepareToRemove (const BaseProcessor* proc)
 
 void BoardComponent::processorRemoved (const BaseProcessor* proc)
 {
-    messager->pushMessage ([=] {
-        if (auto* editor = findEditorForProcessor (proc))
-            processorEditors.removeObject (editor);
+    messager->pushMessage ([=]
+                           {
+                               if (auto* editor = findEditorForProcessor (proc))
+                                   processorEditors.removeObject (editor);
 
-        repaint();
-    });
+                               repaint();
+                           });
 }
 
 void BoardComponent::refreshConnections()
@@ -209,7 +211,8 @@ void BoardComponent::refreshConnections()
 
     addConnectionsForProcessor (cables, &procChain.getInputProcessor());
 
-    messager->pushMessage ([=] { repaint(); });
+    messager->pushMessage ([=]
+                           { repaint(); });
 }
 
 void BoardComponent::connectionAdded (const ConnectionInfo& info)
@@ -219,7 +222,8 @@ void BoardComponent::connectionAdded (const ConnectionInfo& info)
 
     cables.add (connectionToCable (info));
 
-    messager->pushMessage ([=] { repaint(); });
+    messager->pushMessage ([=]
+                           { repaint(); });
 }
 
 void BoardComponent::connectionRemoved (const ConnectionInfo& info)
@@ -239,7 +243,8 @@ void BoardComponent::connectionRemoved (const ConnectionInfo& info)
         }
     }
 
-    messager->pushMessage ([=] { repaint(); });
+    messager->pushMessage ([=]
+                           { repaint(); });
 }
 
 void BoardComponent::showInfoComp (const BaseProcessor& proc)
