@@ -3,8 +3,9 @@ build*/
 bin/
 *.exe
 
-# vscode settings
+# IDE settings
 .vscode/
+.idea/
 
 # Mac extras
 .DS_Store

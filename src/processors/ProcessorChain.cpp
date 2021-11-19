@@ -453,6 +453,12 @@ void ProcessorChain::loadProcChain (const XmlElement* xml)
     std::unordered_map<int, ProcConnectionMap> connectionMaps;
     for (auto* procXml : xml->getChildIterator())
     {
+        if (procXml == nullptr)
+        {
+            jassertfalse;
+            continue;
+        }
+
         auto procName = getProcessorName (procXml->getTagName());
         if (procName == inputProcessor.getName())
         {

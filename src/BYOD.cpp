@@ -58,8 +58,6 @@ AudioProcessorEditor* BYOD::createEditor()
 
 void BYOD::getStateInformation (MemoryBlock& destData)
 {
-    MessageManagerLock mml;
-
     auto xml = std::make_unique<XmlElement> ("state");
 
     auto state = vts.copyState();
@@ -72,7 +70,6 @@ void BYOD::getStateInformation (MemoryBlock& destData)
 
 void BYOD::setStateInformation (const void* data, int sizeInBytes)
 {
-    MessageManagerLock mml;
     auto xmlState = getXmlFromBinary (data, sizeInBytes);
 
     if (xmlState == nullptr) // invalid XML

@@ -13,6 +13,7 @@ class ProcessorChain : private AudioProcessorValueTreeState::Listener
         Listener,
         listeners,
         virtual void processorAdded (BaseProcessor* /*proc*/) {}\
+        virtual void processorPrepareToRemove (const BaseProcessor* /*proc*/) {}\
         virtual void processorRemoved (const BaseProcessor* /*proc*/) {}\
         virtual void refreshConnections() {}\
         virtual void connectionAdded (const ConnectionInfo& /*info*/) {}\
