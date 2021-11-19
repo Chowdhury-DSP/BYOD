@@ -1,4 +1,5 @@
 #include "BoardComponent.h"
+#include "BoardMessageManager.h"
 
 namespace
 {
@@ -45,6 +46,9 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
 
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 {
+    messager = std::make_unique<BoardMessageManager>();
+    messager->startTimerHz (32);
+
     newProcButton.setButtonText ("+");
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
@@ -74,6 +78,8 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 
 BoardComponent::~BoardComponent()
 {
+    messager->stopTimer();
+
     inputEditor->removePortListener (this);
     outputEditor->removePortListener (this);
     procChain.removeListener (this);
@@ -88,11 +94,17 @@ void BoardComponent::paint (Graphics& g)
     for (auto* cable : cables)
     {
         auto* startEditor = findEditorForProcessor (cable->startProc);
+        if (startEditor == nullptr)
+            continue;
+
         auto startPortLocation = getPortLocation (startEditor, cable->startIdx, false);
 
         if (cable->endProc != nullptr)
         {
             auto* endEditor = findEditorForProcessor (cable->endProc);
+            if (endEditor == nullptr)
+                continue;
+
             auto endPortLocation = getPortLocation (endEditor, cable->endIdx, true);
 
             auto cableLine = Line (startPortLocation.toFloat(), endPortLocation.toFloat());
@@ -147,19 +159,26 @@ void BoardComponent::resized()
 
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
-    MessageManagerLock mml;
-    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
-    addAndMakeVisible (newEditor);
+    messager->pushMessage ([=] {
+        if (! procChain.getProcessors().contains (newProc))
+        {
+            jassertfalse;
+            return;
+        }
 
-    addConnectionsForProcessor (cables, newProc);
-    setEditorPosition (newEditor);
+        auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
+        addAndMakeVisible (newEditor);
 
-    newEditor->addPortListener (this);
+        addConnectionsForProcessor (cables, newProc);
+        setEditorPosition (newEditor);
 
-    repaint();
+        newEditor->addPortListener (this);
+
+        repaint();
+    });
 }
 
-void BoardComponent::processorRemoved (const BaseProcessor* proc)
+void BoardComponent::processorPrepareToRemove (const BaseProcessor* proc)
 {
     for (int i = cables.size() - 1; i >= 0; --i)
     {
@@ -167,14 +186,18 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
             cables.remove (i);
     }
 
-    auto* editor = findEditorForProcessor (proc);
-    editor->removePortListener (this);
+    if (auto* editor = findEditorForProcessor (proc))
+        editor->removePortListener (this);
+}
 
-    MessageManager::callAsync ([=]
-                               {
-                                   processorEditors.removeObject (editor);
-                                   repaint();
-                               });
+void BoardComponent::processorRemoved (const BaseProcessor* proc)
+{
+    messager->pushMessage ([=] {
+        if (auto* editor = findEditorForProcessor (proc))
+            processorEditors.removeObject (editor);
+
+        repaint();
+    });
 }
 
 void BoardComponent::refreshConnections()
@@ -186,8 +209,7 @@ void BoardComponent::refreshConnections()
 
     addConnectionsForProcessor (cables, &procChain.getInputProcessor());
 
-    MessageManager::callAsync ([=]
-                               { repaint(); });
+    messager->pushMessage ([=] { repaint(); });
 }
 
 void BoardComponent::connectionAdded (const ConnectionInfo& info)
@@ -197,8 +219,7 @@ void BoardComponent::connectionAdded (const ConnectionInfo& info)
 
     cables.add (connectionToCable (info));
 
-    MessageManager::callAsync ([=]
-                               { repaint(); });
+    messager->pushMessage ([=] { repaint(); });
 }
 
 void BoardComponent::connectionRemoved (const ConnectionInfo& info)
@@ -218,8 +239,7 @@ void BoardComponent::connectionRemoved (const ConnectionInfo& info)
         }
     }
 
-    MessageManager::callAsync ([=]
-                               { repaint(); });
+    messager->pushMessage ([=] { repaint(); });
 }
 
 void BoardComponent::showInfoComp (const BaseProcessor& proc)
@@ -259,13 +279,12 @@ ProcessorEditor* BoardComponent::findEditorForProcessor (const BaseProcessor* pr
         if (editor->getProcPtr() == proc)
             return editor;
 
-    if (inputEditor->getProcPtr() == proc)
+    if (inputEditor != nullptr && inputEditor->getProcPtr() == proc)
         return inputEditor.get();
 
-    if (outputEditor->getProcPtr() == proc)
+    if (outputEditor != nullptr && outputEditor->getProcPtr() == proc)
         return outputEditor.get();
 
-    jassertfalse;
     return nullptr;
 }
 

@@ -6,6 +6,7 @@
 #include "ProcessorEditor.h"
 #include "utils/LookAndFeels.h"
 
+class BoardMessageManager;
 class BoardComponent : public Component,
                        private ProcessorChain::Listener,
                        private ProcessorEditor::PortListener
@@ -21,6 +22,7 @@ public:
     void showInfoComp (const BaseProcessor& proc);
 
     void processorAdded (BaseProcessor* newProc) override;
+    void processorPrepareToRemove (const BaseProcessor* proc) override;
     void processorRemoved (const BaseProcessor* proc) override;
     void refreshConnections() override;
     void connectionAdded (const ConnectionInfo& info) override;
@@ -55,6 +57,9 @@ private:
     bool ignoreConnectionCallbacks = false;
 
     float scaleFactor = 1.0f;
+
+    friend class BoardMessageManager;
+    std::unique_ptr<BoardMessageManager> messager;
 
     SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
 
