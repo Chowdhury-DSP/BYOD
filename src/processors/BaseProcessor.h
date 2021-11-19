@@ -105,7 +105,7 @@ protected:
     Array<AudioBuffer<float>*> outputBuffers;
     Array<int> inputsConnected;
 
-    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
+    chowdsp::SharedLNFAllocator lnfAllocator;
 
 private:
     std::atomic<float>* onOffParam = nullptr;
