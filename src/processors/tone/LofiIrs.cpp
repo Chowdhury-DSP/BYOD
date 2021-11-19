@@ -21,7 +21,8 @@ const static String mixTag = "mix";
 const static String gainTag = "gain";
 } // namespace
 
-LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterLayout(), um)
+LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterLayout(), um),
+                                     convolution (getSharedConvolutionMessageQueue())
 {
     for (const auto& irName : irNames)
     {

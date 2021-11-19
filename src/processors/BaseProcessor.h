@@ -107,6 +107,14 @@ protected:
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 
+    struct ConvolutionMessageQueue : public dsp::ConvolutionMessageQueue
+    {
+        ConvolutionMessageQueue() : dsp::ConvolutionMessageQueue (2048) {}
+    };
+
+    auto& getSharedConvolutionMessageQueue() { return convolutionMessageQueue.get(); }
+    SharedResourcePointer<ConvolutionMessageQueue> convolutionMessageQueue;
+
 private:
     std::atomic<float>* onOffParam = nullptr;
 

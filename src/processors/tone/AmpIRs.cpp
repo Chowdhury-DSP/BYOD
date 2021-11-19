@@ -15,7 +15,8 @@ const static String mixTag = "mix";
 const static String gainTag = "gain";
 } // namespace
 
-AmpIRs::AmpIRs (UndoManager* um) : BaseProcessor ("Amp IRs", createParameterLayout(), um)
+AmpIRs::AmpIRs (UndoManager* um) : BaseProcessor ("Amp IRs", createParameterLayout(), um),
+                                   convolution (getSharedConvolutionMessageQueue())
 {
     for (const auto& irName : StringArray (irNames.begin(), irNames.size() - 1))
     {
