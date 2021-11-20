@@ -103,8 +103,9 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
 void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
 {
     um->beginNewTransaction();
-    
-    try {
+
+    try
+    {
         while (! chain.procs.isEmpty())
             um->perform (new AddOrRemoveProcessor (chain, chain.procs.getLast()));
 
@@ -192,7 +193,9 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
         }
 
         chain.listeners.call (&ProcessorChain::Listener::refreshConnections);
-    } catch (...) {
+    }
+    catch (...)
+    {
         DBG ("Unable to load state!");
         um->undoCurrentTransactionOnly();
     }
