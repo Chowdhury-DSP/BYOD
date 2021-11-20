@@ -5,7 +5,9 @@ message(STATUS "VERSION for JUCE: ${juce_version}")
 
 # add custom JUCE modules
 juce_add_modules(foleys_gui_magic)
-juce_add_modules(chowdsp_utils)
+juce_add_modules(chowdsp_utils/modules/chowdsp_dsp)
+juce_add_modules(chowdsp_utils/modules/chowdsp_gui)
+juce_add_modules(chowdsp_utils/modules/chowdsp_plugin_utils)
 juce_add_modules(chowdsp_juce_dsp)
 
 # add RTNeural
@@ -19,9 +21,10 @@ target_link_libraries(juce_plugin_modules
         BinaryData
         juce::juce_audio_utils
         juce::juce_audio_plugin_client
-        juce::juce_opengl
         chowdsp_juce_dsp
-        chowdsp_utils
+        chowdsp_dsp
+        chowdsp_gui
+        chowdsp_plugin_utils
         foleys_gui_magic
         RTNeural
     PUBLIC
@@ -43,10 +46,9 @@ target_compile_definitions(juce_plugin_modules
         JucePlugin_Manufacturer="chowdsp"
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
-        JUCE_MODAL_LOOPS_PERMITTED=0
+        JUCE_MODAL_LOOPS_PERMITTED=1
         FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
         FOLEYS_ENABLE_BINARY_DATA=1
-        FOLEYS_ENABLE_OPEN_GL_CONTEXT=1
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
 )
@@ -77,4 +79,10 @@ endif()
 if(IOS)
     target_link_libraries(juce_plugin_modules PRIVATE juce::juce_product_unlocking)
     target_compile_definitions(juce_plugin_modules PUBLIC JUCE_IN_APP_PURCHASES=1)
+endif()
+
+if(NOT APPLE)
+    message(STATUS "Linking with OpenGL")
+    target_link_libraries(juce_plugin_modules PRIVATE juce::juce_opengl)
+    target_compile_definitions(juce_plugin_modules PUBLIC FOLEYS_ENABLE_OPEN_GL_CONTEXT=1)
 endif()

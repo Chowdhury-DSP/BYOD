@@ -25,6 +25,7 @@ target_include_directories(BYOD_headless
     PRIVATE
     ../
     ../../modules
+    ../../modules/chowdsp_utils/modules
     ../../modules/JUCE/modules
     ${juce_includes}
 )

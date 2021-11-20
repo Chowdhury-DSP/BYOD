@@ -1,5 +1,5 @@
 #include "PresetManager.h"
-#include "processors/ProcessorChain.h"
+#include "processors/chain/ProcessorChainStateHelper.h"
 
 namespace
 {
@@ -23,10 +23,10 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
 {
-    return procChain->saveProcChain();
+    return procChain->getStateHelper().saveProcChain();
 }
 
 void PresetManager::loadPresetState (const XmlElement* xml)
 {
-    procChain->loadProcChain (xml);
+    procChain->getStateHelper().loadProcChain (xml);
 }

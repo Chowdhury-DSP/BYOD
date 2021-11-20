@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../processors/ProcessorChain.h"
+#include "../processors/chain/ProcessorChain.h"
 #include "KnobsComponent.h"
 #include "Port.h"
 #include "utils/PowerButton.h"
@@ -57,7 +57,7 @@ private:
 
     Point<int> mouseDownOffset;
 
-    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
+    chowdsp::SharedLNFAllocator lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)
 };
