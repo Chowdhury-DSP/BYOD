@@ -3,7 +3,6 @@
 #include "processors/ProcessorStore.h"
 #include "processors/chain/ProcessorChain.h"
 
-
 class BYOD : public chowdsp::PluginBase<BYOD>
 {
 public:

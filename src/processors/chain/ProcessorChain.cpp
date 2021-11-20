@@ -67,7 +67,8 @@ void ProcessorChain::initializeProcessors (int curOS)
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
-    auto prepProcessor = [=] (BaseProcessor& proc) {
+    auto prepProcessor = [=] (BaseProcessor& proc)
+    {
         proc.prepare (osSampleRate, osSamplesPerBlock);
         proc.prepareInputBuffers (osSamplesPerBlock);
     };
@@ -129,7 +130,8 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     else
         proc->processAudio (buffer);
 
-    auto processBuffer = [&] (BaseProcessor* nextProc, AudioBuffer<float>& nextBuffer) {
+    auto processBuffer = [&] (BaseProcessor* nextProc, AudioBuffer<float>& nextBuffer)
+    {
         int nextNumInputs = nextProc->getNumInputs();
         if (nextNumProcs == 1 && nextNumInputs == 1)
         {

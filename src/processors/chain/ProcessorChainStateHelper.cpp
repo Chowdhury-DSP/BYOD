@@ -59,7 +59,8 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");
 
-    auto saveProcessor = [&] (BaseProcessor* proc) {
+    auto saveProcessor = [&] (BaseProcessor* proc)
+    {
         auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
 
@@ -118,7 +119,8 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps) {
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
+    {
         if (procXml->getNumChildElements() > 0)
             newProc->fromXML (procXml->getChildElement (0));
 

@@ -16,7 +16,8 @@ void ProcessorChainActionHelper::removeProcessor (BaseProcessor* procToRemove)
 {
     um->beginNewTransaction();
 
-    auto removeConnections = [=] (BaseProcessor* proc) {
+    auto removeConnections = [=] (BaseProcessor* proc)
+    {
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
             int numConnections = proc->getNumOutputConnections (portIdx);
@@ -50,7 +51,8 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
 
     um->beginNewTransaction();
 
-    auto swapConnections = [&] (BaseProcessor* proc) {
+    auto swapConnections = [&] (BaseProcessor* proc)
+    {
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
             int numConnections = proc->getNumOutputConnections (portIdx);

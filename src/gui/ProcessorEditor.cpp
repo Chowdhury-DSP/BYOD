@@ -25,7 +25,9 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xSvg->replaceColour (Colours::white, contrastColour);
     xButton.setImages (xSvg.get());
     addAndMakeVisible (xButton);
-    xButton.onClick = [=] { MessageManager::callAsync ([=] { procChain.getActionHelper().removeProcessor (&proc); }); };
+    xButton.onClick = [=]
+    { MessageManager::callAsync ([=]
+                                 { procChain.getActionHelper().removeProcessor (&proc); }); };
 
     auto swapSvg = Drawable::createFromImageData (BinaryData::swap_svg, BinaryData::swap_svgSize);
     swapSvg->replaceColour (Colours::black, contrastColour);
