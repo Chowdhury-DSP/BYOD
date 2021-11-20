@@ -1,5 +1,5 @@
 #include "BoardComponent.h"
-#include "BoardMessageManager.h"
+#include "processors/chain/ProcessorChainActionHelper.h"
 
 namespace
 {
@@ -46,9 +46,6 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
 
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 {
-    messager = std::make_unique<BoardMessageManager>();
-    messager->startTimerHz (32);
-
     newProcButton.setButtonText ("+");
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
     newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
@@ -78,8 +75,6 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs)
 
 BoardComponent::~BoardComponent()
 {
-    messager->stopTimer();
-
     inputEditor->removePortListener (this);
     outputEditor->removePortListener (this);
     procChain.removeListener (this);
@@ -159,24 +154,18 @@ void BoardComponent::resized()
 
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
-    messager->pushMessage ([=]
-                           {
-                               if (! procChain.getProcessors().contains (newProc))
-                               {
-                                   jassertfalse;
-                                   return;
-                               }
+    if (! procChain.getProcessors().contains (newProc))
+        return;
 
-                               auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
-                               addAndMakeVisible (newEditor);
+    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
+    addAndMakeVisible (newEditor);
 
-                               addConnectionsForProcessor (cables, newProc);
-                               setEditorPosition (newEditor);
+    addConnectionsForProcessor (cables, newProc);
+    setEditorPosition (newEditor);
 
-                               newEditor->addPortListener (this);
+    newEditor->addPortListener (this);
 
-                               repaint();
-                           });
+    repaint();
 }
 
 void BoardComponent::processorPrepareToRemove (const BaseProcessor* proc)
@@ -193,13 +182,10 @@ void BoardComponent::processorPrepareToRemove (const BaseProcessor* proc)
 
 void BoardComponent::processorRemoved (const BaseProcessor* proc)
 {
-    messager->pushMessage ([=]
-                           {
-                               if (auto* editor = findEditorForProcessor (proc))
-                                   processorEditors.removeObject (editor);
+    if (auto* editor = findEditorForProcessor (proc))
+        processorEditors.removeObject (editor);
 
-                               repaint();
-                           });
+    repaint();
 }
 
 void BoardComponent::refreshConnections()
@@ -211,8 +197,7 @@ void BoardComponent::refreshConnections()
 
     addConnectionsForProcessor (cables, &procChain.getInputProcessor());
 
-    messager->pushMessage ([=]
-                           { repaint(); });
+    repaint();
 }
 
 void BoardComponent::connectionAdded (const ConnectionInfo& info)
@@ -222,8 +207,7 @@ void BoardComponent::connectionAdded (const ConnectionInfo& info)
 
     cables.add (connectionToCable (info));
 
-    messager->pushMessage ([=]
-                           { repaint(); });
+    repaint();
 }
 
 void BoardComponent::connectionRemoved (const ConnectionInfo& info)
@@ -243,8 +227,7 @@ void BoardComponent::connectionRemoved (const ConnectionInfo& info)
         }
     }
 
-    messager->pushMessage ([=]
-                           { repaint(); });
+    repaint();
 }
 
 void BoardComponent::showInfoComp (const BaseProcessor& proc)
@@ -323,7 +306,7 @@ void BoardComponent::releaseCable (const MouseEvent& e)
 
         const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
         auto connection = cableToConnection (*cable);
-        procChain.addConnection (std::move (connection));
+        procChain.getActionHelper().addConnection (std::move (connection));
 
         repaint();
         return;
@@ -343,7 +326,7 @@ void BoardComponent::destroyCable (ProcessorEditor* origin, int portIndex)
         if (cable->endProc == proc && cable->endIdx == portIndex)
         {
             const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
-            procChain.removeConnection (cableToConnection (*cable));
+            procChain.getActionHelper().removeConnection (cableToConnection (*cable));
             cables.removeObject (cable);
 
             break;

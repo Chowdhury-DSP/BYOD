@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../processors/ProcessorChain.h"
 #include "Cable.h"
 #include "InfoComponent.h"
 #include "ProcessorEditor.h"
@@ -57,9 +56,6 @@ private:
     bool ignoreConnectionCallbacks = false;
 
     float scaleFactor = 1.0f;
-
-    friend class BoardMessageManager;
-    std::unique_ptr<BoardMessageManager> messager;
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 

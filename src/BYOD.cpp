@@ -4,12 +4,14 @@
 #include "gui/utils/LookAndFeels.h"
 #include "gui/utils/TextSliderItem.h"
 #include "presets/PresetManager.h"
+#include "processors/chain/ProcessorChainStateHelper.h"
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procStore (&undoManager),
                procs (procStore, vts, presetManager)
 {
     presetManager = std::make_unique<PresetManager> (&procs, vts);
+    // setUsePresetManagerForPluginInterface (false);
 }
 
 void BYOD::addParameters (Parameters& params)
@@ -68,7 +70,7 @@ void BYOD::getStateInformation (MemoryBlock& destData)
 
     auto state = vts.copyState();
     xml->addChildElement (state.createXml().release());
-    xml->addChildElement (procs.saveProcChain().release());
+    xml->addChildElement (procs.getStateHelper().saveProcChain().release());
     xml->addChildElement (presetManager->saveXmlState().release());
 
     copyXmlToBinary (*xml, destData);
@@ -91,7 +93,7 @@ void BYOD::setStateInformation (const void* data, int sizeInBytes)
 
     presetManager->loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
     vts.replaceState (ValueTree::fromXml (*vtsXml));
-    procs.loadProcChain (procChainXml);
+    procs.getStateHelper().loadProcChain (procChainXml);
 }
 
 // This creates new instances of the plugin
