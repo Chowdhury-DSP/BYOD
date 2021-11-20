@@ -1,5 +1,6 @@
 #include "ProcessorEditor.h"
 #include "BoardComponent.h"
+#include "processors/chain/ProcessorChainActionHelper.h"
 
 namespace
 {
@@ -14,6 +15,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
                                                                                                        powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);
+    setBroughtToFrontOnMouseClick (true);
 
     addAndMakeVisible (powerButton);
     powerButton.setEnableDisableComps ({ &knobs });
@@ -25,7 +27,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     addAndMakeVisible (xButton);
     xButton.onClick = [=]
     { MessageManager::callAsync ([=]
-                                 { procChain.removeProcessor (&proc); }); };
+                                 { procChain.getActionHelper().removeProcessor (&proc); }); };
 
     auto swapSvg = Drawable::createFromImageData (BinaryData::swap_svg, BinaryData::swap_svgSize);
     swapSvg->replaceColour (Colours::black, contrastColour);
@@ -40,9 +42,10 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     infoSvg->replaceColour (Colours::black, contrastColour);
     infoButton.setImages (infoSvg.get());
     addAndMakeVisible (infoButton);
-    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)]
+    infoButton.onClick = [&baseProc, &parent]
     {
-        boardComp->showInfoComp (baseProc);
+        if (auto* boardComp = dynamic_cast<BoardComponent*> (parent))
+            boardComp->showInfoComp (baseProc);
     };
 
     if (procUI.lnf != nullptr)
@@ -67,8 +70,6 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
 
 ProcessorEditor::~ProcessorEditor()
 {
-    setLookAndFeel (nullptr);
-
     for (auto* port : inputPorts)
         port->removePortListener (this);
 

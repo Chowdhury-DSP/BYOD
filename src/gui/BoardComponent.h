@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../processors/ProcessorChain.h"
 #include "Cable.h"
 #include "InfoComponent.h"
 #include "ProcessorEditor.h"
 #include "utils/LookAndFeels.h"
 
+class BoardMessageManager;
 class BoardComponent : public Component,
                        private ProcessorChain::Listener,
                        private ProcessorEditor::PortListener
@@ -21,6 +21,7 @@ public:
     void showInfoComp (const BaseProcessor& proc);
 
     void processorAdded (BaseProcessor* newProc) override;
+    void processorPrepareToRemove (const BaseProcessor* proc) override;
     void processorRemoved (const BaseProcessor* proc) override;
     void refreshConnections() override;
     void connectionAdded (const ConnectionInfo& info) override;
@@ -56,7 +57,7 @@ private:
 
     float scaleFactor = 1.0f;
 
-    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
+    chowdsp::SharedLNFAllocator lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardComponent)
 };

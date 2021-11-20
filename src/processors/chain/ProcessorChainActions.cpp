@@ -7,8 +7,7 @@ public:
     {
         DBG (String ("Creating processor: ") + newProc->getName());
 
-        int curOS = static_cast<int> (*chain.oversamplingParam);
-        auto osFactor = (int) chain.overSample[curOS]->getOversamplingFactor();
+        auto osFactor = chain.ioProcessor.getOversamplingFactor();
         newProc->prepare (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
         newProc->prepareInputBuffers (osFactor * chain.mySamplesPerBlock);
 
@@ -29,13 +28,15 @@ public:
     {
         DBG (String ("Removing processor: ") + procToRemove->getName());
 
-        chain.listeners.call (&ProcessorChain::Listener::processorRemoved, procToRemove);
+        chain.listeners.call (&ProcessorChain::Listener::processorPrepareToRemove, procToRemove);
 
         for (auto* param : procToRemove->getParameters())
         {
             if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
                 procToRemove->getVTS().removeParameterListener (paramCast->paramID, &chain);
         }
+
+        chain.listeners.call (&ProcessorChain::Listener::processorRemoved, procToRemove);
 
         SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
         chain.procs.removeObject (procToRemove, false);
