@@ -69,6 +69,8 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
     inputBuffer.setSize (2, samplesPerBlock * 16); // allocate extra space for upsampled buffers
 
     ioProcessor.prepare (sampleRate, samplesPerBlock);
+
+    SpinLock::ScopedLockType scopedProcessingLock (processingLock);
     initializeProcessors();
 }
 

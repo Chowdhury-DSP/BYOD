@@ -18,6 +18,7 @@ private:
     ProcessorChain& chain;
     UndoManager* um;
 
+    CriticalSection crit;
     std::unique_ptr<XmlElement> xmlStateToLoad;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChainStateHelper)

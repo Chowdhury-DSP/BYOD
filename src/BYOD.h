@@ -26,7 +26,7 @@ private:
     ProcessorStore procStore;
     ProcessorChain procs;
 
-    UndoManager undoManager { 300000 };
+    UndoManager undoManager { 500000 };
 
     AudioProcessLoadMeasurer loadMeasurer;
 
