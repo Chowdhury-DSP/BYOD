@@ -3,9 +3,10 @@ build*/
 bin/
 *.exe
 
-# IDE settings
+# IDE extras
 .vscode/
 .idea/
+.cache/
 
 # Mac extras
 .DS_Store
