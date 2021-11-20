@@ -102,95 +102,98 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
 
 void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
 {
-    jassert (MessageManager::existsAndIsCurrentThread());
-
     um->beginNewTransaction();
+    
+    try {
+        while (! chain.procs.isEmpty())
+            um->perform (new AddOrRemoveProcessor (chain, chain.procs.getLast()));
 
-    while (! chain.procs.isEmpty())
-        um->perform (new AddOrRemoveProcessor (chain, chain.procs.getLast()));
-
-    auto numInputConnections = chain.inputProcessor.getNumOutputConnections (0);
-    while (numInputConnections > 0)
-    {
-        auto connection = chain.inputProcessor.getOutputConnection (0, numInputConnections - 1);
-        um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
-        numInputConnections = chain.inputProcessor.getNumOutputConnections (0);
-    }
-
-    using PortMap = std::vector<std::pair<int, int>>;
-    using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
-    {
-        if (procXml->getNumChildElements() > 0)
-            newProc->fromXML (procXml->getChildElement (0));
-
-        ProcConnectionMap connectionMap;
-        for (int portIdx = 0; portIdx < newProc->getNumOutputs(); ++portIdx)
+        auto numInputConnections = chain.inputProcessor.getNumOutputConnections (0);
+        while (numInputConnections > 0)
         {
-            if (auto* portElement = procXml->getChildByName (getPortTag (portIdx)))
+            auto connection = chain.inputProcessor.getOutputConnection (0, numInputConnections - 1);
+            um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
+            numInputConnections = chain.inputProcessor.getNumOutputConnections (0);
+        }
+
+        using PortMap = std::vector<std::pair<int, int>>;
+        using ProcConnectionMap = std::unordered_map<int, PortMap>;
+        auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
+        {
+            if (procXml->getNumChildElements() > 0)
+                newProc->fromXML (procXml->getChildElement (0));
+
+            ProcConnectionMap connectionMap;
+            for (int portIdx = 0; portIdx < newProc->getNumOutputs(); ++portIdx)
             {
-                auto numConnections = portElement->getNumAttributes() / 2;
-                PortMap portConnections (numConnections);
-                for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+                if (auto* portElement = procXml->getChildByName (getPortTag (portIdx)))
                 {
-                    auto processorIdx = portElement->getIntAttribute (getConnectionTag (cIdx));
-                    auto endPort = portElement->getIntAttribute (getConnectionEndTag (cIdx));
-                    portConnections[cIdx] = std::make_pair (processorIdx, endPort);
+                    auto numConnections = portElement->getNumAttributes() / 2;
+                    PortMap portConnections (numConnections);
+                    for (int cIdx = 0; cIdx < numConnections; ++cIdx)
+                    {
+                        auto processorIdx = portElement->getIntAttribute (getConnectionTag (cIdx));
+                        auto endPort = portElement->getIntAttribute (getConnectionEndTag (cIdx));
+                        portConnections[cIdx] = std::make_pair (processorIdx, endPort);
+                    }
+
+                    connectionMap.insert ({ portIdx, std::move (portConnections) });
                 }
-
-                connectionMap.insert ({ portIdx, std::move (portConnections) });
             }
-        }
 
-        int procIdx = newProc == &chain.inputProcessor ? -1 : chain.procs.size();
-        connectionMaps.insert ({ procIdx, std::move (connectionMap) });
-    };
+            int procIdx = newProc == &chain.inputProcessor ? -1 : chain.procs.size();
+            connectionMaps.insert ({ procIdx, std::move (connectionMap) });
+        };
 
-    std::unordered_map<int, ProcConnectionMap> connectionMaps;
-    for (auto* procXml : xml->getChildIterator())
-    {
-        if (procXml == nullptr)
+        std::unordered_map<int, ProcConnectionMap> connectionMaps;
+        for (auto* procXml : xml->getChildIterator())
         {
-            jassertfalse;
-            continue;
-        }
-
-        auto procName = getProcessorName (procXml->getTagName());
-        if (procName == chain.inputProcessor.getName())
-        {
-            loadProcessorState (procXml, &chain.inputProcessor, connectionMaps);
-            continue;
-        }
-
-        auto newProc = chain.procStore.createProcByName (procName);
-        if (newProc == nullptr)
-        {
-            jassertfalse;
-            continue;
-        }
-
-        loadProcessorState (procXml, newProc.get(), connectionMaps);
-        um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
-    }
-
-    // wait until all the processors are created before connecting them
-    for (auto [procIdx, connectionMap] : connectionMaps)
-    {
-        auto* proc = procIdx >= 0 ? chain.procs[(int) procIdx] : &chain.inputProcessor;
-        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
-        {
-            if (connectionMap.find (portIdx) == connectionMap.end())
-                continue; // no connections!
-
-            const auto& connections = connectionMap.at (portIdx);
-            for (auto [cIdx, endPort] : connections)
+            if (procXml == nullptr)
             {
-                auto* procToConnect = cIdx >= 0 ? chain.procs[cIdx] : &chain.outputProcessor;
-                ConnectionInfo info { proc, portIdx, procToConnect, endPort };
-                um->perform (new AddOrRemoveConnection (chain, std::move (info)));
+                jassertfalse;
+                continue;
+            }
+
+            auto procName = getProcessorName (procXml->getTagName());
+            if (procName == chain.inputProcessor.getName())
+            {
+                loadProcessorState (procXml, &chain.inputProcessor, connectionMaps);
+                continue;
+            }
+
+            auto newProc = chain.procStore.createProcByName (procName);
+            if (newProc == nullptr)
+            {
+                jassertfalse;
+                continue;
+            }
+
+            loadProcessorState (procXml, newProc.get(), connectionMaps);
+            um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
+        }
+
+        // wait until all the processors are created before connecting them
+        for (auto [procIdx, connectionMap] : connectionMaps)
+        {
+            auto* proc = procIdx >= 0 ? chain.procs[(int) procIdx] : &chain.inputProcessor;
+            for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+            {
+                if (connectionMap.find (portIdx) == connectionMap.end())
+                    continue; // no connections!
+
+                const auto& connections = connectionMap.at (portIdx);
+                for (auto [cIdx, endPort] : connections)
+                {
+                    auto* procToConnect = cIdx >= 0 ? chain.procs[cIdx] : &chain.outputProcessor;
+                    ConnectionInfo info { proc, portIdx, procToConnect, endPort };
+                    um->perform (new AddOrRemoveConnection (chain, std::move (info)));
+                }
             }
         }
-    }
 
-    chain.listeners.call (&ProcessorChain::Listener::refreshConnections);
+        chain.listeners.call (&ProcessorChain::Listener::refreshConnections);
+    } catch (...) {
+        DBG ("Unable to load state!");
+        um->undoCurrentTransactionOnly();
+    }
 }
