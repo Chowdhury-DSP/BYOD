@@ -7,8 +7,7 @@ public:
     {
         DBG (String ("Creating processor: ") + newProc->getName());
 
-        int curOS = static_cast<int> (*chain.oversamplingParam);
-        auto osFactor = (int) chain.overSample[curOS]->getOversamplingFactor();
+        auto osFactor = chain.ioProcessor.getOversamplingFactor();
         newProc->prepare (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
         newProc->prepareInputBuffers (osFactor * chain.mySamplesPerBlock);
 

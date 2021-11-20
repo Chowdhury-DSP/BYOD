@@ -1,11 +1,13 @@
 #pragma once
 
 #include "../ProcessorStore.h"
-#include "DryWetProcessor.h"
+#include "ChainIOProcessor.h"
 
 #include "../utility/InputProcessor.h"
 #include "../utility/OutputProcessor.h"
 
+class ProcessorChainActionHelper;
+class ProcessorChainStateHelper;
 class ProcessorChain : private AudioProcessorValueTreeState::Listener
 {
     // clang-format off
@@ -26,7 +28,7 @@ public:
 
     static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);
-    void processAudio (AudioBuffer<float> buffer);
+    void processAudio (AudioBuffer<float>& buffer);
 
     OwnedArray<BaseProcessor>& getProcessors() { return procs; }
     ProcessorStore& getProcStore() { return procStore; }
@@ -39,7 +41,7 @@ public:
     auto& getStateHelper() { return *stateHelper; }
 
 private:
-    void initializeProcessors (int curOS);
+    void initializeProcessors();
     void runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed);
     void parameterChanged (const juce::String& parameterID, float newValue) override;
 
@@ -54,17 +56,7 @@ private:
     InputProcessor inputProcessor;
     AudioBuffer<float> inputBuffer;
     OutputProcessor outputProcessor;
-
-    std::atomic<float>* oversamplingParam = nullptr;
-    std::unique_ptr<dsp::Oversampling<float>> overSample[5];
-    int prevOS = 0;
-
-    std::atomic<float>* inGainParam = nullptr;
-    std::atomic<float>* outGainParam = nullptr;
-    dsp::Gain<float> inGain, outGain;
-
-    std::atomic<float>* dryWetParam = nullptr;
-    DryWetProcessor dryWetMixer;
+    ChainIOProcessor ioProcessor;
 
     std::unique_ptr<chowdsp::PresetManager>& presetManager;
 

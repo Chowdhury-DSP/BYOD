@@ -16,6 +16,7 @@ target_sources(BYOD PRIVATE
     processors/BaseProcessor.cpp
     processors/ProcessorStore.cpp
     
+    processors/chain/ChainIOProcessor.cpp
     processors/chain/DryWetProcessor.cpp
     processors/chain/ProcessorChain.cpp
     processors/chain/ProcessorChainActions.cpp
