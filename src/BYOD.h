@@ -1,7 +1,7 @@
 #pragma once
 
-#include "processors/ProcessorChain.h"
 #include "processors/ProcessorStore.h"
+#include "processors/chain/ProcessorChain.h"
 
 class BYOD : public chowdsp::PluginBase<BYOD>
 {
@@ -20,12 +20,15 @@ public:
 
     ProcessorChain& getProcChain() { return procs; }
     AudioProcessorValueTreeState& getVTS() { return vts; }
+    AudioProcessLoadMeasurer& getLoadMeasurer() { return loadMeasurer; }
 
 private:
     ProcessorStore procStore;
     ProcessorChain procs;
 
     UndoManager undoManager { 300000 };
+
+    AudioProcessLoadMeasurer loadMeasurer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BYOD)
 };

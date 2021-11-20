@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # install functions
 install_pluginval_linux()
 {
@@ -32,7 +34,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     declare -a plugins=("build/BYOD_artefacts/VST3/BYOD.vst3")
 else
     pluginval=$(install_pluginval_win)
-    declare -a plugins=("build/BYOD_artefacts/Release/VST3/BYOD.vst3")
+    declare -a plugins=("build/BYOD_artefacts/Debug/VST3/BYOD.vst3")
 fi
 
 echo "Pluginval installed at ${pluginval}"
@@ -40,7 +42,7 @@ echo "Pluginval installed at ${pluginval}"
 # run
 for plugin in "${plugins[@]}"; do
     echo "Validating ${plugin}"
-    $pluginval --strictness-level 8 --validate-in-process --validate $plugin
+    $pluginval --strictness-level 8 --validate-in-process --validate $plugin --repeat 5
 done
 
 # clean up
