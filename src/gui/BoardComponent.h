@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../processors/ProcessorChain.h"
 #include "Cable.h"
 #include "InfoComponent.h"
 #include "ProcessorEditor.h"
@@ -56,7 +55,7 @@ private:
 
     float scaleFactor = 1.0f;
 
-    SharedResourcePointer<chowdsp::LNFAllocator> lnfAllocator;
+    chowdsp::SharedLNFAllocator lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardComponent)
 };

@@ -1,11 +1,13 @@
 #pragma once
 
-#include "DryWetProcessor.h"
-#include "ProcessorStore.h"
+#include "../ProcessorStore.h"
+#include "ChainIOProcessor.h"
 
-#include "utility/InputProcessor.h"
-#include "utility/OutputProcessor.h"
+#include "../utility/InputProcessor.h"
+#include "../utility/OutputProcessor.h"
 
+class ProcessorChainActionHelper;
+class ProcessorChainStateHelper;
 class ProcessorChain : private AudioProcessorValueTreeState::Listener
 {
     // clang-format off
@@ -21,30 +23,24 @@ class ProcessorChain : private AudioProcessorValueTreeState::Listener
     // clang-format on
 public:
     ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts, std::unique_ptr<chowdsp::PresetManager>& presetMgr);
+    ~ProcessorChain();
 
     static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);
-    void processAudio (AudioBuffer<float> buffer);
+    void processAudio (AudioBuffer<float>& buffer);
 
-    void addProcessor (BaseProcessor::Ptr newProc);
-    void removeProcessor (BaseProcessor* procToRemove);
-    void replaceProcessor (BaseProcessor::Ptr newProc, BaseProcessor* procToReplace);
     OwnedArray<BaseProcessor>& getProcessors() { return procs; }
-
-    void addConnection (ConnectionInfo&& info);
-    void removeConnection (ConnectionInfo&& info);
-
-    std::unique_ptr<XmlElement> saveProcChain();
-    void loadProcChain (const XmlElement* xml);
-
     ProcessorStore& getProcStore() { return procStore; }
     const SpinLock& getProcChainLock() const { return processingLock; }
 
     InputProcessor& getInputProcessor() { return inputProcessor; }
     OutputProcessor& getOutputProcessor() { return outputProcessor; }
 
+    auto& getActionHelper() { return *actionHelper; }
+    auto& getStateHelper() { return *stateHelper; }
+
 private:
-    void initializeProcessors (int curOS);
+    void initializeProcessors();
     void runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed);
     void parameterChanged (const juce::String& parameterID, float newValue) override;
 
@@ -59,23 +55,19 @@ private:
     InputProcessor inputProcessor;
     AudioBuffer<float> inputBuffer;
     OutputProcessor outputProcessor;
-
-    std::atomic<float>* oversamplingParam = nullptr;
-    std::unique_ptr<dsp::Oversampling<float>> overSample[5];
-    int prevOS = 0;
-
-    std::atomic<float>* inGainParam = nullptr;
-    std::atomic<float>* outGainParam = nullptr;
-    dsp::Gain<float> inGain, outGain;
-
-    std::atomic<float>* dryWetParam = nullptr;
-    DryWetProcessor dryWetMixer;
+    ChainIOProcessor ioProcessor;
 
     std::unique_ptr<chowdsp::PresetManager>& presetManager;
 
     friend class ProcChainActions;
     friend class AddOrRemoveProcessor;
     friend class AddOrRemoveConnection;
+
+    friend class ProcessorChainActionHelper;
+    std::unique_ptr<ProcessorChainActionHelper> actionHelper;
+
+    friend class ProcessorChainStateHelper;
+    std::unique_ptr<ProcessorChainStateHelper> stateHelper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };
