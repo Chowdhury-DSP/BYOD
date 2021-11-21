@@ -1,23 +1,27 @@
 #!/bin/bash
 
+set -e
+
+pluginval_version="v0.3.0"
+
 # install functions
 install_pluginval_linux()
 {
-    curl -L "https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_Linux.zip" -o pluginval.zip
+    curl -L "https://github.com/Tracktion/pluginval/releases/download/${pluginval_version}/pluginval_Linux.zip" -o pluginval.zip
     unzip pluginval > /dev/null
     echo "./pluginval"
 }
 
 install_pluginval_mac()
 {
-    curl -L "https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_macOS.zip" -o pluginval.zip
+    curl -L "https://github.com/Tracktion/pluginval/releases/download/${pluginval_version}/pluginval_macOS.zip" -o pluginval.zip
     unzip pluginval > /dev/null
     echo "pluginval.app/Contents/MacOS/pluginval"
 }
 
 install_pluginval_win()
 {
-    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://github.com/Tracktion/pluginval/releases/download/latest_release/pluginval_Windows.zip -OutFile pluginval.zip"
+    powershell -Command "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest https://github.com/Tracktion/pluginval/releases/download/${pluginval_version}/pluginval_Windows.zip -OutFile pluginval.zip"
     powershell -Command "Expand-Archive pluginval.zip -DestinationPath ."
     echo "./pluginval.exe"
 }

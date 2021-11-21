@@ -1,4 +1,5 @@
 #include "BoardComponent.h"
+#include "processors/chain/ProcessorChainActionHelper.h"
 
 namespace
 {
@@ -88,11 +89,15 @@ void BoardComponent::paint (Graphics& g)
     for (auto* cable : cables)
     {
         auto* startEditor = findEditorForProcessor (cable->startProc);
+        jassert (startEditor != nullptr);
+
         auto startPortLocation = getPortLocation (startEditor, cable->startIdx, false);
 
         if (cable->endProc != nullptr)
         {
             auto* endEditor = findEditorForProcessor (cable->endProc);
+            jassert (endEditor != nullptr);
+
             auto endPortLocation = getPortLocation (endEditor, cable->endIdx, true);
 
             auto cableLine = Line (startPortLocation.toFloat(), endPortLocation.toFloat());
@@ -147,6 +152,12 @@ void BoardComponent::resized()
 
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
+    if (! procChain.getProcessors().contains (newProc))
+    {
+        jassertfalse; // being asked to add a processor that is no longer in the chain?
+        return;
+    }
+
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
     addAndMakeVisible (newEditor);
 
@@ -166,9 +177,11 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
             cables.remove (i);
     }
 
-    auto* editor = findEditorForProcessor (proc);
-    editor->removePortListener (this);
-    processorEditors.removeObject (editor);
+    if (auto* editor = findEditorForProcessor (proc))
+    {
+        editor->removePortListener (this);
+        processorEditors.removeObject (editor);
+    }
 
     repaint();
 }
@@ -191,6 +204,7 @@ void BoardComponent::connectionAdded (const ConnectionInfo& info)
         return;
 
     cables.add (connectionToCable (info));
+
     repaint();
 }
 
@@ -251,13 +265,12 @@ ProcessorEditor* BoardComponent::findEditorForProcessor (const BaseProcessor* pr
         if (editor->getProcPtr() == proc)
             return editor;
 
-    if (inputEditor->getProcPtr() == proc)
+    if (inputEditor != nullptr && inputEditor->getProcPtr() == proc)
         return inputEditor.get();
 
-    if (outputEditor->getProcPtr() == proc)
+    if (outputEditor != nullptr && outputEditor->getProcPtr() == proc)
         return outputEditor.get();
 
-    jassertfalse;
     return nullptr;
 }
 
@@ -291,7 +304,7 @@ void BoardComponent::releaseCable (const MouseEvent& e)
 
         const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
         auto connection = cableToConnection (*cable);
-        procChain.addConnection (std::move (connection));
+        procChain.getActionHelper().addConnection (std::move (connection));
 
         repaint();
         return;
@@ -311,7 +324,7 @@ void BoardComponent::destroyCable (ProcessorEditor* origin, int portIndex)
         if (cable->endProc == proc && cable->endIdx == portIndex)
         {
             const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
-            procChain.removeConnection (cableToConnection (*cable));
+            procChain.getActionHelper().removeConnection (cableToConnection (*cable));
             cables.removeObject (cable);
 
             break;

@@ -14,10 +14,14 @@ target_sources(BYOD PRIVATE
     presets/PresetManager.cpp
 
     processors/BaseProcessor.cpp
-    processors/DryWetProcessor.cpp
-    processors/ProcessorChain.cpp
-    processors/ProcessorChainActions.cpp
     processors/ProcessorStore.cpp
+    
+    processors/chain/ChainIOProcessor.cpp
+    processors/chain/DryWetProcessor.cpp
+    processors/chain/ProcessorChain.cpp
+    processors/chain/ProcessorChainActions.cpp
+    processors/chain/ProcessorChainActionHelper.cpp
+    processors/chain/ProcessorChainStateHelper.cpp
 
     processors/drive/GuitarMLAmp.cpp
     processors/drive/RONN.cpp

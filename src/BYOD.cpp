@@ -1,8 +1,10 @@
 #include "BYOD.h"
 #include "gui/BoardViewport.h"
+#include "gui/utils/CPUMeter.h"
 #include "gui/utils/LookAndFeels.h"
 #include "gui/utils/TextSliderItem.h"
 #include "presets/PresetManager.h"
+#include "processors/chain/ProcessorChainStateHelper.h"
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procStore (&undoManager),
@@ -19,6 +21,7 @@ void BYOD::addParameters (Parameters& params)
 void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     procs.prepare (sampleRate, samplesPerBlock);
+    loadMeasurer.reset (sampleRate, samplesPerBlock);
 }
 
 void BYOD::releaseResources()
@@ -27,6 +30,8 @@ void BYOD::releaseResources()
 
 void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
+    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer };
+
     procs.processAudio (buffer);
 }
 
@@ -36,7 +41,9 @@ AudioProcessorEditor* BYOD::createEditor()
     builder->registerFactory ("Board", &BoardItem::factory);
     builder->registerFactory ("PresetsItem", &chowdsp::PresetsItem<BYOD>::factory);
     builder->registerFactory ("TextSlider", &TextSliderItem::factory);
+    builder->registerFactory ("CPUMeter", &CPUMeterItem<BYOD>::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
+    builder->registerLookAndFeel ("CPUMeterLNF", std::make_unique<CPUMeterLNF>());
 
     // GUI trigger functions
     magicState.addTrigger ("undo", [=]
@@ -58,13 +65,11 @@ AudioProcessorEditor* BYOD::createEditor()
 
 void BYOD::getStateInformation (MemoryBlock& destData)
 {
-    MessageManagerLock mml;
-
     auto xml = std::make_unique<XmlElement> ("state");
 
     auto state = vts.copyState();
     xml->addChildElement (state.createXml().release());
-    xml->addChildElement (procs.saveProcChain().release());
+    xml->addChildElement (procs.getStateHelper().saveProcChain().release());
     xml->addChildElement (presetManager->saveXmlState().release());
 
     copyXmlToBinary (*xml, destData);
@@ -72,7 +77,6 @@ void BYOD::getStateInformation (MemoryBlock& destData)
 
 void BYOD::setStateInformation (const void* data, int sizeInBytes)
 {
-    MessageManagerLock mml;
     auto xmlState = getXmlFromBinary (data, sizeInBytes);
 
     if (xmlState == nullptr) // invalid XML
@@ -88,7 +92,7 @@ void BYOD::setStateInformation (const void* data, int sizeInBytes)
 
     presetManager->loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
     vts.replaceState (ValueTree::fromXml (*vtsXml));
-    procs.loadProcChain (procChainXml);
+    procs.getStateHelper().loadProcChain (procChainXml);
 }
 
 // This creates new instances of the plugin
