@@ -42,10 +42,9 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     infoSvg->replaceColour (Colours::black, contrastColour);
     infoButton.setImages (infoSvg.get());
     addAndMakeVisible (infoButton);
-    infoButton.onClick = [&baseProc, &parent]
+    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)]
     {
-        if (auto* boardComp = dynamic_cast<BoardComponent*> (parent))
-            boardComp->showInfoComp (baseProc);
+        boardComp->showInfoComp (baseProc);
     };
 
     if (procUI.lnf != nullptr)

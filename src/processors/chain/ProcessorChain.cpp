@@ -29,10 +29,6 @@ ProcessorChain::ProcessorChain (ProcessorStore& store,
 {
     actionHelper = std::make_unique<ProcessorChainActionHelper> (*this);
     stateHelper = std::make_unique<ProcessorChainStateHelper> (*this);
-
-    using namespace std::placeholders;
-    procStore.addProcessorCallback = std::bind (&ProcessorChainActionHelper::addProcessor, actionHelper.get(), _1);
-    procStore.replaceProcessorCallback = std::bind (&ProcessorChainActionHelper::replaceProcessor, actionHelper.get(), _1, _2);
 }
 
 ProcessorChain::~ProcessorChain() = default;

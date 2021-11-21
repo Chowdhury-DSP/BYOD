@@ -65,14 +65,13 @@ dsp::AudioBlock<float> ChainIOProcessor::processAudioInput (AudioBuffer<float>& 
         prevOS = curOS;
     }
 
-    // set input, output, and dry/wet
-    inGain.setGainDecibels (inGainParam->load());
-    outGain.setGainDecibels (outGainParam->load());
-    dryWetMixer.setDryWet (dryWetParam->load());
-
     dsp::AudioBlock<float> block (buffer);
     dsp::ProcessContextReplacing<float> context (block);
+
+    inGain.setGainDecibels (inGainParam->load());
     inGain.process (context);
+
+    dryWetMixer.setDryWet (dryWetParam->load());
     dryWetMixer.copyDryBuffer (buffer);
 
     return overSample[curOS]->processSamplesUp (block);
@@ -88,5 +87,6 @@ void ChainIOProcessor::processAudioOutput (AudioBuffer<float>& buffer)
     dryWetMixer.processBlock (buffer, latencySamples);
 
     dsp::ProcessContextReplacing<float> context (block);
+    outGain.setGainDecibels (outGainParam->load());
     outGain.process (context);
 }

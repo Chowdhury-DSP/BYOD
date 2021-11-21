@@ -28,15 +28,13 @@ public:
     {
         DBG (String ("Removing processor: ") + procToRemove->getName());
 
-        chain.listeners.call (&ProcessorChain::Listener::processorPrepareToRemove, procToRemove);
+        chain.listeners.call (&ProcessorChain::Listener::processorRemoved, procToRemove);
 
         for (auto* param : procToRemove->getParameters())
         {
             if (auto* paramCast = dynamic_cast<juce::RangedAudioParameter*> (param))
                 procToRemove->getVTS().removeParameterListener (paramCast->paramID, &chain);
         }
-
-        chain.listeners.call (&ProcessorChain::Listener::processorRemoved, procToRemove);
 
         SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
         chain.procs.removeObject (procToRemove, false);

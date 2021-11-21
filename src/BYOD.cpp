@@ -11,7 +11,6 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procs (procStore, vts, presetManager)
 {
     presetManager = std::make_unique<PresetManager> (&procs, vts);
-    // setUsePresetManagerForPluginInterface (false);
 }
 
 void BYOD::addParameters (Parameters& params)

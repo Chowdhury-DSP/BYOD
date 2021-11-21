@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DryWetProcessor.h"
-#include "juce_core/system/juce_PlatformDefs.h"
 
 class ChainIOProcessor
 {

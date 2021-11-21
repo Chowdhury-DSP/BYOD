@@ -89,16 +89,14 @@ void BoardComponent::paint (Graphics& g)
     for (auto* cable : cables)
     {
         auto* startEditor = findEditorForProcessor (cable->startProc);
-        if (startEditor == nullptr)
-            continue;
+        jassert (startEditor != nullptr);
 
         auto startPortLocation = getPortLocation (startEditor, cable->startIdx, false);
 
         if (cable->endProc != nullptr)
         {
             auto* endEditor = findEditorForProcessor (cable->endProc);
-            if (endEditor == nullptr)
-                continue;
+            jassert (endEditor != nullptr);
 
             auto endPortLocation = getPortLocation (endEditor, cable->endIdx, true);
 
@@ -155,7 +153,10 @@ void BoardComponent::resized()
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
     if (! procChain.getProcessors().contains (newProc))
+    {
+        jassertfalse; // being asked to add a processor that is no longer in the chain?
         return;
+    }
 
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
     addAndMakeVisible (newEditor);
@@ -168,7 +169,7 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     repaint();
 }
 
-void BoardComponent::processorPrepareToRemove (const BaseProcessor* proc)
+void BoardComponent::processorRemoved (const BaseProcessor* proc)
 {
     for (int i = cables.size() - 1; i >= 0; --i)
     {
@@ -177,13 +178,10 @@ void BoardComponent::processorPrepareToRemove (const BaseProcessor* proc)
     }
 
     if (auto* editor = findEditorForProcessor (proc))
+    {
         editor->removePortListener (this);
-}
-
-void BoardComponent::processorRemoved (const BaseProcessor* proc)
-{
-    if (auto* editor = findEditorForProcessor (proc))
         processorEditors.removeObject (editor);
+    }
 
     repaint();
 }

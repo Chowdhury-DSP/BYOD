@@ -4,6 +4,8 @@
 ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChain) : chain (thisChain),
                                                                                      um (chain.um)
 {
+    chain.procStore.addProcessorCallback = [=] (auto newProc) { addProcessor (std::move (newProc)); };
+    chain.procStore.replaceProcessorCallback = [=] (auto newProc, auto procToReplace) { replaceProcessor (std::move (newProc), procToReplace); };
 }
 
 void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)
