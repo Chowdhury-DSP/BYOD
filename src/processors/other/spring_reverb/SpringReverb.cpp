@@ -2,8 +2,8 @@
 
 namespace
 {
-constexpr float smallShakeSeconds = 0.004f;
-constexpr float largeShakeSeconds = 0.008f;
+constexpr float smallShakeSeconds = 0.0005f;
+constexpr float largeShakeSeconds = 0.001f;
 } // namespace
 
 void SpringReverb::prepare (double sampleRate, int samplesPerBlock)
@@ -30,7 +30,8 @@ void SpringReverb::prepare (double sampleRate, int samplesPerBlock)
     z[1] = 0.0f;
 
     shakeCounter = -1;
-    shakeBuffer.setSize (1, int (fs * largeShakeSeconds) + maxBlockSize);
+    shakeBuffer.setSize (1, int (fs * largeShakeSeconds * 3.0f) + maxBlockSize);
+    shortShakeBuffer.setSize (1, (int) spec.maximumBlockSize);
 }
 
 void SpringReverb::setParams (const Params& params, int numSamples)
@@ -43,8 +44,8 @@ void SpringReverb::setParams (const Params& params, int numSamples)
     if (params.shake && shakeCounter < 0) // start shaking
     {
         float shakeAmount = rand.nextFloat();
-        // float shakeSeconds = smallShakeSeconds * std::pow (largeShakeSeconds / smallShakeSeconds, shakeAmount);
         float shakeSeconds = smallShakeSeconds + (largeShakeSeconds - smallShakeSeconds) * shakeAmount;
+        shakeSeconds *= 1.0f + 0.5f * params.size;
         shakeCounter = int (fs * shakeSeconds);
 
         shakeBuffer.setSize (1, shakeCounter + maxBlockSize, false, false, true);
@@ -91,13 +92,14 @@ void SpringReverb::processBlock (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
+    shortShakeBuffer.clear();
+    const auto* shakePtr = shortShakeBuffer.getReadPointer (0);
+
     // add shakeBuffer
     if (shakeCounter > 0)
     {
         int startSample = shakeBuffer.getNumSamples() - shakeCounter - maxBlockSize;
-        for (int ch = 0; ch < numChannels; ++ch)
-            buffer.addFrom (ch, 0, shakeBuffer, 0, startSample, numSamples);
-
+        shortShakeBuffer.copyFrom (0, 0, shakeBuffer, 0, startSample, numSamples);
         shakeCounter = jmax (shakeCounter - numSamples, 0);
     }
 
@@ -108,10 +110,10 @@ void SpringReverb::processBlock (AudioBuffer<float>& buffer)
     //   [2-3]: equivalents for right channel, or zeros
     float simdReg alignas (16)[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    auto doSpringInput = [=] (int ch, float input) -> float
+    auto doSpringInput = [=, &shakePtr] (int ch, float input, int n) -> float
     {
         auto output = std::tanh (input - feedbackGain * delay.popSample (ch));
-        return dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, output);
+        return dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, output) + shakePtr[n];
     };
 
     auto doAPFProcess = [&]()
@@ -139,7 +141,7 @@ void SpringReverb::processBlock (AudioBuffer<float>& buffer)
         auto* x = buffer.getWritePointer (0);
         for (int n = 0; n < numSamples; ++n)
         {
-            simdReg[0] = doSpringInput (0, x[n]);
+            simdReg[0] = doSpringInput (0, x[n], n);
             doAPFProcess();
             doSpringOutput (0);
 
@@ -158,8 +160,8 @@ void SpringReverb::processBlock (AudioBuffer<float>& buffer)
         auto* x_R = buffer.getWritePointer (1);
         for (int n = 0; n < numSamples; ++n)
         {
-            simdReg[0] = doSpringInput (0, x_L[n]);
-            simdReg[2] = doSpringInput (1, x_R[n]);
+            simdReg[0] = doSpringInput (0, x_L[n], n);
+            simdReg[2] = doSpringInput (1, x_R[n], n);
 
             doAPFProcess();
 

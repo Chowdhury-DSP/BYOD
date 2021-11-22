@@ -47,6 +47,7 @@ private:
 
     int shakeCounter = -1;
     AudioBuffer<float> shakeBuffer;
+    AudioBuffer<float> shortShakeBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpringReverb)
 };
