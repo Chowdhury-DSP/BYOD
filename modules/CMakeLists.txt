@@ -5,9 +5,7 @@ message(STATUS "VERSION for JUCE: ${juce_version}")
 
 # add custom JUCE modules
 juce_add_modules(foleys_gui_magic)
-juce_add_modules(chowdsp_utils/modules/chowdsp_dsp)
-juce_add_modules(chowdsp_utils/modules/chowdsp_gui)
-juce_add_modules(chowdsp_utils/modules/chowdsp_plugin_utils)
+add_subdirectory(chowdsp_utils)
 juce_add_modules(chowdsp_juce_dsp)
 
 # add RTNeural
