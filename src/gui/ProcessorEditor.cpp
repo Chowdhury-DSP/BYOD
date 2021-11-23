@@ -1,6 +1,7 @@
 #include "ProcessorEditor.h"
 #include "BoardComponent.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
+#include "utils/LookAndFeels.h"
 
 namespace
 {
@@ -49,6 +50,8 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
 
     if (procUI.lnf != nullptr)
         setLookAndFeel (procUI.lnf);
+    else
+        setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
 
     for (int i = 0; i < baseProc.getNumInputs(); ++i)
     {

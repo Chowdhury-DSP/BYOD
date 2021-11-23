@@ -17,7 +17,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
 
         newSlide->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         newSlide->setName (param->name);
-        newSlide->setTextBoxStyle (Slider::TextBoxBelow, false, 66, 16);
+        newSlide->setTextBoxStyle (Slider::TextBoxBelow, false, 80, 20);
         newSlide->setColour (Slider::textBoxOutlineColourId, contrastColour);
         newSlide->setColour (Slider::textBoxTextColourId, contrastColour);
         newSlide->setColour (Slider::thumbColourId, accentColour);
@@ -116,7 +116,12 @@ void KnobsComponent::paint (Graphics& g)
     const auto nameOffset = proportionOfHeight (0.157f);
     auto makeName = [&g, nameHeight, nameOffset] (Component& comp, String name, int offset = 0)
     {
-        g.setFont (Font ((float) nameHeight - 2.0f).boldened());
+        auto font = Font ((float) nameHeight - 2.0f).boldened();
+        const auto textWidth = comp.proportionOfWidth (0.8f);
+        while (font.getStringWidth (name) > textWidth)
+            font = Font (font.getHeight() - 0.5f).boldened();
+
+        g.setFont (font);
         Rectangle<int> nameBox (comp.getX(), comp.getY() - nameOffset + offset, comp.getWidth(), nameHeight);
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
@@ -212,7 +217,7 @@ void KnobsComponent::resized()
         for (auto* s : sliders)
         {
             s->setBounds (bounds[compIdx++]);
-            s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 15, 16);
+            s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 15, 18);
         }
 
         const auto yDim = proportionOfHeight (0.214f);
@@ -251,7 +256,7 @@ void KnobsComponent::resized()
         for (auto* s : sliders)
         {
             s->setBounds (bounds[compIdx++]);
-            s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 10, 16);
+            s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 10, 18);
         }
 
         for (auto* b : boxes)
@@ -271,7 +276,7 @@ void KnobsComponent::resized()
         for (auto* s : sliders)
         {
             s->setSliderStyle (Slider::SliderStyle::LinearVertical);
-            s->setTextBoxStyle (Slider::TextBoxBelow, false, width - 2, 14);
+            s->setTextBoxStyle (Slider::TextBoxBelow, false, width - 2, 16);
             auto bounds = Rectangle { x + 2, yPad, width - 4, getHeight() - yPad };
             x += width;
 

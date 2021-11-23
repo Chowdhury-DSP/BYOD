@@ -10,6 +10,7 @@ target_sources(BYOD PRIVATE
     gui/InfoComponent.cpp
     gui/KnobsComponent.cpp
     gui/ProcessorEditor.cpp
+    gui/utils/LookAndFeels.cpp
 
     presets/PresetManager.cpp
 
@@ -61,4 +62,3 @@ target_sources(BYOD PRIVATE
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)
-    
