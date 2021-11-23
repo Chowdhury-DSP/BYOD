@@ -85,10 +85,14 @@ void BaseProcessor::setPosition (Point<int> pos, Rectangle<int> parentBounds)
     if (parentBounds.getWidth() <= 0 || parentBounds.getHeight() <= 0)
         return; // out of bounds!
 
-    if (pos.x <= 0 || pos.y <= 0)
+    if (pos.x <= -50 || pos.y <= -50)
         return; // out of bounds!
 
     editorPosition = pos.toFloat() / Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() };
+
+    // limit so we can't go off-screen!
+    editorPosition.x = jlimit (0.0f, 0.9f, editorPosition.x);
+    editorPosition.y = jlimit (0.0f, 0.9f, editorPosition.y);
 }
 
 Point<int> BaseProcessor::getPosition (Rectangle<int> parentBounds)
