@@ -5,7 +5,7 @@ class ProcChainActions
 public:
     static BaseProcessor* addProcessor (ProcessorChain& chain, BaseProcessor::Ptr newProc)
     {
-        DBG (String ("Creating processor: ") + newProc->getName());
+        Logger::writeToLog (String ("Creating processor: ") + newProc->getName());
 
         auto osFactor = chain.ioProcessor.getOversamplingFactor();
         newProc->prepare (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
@@ -26,7 +26,7 @@ public:
 
     static void removeProcessor (ProcessorChain& chain, BaseProcessor* procToRemove)
     {
-        DBG (String ("Removing processor: ") + procToRemove->getName());
+        Logger::writeToLog (String ("Removing processor: ") + procToRemove->getName());
 
         chain.listeners.call (&ProcessorChain::Listener::processorRemoved, procToRemove);
 

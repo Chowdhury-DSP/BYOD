@@ -6,7 +6,14 @@
 #include "presets/PresetManager.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
 
+namespace
+{
+const String logFileSubDir = "ChowdhuryDSP/BYOD/Logs";
+const String logFileNameRoot = "BYOD_Log_";
+} // namespace
+
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
+               logger (logFileSubDir, logFileNameRoot),
                procStore (&undoManager),
                procs (procStore, vts, presetManager)
 {

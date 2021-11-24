@@ -23,6 +23,8 @@ public:
     AudioProcessLoadMeasurer& getLoadMeasurer() { return loadMeasurer; }
 
 private:
+    chowdsp::PluginLogger logger;
+
     ProcessorStore procStore;
     ProcessorChain procs;
 
