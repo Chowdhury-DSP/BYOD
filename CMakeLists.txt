@@ -31,7 +31,10 @@ juce_add_plugin(BYOD
     PLUGIN_CODE Dqu0
     FORMATS ${JUCE_FORMATS}
     ProductName "BYOD"
+    ICON_BIG res/logo.png
+
     LV2_URI https://github.com/Chowdhury-DSP/BYOD
+
     MICROPHONE_PERMISSION_ENABLED TRUE
     NEEDS_STORE_KIT TRUE
     REQUIRES_FULL_SCREEN TRUE
