@@ -8,24 +8,30 @@ AppName="{#MyAppName} {#MyAppVersion}"
 AppVersion={#MyAppVersion}
 AppVerName={#MyAppName}
 AppPublisher={#MyAppPublisher}
-AppPublisherURL={#MyAppURL} AppSupportURL = { #MyAppURL } AppUpdatesURL = { #MyAppURL } DefaultDirName = { commonpf64 }\Chowdhury DSP\
-DefaultGroupName = { #MyAppName } DisableProgramGroupPage = yes
-    DisableDirPage = yes
-        DisableWelcomePage = no
-            LicenseFile =../../ LICENSE OutputBaseFilename = "{#MyAppName}-Win-{#MyAppVersion}" OutputDir =.SetupIconFile = byod.ico
-                                                                                                                                UninstallDisplayIcon = byod.ico
-                                                                                                                                                           UninstallFilesDir = { commonpf64 }\Chowdhury DSP\ { #MyAppName } Compression = lzma
-                SolidCompression = yes
+AppPublisherURL={#MyAppURL}
+AppSupportURL={#MyAppURL}
+AppUpdatesURL={#MyAppURL}
+DefaultDirName={commonpf64}\Chowdhury DSP\
+DefaultGroupName={#MyAppName}
+DisableProgramGroupPage=yes
+DisableDirPage=yes
+DisableWelcomePage=no
+LicenseFile=../../LICENSE
+OutputBaseFilename="{#MyAppName}-Win-{#MyAppVersion}"
+OutputDir=.
+SetupIconFile=byod.ico
+UninstallDisplayIcon=byod.ico
+UninstallFilesDir={commonpf64}\Chowdhury DSP\{#MyAppName}
+Compression=lzma
+SolidCompression=yes
 
-                    [Types] Name : "full";
-Description : "Full installation" Name : "custom";
-Description : "Custom installation";
-Flags : iscustom
+[Types]
+Name: "full"; Description: "Full installation"
+Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
-            [Components] Name : "VST3_64";
-Description : "VST3 Plugin 64-bit";
-Types : full
-            Name: "VST_64"; Description: "VST Plugin 64-bit"; Types: full
+[Components]
+Name: "VST3_64"; Description: "VST3 Plugin 64-bit"; Types: full
+Name: "VST_64"; Description: "VST Plugin 64-bit"; Types: full
 Name: "VST3_32"; Description: "VST3 Plugin 32-bit"; Types: full
 Name: "VST_32"; Description: "VST Plugin 32-bit"; Types: full
 ; Name: "AAX"; Description: "AAX Plugin"; Types: full
