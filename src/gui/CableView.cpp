@@ -22,7 +22,7 @@ ConnectionInfo cableToConnection (const Cable& cable)
     return { cable.startProc, cable.startIdx, cable.endProc, cable.endIdx };
 }
 
-void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
+void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent* board)
 {
     for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
     {
@@ -31,6 +31,9 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc)
         {
             const auto& connection = proc->getOutputConnection (portIdx, cIdx);
             cables.add (connectionToCable (connection));
+
+            if (auto* editor = board->findEditorForProcessor (connection.endProc))
+                editor->setConnectionStatus (true, connection.endPort);
         }
     }
 }
@@ -43,10 +46,9 @@ CableView::CableView (const BoardComponent* comp) : board (comp)
 
 void CableView::paint (Graphics& g)
 {
-    const Colour baseColour = Colour (0xFFD0592C);
-    const float cableThickness = 5.0f;
+    using namespace CableConstants;
 
-    g.setColour (baseColour.brighter (0.1f));
+    g.setColour (cableColour.brighter (0.1f));
     for (auto* cable : cables)
     {
         auto* startEditor = board->findEditorForProcessor (cable->startProc);
@@ -71,7 +73,7 @@ void CableView::paint (Graphics& g)
             if (editor != nullptr)
             {
                 Graphics::ScopedSaveState graphicsState (g);
-                g.setColour (baseColour.darker (0.1f));
+                g.setColour (cableColour.darker (0.1f));
                 g.setOpacity (0.5f);
 
                 auto endPortLocation = getPortLocation (editor, portIdx, true);
@@ -187,7 +189,7 @@ std::pair<ProcessorEditor*, int> CableView::getNearestInputPort (const Point<int
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)
 {
-    addConnectionsForProcessor (cables, newProc);
+    addConnectionsForProcessor (cables, newProc, board);
 }
 
 void CableView::processorBeingRemoved (const BaseProcessor* proc)
@@ -204,15 +206,18 @@ void CableView::refreshConnections()
     cables.clear();
 
     for (auto* proc : board->procChain.getProcessors())
-        addConnectionsForProcessor (cables, proc);
+        addConnectionsForProcessor (cables, proc, board);
 
-    addConnectionsForProcessor (cables, &board->procChain.getInputProcessor());
+    addConnectionsForProcessor (cables, &board->procChain.getInputProcessor(), board);
 
     repaint();
 }
 
 void CableView::connectionAdded (const ConnectionInfo& info)
 {
+    if (auto* editor = board->findEditorForProcessor (info.endProc))
+        editor->setConnectionStatus (true, info.endPort);
+
     if (ignoreConnectionCallbacks)
         return;
 
@@ -223,6 +228,9 @@ void CableView::connectionAdded (const ConnectionInfo& info)
 
 void CableView::connectionRemoved (const ConnectionInfo& info)
 {
+    if (auto* editor = board->findEditorForProcessor (info.endProc))
+        editor->setConnectionStatus (false, info.endPort);
+
     if (ignoreConnectionCallbacks)
         return;
 

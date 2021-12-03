@@ -3,6 +3,12 @@
 #include "Cable.h"
 #include "ProcessorEditor.h"
 
+namespace CableConstants
+{
+const Colour cableColour (0xFFD0592C);
+constexpr float cableThickness = 5.0f;
+} // namespace CableConstants
+
 class BoardComponent;
 class CableView : public Component,
                   public ProcessorEditor::PortListener,

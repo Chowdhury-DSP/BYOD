@@ -35,6 +35,8 @@ public:
     void releaseCable (const MouseEvent& e) override;
     void destroyCable (Port* origin) override;
 
+    void setConnectionStatus (bool isConnected, int portIndex) { inputPorts[portIndex]->setConnectionStatus (isConnected); }
+
     Point<int> getPortLocation (int portIndex, bool isInput) const;
 
 private:
