@@ -20,7 +20,7 @@ class ProcessorEditor : public Component,
     // clang-format on
 public:
     ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs, Component* parent);
-    ~ProcessorEditor();
+    ~ProcessorEditor() override;
 
     void paint (Graphics& g) override;
     void resized() override;

@@ -1,19 +1,17 @@
 #pragma once
 
-#include "Cable.h"
+#include "CableView.h"
 #include "InfoComponent.h"
 #include "ProcessorEditor.h"
 #include "utils/LookAndFeels.h"
 
-class BoardComponent : public Component,
-                       private ProcessorChain::Listener,
-                       private ProcessorEditor::PortListener
+class BoardComponent final : public Component,
+                             private ProcessorChain::Listener
 {
 public:
-    BoardComponent (ProcessorChain& procs);
-    ~BoardComponent();
+    explicit BoardComponent (ProcessorChain& procs);
+    ~BoardComponent() override;
 
-    void paint (Graphics& g) override;
     void resized() override;
     void setScaleFactor (float newScaleFactor);
 
@@ -21,23 +19,14 @@ public:
 
     void processorAdded (BaseProcessor* newProc) override;
     void processorRemoved (const BaseProcessor* proc) override;
-    void refreshConnections() override;
-    void connectionAdded (const ConnectionInfo& info) override;
-    void connectionRemoved (const ConnectionInfo& info) override;
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
-
-    void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e) override;
-    void refreshCable (const MouseEvent& e) override;
-    void releaseCable (const MouseEvent& e) override;
-    void destroyCable (ProcessorEditor* origin, int portIndex) override;
 
     static constexpr auto yOffset = 35;
 
 private:
     void showNewProcMenu() const;
-    std::pair<ProcessorEditor*, int> getNearestInputPort (const Point<int>& pos) const;
     void setEditorPosition (ProcessorEditor* editor);
 
     ProcessorChain& procChain;
@@ -49,9 +38,8 @@ private:
     std::unique_ptr<ProcessorEditor> inputEditor;
     std::unique_ptr<ProcessorEditor> outputEditor;
 
-    OwnedArray<Cable> cables;
-    std::unique_ptr<MouseEvent> cableMouse;
-    bool ignoreConnectionCallbacks = false;
+    friend class CableView;
+    CableView cableView;
 
     float scaleFactor = 1.0f;
 
