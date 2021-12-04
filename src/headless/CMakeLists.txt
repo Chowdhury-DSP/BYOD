@@ -18,6 +18,7 @@ target_sources(BYOD_headless PRIVATE
     tests/PreBufferTest.cpp
     tests/UndoRedoTest.cpp
     tests/UnitTests.cpp
+    tests/WaveshaperTest.cpp
 )
 
 target_precompile_headers(BYOD_headless PRIVATE ../pch.h)

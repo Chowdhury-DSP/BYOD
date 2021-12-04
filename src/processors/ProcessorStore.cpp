@@ -9,6 +9,7 @@
 #include "drive/mxr_distortion/MXRDistortion.h"
 #include "drive/tube_amp/TubeAmp.h"
 #include "drive/tube_screamer/TubeScreamer.h"
+#include "drive/waveshaper/Waveshaper.h"
 #include "drive/zen_drive/ZenDrive.h"
 
 #include "other/Chorus.h"
@@ -48,6 +49,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "MXR Distortion", &processorFactory<MXRDistortion> },
     { "RONN", &processorFactory<RONN> },
     { "Tube Screamer", &processorFactory<TubeScreamer> },
+    { "Waveshaper", &processorFactory<Waveshaper> },
     { "Zen Drive", &processorFactory<ZenDrive> },
 
     { "Bass Cleaner", &processorFactory<BassCleaner> },
