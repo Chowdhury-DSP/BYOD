@@ -29,7 +29,8 @@ UnitTests::UnitTests()
     this->argumentDescription = "--unit-tests [--seed=RANDOM_SEED --all] TEST1 TEST2 ...";
     this->shortDescription = "Runs unit tests for ChowTapeModel";
     this->longDescription = "";
-    this->command = std::bind (&UnitTests::runUnitTests, this, std::placeholders::_1);
+    this->command = [=] (const ArgumentList& args)
+    { runUnitTests (args); };
 }
 
 void UnitTests::runUnitTests (const ArgumentList& args)
