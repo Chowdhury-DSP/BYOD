@@ -5,7 +5,7 @@
 class ProcessorChainActionHelper
 {
 public:
-    ProcessorChainActionHelper (ProcessorChain& thisChain);
+    explicit ProcessorChainActionHelper (ProcessorChain& thisChain);
 
     void addProcessor (BaseProcessor::Ptr newProc);
     void removeProcessor (BaseProcessor* procToRemove);
