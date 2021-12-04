@@ -7,13 +7,13 @@ class ProcessorStore
     using StoreMap = std::map<String, std::function<BaseProcessor::Ptr (UndoManager*)>>;
 
 public:
-    ProcessorStore (UndoManager* um = nullptr);
+    explicit ProcessorStore (UndoManager* um = nullptr);
 
     BaseProcessor::Ptr createProcByName (const String& name);
     void createProcList (PopupMenu& menu, int& menuID, ProcessorType type);
     void createProcReplaceList (PopupMenu& menu, int& menuID, ProcessorType type, BaseProcessor* procToReplace);
 
-    StoreMap& getStoreMap() { return store; }
+    static StoreMap& getStoreMap() { return store; }
 
     std::function<void (BaseProcessor::Ptr)> addProcessorCallback = nullptr;
     std::function<void (BaseProcessor::Ptr, BaseProcessor*)> replaceProcessorCallback = nullptr;

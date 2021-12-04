@@ -5,7 +5,7 @@
 class ProcessorChainStateHelper : private AsyncUpdater
 {
 public:
-    ProcessorChainStateHelper (ProcessorChain& thisChain);
+    explicit ProcessorChainStateHelper (ProcessorChain& thisChain);
 
     void handleAsyncUpdate() override;
 
