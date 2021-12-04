@@ -7,8 +7,10 @@ target_sources(BYOD PRIVATE
 
     gui/BoardComponent.cpp
     gui/BoardViewport.cpp
+    gui/CableView.cpp
     gui/InfoComponent.cpp
     gui/KnobsComponent.cpp
+    gui/Port.cpp
     gui/ProcessorEditor.cpp
     gui/utils/LookAndFeels.cpp
 

@@ -186,7 +186,7 @@ void ProcessorEditor::mouseDrag (const MouseEvent& e)
         auto parentBounds = parent->getBounds();
         proc.setPosition (relE.getPosition() - mouseDownOffset, parentBounds);
         setTopLeftPosition (proc.getPosition (parentBounds));
-        getParentComponent()->repaint();
+        parent->repaint();
     }
     else
     {

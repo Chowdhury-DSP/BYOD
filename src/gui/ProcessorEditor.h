@@ -20,7 +20,7 @@ class ProcessorEditor : public Component,
     // clang-format on
 public:
     ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs, Component* parent);
-    ~ProcessorEditor();
+    ~ProcessorEditor() override;
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -34,6 +34,8 @@ public:
     void refreshCable (const MouseEvent& e) override;
     void releaseCable (const MouseEvent& e) override;
     void destroyCable (Port* origin) override;
+
+    void setConnectionStatus (bool isConnected, int portIndex) { inputPorts[portIndex]->setConnectionStatus (isConnected); }
 
     Point<int> getPortLocation (int portIndex, bool isInput) const;
 
