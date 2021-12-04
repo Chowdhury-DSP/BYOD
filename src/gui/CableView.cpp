@@ -197,7 +197,12 @@ void CableView::processorBeingRemoved (const BaseProcessor* proc)
     for (int i = cables.size() - 1; i >= 0; --i)
     {
         if (cables[i]->startProc == proc || cables[i]->endProc == proc)
+        {
+            if (auto* editor = board->findEditorForProcessor (cables[i]->endProc))
+                editor->setConnectionStatus (false, cables[i]->endIdx);
+
             cables.remove (i);
+        }
     }
 }
 
