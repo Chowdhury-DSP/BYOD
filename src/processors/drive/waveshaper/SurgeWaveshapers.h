@@ -93,7 +93,7 @@ extern StringArray wst_names;
 
 constexpr int n_waveshaper_registers = 4;
 
-struct alignas (16) QuadFilterWaveshaperState
+struct QuadFilterWaveshaperState
 {
     Vec4 R[n_waveshaper_registers];
     dsp::SIMDRegister<uint32_t> init;
