@@ -52,6 +52,7 @@ target_sources(BYOD PRIVATE
 
     processors/tone/AmpIRs.cpp
     processors/tone/BassCleaner.cpp
+    processors/tone/GraphicEQ.cpp
     processors/tone/HighCut.cpp
     processors/tone/LofiIrs.cpp
     processors/tone/StateVariableFilter.cpp
