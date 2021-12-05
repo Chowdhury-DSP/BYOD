@@ -88,10 +88,8 @@ Vec4 DIGI_SSE2 (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 
 Vec4 TANH (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 {
-    auto x = Vec4::max (Vec4::min ((in * drive), Vec4 (3.1f)), Vec4 (-3.1f));
-
-    return x;
-    //    return tanSIMD (x);
+    auto x = in * drive;
+    return tanhSIMD (x);
 }
 
 float Digi (const float x)

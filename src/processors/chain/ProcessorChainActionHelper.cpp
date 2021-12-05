@@ -55,6 +55,10 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
 
     um->beginNewTransaction();
 
+    newProc->setPosition (*procToReplace);
+    um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
+    auto* procJustAdded = chain.procs.getLast();
+
     auto swapConnections = [&] (BaseProcessor* proc)
     {
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
@@ -66,7 +70,7 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
                 if (connection.endProc == procToReplace)
                 {
                     auto newConnection = connection;
-                    newConnection.endProc = newProc.get();
+                    newConnection.endProc = procJustAdded;
 
                     um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
                     um->perform (new AddOrRemoveConnection (chain, std::move (newConnection)));
@@ -94,16 +98,13 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
         {
             auto connection = procToReplace->getOutputConnection (portIdx, cIdx);
             auto newConnection = connection;
-            newConnection.startProc = newProc.get();
+            newConnection.startProc = procJustAdded;
 
             um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
             um->perform (new AddOrRemoveConnection (chain, std::move (newConnection)));
         }
     }
 
-    newProc->setPosition (*procToReplace);
-
-    um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
     um->perform (new AddOrRemoveProcessor (chain, procToReplace));
 }
 

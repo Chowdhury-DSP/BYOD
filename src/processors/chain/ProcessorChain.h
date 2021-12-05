@@ -23,7 +23,7 @@ class ProcessorChain : private AudioProcessorValueTreeState::Listener
     // clang-format on
 public:
     ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts, std::unique_ptr<chowdsp::PresetManager>& presetMgr);
-    ~ProcessorChain();
+    ~ProcessorChain() override;
 
     static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);

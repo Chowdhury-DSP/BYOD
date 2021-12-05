@@ -180,6 +180,9 @@ void KnobsComponent::resized()
         for (auto* b : buttons)
             b->setBounds (x + (compIdx++) * compWidth, yPad + (compHeight - yDim) / 2, compWidth - 5, yDim);
 
+        for (auto* c : customComponents)
+            c->setBounds (x + (compIdx++) * compWidth, yPad + (compHeight - yDim) / 2, compWidth - 5, yDim);
+
         return;
     }
 
