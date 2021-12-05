@@ -24,6 +24,7 @@
 #include "tone/StateVariableFilter.h"
 #include "tone/TrebleBooster.h"
 #include "tone/bassman/BassmanTone.h"
+#include "tone/baxandall/BaxandallEQ.h"
 
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
@@ -53,6 +54,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
 
     { "Bass Cleaner", &processorFactory<BassCleaner> },
     { "Bassman Tone", &processorFactory<BassmanTone> },
+    { "Baxandall EQ", &processorFactory<BaxandallEQ> },
     { "High Cut", &processorFactory<HighCut> },
     { "Amp IRs", &processorFactory<AmpIRs> },
     { "LoFi IRs", &processorFactory<LofiIrs> },

@@ -5,7 +5,7 @@
 class StateVariableFilter : public BaseProcessor
 {
 public:
-    StateVariableFilter (UndoManager* um = nullptr);
+    explicit StateVariableFilter (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Tone; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
