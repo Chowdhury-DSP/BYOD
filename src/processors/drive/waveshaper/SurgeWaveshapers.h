@@ -17,6 +17,14 @@
 
 #include <pch.h>
 
+/**
+ * This code contains a bunch of waveshaper code that was borrowed from the Surge Synthesizer waveshaper effect.
+ * Majority of the waveshapers here were written by Paul (@baconpaul), and are borrowed with his permission.
+ *
+ * wst_soft, wst_hard, wst_asym, wst_digital, and wst_sine have been completely re-written, so there's no issue there.
+ *
+ * @TODO: contact developer for wst_ojd...
+ */
 namespace SurgeWaveshapers
 {
 using Vec4 = dsp::SIMDRegister<float>;

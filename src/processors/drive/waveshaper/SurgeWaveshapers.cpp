@@ -88,27 +88,37 @@ Vec4 DIGI_SSE2 (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 
 Vec4 TANH (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 {
-    // Closer to ideal than TANH0
-    // y = x * ( 27 + x * x ) / ( 27 + 9 * x * x );
-    // y = clip(y)
-    const Vec4 m9 = Vec4 (9.f);
-    const Vec4 m27 = Vec4 (27.f);
+    auto x = Vec4::max (Vec4::min ((in * drive), Vec4 (3.1f)), Vec4 (-3.1f));
 
-    Vec4 x = in * drive;
-    Vec4 xx = x * x;
-    Vec4 denom = m27 + (m9 * xx);
-    Vec4 y = x * (m27 + xx);
-    y = y * (Vec4 (1.0f) / denom);
+    return x;
+    //    return tanSIMD (x);
+}
 
-    const Vec4 y_min = Vec4 (-1.0f);
-    const Vec4 y_max = Vec4 (1.0f);
-    return Vec4::max (Vec4::min (y, y_max), y_min);
+float Digi (const float x)
+{
+    constexpr int shift = 19;
+
+    int32_t i = *(int32_t*) &x;
+    i = i >> shift;
+    i = i << shift;
+
+    auto y = *(float*) &i;
+    return y;
 }
 
 float Sinus (const float x) { return std::sin (x * (float) M_PI); }
 
-float shafted_tanh (float x) { return (std::exp (x) - std::exp (-x * 1.2f)) / (std::exp (x) + std::exp (-x)); }
-float Asym (const float x) { return shafted_tanh (x + 0.5f) - shafted_tanh (0.5f); }
+inline Vec4 Asym (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
+{
+    const auto tanh0p5 = Vec4 (0.46211715726f); // tanh(0.5)
+
+    auto x = in * drive + Vec4 (0.5f);
+    auto isPos = Vec4::greaterThanOrEqual (x, Vec4 (0.0f));
+    auto pos = tanhSIMD (x);
+    auto neg = chowdsp::Polynomials::horner<3> ({ Vec4 (0.07f), Vec4 (0.0054f), Vec4 (1.0f), Vec4 (0.0f) }, x);
+
+    return ((pos & isPos) + (neg & (~isPos))) - tanh0p5;
+}
 
 template <int R1, int R2>
 inline Vec4 dcBlock (QuadFilterWaveshaperState* __restrict s, Vec4 x)
@@ -683,11 +693,12 @@ WaveshaperQFPtr GetQFPtrWaveshaper (int type)
         case wst_hard:
             return CLIP;
         case wst_asym:
-            return TableEval<Asym, 2048, CLIP, false>;
+            return Asym;
         case wst_sine:
             return TableEval<Sinus, 1024, CLIP, false>;
         case wst_digital:
-            return DIGI_SSE2;
+            return TableEval<Digi, 2048, CLIP, false>;
+            //            return DIGI_SSE2;
         case wst_cheby2:
             return CHEBY_CORE<cheb2_kernel, true>;
         case wst_cheby3:

@@ -22,6 +22,7 @@ private:
     SurgeWaveshapers::QuadFilterWaveshaperState wss;
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> driveSmooth;
+    dsp::Gain<float> inverseGain;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Waveshaper)
 };

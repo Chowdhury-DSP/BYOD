@@ -24,17 +24,20 @@ AudioProcessorValueTreeState::ParameterLayout Waveshaper::createParameterLayout(
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createGainDBParameter (params, "drive", "Drive", -24.0f, 24.0f, 0.0f);
+    createGainDBParameter (params, "drive", "Drive", -6.0f, 36.0f, 0.0f);
 
     params.push_back (std::make_unique<AudioParameterChoice> ("shape", "Shape", wst_names, wst_ojd));
 
     return { params.begin(), params.end() };
 }
 
-void Waveshaper::prepare (double sampleRate, int /*samplesPerBlock*/)
+void Waveshaper::prepare (double sampleRate, int samplesPerBlock)
 {
     driveSmooth.reset (sampleRate, 0.05);
     driveSmooth.setCurrentAndTargetValue (Decibels::decibelsToGain (driveParam->load()));
+
+    inverseGain.prepare ({ sampleRate, (uint32) samplesPerBlock, 2 });
+    inverseGain.setRampDurationSeconds (0.05);
 }
 
 void Waveshaper::processAudio (AudioBuffer<float>& buffer)
@@ -42,7 +45,10 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    driveSmooth.setTargetValue (Decibels::decibelsToGain (driveParam->load()));
+    auto driveGain = Decibels::decibelsToGain (driveParam->load());
+    driveSmooth.setTargetValue (driveGain);
+    //    inverseGain.setGainLinear (1.0f / std::sqrt (driveGain));
+    inverseGain.setGainLinear (1.0f / driveGain);
 
     if ((int) *shapeParam != lastShape)
     {
@@ -100,4 +106,8 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
             }
         }
     }
+
+    auto block = dsp::AudioBlock<float> { buffer };
+    auto context = dsp::ProcessContextReplacing<float> { block };
+    inverseGain.process (context);
 }
