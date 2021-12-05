@@ -5,20 +5,13 @@ namespace
 {
 const StringArray freqLabels { "100", "220", "500", "1k", "2.2k", "5k" };
 
+/** Q to gain relationship for adaptive Q */
 float calcQ (float gainDB)
 {
     const auto gain = Decibels::decibelsToGain (gainDB);
 
-    // @TODO: use Estrin's scheme
-    return ((float) (1.270585387e-1
-                     - 6.555768189e-3 * gain
-                     + 2.66460649e-2 * gain * gain
-                     + 4.58428215e-4 * gain * gain * gain
-                     - 4.001063634e-4 * gain * gain * gain * gain
-                     - 7.001563368e-6 * gain * gain * gain * gain * gain
-                     + 2.681260813e-6 * gain * gain * gain * gain * gain * gain
-                     + 2.737518005e-8 * gain * gain * gain * gain * gain * gain * gain
-                     - 6.328079654e-9 * gain * gain * gain * gain * gain * gain * gain * gain));
+    constexpr float adaptiveQCoeffs[] = { -6.328079654e-9f, 2.737518005e-8f, 2.681260813e-6f, -7.001563368e-6f, -4.001063634e-4f, 4.58428215e-4f, 2.66460649e-2f, -6.555768189e-3f, 1.270585387e-1f };
+    return chowdsp::Polynomials::estrin<8> (adaptiveQCoeffs, gain);
 }
 } // namespace
 
@@ -27,8 +20,8 @@ GraphicEQ::GraphicEQ (UndoManager* um) : BaseProcessor ("Graphic EQ", createPara
     for (int i = 0; i < nBands; ++i)
         gainDBParams[i] = vts.getRawParameterValue ("gain_" + String (i));
 
-    uiOptions.backgroundColour = Colours::burlywood;
-    uiOptions.powerColour = Colours::coral;
+    uiOptions.backgroundColour = Colours::burlywood.brighter (0.1f);
+    uiOptions.powerColour = Colours::red.darker (0.1f);
     uiOptions.info.description = "A 5-band graphic EQ.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
