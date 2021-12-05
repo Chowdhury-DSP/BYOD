@@ -23,7 +23,7 @@
  *
  * wst_soft, wst_hard, wst_asym, wst_digital, and wst_sine have been completely re-written, so there's no issue there.
  *
- * Waiting to hear back from the original developer if we can use wst_ojd...
+ * wst_ojd was originally written by @JanosGit and is borrowed here with his permission.
  */
 namespace SurgeWaveshapers
 {
