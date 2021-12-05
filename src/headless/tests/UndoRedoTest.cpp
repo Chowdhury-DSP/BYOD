@@ -103,6 +103,8 @@ public:
         auto& actionHelper = chain.getActionHelper();
         auto connectionToRemove = startProc->getOutputConnection (startPortIndex, 0);
         actionHelper.removeConnection (std::move (connectionToRemove));
+
+        return true;
     }
 
     void runTest() override
