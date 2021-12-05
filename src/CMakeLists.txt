@@ -54,6 +54,7 @@ target_sources(BYOD PRIVATE
     processors/tone/BassCleaner.cpp
     processors/tone/HighCut.cpp
     processors/tone/LofiIrs.cpp
+    processors/tone/StateVariableFilter.cpp
     processors/tone/TrebleBooster.cpp
     processors/tone/bassman/BassmanTone.cpp
 

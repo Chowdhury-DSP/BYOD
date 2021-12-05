@@ -21,6 +21,7 @@
 #include "tone/BassCleaner.h"
 #include "tone/HighCut.h"
 #include "tone/LofiIrs.h"
+#include "tone/StateVariableFilter.h"
 #include "tone/TrebleBooster.h"
 #include "tone/bassman/BassmanTone.h"
 
@@ -55,6 +56,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "High Cut", &processorFactory<HighCut> },
     { "Amp IRs", &processorFactory<AmpIRs> },
     { "LoFi IRs", &processorFactory<LofiIrs> },
+    { "SVF", &processorFactory<StateVariableFilter> },
     { "Treble Booster", &processorFactory<TrebleBooster> },
 
     { "Clean Gain", &processorFactory<CleanGain> },
