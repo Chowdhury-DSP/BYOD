@@ -29,7 +29,7 @@ AudioProcessorValueTreeState::ParameterLayout Waveshaper::createParameterLayout(
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createGainDBParameter (params, "drive", "Drive", -6.0f, 36.0f, 0.0f);
+    createGainDBParameter (params, "drive", "Drive", -6.0f, 30.0f, 0.0f);
 
     params.push_back (std::make_unique<AudioParameterChoice> (shapeTag, "Shape", wst_names, wst_ojd));
 

@@ -104,7 +104,7 @@ float Digi (const float x)
     return y;
 }
 
-float Sinus (const float x) { return std::sin (x * (float) M_PI); }
+float Sinus (const float x) { return std::sin (x * MathConstants<float>::pi); }
 
 inline Vec4 Asym (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 {
@@ -114,6 +114,7 @@ inline Vec4 Asym (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
     auto isPos = Vec4::greaterThanOrEqual (x, Vec4 (0.0f));
     auto pos = tanhSIMD (x);
     auto neg = chowdsp::Polynomials::horner<3> ({ Vec4 (0.07f), Vec4 (0.0054f), Vec4 (1.0f), Vec4 (0.0f) }, x);
+    neg = Vec4::max (neg, Vec4 (-10.0f));
 
     return ((pos & isPos) + (neg & (~isPos))) - tanh0p5;
 }
@@ -225,27 +226,27 @@ float FuzzEdgeTable (const float x)
     return xadj;
 }
 
-float SinPlusX (const float x) { return x - std::sin (x * (float) M_PI); }
+float SinPlusX (const float x) { return x - std::sin (x * MathConstants<float>::pi); }
 
 template <int T>
 float SinNXPlusXBound (const float x)
 {
     auto z = 1 - fabs (x);
-    auto r = z * std::sin (x * (float) M_PI * (float) T);
+    auto r = z * std::sin (x * MathConstants<float>::pi * (float) T);
     return r + x;
 }
 
 template <int T>
 float SinNX (const float x)
 {
-    return std::sin (x * (float) M_PI * (float) T);
+    return std::sin (x * MathConstants<float>::pi * (float) T);
 }
 
 template <int T>
 float SinNXBound (const float x)
 {
     auto z = 1 - fabs (x);
-    auto r = z * std::sin (x * (float) M_PI * (float) T);
+    auto r = z * std::sin (x * MathConstants<float>::pi * (float) T);
     return r;
 }
 
@@ -776,20 +777,12 @@ WaveshaperQFPtr GetQFPtrWaveshaper (int type)
         case wst_softfold:
             return SoftOneFold;
     }
-    return 0;
+    return nullptr;
 }
 
-void initializeWaveshaperRegister (int type, float R[n_waveshaper_registers])
+void initializeWaveshaperRegister (int /*type*/, float R[n_waveshaper_registers])
 {
-    switch (type)
-    {
-        default:
-        {
-            for (int i = 0; i < n_waveshaper_registers; ++i)
-                R[i] = 0.f;
-        }
-        break;
-    }
-    return;
+    for (int i = 0; i < n_waveshaper_registers; ++i)
+        R[i] = 0.f;
 }
 } // namespace SurgeWaveshapers
