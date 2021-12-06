@@ -16,6 +16,7 @@ target_sources(BYOD_headless PRIVATE
 
     tests/ParameterSmoothTest.cpp
     tests/PreBufferTest.cpp
+    tests/PresetsTest.cpp
     tests/UndoRedoTest.cpp
     tests/UnitTests.cpp
     tests/WaveshaperTest.cpp
