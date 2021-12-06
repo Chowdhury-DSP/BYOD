@@ -216,7 +216,7 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
             ampIRs.addAmpIRListener (this);
         }
 
-        ~IRComboBox()
+        ~IRComboBox() override
         {
             ampIRs.removeAmpIRListener (this);
         }

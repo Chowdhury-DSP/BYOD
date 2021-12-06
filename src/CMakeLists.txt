@@ -1,4 +1,5 @@
 if(NOT (IOS OR MACOS_RELEASE))
+    message(STATUS "Configuring BYOD headless")
     add_subdirectory(headless)
 endif()
 
@@ -41,6 +42,8 @@ target_sources(BYOD PRIVATE
     processors/drive/mxr_distortion/MXRDistortion.cpp
     processors/drive/tube_amp/TubeAmp.cpp
     processors/drive/tube_screamer/TubeScreamer.cpp
+    processors/drive/waveshaper/SurgeWaveshapers.cpp
+    processors/drive/waveshaper/Waveshaper.cpp
     processors/drive/zen_drive/ZenDrive.cpp
 
     processors/other/Chorus.cpp
