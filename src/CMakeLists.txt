@@ -9,6 +9,7 @@ target_sources(BYOD PRIVATE
     gui/BoardComponent.cpp
     gui/BoardViewport.cpp
     gui/InfoComponent.cpp
+    gui/cables/CableDrawingHelpers.cpp
     gui/cables/CableView.cpp
     gui/editors/KnobsComponent.cpp
     gui/editors/Port.cpp

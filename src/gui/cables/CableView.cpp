@@ -1,11 +1,10 @@
 #include "CableView.h"
 #include "../BoardComponent.h"
+#include "CableDrawingHelpers.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
 
 namespace
 {
-constexpr int portDistanceLimit = 25;
-
 Point<int> getPortLocation (ProcessorEditor* editor, int portIdx, bool isInput)
 {
     auto portLocation = editor->getPortLocation (portIdx, isInput);
@@ -47,6 +46,7 @@ CableView::CableView (const BoardComponent* comp) : board (comp)
 void CableView::paint (Graphics& g)
 {
     using namespace CableConstants;
+    using namespace CableDrawingHelpers;
 
     g.setColour (cableColour.brighter (0.1f));
     for (auto* cable : cables)
@@ -63,8 +63,7 @@ void CableView::paint (Graphics& g)
 
             auto endPortLocation = getPortLocation (endEditor, cable->endIdx, true);
 
-            auto cableLine = Line (startPortLocation.toFloat(), endPortLocation.toFloat());
-            g.drawLine (cableLine, cableThickness);
+            drawCable (g, startPortLocation.toFloat(), endPortLocation.toFloat(), scaleFactor);
         }
         else if (cableMouse != nullptr)
         {
@@ -72,19 +71,19 @@ void CableView::paint (Graphics& g)
             auto [editor, portIdx] = getNearestInputPort (mousePos);
             if (editor != nullptr)
             {
-                Graphics::ScopedSaveState graphicsState (g);
-                g.setColour (cableColour.darker (0.1f));
-                g.setOpacity (0.5f);
-
                 auto endPortLocation = getPortLocation (editor, portIdx, true);
-                auto glowBounds = (Rectangle (portDistanceLimit, portDistanceLimit) * 2).withCentre (endPortLocation);
-                g.fillEllipse (glowBounds.toFloat());
+                drawCablePortGlow (g, endPortLocation);
             }
 
-            auto cableLine = Line (startPortLocation.toFloat(), mousePos.toFloat());
-            g.drawLine (cableLine, cableThickness);
+            drawCable (g, startPortLocation.toFloat(), mousePos.toFloat(), scaleFactor);
         }
     }
+}
+
+void CableView::setScaleFactor (float newScaleFactor)
+{
+    scaleFactor = newScaleFactor;
+    repaint();
 }
 
 void CableView::createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e)
@@ -160,7 +159,7 @@ std::pair<ProcessorEditor*, int> CableView::getNearestInputPort (const Point<int
             auto portLocation = getPortLocation (editor, i, true);
             auto distanceFromPort = pos.getDistanceFrom (portLocation);
 
-            bool isClosest = (distanceFromPort < portDistanceLimit && minDistance < 0) || distanceFromPort < minDistance;
+            bool isClosest = (distanceFromPort < CableConstants::portDistanceLimit && minDistance < 0) || distanceFromPort < minDistance;
             if (isClosest)
             {
                 minDistance = distanceFromPort;
