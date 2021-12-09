@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../editors/ProcessorEditor.h"
 #include "Cable.h"
-#include "ProcessorEditor.h"
 
 namespace CableConstants
 {

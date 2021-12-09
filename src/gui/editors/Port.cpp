@@ -1,5 +1,5 @@
 #include "Port.h"
-#include "CableView.h"
+#include "../cables/CableView.h"
 
 void Port::paint (Graphics& g)
 {

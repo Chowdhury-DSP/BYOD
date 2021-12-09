@@ -1,8 +1,8 @@
 #pragma once
 
-#include "CableView.h"
 #include "InfoComponent.h"
-#include "ProcessorEditor.h"
+#include "cables/CableView.h"
+#include "editors/ProcessorEditor.h"
 #include "utils/LookAndFeels.h"
 
 class BoardComponent final : public Component,

@@ -8,11 +8,11 @@ target_sources(BYOD PRIVATE
 
     gui/BoardComponent.cpp
     gui/BoardViewport.cpp
-    gui/CableView.cpp
     gui/InfoComponent.cpp
-    gui/KnobsComponent.cpp
-    gui/Port.cpp
-    gui/ProcessorEditor.cpp
+    gui/cables/CableView.cpp
+    gui/editors/KnobsComponent.cpp
+    gui/editors/Port.cpp
+    gui/editors/ProcessorEditor.cpp
     gui/utils/LookAndFeels.cpp
 
     presets/PresetManager.cpp

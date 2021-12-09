@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../processors/chain/ProcessorChain.h"
+#include "../utils/PowerButton.h"
 #include "KnobsComponent.h"
 #include "Port.h"
-#include "utils/PowerButton.h"
+#include "processors/chain/ProcessorChain.h"
 
 class ProcessorEditor : public Component,
                         private Port::PortListener

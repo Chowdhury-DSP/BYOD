@@ -1,5 +1,5 @@
 #include "CableView.h"
-#include "BoardComponent.h"
+#include "../BoardComponent.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
 
 namespace
