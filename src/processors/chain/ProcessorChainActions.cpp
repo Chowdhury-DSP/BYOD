@@ -42,12 +42,20 @@ public:
 
     static void addConnection (ProcessorChain& chain, const ConnectionInfo& info)
     {
+        Logger::writeToLog (String ("Adding connection from ") + info.startProc->getName() + ", port #"
+                            + String (info.startPort) +  " to " + info.endProc->getName() + " port #"
+                            + String (info.endPort));
+
         info.startProc->addConnection (ConnectionInfo (info));
         chain.listeners.call (&ProcessorChain::Listener::connectionAdded, info);
     }
 
     static void removeConnection (ProcessorChain& chain, const ConnectionInfo& info)
     {
+        Logger::writeToLog (String ("Removing connection from ") + info.startProc->getName() + ", port #"
+                            + String (info.startPort) +  " to " + info.endProc->getName() + " port #"
+                            + String (info.endPort));
+
         info.startProc->removeConnection (info);
         chain.listeners.call (&ProcessorChain::Listener::connectionRemoved, info);
     }

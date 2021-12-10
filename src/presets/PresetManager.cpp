@@ -28,5 +28,7 @@ std::unique_ptr<XmlElement> PresetManager::savePresetState()
 
 void PresetManager::loadPresetState (const XmlElement* xml)
 {
+    Logger::writeToLog ("Loading preset: " + getCurrentPreset()->getName());
+
     procChain->getStateHelper().loadProcChain (xml);
 }
