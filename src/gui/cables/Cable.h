@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../processors/BaseProcessor.h"
+#include "processors/BaseProcessor.h"
 
 struct Cable
 {

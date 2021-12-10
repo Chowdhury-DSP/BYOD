@@ -57,6 +57,8 @@ BoardComponent::~BoardComponent()
 void BoardComponent::setScaleFactor (float newScaleFactor)
 {
     scaleFactor = newScaleFactor;
+    cableView.setScaleFactor (scaleFactor);
+
     resized();
 }
 
