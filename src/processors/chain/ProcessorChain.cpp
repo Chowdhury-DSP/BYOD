@@ -123,7 +123,7 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
         }
     };
 
-    for (int i = numOutputs - 1; i >= 0; --i)
+    for (int i = 0; i < numOutputs; ++i)
     {
         auto* outBuffer = proc->getOutputBuffer (i);
         if (outBuffer == nullptr)
