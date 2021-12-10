@@ -1,7 +1,7 @@
 #include "ProcessorEditor.h"
-#include "BoardComponent.h"
+#include "../BoardComponent.h"
+#include "../utils/LookAndFeels.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
-#include "utils/LookAndFeels.h"
 
 namespace
 {
