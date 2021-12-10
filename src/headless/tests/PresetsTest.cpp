@@ -33,12 +33,13 @@ public:
 
         auto async = std::async (std::launch::async, [&]
                                  {
-           while (! finished.load())
-           {
-                plugin.processBlock (buffer, midi);
-                bufferCount++;
-           }
-           waiter.signal(); });
+                                     while (! finished.load())
+                                     {
+                                         plugin.processBlock (buffer, midi);
+                                         bufferCount++;
+                                     }
+                                     waiter.signal();
+                                 });
 
         int numPrograms = plugin.getNumPrograms();
         for (int i = 0; i < numPrograms; ++i)
