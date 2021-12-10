@@ -13,7 +13,6 @@ constexpr auto portOffset = 50.0f;
 
 namespace CableDrawingHelpers
 {
-
 void drawCable (Graphics& g, Point<float> start, Point<float> end, float scaleFactor);
 
 void drawCablePortGlow (Graphics& g, Point<int> location);
