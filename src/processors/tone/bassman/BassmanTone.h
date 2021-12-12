@@ -20,7 +20,7 @@ private:
     std::atomic<float>* bassParam = nullptr;
     std::atomic<float>* midParam = nullptr;
     std::atomic<float>* trebleParam = nullptr;
-    
+
     BassmanToneStack wdf[2];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BassmanTone)
