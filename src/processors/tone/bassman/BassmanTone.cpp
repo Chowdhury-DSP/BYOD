@@ -26,38 +26,32 @@ AudioProcessorValueTreeState::ParameterLayout BassmanTone::createParameterLayout
     return { params.begin(), params.end() };
 }
 
-std::tuple<double, double, double> BassmanTone::cookParameters() const
+auto BassmanTone::cookParameters() const
 {
     auto lowPot = 0.999f * std::pow (*bassParam, 0.25f) + 0.001f;
     auto midPot = 0.999f * (*midParam) + 0.001f;
     auto highPot = 0.99999f * std::pow (*trebleParam, 0.25f) + 0.00001f;
 
-    return std::make_tuple ((double) lowPot, (double) midPot, (double) highPot);
+    return std::make_tuple (lowPot, midPot, highPot);
 }
 
-void BassmanTone::prepare (double sampleRate, int samplesPerBlock)
+void BassmanTone::prepare (double sampleRate, int /*samplesPerBlock*/)
 {
     auto [lowPot, midPot, highPot] = cookParameters();
-    for (int ch = 0; ch < 2; ++ch)
+    for (auto& ch : wdf)
     {
-        wdf[ch] = std::make_unique<BassmanToneStack> (sampleRate);
-        wdf[ch]->setParams (highPot, 1.0 - lowPot, 1.0 - midPot, true);
+        ch.prepare (sampleRate);
+        ch.setParams (highPot, 1.0f - lowPot, 1.0f - midPot, true);
     }
-
-    dBuffer.setSize (2, samplesPerBlock);
-    dBuffer.clear();
 }
 
 void BassmanTone::processAudio (AudioBuffer<float>& buffer)
 {
-    dBuffer.makeCopyOf (buffer, true);
     auto [lowPot, midPot, highPot] = cookParameters();
-    for (int ch = 0; ch < dBuffer.getNumChannels(); ++ch)
+    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch]->setParams (highPot, 1.0 - lowPot, 1.0 - midPot);
-        auto* x = dBuffer.getWritePointer (ch);
-        wdf[ch]->process (x, dBuffer.getNumSamples());
+        wdf[ch].setParams (highPot, 1.0f - lowPot, 1.0f - midPot);
+        auto* x = buffer.getWritePointer (ch);
+        wdf[ch].process (x, buffer.getNumSamples());
     }
-
-    buffer.makeCopyOf (dBuffer, true);
 }

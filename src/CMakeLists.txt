@@ -61,6 +61,7 @@ target_sources(BYOD PRIVATE
     processors/tone/StateVariableFilter.cpp
     processors/tone/TrebleBooster.cpp
     processors/tone/bassman/BassmanTone.cpp
+    processors/tone/bassman/BassmanToneStack.cpp
     processors/tone/baxandall/BaxandallEQ.cpp
 
     processors/utility/FreqBandSplitter.cpp
