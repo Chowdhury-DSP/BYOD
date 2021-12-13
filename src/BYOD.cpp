@@ -3,8 +3,8 @@
 #include "gui/utils/CPUMeter.h"
 #include "gui/utils/LookAndFeels.h"
 #include "gui/utils/TextSliderItem.h"
-#include "presets/PresetManager.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
+#include "state/PresetManager.h"
 
 namespace
 {
@@ -15,7 +15,8 @@ const String logFileNameRoot = "BYOD_Log_";
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                logger (logFileSubDir, logFileNameRoot),
                procStore (&undoManager),
-               procs (procStore, vts, presetManager)
+               procs (procStore, vts, presetManager),
+               paramForwarder (vts, procs)
 {
     presetManager = std::make_unique<PresetManager> (&procs, vts);
 }

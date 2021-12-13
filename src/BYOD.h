@@ -2,6 +2,7 @@
 
 #include "processors/ProcessorStore.h"
 #include "processors/chain/ProcessorChain.h"
+#include "state/ParamForwardManager.h"
 
 class BYOD : public chowdsp::PluginBase<BYOD>
 {
@@ -27,6 +28,7 @@ private:
 
     ProcessorStore procStore;
     ProcessorChain procs;
+    ParamForwardManager paramForwarder;
 
     UndoManager undoManager { 500000 };
 
