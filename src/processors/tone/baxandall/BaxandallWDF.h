@@ -30,14 +30,14 @@ private:
     wdft::ResistorT<float> Pt_plus { Pt * 0.5f };
     wdft::ResistorT<float> Resd { 10.0e3f };
     wdft::WDFParallelT<float, decltype (Pt_plus), decltype (Resd)> P4 { Pt_plus, Resd };
-    wdft::CapacitorT<float> Cd { 15.0e-9f };
+    wdft::CapacitorT<float> Cd { 6.4e-9f };
     wdft::WDFSeriesT<float, decltype (Cd), decltype (P4)> S4 { Cd, P4 };
 
     // Port B
     wdft::ResistorT<float> Pt_minus { Pt * 0.5f };
     wdft::ResistorT<float> Rese { 1.0e3f };
     wdft::WDFParallelT<float, decltype (Pt_minus), decltype (Rese)> P5 { Pt_minus, Rese };
-    wdft::CapacitorT<float> Ce { 150.0e-9f };
+    wdft::CapacitorT<float> Ce { 64.0e-9f };
     wdft::WDFSeriesT<float, decltype (Ce), decltype (P5)> S5 { Ce, P5 };
     wdft::ResistorT<float> Rl { 1.0e6f };
     wdft::WDFParallelT<float, decltype (Rl), decltype (S5)> P1 { Rl, S5 };
@@ -47,14 +47,14 @@ private:
 
     // Port D
     wdft::ResistorT<float> Pb_minus { Pb * 0.5f };
-    wdft::CapacitorT<float> Cc { 330.0e-9f };
+    wdft::CapacitorT<float> Cc { 220.0e-9f };
     wdft::WDFParallelT<float, decltype (Pb_minus), decltype (Cc)> P3 { Pb_minus, Cc };
     wdft::ResistorT<float> Resb { 1.0e3f };
     wdft::WDFSeriesT<float, decltype (Resb), decltype (P3)> S3 { Resb, P3 };
 
     // Port E
     wdft::ResistorT<float> Pb_plus { Pb * 0.5f };
-    wdft::CapacitorT<float> Cb { 33.0e-9f };
+    wdft::CapacitorT<float> Cb { 22.0e-9f };
     wdft::WDFParallelT<float, decltype (Pb_plus), decltype (Cb)> P2 { Pb_plus, Cb };
     wdft::ResistorT<float> Resa { 10.0e3f };
     wdft::WDFSeriesT<float, decltype (Resa), decltype (P2)> S2 { Resa, P2 };
