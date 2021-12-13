@@ -16,7 +16,8 @@ target_sources(BYOD PRIVATE
     gui/editors/ProcessorEditor.cpp
     gui/utils/LookAndFeels.cpp
 
-    presets/PresetManager.cpp
+    state/ParamForwardManager.cpp
+    state/PresetManager.cpp
 
     processors/BaseProcessor.cpp
     processors/ProcessorStore.cpp
