@@ -1,8 +1,7 @@
 #pragma once
 
 #include "../../BaseProcessor.h"
-#include "BaxandallBass.h"
-#include "BaxandallTreble.h"
+#include "BaxandallWDF.h"
 
 class BaxandallEQ : public BaseProcessor
 {
@@ -22,8 +21,7 @@ private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> bassSmooth[2];
     SmoothedValue<float, ValueSmoothingTypes::Linear> trebleSmooth[2];
 
-    BaxandallBass bassCircuit[2];
-    BaxandallTreble trebleCircuit[2];
+    BaxandallWDF wdfCircuit[2];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaxandallEQ)
 };

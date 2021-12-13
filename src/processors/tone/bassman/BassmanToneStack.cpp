@@ -2,6 +2,10 @@
 
 void BassmanToneStack::prepare (double sr)
 {
+    Cap1.prepare ((float) sr);
+    Cap2.prepare ((float) sr);
+    Cap3.prepare ((float) sr);
+
     pot1Smooth.reset (sr, 0.005);
     pot2Smooth.reset (sr, 0.005);
     pot3Smooth.reset (sr, 0.005);
