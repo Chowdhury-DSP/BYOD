@@ -2,8 +2,6 @@
 
 #include <pch.h>
 
-using namespace chowdsp::WDF;
-
 class BassmanToneStack
 {
 public:

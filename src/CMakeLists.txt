@@ -65,6 +65,8 @@ target_sources(BYOD PRIVATE
     processors/tone/bassman/BassmanTone.cpp
     processors/tone/bassman/BassmanToneStack.cpp
     processors/tone/baxandall/BaxandallEQ.cpp
+    processors/tone/baxandall/BaxandallEQ2.cpp
+    processors/tone/baxandall/BaxandallWDF.cpp
 
     processors/utility/FreqBandSplitter.cpp
     processors/utility/Mixer.cpp
