@@ -63,7 +63,9 @@ void CableView::paint (Graphics& g)
 
             auto endPortLocation = getPortLocation (endEditor, cable->endIdx, true);
 
-            drawCable (g, startPortLocation.toFloat(), endPortLocation.toFloat(), scaleFactor);
+            auto startColour = startEditor->getColour();
+            auto endColour = endEditor->getColour();
+            drawCable (g, startPortLocation.toFloat(), startColour, endPortLocation.toFloat(), endColour, scaleFactor);
         }
         else if (cableMouse != nullptr)
         {
@@ -75,7 +77,8 @@ void CableView::paint (Graphics& g)
                 drawCablePortGlow (g, endPortLocation);
             }
 
-            drawCable (g, startPortLocation.toFloat(), mousePos.toFloat(), scaleFactor);
+            auto colour = startEditor->getColour();
+            drawCable (g, startPortLocation.toFloat(), colour, mousePos.toFloat(), colour, scaleFactor);
         }
     }
 }

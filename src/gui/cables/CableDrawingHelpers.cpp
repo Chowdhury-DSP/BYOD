@@ -47,18 +47,34 @@ struct CubicBezier
 
 using namespace CableConstants;
 
-void drawCable (Graphics& g, Point<float> start, Point<float> end, float scaleFactor)
+void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float> end, Colour endColour, float scaleFactor)
 {
     const auto pointOff = portOffset + scaleFactor;
     auto bezier = CubicBezier (start, start.translated (pointOff, 0.0f), end.translated (-pointOff, 0.0f), end);
     auto numPoints = (int) start.getDistanceFrom (end) + 1;
 
-    Path bezierPath;
-    bezierPath.startNewSubPath (start);
+    Path bezierPath1;
+    bezierPath1.preallocateSpace (numPoints * 3 / 2);
+    bezierPath1.startNewSubPath (start);
     for (int i = 1; i <= numPoints; ++i)
-        bezierPath.lineTo (bezier.pointOnCubicBezier ((float) i / (float) numPoints));
+        bezierPath1.lineTo (bezier.pointOnCubicBezier ((float) i / (float) numPoints));
 
-    g.strokePath (bezierPath, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
+    g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
+    g.strokePath (bezierPath1, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
+
+    auto startCircle = (Rectangle { 10.0f, 10.0f } * scaleFactor).withCentre (start);
+    g.setColour (startColour);
+    g.fillEllipse (startCircle);
+
+    g.setColour (Colours::white);
+    g.drawEllipse (startCircle, 1.0f);
+
+    auto endCircle = (Rectangle { 10.0f, 10.0f } * scaleFactor).withCentre (end);
+    g.setColour (endColour);
+    g.fillEllipse (endCircle);
+
+    g.setColour (Colours::white);
+    g.drawEllipse (endCircle, 1.0f);
 }
 
 void drawCablePortGlow (Graphics& g, Point<int> location)

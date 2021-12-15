@@ -38,6 +38,7 @@ public:
     void setConnectionStatus (bool isConnected, int portIndex) { inputPorts[portIndex]->setConnectionStatus (isConnected); }
 
     Point<int> getPortLocation (int portIndex, bool isInput) const;
+    Colour getColour() const noexcept { return procUI.backgroundColour; }
 
 private:
     void resetProcParameters();
