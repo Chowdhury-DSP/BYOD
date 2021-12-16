@@ -23,8 +23,6 @@ void BassmanToneStack::setSMatrixData()
     auto pot3 = pot3Smooth.getNextValue();
     Res3m.setResistanceValue (pot3 * R3);
     Res3p.setResistanceValue ((1.0f - pot3) * R3);
-
-
 }
 
 void BassmanToneStack::process (float* buffer, const int numSamples) noexcept

@@ -87,6 +87,6 @@ private:
     wdft::CapacitorT<float> Ca { 1.0e-6f };
     wdft::WDFSeriesT<float, decltype (R), decltype (Ca)> S1 { R, Ca };
     wdft::IdealVoltageSourceT<float, decltype (S1)> Vin { S1 };
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaxandallWDF)
 };
