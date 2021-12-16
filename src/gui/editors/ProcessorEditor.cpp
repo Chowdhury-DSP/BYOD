@@ -54,24 +54,8 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options&)
     {
-        menu.addItem ("Reset",
-                      [&]
-                      {
-                          auto& vts = proc.getVTS();
-                          if (auto* um = vts.undoManager)
-                              um->beginNewTransaction();
-
-                          for (auto* param : proc.getVTS().processor.getParameters())
-                          {
-                              if (auto* rangedParam = dynamic_cast<RangedAudioParameter*> (param))
-                              {
-                                  if (rangedParam->paramID == "on_off")
-                                      continue;
-
-                                  rangedParam->setValueNotifyingHost (rangedParam->getDefaultValue());
-                              }
-                          }
-                      });
+        menu.addItem ("Reset", [&]
+                      { resetProcParameters(); });
 
         PopupMenu replaceProcMenu;
         createReplaceProcMenu (replaceProcMenu);
@@ -94,6 +78,24 @@ ProcessorEditor::~ProcessorEditor()
         port->removePortListener (this);
 }
 
+void ProcessorEditor::resetProcParameters()
+{
+    auto& vts = proc.getVTS();
+    if (auto* um = vts.undoManager)
+        um->beginNewTransaction();
+
+    for (auto* param : proc.getVTS().processor.getParameters())
+    {
+        if (auto* rangedParam = dynamic_cast<RangedAudioParameter*> (param))
+        {
+            if (rangedParam->paramID == "on_off")
+                continue;
+
+            rangedParam->setValueNotifyingHost (rangedParam->getDefaultValue());
+        }
+    }
+}
+
 void ProcessorEditor::createReplaceProcMenu (PopupMenu& menu)
 {
     auto& procStore = procChain.getProcStore();
@@ -107,14 +109,6 @@ void ProcessorEditor::createReplaceProcMenu (PopupMenu& menu)
         auto typeName = std::string (magic_enum::enum_name (type));
         menu.addSubMenu (String (typeName), subMenu);
     }
-
-    //    auto options = PopupMenu::Options()
-    //                       .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-    //                       .withMinimumWidth (125)
-    //                       .withStandardItemHeight (27);
-    //
-    //    menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
-    //    menu.showMenuAsync (options);
 }
 
 void ProcessorEditor::paint (Graphics& g)
@@ -184,10 +178,6 @@ void ProcessorEditor::resized()
 
 void ProcessorEditor::mouseDown (const MouseEvent& e)
 {
-    if (e.mods.isPopupMenu())
-    {
-    }
-
     mouseDownOffset = e.getEventRelativeTo (this).getPosition();
 }
 

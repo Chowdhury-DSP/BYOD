@@ -40,6 +40,7 @@ public:
     Point<int> getPortLocation (int portIndex, bool isInput) const;
 
 private:
+    void resetProcParameters();
     void createReplaceProcMenu (PopupMenu& menu);
 
     BaseProcessor& proc;
