@@ -23,7 +23,7 @@ private:
 
     dsp::Gain<float> inGain, outGain;
     using DiodeRectifierWDF = DiodeClipperWDF<wdft::DiodeT>;
-    std::unique_ptr<DiodeRectifierWDF> wdf[2];
+    DiodeRectifierWDF wdf[2];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiodeRectifier)
 };
