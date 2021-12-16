@@ -25,8 +25,8 @@ void MXRDistortion::prepare (double sampleRate, int samplesPerBlock)
 {
     for (int ch = 0; ch < 2; ++ch)
     {
-        wdf[ch] = std::make_unique<MXRDistWDF> (sampleRate);
-        wdf[ch]->setParameters (1.0f - iLogPot (*distParam));
+        wdf[ch].prepare (sampleRate);
+        wdf[ch].setParameters (1.0f - iLogPot (*distParam));
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
@@ -53,9 +53,9 @@ void MXRDistortion::processAudio (AudioBuffer<float>& buffer)
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch]->setParameters (1.0f - iLogPot (iLogPot (0.5f * *distParam + 0.5f)));
+        wdf[ch].setParameters (1.0f - iLogPot (iLogPot (0.5f * *distParam + 0.5f)));
         auto* x = buffer.getWritePointer (ch);
-        wdf[ch]->process (x, buffer.getNumSamples());
+        wdf[ch].process (x, buffer.getNumSamples());
     }
 
     dcBlocker.processAudio (buffer);

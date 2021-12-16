@@ -6,8 +6,11 @@ template <template <typename, typename, wdft::DiodeQuality> typename DiodeType>
 class DiodeClipperWDF
 {
 public:
-    DiodeClipperWDF (float sampleRate) : C1 (capVal, sampleRate)
+    DiodeClipperWDF() = default;
+
+    void prepare (float sampleRate)
     {
+        C1.prepare (sampleRate);
         cutoffSmooth.reset ((double) sampleRate, 0.01);
         nDiodesSmooth.reset ((double) sampleRate, 0.01);
     }
@@ -88,7 +91,7 @@ private:
     using ResVs = wdft::ResistiveVoltageSourceT<wdf_type>;
 
     ResVs Vs { 4700.0f };
-    Cap C1;
+    Cap C1 { capVal };
 
     wdft::WDFParallelT<wdf_type, Cap, ResVs> P1 { C1, Vs };
     DiodeType<wdf_type, decltype (P1), wdft::DiodeQuality::Best> dp { P1, 2.52e-9f };

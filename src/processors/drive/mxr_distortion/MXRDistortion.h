@@ -18,7 +18,7 @@ private:
     std::atomic<float>* distParam = nullptr;
     std::atomic<float>* levelParam = nullptr;
 
-    std::unique_ptr<MXRDistWDF> wdf[2];
+    MXRDistWDF wdf[2];
     dsp::Gain<float> gain;
     DCBlocker dcBlocker;
 
