@@ -19,7 +19,7 @@ class ProcessorEditor : public Component,
     )
     // clang-format on
 public:
-    ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs, Component* parent);
+    ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs);
     ~ProcessorEditor() override;
 
     void paint (Graphics& g) override;
@@ -40,7 +40,8 @@ public:
     Point<int> getPortLocation (int portIndex, bool isInput) const;
 
 private:
-    void createReplaceProcMenu();
+    void resetProcParameters();
+    void createReplaceProcMenu (PopupMenu& menu);
 
     BaseProcessor& proc;
     ProcessorChain& procChain;
@@ -51,14 +52,13 @@ private:
     KnobsComponent knobs;
     PowerButton powerButton;
     DrawableButton xButton { "", DrawableButton::ButtonStyle::ImageFitted };
-    DrawableButton swapButton { "", DrawableButton::ButtonStyle::ImageFitted };
-    DrawableButton infoButton { "", DrawableButton::ButtonStyle::ImageFitted };
 
     OwnedArray<Port> inputPorts;
     OwnedArray<Port> outputPorts;
 
     Point<int> mouseDownOffset;
 
+    chowdsp::PopupMenuHelper popupMenu;
     chowdsp::SharedLNFAllocator lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)

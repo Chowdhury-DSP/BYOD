@@ -8,12 +8,12 @@ namespace
 constexpr float cornerSize = 5.0f;
 }
 
-ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs, Component* parent) : proc (baseProc),
-                                                                                                       procChain (procs),
-                                                                                                       procUI (proc.getUIOptions()),
-                                                                                                       contrastColour (procUI.backgroundColour.contrasting()),
-                                                                                                       knobs (baseProc, proc.getVTS(), contrastColour, procUI.powerColour),
-                                                                                                       powerButton (procUI.powerColour)
+ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs) : proc (baseProc),
+                                                                                    procChain (procs),
+                                                                                    procUI (proc.getUIOptions()),
+                                                                                    contrastColour (procUI.backgroundColour.contrasting()),
+                                                                                    knobs (baseProc, proc.getVTS(), contrastColour, procUI.powerColour),
+                                                                                    powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);
     setBroughtToFrontOnMouseClick (true);
@@ -29,24 +29,6 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.onClick = [=]
     { MessageManager::callAsync ([=]
                                  { procChain.getActionHelper().removeProcessor (&proc); }); };
-
-    auto swapSvg = Drawable::createFromImageData (BinaryData::swap_svg, BinaryData::swap_svgSize);
-    swapSvg->replaceColour (Colours::black, contrastColour);
-    swapButton.setImages (swapSvg.get());
-    swapButton.onClick = [=]
-    { createReplaceProcMenu(); };
-
-    if (proc.getNumInputs() == 1 && proc.getNumOutputs() == 1)
-        addAndMakeVisible (swapButton);
-
-    auto infoSvg = Drawable::createFromImageData (BinaryData::info_svg, BinaryData::info_svgSize);
-    infoSvg->replaceColour (Colours::black, contrastColour);
-    infoButton.setImages (infoSvg.get());
-    addAndMakeVisible (infoButton);
-    infoButton.onClick = [&baseProc, boardComp = dynamic_cast<BoardComponent*> (parent)]
-    {
-        boardComp->showInfoComp (baseProc);
-    };
 
     if (procUI.lnf != nullptr)
         setLookAndFeel (procUI.lnf);
@@ -68,6 +50,23 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         addAndMakeVisible (newPort);
         newPort->addPortListener (this);
     }
+
+    popupMenu.setAssociatedComponent (this);
+    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options&)
+    {
+        menu.addItem ("Reset", [&]
+                      { resetProcParameters(); });
+
+        PopupMenu replaceProcMenu;
+        createReplaceProcMenu (replaceProcMenu);
+        menu.addSubMenu ("Replace", replaceProcMenu);
+
+        if (auto* p = getParentComponent())
+        {
+            menu.addItem ("Info", [&, boardComp = dynamic_cast<BoardComponent*> (p)]
+                          { boardComp->showInfoComp (proc); });
+        }
+    };
 }
 
 ProcessorEditor::~ProcessorEditor()
@@ -79,12 +78,29 @@ ProcessorEditor::~ProcessorEditor()
         port->removePortListener (this);
 }
 
-void ProcessorEditor::createReplaceProcMenu()
+void ProcessorEditor::resetProcParameters()
+{
+    auto& vts = proc.getVTS();
+    if (auto* um = vts.undoManager)
+        um->beginNewTransaction();
+
+    for (auto* param : proc.getVTS().processor.getParameters())
+    {
+        if (auto* rangedParam = dynamic_cast<RangedAudioParameter*> (param))
+        {
+            if (rangedParam->paramID == "on_off")
+                continue;
+
+            rangedParam->setValueNotifyingHost (rangedParam->getDefaultValue());
+        }
+    }
+}
+
+void ProcessorEditor::createReplaceProcMenu (PopupMenu& menu)
 {
     auto& procStore = procChain.getProcStore();
 
-    int menuID = 0;
-    PopupMenu menu;
+    int menuID = 100;
     for (auto type : { Drive, Tone, Utility, Other })
     {
         PopupMenu subMenu;
@@ -93,14 +109,6 @@ void ProcessorEditor::createReplaceProcMenu()
         auto typeName = std::string (magic_enum::enum_name (type));
         menu.addSubMenu (String (typeName), subMenu);
     }
-
-    auto options = PopupMenu::Options()
-                       .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-                       .withMinimumWidth (125)
-                       .withStandardItemHeight (27);
-
-    menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
-    menu.showMenuAsync (options);
 }
 
 void ProcessorEditor::paint (Graphics& g)
@@ -144,12 +152,8 @@ void ProcessorEditor::resized()
     {
         const auto xButtonSize = proportionOfWidth (0.1f);
         const auto xButtonPad = proportionOfWidth (0.015f);
-        swapButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
         powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
         xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
-
-        const auto infoButtonSize = proportionOfWidth (0.074f);
-        infoButton.setBounds (0, height - infoButtonSize, infoButtonSize, infoButtonSize);
     }
 
     const int portDim = proportionOfHeight (0.15f);

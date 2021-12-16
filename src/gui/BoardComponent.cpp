@@ -23,11 +23,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
     newProcButton.onClick = [=]
     { showNewProcMenu(); };
 
-    inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, this);
+    inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
     addAndMakeVisible (inputEditor.get());
     inputEditor->addPortListener (&cableView);
 
-    outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain, this);
+    outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain);
     addAndMakeVisible (outputEditor.get());
     outputEditor->addPortListener (&cableView);
 
@@ -92,7 +92,7 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
         return;
     }
 
-    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, this));
+    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain));
     addAndMakeVisible (newEditor);
 
     cableView.processorBeingAdded (newProc);
