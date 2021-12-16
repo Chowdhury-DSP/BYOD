@@ -31,8 +31,8 @@ void DiodeRectifier::prepare (double sampleRate, int samplesPerBlock)
     int diodeType = static_cast<int> (*diodeTypeParam);
     for (int ch = 0; ch < 2; ++ch)
     {
-        wdf[ch] = std::make_unique<DiodeRectifierWDF> ((float) sampleRate);
-        wdf[ch]->setParameters (*cutoffParam, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
+        wdf[ch].prepare ((float) sampleRate);
+        wdf[ch].setParameters (*cutoffParam, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
     }
 
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
@@ -54,9 +54,9 @@ void DiodeRectifier::processAudio (AudioBuffer<float>& buffer)
     int diodeType = static_cast<int> (*diodeTypeParam);
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch]->setParameters (*cutoffParam, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam);
+        wdf[ch].setParameters (*cutoffParam, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam);
         auto* x = buffer.getWritePointer (ch);
-        wdf[ch]->process (x, buffer.getNumSamples());
+        wdf[ch].process (x, buffer.getNumSamples());
     }
 
     outGain.process (context);

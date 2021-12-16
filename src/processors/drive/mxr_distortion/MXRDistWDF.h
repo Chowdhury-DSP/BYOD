@@ -21,12 +21,11 @@ private:
     static constexpr float R3Val = 4.7e3f;
     static constexpr float rDistVal = 1.0e6f;
     Res ResDist_R3 { rDistVal + R3Val }; //distortion potentiometer
-    float prevDistParam = 0.0f;
 
-    Cap C1;
-    Cap C2;
-    Cap C3;
-    Cap C4;
+    Cap C1 { 1.0e-9f };
+    Cap C2 { 10.0e-9f };
+    Cap C3 { 47.0e-9f };
+    Cap C4 { 1.0e-6f };
 
     wdft::WDFSeriesT<float, Cap, Res> S3 { C2, R1 };
     wdft::WDFParallelT<float, ResVs, Cap> P1 { Vres, C1 };
@@ -34,48 +33,46 @@ private:
     wdft::WDFParallelT<float, decltype (S4), ResVs> P2 { S4, Vb };
     wdft::WDFSeriesT<float, Res, Cap> S2 { ResDist_R3, C3 };
 
-    wdft::RootRtypeAdaptor<float, decltype (P2), decltype (S2), Res, Cap> R;
+    struct ImpedanceCalc
+    {
+        template <typename RType>
+        static void calcImpedance (RType& R)
+        {
+            const auto [_, Rb, Rc, Rd] = R.getPortImpedances();
+
+            R.setSMatrixData ({ { 1.0f, 0.0f, 0.0f, 0.0f },
+                                { (200.0f * Rb) / (101.0f * Rb + Rc), 1.0f - (202.0f * Rb) / (101.0f * Rb + Rc), (2.0f * Rb) / (101.0f * Rb + Rc), 0.0f },
+                                { -(200.0f * Rc) / (101.0f * Rb + Rc), (202.0f * Rc) / (101.0f * Rb + Rc), 1.0f - (2.0f * Rc) / (101.0f * Rb + Rc), 0.0f },
+                                { (200.0f * Rd * (Rb + Rc)) / (101.0f * Rb * Rd + Rc * Rd), -(200.0f * Rc * Rd) / (101.0f * Rb * Rd + Rc * Rd), -(200.0f * Rb * Rd) / (101.0f * Rb * Rd + Rc * Rd), -1.0f } });
+        }
+    };
+
+    wdft::RootRtypeAdaptor<float, ImpedanceCalc, decltype (P2), decltype (S2), Res, Cap> R { std::tie (P2, S2, R4, C4) };
 
 public:
-    MXRDistPlus1 (float sampleRate) : C1 (1.0e-9f, sampleRate),
-                                      C2 (10.0e-9f, sampleRate),
-                                      C3 (47.0e-9f, sampleRate),
-                                      C4 (1.0e-6f, sampleRate),
-                                      R (std::tie (P2, S2, R4, C4))
+    MXRDistPlus1() = default;
+
+    void prepare (float sampleRate)
     {
+        C1.prepare (sampleRate);
+        C2.prepare (sampleRate);
+        C3.prepare (sampleRate);
+        C4.prepare (sampleRate);
+
         Vb.setVoltage (4.5);
-        setSMatrixData();
-    }
-
-    void setSMatrixData()
-    {
-        // float Ra = P2.R;
-        float Rb = S2.R;
-        float Rc = R4.R;
-        float Rd = C4.R;
-
-        R.setSMatrixData ({ { 1.0f, 0.0f, 0.0f, 0.0f },
-                            { (200.0f * Rb) / (101.0f * Rb + Rc), 1.0f - (202.0f * Rb) / (101.0f * Rb + Rc), (2.0f * Rb) / (101.0f * Rb + Rc), 0.0f },
-                            { -(200.0f * Rc) / (101.0f * Rb + Rc), (202.0f * Rc) / (101.0f * Rb + Rc), 1.0f - (2.0f * Rc) / (101.0f * Rb + Rc), 0.0f },
-                            { (200.0f * Rd * (Rb + Rc)) / (101.0f * Rb * Rd + Rc * Rd), -(200.0f * Rc * Rd) / (101.0f * Rb * Rd + Rc * Rd), -(200.0f * Rb * Rd) / (101.0f * Rb * Rd + Rc * Rd), -1.0f } });
     }
 
     inline float processSample (float inSamp) noexcept
     {
         Vres.setVoltage (inSamp);
-        R.incident (0.0f);
+        R.compute();
 
         return wdft::voltage<float> (C4);
     }
 
     void setParams (float distParam)
     {
-        if (distParam != prevDistParam)
-        {
-            ResDist_R3.setResistanceValue (distParam * rDistVal + R3Val);
-            prevDistParam = distParam;
-            setSMatrixData();
-        }
+        ResDist_R3.setResistanceValue (distParam * rDistVal + R3Val);
     }
 };
 
@@ -85,7 +82,7 @@ private:
     ResVs Vres { 10.0e3f }; //encompasses R5 = 10k
     Res ResOut { 10.0e3f }; //output potentiometer
 
-    Cap C5;
+    Cap C5 { 1.0e-9f };
 
     wdft::WDFParallelT<float, Res, Cap> P3 { ResOut, C5 };
     wdft::WDFParallelT<float, decltype (P3), ResVs> P4 { P3, Vres };
@@ -93,8 +90,11 @@ private:
     wdft::DiodePairT<float, decltype (P4), wdft::DiodeQuality::Best> DP { P4, 2.52e-9f, 25.85e-3f * 1.75f };
 
 public:
-    MXRDistPlus2 (float sampleRate) : C5 (1.0e-9f, sampleRate)
+    MXRDistPlus2() = default;
+
+    void prepare (float sampleRate)
     {
+        C5.prepare (sampleRate);
     }
 
     inline float processSample (float inSamp) noexcept
@@ -112,9 +112,12 @@ public:
 class MXRDistWDF
 {
 public:
-    MXRDistWDF (double sampleRate) : wdf1 ((float) sampleRate),
-                                     wdf2 ((float) sampleRate)
+    MXRDistWDF() = default;
+
+    void prepare (double sampleRate)
     {
+        wdf1.prepare ((float) sampleRate);
+        wdf2.prepare ((float) sampleRate);
     }
 
     void setParameters (float distParam)
