@@ -2,6 +2,14 @@
 
 using namespace ParameterHelpers;
 
+namespace
+{
+float paramSkew (float paramVal)
+{
+    return 1.0f - iLogPot (iLogPot (0.5f * paramVal + 0.5f));
+}
+} // namespace
+
 MXRDistortion::MXRDistortion (UndoManager* um) : BaseProcessor ("MXR Distortion", createParameterLayout(), um)
 {
     distParam = vts.getRawParameterValue ("dist");
@@ -26,7 +34,7 @@ void MXRDistortion::prepare (double sampleRate, int samplesPerBlock)
     for (int ch = 0; ch < 2; ++ch)
     {
         wdf[ch].prepare (sampleRate);
-        wdf[ch].setParameters (1.0f - iLogPot (*distParam));
+        wdf[ch].setParams (paramSkew (*distParam));
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
@@ -53,9 +61,11 @@ void MXRDistortion::processAudio (AudioBuffer<float>& buffer)
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch].setParameters (1.0f - iLogPot (iLogPot (0.5f * *distParam + 0.5f)));
+        wdf[ch].setParams (paramSkew (*distParam));
+
         auto* x = buffer.getWritePointer (ch);
-        wdf[ch].process (x, buffer.getNumSamples());
+        for (int n = 0; n < buffer.getNumSamples(); ++n)
+            x[n] = wdf[ch].processSample (x[n]);
     }
 
     dcBlocker.processAudio (buffer);
