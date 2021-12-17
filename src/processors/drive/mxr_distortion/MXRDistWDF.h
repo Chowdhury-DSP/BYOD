@@ -63,11 +63,10 @@ private:
         static float calcImpedance (RType& R)
         {
             constexpr float A = 100.0f; // op-amp gain
-            constexpr float Ri = 1.0e12f; // op-amp input impedance
-            constexpr float Ro = 1.0e-6f; // op-amp output impedance
+            constexpr float Ri = 1.0e9f; // op-amp input impedance
+            constexpr float Ro = 1.0e-1f; // op-amp output impedance
 
             const auto [Ra, Rb, Rc] = R.getPortImpedances();
-            //            std::cout << Ra << ", " << Rb << ", " << Rc << std::endl;
 
             // This scattering matrix was derived using the R-Solver python script (https://github.com/jatinchowdhury18/R-Solver),
             // invoked with command: r_solver.py --datum 0 --adapt 3 --out scratch/mxr_scatt.txt netlists/mxr_distplus_vcvs.txt
