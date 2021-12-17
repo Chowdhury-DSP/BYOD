@@ -6,7 +6,7 @@
 class MXRDistortion : public BaseProcessor
 {
 public:
-    MXRDistortion (UndoManager* um = nullptr);
+    explicit MXRDistortion (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -19,6 +19,7 @@ private:
     std::atomic<float>* levelParam = nullptr;
 
     MXRDistWDF wdf[2];
+
     dsp::Gain<float> gain;
     DCBlocker dcBlocker;
 
