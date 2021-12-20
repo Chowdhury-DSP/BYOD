@@ -2,7 +2,7 @@
 #include "BYOD.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
 
-constexpr int nProcs = 20;
+constexpr int nProcs = 50;
 
 PresetSaveLoadTime::PresetSaveLoadTime()
 {
@@ -66,7 +66,7 @@ auto timeLoadPreset (chowdsp::PresetManager& presetManager, const File& file)
     return duration;
 }
 
-void PresetSaveLoadTime::timePresetSaveAndLoad (const ArgumentList& args)
+void PresetSaveLoadTime::timePresetSaveAndLoad (const ArgumentList&)
 {
     BYOD plugin;
     auto& presetManager = plugin.getPresetManager();

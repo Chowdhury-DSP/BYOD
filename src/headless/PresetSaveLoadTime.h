@@ -8,7 +8,7 @@ public:
     PresetSaveLoadTime();
 
 private:
-    void timePresetSaveAndLoad (const ArgumentList& args);
+    static void timePresetSaveAndLoad (const ArgumentList& args);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetSaveLoadTime)
 };
