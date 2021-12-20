@@ -27,7 +27,7 @@ public:
 
 private:
     void showNewProcMenu() const;
-    void setEditorPosition (ProcessorEditor* editor);
+    void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
 
     ProcessorChain& procChain;
 

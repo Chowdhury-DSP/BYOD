@@ -5,7 +5,7 @@ namespace
 {
 constexpr int editorWidth = 270;
 constexpr int editorHeight = 180;
-constexpr int editorPad = 10;
+constexpr int editorPad = 5;
 constexpr int newButtonWidth = 40;
 
 constexpr int getScaleDim (int dim, float scaleFactor)
@@ -30,8 +30,6 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
     outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain);
     addAndMakeVisible (outputEditor.get());
     outputEditor->addPortListener (&cableView);
-
-    setSize (800, 800);
 
     addChildComponent (infoComp);
     addAndMakeVisible (cableView);
@@ -72,8 +70,9 @@ void BoardComponent::resized()
     const auto thisEditorWidth = getScaleDim (editorWidth, scaleFactor);
     const auto thisEditorHeight = getScaleDim (editorHeight, scaleFactor);
     auto centreEditorHeight = (height - thisEditorHeight) / 2;
-    inputEditor->setBounds (editorPad, centreEditorHeight, thisEditorWidth / 2, thisEditorHeight);
-    outputEditor->setBounds (width - (thisEditorWidth / 3 + editorPad), centreEditorHeight, thisEditorWidth / 3, thisEditorHeight);
+
+    setEditorPosition (inputEditor.get(), Rectangle (editorPad, centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
+    setEditorPosition (outputEditor.get(), Rectangle (width - (thisEditorWidth / 2 + editorPad), centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
 
     for (auto* editor : processorEditors)
         setEditorPosition (editor);
@@ -162,7 +161,7 @@ ProcessorEditor* BoardComponent::findEditorForProcessor (const BaseProcessor* pr
     return nullptr;
 }
 
-void BoardComponent::setEditorPosition (ProcessorEditor* editor)
+void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds)
 {
     const auto thisEditorWidth = getScaleDim (editorWidth, scaleFactor);
     const auto thisEditorHeight = getScaleDim (editorHeight, scaleFactor);
@@ -171,20 +170,28 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor)
     auto position = proc->getPosition (getBounds());
     if (position == Point (0, 0) && getWidth() > 0 && getHeight() > 0) // no position set yet
     {
-        auto b = getLocalBounds()
-                     .withWidth (getWidth() * 2 / 3)
-                     .withHeight (getHeight() * 2 / 3);
+        if (bounds == Rectangle<int> {}) // set initial bounds sort-of randomly
+        {
+            auto b = getLocalBounds()
+                         .withWidth (getWidth() * 2 / 3)
+                         .withHeight (getHeight() * 2 / 3);
 
-        auto randX = jmax (proportionOfWidth (0.1f), 1);
-        auto randY = jmax (proportionOfHeight (0.1f), 1);
-        auto& rand = Random::getSystemRandom();
-        auto centre = b.getCentre() + Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
+            auto randX = jmax (proportionOfWidth (0.1f), 1);
+            auto randY = jmax (proportionOfHeight (0.1f), 1);
+            auto& rand = Random::getSystemRandom();
+            auto centre = b.getCentre() + Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
 
-        editor->setBounds (Rectangle (thisEditorWidth, thisEditorHeight).withCentre (centre));
+            bounds = Rectangle (thisEditorWidth, thisEditorHeight).withCentre (centre);
+        }
+
+        editor->setBounds (bounds);
         proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
     }
     else
     {
-        editor->setBounds (Rectangle (thisEditorWidth, thisEditorHeight).withPosition (position));
+        if (bounds == Rectangle<int> {})
+            bounds = Rectangle (thisEditorWidth, thisEditorHeight);
+
+        editor->setBounds (bounds.withPosition (position));
     }
 }

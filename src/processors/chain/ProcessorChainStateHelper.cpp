@@ -98,6 +98,7 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
         saveProcessor (proc);
 
     saveProcessor (&chain.inputProcessor);
+    saveProcessor (&chain.outputProcessor);
 
     return std::move (xml);
 }
@@ -142,6 +143,9 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
             }
         }
 
+        if (newProc == &chain.outputProcessor)
+            return;
+
         int procIdx = newProc == &chain.inputProcessor ? -1 : chain.procs.size();
         connectionMaps.insert ({ procIdx, std::move (connectionMap) });
     };
@@ -159,6 +163,12 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
         if (procName == chain.inputProcessor.getName())
         {
             loadProcessorState (procXml, &chain.inputProcessor, connectionMaps);
+            continue;
+        }
+
+        if (procName == chain.outputProcessor.getName())
+        {
+            loadProcessorState (procXml, &chain.outputProcessor, connectionMaps);
             continue;
         }
 
