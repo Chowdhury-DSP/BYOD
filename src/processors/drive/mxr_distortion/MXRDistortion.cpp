@@ -57,8 +57,6 @@ void MXRDistortion::processAudio (AudioBuffer<float>& buffer)
     dsp::AudioBlock<float> block (buffer);
     dsp::ProcessContextReplacing<float> context (block);
 
-    buffer.applyGain (2.5f);
-
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
         wdf[ch].setParams (paramSkew (*distParam));
