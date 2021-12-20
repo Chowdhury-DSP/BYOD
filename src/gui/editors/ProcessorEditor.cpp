@@ -52,8 +52,11 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     }
 
     popupMenu.setAssociatedComponent (this);
-    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options&)
+    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
     {
+        if (proc.getNumInputs() == 0 || proc.getNumOutputs() == 0)
+            return; // no menu for I/O processors
+
         menu.addItem ("Reset", [&]
                       { resetProcParameters(); });
 
@@ -66,6 +69,10 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
             menu.addItem ("Info", [&, boardComp = dynamic_cast<BoardComponent*> (p)]
                           { boardComp->showInfoComp (proc); });
         }
+
+        menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
+
+        options = options.withStandardItemHeight (27);
     };
 }
 
