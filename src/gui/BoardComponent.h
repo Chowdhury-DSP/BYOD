@@ -19,6 +19,7 @@ public:
 
     void processorAdded (BaseProcessor* newProc) override;
     void processorRemoved (const BaseProcessor* proc) override;
+    void refreshConnections() override { resized(); }
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;

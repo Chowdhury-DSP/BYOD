@@ -29,7 +29,7 @@ public:
     void prepare (double sampleRate, int samplesPerBlock);
     void processAudio (AudioBuffer<float>& buffer);
 
-    OwnedArray<BaseProcessor>& getProcessors() { return procs; }
+    auto& getProcessors() { return procs; }
     ProcessorStore& getProcStore() { return procStore; }
     const SpinLock& getProcChainLock() const { return processingLock; }
 

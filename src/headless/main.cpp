@@ -1,5 +1,6 @@
 #include "../pch.h"
 #include "PresetResaver.h"
+#include "PresetSaveLoadTime.h"
 #include "ScreenshotGenerator.h"
 #include "tests/UnitTests.h"
 
@@ -27,13 +28,17 @@ int main (int argc, char* argv[])
     app.addHelpCommand ("--help|-h", getHelp(), true);
 
     ScreenshotGenerator screenshooter;
-    app.addCommand (screenshooter);
+    app.addCommand (ScreenshotGenerator());
 
     PresetResaver presetsResaver;
     app.addCommand (presetsResaver);
 
+    PresetSaveLoadTime presetSaveLoadTime;
+    app.addCommand (presetSaveLoadTime);
+
     UnitTests unitTests;
     app.addCommand (unitTests);
+
     // ArgumentList args { "--unit-tests", "--all" };
     // unitTests.runUnitTests (args);
 
