@@ -110,13 +110,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
     while (! chain.procs.isEmpty())
         um->perform (new AddOrRemoveProcessor (chain, chain.procs.getLast()));
 
-    auto numInputConnections = chain.inputProcessor.getNumOutputConnections (0);
-    while (numInputConnections > 0)
-    {
-        auto connection = chain.inputProcessor.getOutputConnection (0, numInputConnections - 1);
-        um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
-        numInputConnections = chain.inputProcessor.getNumOutputConnections (0);
-    }
+    ProcessorChainHelpers::removeOutputConnectionsFromProcessor (chain, &chain.inputProcessor, chain.um);
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;

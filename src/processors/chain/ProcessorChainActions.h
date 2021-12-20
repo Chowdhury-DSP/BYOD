@@ -2,6 +2,11 @@
 
 #include "ProcessorChain.h"
 
+namespace ProcessorChainHelpers
+{
+void removeOutputConnectionsFromProcessor (ProcessorChain& chain, BaseProcessor* proc, UndoManager* um);
+}
+
 class AddOrRemoveProcessor : public UndoableAction
 {
 public:

@@ -1,5 +1,22 @@
 #include "ProcessorChainActions.h"
 
+namespace ProcessorChainHelpers
+{
+void removeOutputConnectionsFromProcessor (ProcessorChain& chain, BaseProcessor* proc, UndoManager* um)
+{
+    for (int portIndex = 0; portIndex < proc->getNumOutputs(); ++portIndex)
+    {
+        auto numOutputConnections = proc->getNumOutputConnections (0);
+        while (numOutputConnections > 0)
+        {
+            auto connection = proc->getOutputConnection (0, numOutputConnections - 1);
+            um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
+            numOutputConnections = proc->getNumOutputConnections (0);
+        }
+    }
+}
+} // namespace ProcessorChainHelpers
+
 class ProcChainActions
 {
 public:
@@ -27,6 +44,8 @@ public:
     static void removeProcessor (ProcessorChain& chain, BaseProcessor* procToRemove)
     {
         Logger::writeToLog (String ("Removing processor: ") + procToRemove->getName());
+
+        ProcessorChainHelpers::removeOutputConnectionsFromProcessor (chain, procToRemove, chain.um);
 
         chain.listeners.call (&ProcessorChain::Listener::processorRemoved, procToRemove);
 

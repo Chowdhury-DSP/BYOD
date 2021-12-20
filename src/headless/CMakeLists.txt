@@ -12,6 +12,7 @@ add_custom_command(TARGET BYOD_headless
 target_sources(BYOD_headless PRIVATE
     main.cpp
     PresetResaver.cpp
+    PresetSaveLoadTime.cpp
     ScreenshotGenerator.cpp
 
     tests/ParameterSmoothTest.cpp
