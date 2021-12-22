@@ -2,6 +2,9 @@
 
 #include <pch.h>
 
+// This circuit model was originally implemented as part of Sam Schachter's
+// Master's Thesis (https://github.com/schachtersam32/WaveDigitalFilters_Sharc/blob/master/MXR_DistPlus.h).
+// Since then, we've re-derived the R-adaptor to adapt to the port facing the diode pair.
 class MXRDistWDF
 {
 public:

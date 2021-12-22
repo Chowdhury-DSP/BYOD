@@ -17,7 +17,9 @@ public:
     inline float processSample (float x)
     {
         Vin.setVoltage (x);
-        R.incident (0.0f);
+        
+        Vin.incident (S1.reflected());
+        S1.incident (Vin.reflected());
 
         return wdft::voltage<float> (Rl);
     }
