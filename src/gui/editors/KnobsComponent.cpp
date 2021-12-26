@@ -135,7 +135,7 @@ void KnobsComponent::paint (Graphics& g)
 
 void KnobsComponent::resized()
 {
-    int totalNumComponents = sliders.size() + boxes.size() + buttons.size();
+    int totalNumComponents = sliders.size() + boxes.size() + buttons.size() + customComponents.size();
 
     const auto nameHeight = proportionOfHeight (nameHeightScale);
     int compHeight = getHeight() - nameHeight;
@@ -159,7 +159,7 @@ void KnobsComponent::resized()
             buttons[0]->setBounds (x, yPad + (compHeight - yDim) / 2, compWidth - 5, yDim);
 
         if (customComponents.size() > 0)
-            customComponents[0]->setBounds (x, yPad + (compHeight - yDim) / 2, compWidth / -5, yDim);
+            customComponents[0]->setBounds (getLocalBounds());
 
         return;
     }

@@ -6,7 +6,7 @@
 class CleanGain : public BaseProcessor
 {
 public:
-    CleanGain (UndoManager* um = nullptr) : BaseProcessor ("Clean Gain", createParameterLayout(), um)
+    explicit CleanGain (UndoManager* um = nullptr) : BaseProcessor ("Clean Gain", createParameterLayout(), um)
     {
         gainDBParam = vts.getRawParameterValue ("gain");
 

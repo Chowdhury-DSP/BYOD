@@ -81,14 +81,20 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
             nextNumProcs += 1;
     }
 
-    if (proc == &outputProcessor)
+    if (proc == &outputProcessor) // we've reached the output processor, so we're done!
     {
         proc->processAudio (buffer);
         outProcessed = true;
         return;
     }
 
-    if (nextNumProcs == 0)
+    if (numOutputs == 0) // this processor has no outputs, so after we process, we're done!
+    {
+        proc->processAudio (buffer);
+        return;
+    }
+
+    if (nextNumProcs == 0) // the output of this processor is connected to nothing, so let's not waste our processing...
         return;
 
     if (proc->isBypassed())
