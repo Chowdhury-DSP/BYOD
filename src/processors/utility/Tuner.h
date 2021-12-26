@@ -16,33 +16,21 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    struct TunerBackgroundTask : private Thread
+    struct TunerBackgroundTask : chowdsp::AudioUIBackgroundTask
     {
-        TunerBackgroundTask() : Thread ("Tuner Background Task") {}
+        TunerBackgroundTask() : chowdsp::AudioUIBackgroundTask ("Tuner Background Task") {}
 
-        void prepare (double sampleRate, int samplesPerBlock);
+        void prepareTask (double sampleRate, int samplesPerBlock, int& requstedBlockSize) override;
+        void runTask (const float* data) override;
 
-        void pushSamples (const float* samples, int numSamples);
-
-        void run() override;
-
-        double getCurrentFreqHz() const noexcept { return curFreqHz.load(); }
-
-        void setShouldBeRunning (bool shouldRun);
-
-        void computeCurrentFrequency();
+        double getCurrentFreqHz() noexcept;
 
     private:
-        chowdsp::DoubleBuffer<float> data;
-        std::atomic<int> writePosition { 0 };
+        chowdsp::TunerProcessor<float> tuner;
+        std::atomic<double> curFreqHz {};
 
-        std::atomic<double> curFreqHz = { 0.0 };
+        SmoothedValue<double, ValueSmoothingTypes::Multiplicative> freqValSmoother;
 
-        std::atomic_bool shouldBeRunning { false };
-        std::atomic_bool isPrepared { false };
-        double fs = 48000.0;
-        int autocorrelationSize = 0;
-        int waitMilliseconds = 0;
     } tunerTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Tuner)

@@ -1,6 +1,11 @@
 #include "Tuner.h"
 #include "../ParameterHelpers.h"
 
+namespace
+{
+constexpr int tunerRefreshHz = 24;
+}
+
 Tuner::Tuner (UndoManager* um) : BaseProcessor ("Tuner", createParameterLayout(), um, 1, 0)
 {
     uiOptions.backgroundColour = Colours::silver.brighter (0.2f);
@@ -36,106 +41,25 @@ void Tuner::processAudio (AudioBuffer<float>& buffer)
 }
 
 //===================================================================
-void Tuner::TunerBackgroundTask::prepare (double sampleRate, int samplesPerBlock)
+void Tuner::TunerBackgroundTask::prepareTask (double sampleRate, int /*samplesPerBlock*/, int& requestedBlockSize)
 {
-    if (isThreadRunning())
-        stopThread (-1);
+    tuner.prepare (sampleRate);
+    requestedBlockSize = tuner.getAutocorrelationSize();
 
-    isPrepared = false;
-
-    constexpr double lowestFreqHz = 34.0; // lowest string on a bass guitar tuned to low D is 36.71 Hz
-    autocorrelationSize = int (sampleRate / lowestFreqHz) + 1;
-    data.resize (2 * jmax (autocorrelationSize, samplesPerBlock));
-
-    auto refreshTime = (double) data.size() / sampleRate; // time (seconds) for the whole buffer to be refreshed
-    waitMilliseconds = int (1000.0 * refreshTime);
-
-    fs = sampleRate;
-    writePosition = 0;
-    curFreqHz = 0.0;
-    isPrepared = true;
-
-    if (shouldBeRunning)
-        startThread();
+    freqValSmoother.reset ((double) tunerRefreshHz, 0.15);
+    freqValSmoother.setCurrentAndTargetValue ((double) tuner.getCurrentFrequencyHz());
 }
 
-void Tuner::TunerBackgroundTask::pushSamples (const float* samples, int numSamples)
+void Tuner::TunerBackgroundTask::runTask (const float* data)
 {
-    data.push (samples, numSamples);
-    writePosition = data.getWritePointer();
+    tuner.process (data);
+    curFreqHz = (double) tuner.getCurrentFrequencyHz();
 }
 
-void Tuner::TunerBackgroundTask::run()
+double Tuner::TunerBackgroundTask::getCurrentFreqHz() noexcept
 {
-    while (1)
-    {
-        if (threadShouldExit())
-            return;
-
-        computeCurrentFrequency();
-        wait (waitMilliseconds);
-    }
-}
-
-void Tuner::TunerBackgroundTask::computeCurrentFrequency()
-{
-    const auto* latestData = data.data (writePosition - autocorrelationSize);
-
-    // fail early if buffer is silent!
-    auto minMax = FloatVectorOperations::findMinAndMax (latestData, autocorrelationSize);
-    if (std::abs (minMax.getStart()) < 1.0e-2f && std::abs (minMax.getEnd()) < 1.0e-2f)
-    {
-        curFreqHz = 0.0f;
-        return;
-    }
-
-    // simple autocorrelation-based frequency detection
-    float sumOld = 0.0;
-    float sum = 0.0;
-    int peakDetectorState = 1;
-    int period = 0;
-    float thresh = 0.0f;
-
-    for (int i = 0; i < autocorrelationSize; ++i)
-    {
-        sumOld = sum;
-        sum = std::inner_product (latestData, &latestData[autocorrelationSize - i], &latestData[i], 0.0f);
-
-        // Peak Detect State Machine
-        if (peakDetectorState == 2 && (sum - sumOld) <= 0)
-        {
-            period = i;
-            break;
-        }
-        if (peakDetectorState == 1 && (sum > thresh) && (sum - sumOld) > 0)
-            peakDetectorState = 2;
-
-        if (i == 0)
-        {
-            thresh = sum * 0.5f;
-            peakDetectorState = 1;
-        }
-    }
-
-    if (period > 0)
-        curFreqHz = fs / (double) period;
-}
-
-void Tuner::TunerBackgroundTask::setShouldBeRunning (bool shouldRun)
-{
-    shouldBeRunning = shouldRun;
-
-    if (! shouldRun && isThreadRunning())
-    {
-        stopThread (-1);
-        return;
-    }
-
-    if (isPrepared && shouldRun && ! isThreadRunning())
-    {
-        startThread();
-        return;
-    }
+    freqValSmoother.setTargetValue (curFreqHz.load());
+    return freqValSmoother.getNextValue();
 }
 
 //===================================================================
@@ -144,10 +68,10 @@ void Tuner::getCustomComponents (OwnedArray<Component>& customComps)
     struct TunerComp : public Component,
                        private Timer
     {
-        TunerComp (TunerBackgroundTask& tTask) : tunerTask (tTask)
+        explicit TunerComp (TunerBackgroundTask& tTask) : tunerTask (tTask)
         {
             tunerTask.setShouldBeRunning (true);
-            startTimerHz (20);
+            startTimerHz (tunerRefreshHz);
         }
 
         ~TunerComp() override
@@ -155,15 +79,83 @@ void Tuner::getCustomComponents (OwnedArray<Component>& customComps)
             tunerTask.setShouldBeRunning (false);
         }
 
+        static float getAngleForCents (int cents)
+        {
+            const auto centsNorm = (float) cents / 50.0f;
+            return degreesToRadians (60.0f * centsNorm);
+        }
+
+        static void drawTunerVizBackground (Graphics& g, Rectangle<int> bounds)
+        {
+            g.setColour (Colours::grey.brighter());
+
+            const auto height = (float) bounds.getHeight();
+            auto tickLength = height * 0.15f;
+            const auto bottomCentre = Point { bounds.getCentreX(), bounds.getBottom() }.toFloat();
+            for (auto cents : { -50, -25, -10, 0, 10, 25, 50 })
+            {
+                auto angle = getAngleForCents (cents);
+                auto line = Line<float>::fromStartAndAngle (bottomCentre, height, angle);
+                line = line.withShortenedStart (height - tickLength);
+                g.drawLine (line, 2.5f);
+            }
+
+            g.setColour (Colours::grey.withAlpha (0.65f));
+            tickLength = height * 0.075f;
+            for (auto cents : { -45, -40, -35, -30, -20, -15, -5, 5, 15, 20, 25, 30, 35, 40, 45 })
+            {
+                auto angle = getAngleForCents (cents);
+                auto line = Line<float>::fromStartAndAngle (bottomCentre, height, angle);
+                line = line.withShortenedStart (height - tickLength);
+                g.drawLine (line, 1.5f);
+            }
+        }
+
+        static void drawTunerLine (Graphics& g, Rectangle<int> bounds, int cents)
+        {
+            const auto height = (float) bounds.getHeight();
+            const auto lineLength = height * 0.925f;
+            const auto bottomCentre = Point { bounds.getCentreX(), bounds.getBottom() }.toFloat();
+
+            auto angle = getAngleForCents (cents);
+            auto line = Line<float>::fromStartAndAngle (bottomCentre, lineLength, angle);
+            g.drawLine (line, 2.5f);
+        }
+
         void paint (Graphics& g) override
         {
-            g.setColour (Colours::black);
-            g.fillRoundedRectangle (getLocalBounds().toFloat(), 25.0f);
+            auto b = getLocalBounds();
 
-            g.setColour (Colours::yellow);
-            g.setFont (18.0f);
-            auto freqString = String (tunerTask.getCurrentFreqHz(), 2) + " Hz";
-            g.drawFittedText (freqString, getLocalBounds(), Justification::centred, 1);
+            g.setColour (Colours::black);
+            g.fillRoundedRectangle (b.toFloat(), 20.0f);
+
+            auto nameHeight = proportionOfHeight (0.3f);
+            auto nameBounds = b.removeFromTop (nameHeight);
+            auto tunerVizBounds = b.reduced (proportionOfHeight (0.05f), 0);
+            tunerVizBounds.removeFromTop (proportionOfHeight (0.025f));
+
+            drawTunerVizBackground (g, tunerVizBounds);
+
+            auto curFreqHz = tunerTask.getCurrentFreqHz();
+            if (curFreqHz < 20.0)
+                return;
+
+            auto [noteNum, centsDouble] = chowdsp::TuningHelpers::frequencyHzToNoteAndCents (curFreqHz);
+            const auto cents = (int) centsDouble;
+
+            if (std::abs (cents) > 20)
+                g.setColour (Colours::red.brighter());
+            else if (std::abs (cents) > 5)
+                g.setColour (Colours::yellow);
+            else
+                g.setColour (Colours::green.brighter());
+
+            drawTunerLine (g, tunerVizBounds, cents);
+
+            g.setFont ((float) nameHeight * 0.6f);
+            auto freqString = String (curFreqHz, 1) + " Hz";
+            auto noteString = MidiMessage::getMidiNoteName (noteNum, true, true, 4) + " (" + String ((int) cents) + ")";
+            g.drawFittedText (noteString + " | " + freqString, nameBounds, Justification::centred, 1);
         }
 
         void timerCallback() override
