@@ -35,6 +35,7 @@
 #include "utility/Mixer.h"
 #include "utility/StereoMerger.h"
 #include "utility/StereoSplitter.h"
+#include "utility/Tuner.h"
 
 template <typename ProcType>
 static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
@@ -72,6 +73,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Mixer", &processorFactory<Mixer> },
     { "Stereo Merger", &processorFactory<StereoMerger> },
     { "Stereo Splitter", &processorFactory<StereoSplitter> },
+    { "Tuner", &processorFactory<Tuner> },
 
     { "Chorus", &processorFactory<Chorus> },
     { "Delay", &processorFactory<Delay> },
