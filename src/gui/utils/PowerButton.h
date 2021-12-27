@@ -43,6 +43,7 @@ public:
     void setEnableDisableComps (const std::initializer_list<Component*>& comps)
     {
         enableDisableComps = Array<Component*> (comps);
+        enableDisable();
     }
 
     void enableDisable()

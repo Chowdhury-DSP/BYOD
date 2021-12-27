@@ -79,6 +79,11 @@ void Tuner::getCustomComponents (OwnedArray<Component>& customComps)
             tunerTask.setShouldBeRunning (false);
         }
 
+        void enablementChanged() override
+        {
+            tunerTask.setShouldBeRunning (isEnabled());
+        }
+
         static float getAngleForCents (int cents)
         {
             const auto centsNorm = (float) cents / 50.0f;
@@ -143,12 +148,13 @@ void Tuner::getCustomComponents (OwnedArray<Component>& customComps)
             auto [noteNum, centsDouble] = chowdsp::TuningHelpers::frequencyHzToNoteAndCents (curFreqHz);
             const auto cents = (int) centsDouble;
 
+            const auto alphaMult = isEnabled() ? 1.0f : 0.5f;
             if (std::abs (cents) > 20)
-                g.setColour (Colours::red.brighter());
+                g.setColour (Colours::red.brighter().withAlpha (alphaMult));
             else if (std::abs (cents) > 5)
-                g.setColour (Colours::yellow);
+                g.setColour (Colours::yellow.withAlpha (alphaMult));
             else
-                g.setColour (Colours::green.brighter());
+                g.setColour (Colours::green.brighter().withAlpha (alphaMult));
 
             drawTunerLine (g, tunerVizBounds, cents);
 

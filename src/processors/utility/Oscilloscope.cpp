@@ -112,6 +112,11 @@ void Oscilloscope::getCustomComponents (OwnedArray<Component>& customComps)
             scopeTask.setShouldBeRunning (false);
         }
 
+        void enablementChanged() override
+        {
+            scopeTask.setShouldBeRunning (isEnabled());
+        }
+
         void paint (Graphics& g) override
         {
             auto b = getLocalBounds();
@@ -119,9 +124,10 @@ void Oscilloscope::getCustomComponents (OwnedArray<Component>& customComps)
             g.setColour (Colours::black);
             g.fillRoundedRectangle (b.toFloat(), 15.0f);
 
+            constexpr float lineThickness = 2.0f;
+            g.setColour (Colours::red.withAlpha (isEnabled() ? 1.0f : 0.6f));
             auto scopePath = scopeTask.getScopePath();
-            g.setColour (Colours::red);
-            g.strokePath (scopePath, juce::PathStrokeType (2.0));
+            g.strokePath (scopePath, juce::PathStrokeType (lineThickness));
         }
 
         void resized() override { scopeTask.setBounds (getLocalBounds()); }
