@@ -7,7 +7,6 @@ message(STATUS "VERSION for JUCE: ${juce_version}")
 juce_add_modules(foleys_gui_magic)
 add_subdirectory(chowdsp_utils)
 juce_add_modules(chowdsp_juce_dsp)
-juce_add_module(cpp_data_structures/ea_data_structures)
 
 # add RTNeural
 set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
@@ -24,7 +23,6 @@ target_link_libraries(juce_plugin_modules
         chowdsp_dsp
         chowdsp_gui
         chowdsp_plugin_utils
-        ea_data_structures
         foleys_gui_magic
         RTNeural
     PUBLIC
