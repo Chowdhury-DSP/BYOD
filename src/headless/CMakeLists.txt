@@ -32,6 +32,7 @@ target_include_directories(BYOD_headless
     ../
     ../../modules
     ../../modules/chowdsp_utils/modules
+    ../../modules/cpp_data_structures
     ../../modules/JUCE/modules
     ${juce_includes}
 )
