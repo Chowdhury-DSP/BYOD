@@ -23,7 +23,7 @@ AudioProcessorValueTreeState::ParameterLayout Tuner::createParameterLayout()
 
 void Tuner::prepare (double sampleRate, int samplesPerBlock)
 {
-    tunerTask.prepare (sampleRate, samplesPerBlock);
+    tunerTask.prepare (sampleRate, samplesPerBlock, 1);
 }
 
 void Tuner::processAudio (AudioBuffer<float>& buffer)
@@ -37,7 +37,7 @@ void Tuner::processAudio (AudioBuffer<float>& buffer)
         buffer.applyGain (0, 0, numSamples, 1.0f / MathConstants<float>::sqrt2);
     }
 
-    tunerTask.pushSamples (buffer.getReadPointer (0), numSamples);
+    tunerTask.pushSamples (0, buffer.getReadPointer (0), numSamples);
 }
 
 //===================================================================
@@ -50,9 +50,9 @@ void Tuner::TunerBackgroundTask::prepareTask (double sampleRate, int /*samplesPe
     freqValSmoother.setCurrentAndTargetValue ((double) tuner.getCurrentFrequencyHz());
 }
 
-void Tuner::TunerBackgroundTask::runTask (const float* data)
+void Tuner::TunerBackgroundTask::runTask (const AudioBuffer<float>& data)
 {
-    tuner.process (data);
+    tuner.process (data.getReadPointer (0));
     curFreqHz = (double) tuner.getCurrentFrequencyHz();
 }
 
