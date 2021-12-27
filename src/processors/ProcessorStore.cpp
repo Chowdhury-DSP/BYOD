@@ -33,6 +33,7 @@
 #include "utility/DCBlocker.h"
 #include "utility/FreqBandSplitter.h"
 #include "utility/Mixer.h"
+#include "utility/Oscilloscope.h"
 #include "utility/StereoMerger.h"
 #include "utility/StereoSplitter.h"
 #include "utility/Tuner.h"
@@ -71,6 +72,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "DC Blocker", &processorFactory<DCBlocker> },
     { "Frequency Splitter", &processorFactory<FreqBandSplitter> },
     { "Mixer", &processorFactory<Mixer> },
+    { "Oscilloscope", &processorFactory<Oscilloscope> },
     { "Stereo Merger", &processorFactory<StereoMerger> },
     { "Stereo Splitter", &processorFactory<StereoSplitter> },
     { "Tuner", &processorFactory<Tuner> },

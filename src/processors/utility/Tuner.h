@@ -20,7 +20,7 @@ private:
     {
         TunerBackgroundTask() : chowdsp::AudioUIBackgroundTask ("Tuner Background Task") {}
 
-        void prepareTask (double sampleRate, int samplesPerBlock, int& requstedBlockSize) override;
+        void prepareTask (double sampleRate, int samplesPerBlock, int& requstedBlockSize, int& waitMs) override;
         void runTask (const AudioBuffer<float>& data) override;
 
         double getCurrentFreqHz() noexcept;

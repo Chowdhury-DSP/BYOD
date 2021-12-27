@@ -41,7 +41,7 @@ void Tuner::processAudio (AudioBuffer<float>& buffer)
 }
 
 //===================================================================
-void Tuner::TunerBackgroundTask::prepareTask (double sampleRate, int /*samplesPerBlock*/, int& requestedBlockSize)
+void Tuner::TunerBackgroundTask::prepareTask (double sampleRate, int /*samplesPerBlock*/, int& requestedBlockSize, int& /*waitMs*/)
 {
     tuner.prepare (sampleRate);
     requestedBlockSize = tuner.getAutocorrelationSize();
