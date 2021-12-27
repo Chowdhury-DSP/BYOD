@@ -93,6 +93,57 @@ Slider::SliderLayout ProcessorLNF::getSliderLayout (Slider& slider)
     return layout;
 }
 
+class LabelWithCustomEditor : public Label
+{
+public:
+    LabelWithCustomEditor() : Label ({}, {}) {}
+
+    std::function<void (TextEditor&)> customiseEditor = [] (TextEditor&) {};
+
+    void mouseWheelMove (const MouseEvent&, const MouseWheelDetails&) override {}
+
+    TextEditor* createEditorComponent() override
+    {
+        auto* editor = Label::createEditorComponent();
+
+        if (editor != nullptr)
+            customiseEditor (*editor);
+
+        return editor;
+    }
+};
+
+Label* ProcessorLNF::createSliderTextBox (Slider& slider)
+{
+    auto l = new LabelWithCustomEditor();
+
+    l->setFont ((float) slider.getTextBoxHeight());
+    l->setJustificationType (Justification::centred);
+    l->setKeyboardType (TextInputTarget::decimalKeyboard);
+
+    l->setColour (Label::textColourId, slider.findColour (Slider::textBoxTextColourId));
+    l->setColour (Label::textWhenEditingColourId, slider.findColour (Slider::textBoxTextColourId));
+    l->setColour (Label::backgroundColourId, slider.findColour (Slider::textBoxBackgroundColourId));
+    l->setColour (Label::outlineColourId, slider.findColour (Slider::textBoxOutlineColourId));
+    l->setColour (TextEditor::textColourId, slider.findColour (Slider::textBoxTextColourId));
+    l->setColour (TextEditor::backgroundColourId, slider.findColour (Slider::textBoxBackgroundColourId).withAlpha (1.0f));
+    l->setColour (TextEditor::outlineColourId, slider.findColour (Slider::textBoxOutlineColourId));
+    l->setColour (TextEditor::highlightColourId, slider.findColour (Slider::textBoxHighlightColourId));
+
+    l->customiseEditor = [&] (TextEditor& ed)
+    {
+        ed.setFont (0.85f * (float) slider.getTextBoxHeight());
+        ed.setJustification (Justification::centred);
+
+        ed.setColour (TextEditor::backgroundColourId, Colours::transparentWhite);
+        ed.setColour (TextEditor::focusedOutlineColourId, Colours::transparentWhite);
+        ed.setColour (TextEditor::highlightedTextColourId, slider.findColour (Slider::textBoxHighlightColourId).contrasting());
+        ed.setColour (CaretComponent::caretColourId, slider.findColour (Slider::textBoxHighlightColourId).withAlpha (0.9f));
+    };
+
+    return l;
+}
+
 Font ProcessorLNF::getLabelFont (Label& label)
 {
     auto* labelParent = dynamic_cast<Slider*> (label.getParentComponent());

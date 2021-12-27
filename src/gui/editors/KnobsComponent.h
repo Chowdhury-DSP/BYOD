@@ -5,7 +5,7 @@
 class KnobsComponent : public Component
 {
 public:
-    KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& contrastColour, const Colour& accentColour, std::function<void()> paramLambda = {});
+    KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& contrastColour, const Colour& accentColour, const std::function<void()>& paramLambda = {});
 
     void paint (Graphics& g) override;
     void resized() override;

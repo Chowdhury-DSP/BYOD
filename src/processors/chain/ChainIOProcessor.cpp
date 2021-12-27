@@ -28,8 +28,8 @@ void ChainIOProcessor::createParameters (Parameters& params)
                                                               1));
 
     using namespace ParameterHelpers;
-    createGainDBParameter (params, inGainTag, "In Gain", -72.0f, 18.0f, 0.0f);
-    createGainDBParameter (params, outGainTag, "Out Gain", -72.0f, 18.0f, 0.0f);
+    createGainDBParameter (params, inGainTag, "In Gain", -72.0f, 18.0f, 0.0f, 0.0f);
+    createGainDBParameter (params, outGainTag, "Out Gain", -72.0f, 18.0f, 0.0f, 0.0f);
     createPercentParameter (params, dryWetTag, "Dry/Wet", 1.0f);
 }
 

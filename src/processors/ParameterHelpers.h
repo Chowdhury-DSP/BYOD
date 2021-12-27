@@ -5,48 +5,35 @@
 namespace ParameterHelpers
 {
 using namespace chowdsp::ParamUtils;
-using Params = std::vector<std::unique_ptr<RangedAudioParameter>>;
+using Params = chowdsp::Parameters;
 
 inline void createFreqParameter (Params& params, const String& id, const String& name, float min, float max, float centre, float defaultValue)
 {
     NormalisableRange<float> freqRange { min, max };
     freqRange.setSkewForCentre (centre);
 
-    params.push_back (std::make_unique<VTSParam> (id,
-                                                  name,
-                                                  String(),
-                                                  freqRange,
-                                                  defaultValue,
-                                                  &freqValToString,
-                                                  &stringToFreqVal));
+    emplace_param<VTSParam> (params, id, name, String(), freqRange, defaultValue, &freqValToString, &stringToFreqVal);
 }
 
 inline void createPercentParameter (Params& params, const String& id, const String& name, float defaultValue)
 {
-    params.push_back (std::make_unique<VTSParam> (id,
-                                                  name,
-                                                  String(),
-                                                  NormalisableRange<float> { 0.0f, 1.0f },
-                                                  defaultValue,
-                                                  &percentValToString,
-                                                  &stringToPercentVal));
+    NormalisableRange<float> range { 0.0f, 1.0f };
+    emplace_param<VTSParam> (params, id, name, String(), range, defaultValue, &percentValToString, &stringToPercentVal);
 }
 
-inline void createGainDBParameter (Params& params, const String& id, const String& name, float min, float max, float defaultValue)
+inline void createGainDBParameter (Params& params, const String& id, const String& name, float min, float max, float defaultValue, float centerValue = -1000.0f)
 {
-    params.push_back (std::make_unique<VTSParam> (id,
-                                                  name,
-                                                  String(),
-                                                  NormalisableRange<float> { min, max },
-                                                  defaultValue,
-                                                  &gainValToString,
-                                                  &stringToGainVal));
+    NormalisableRange<float> range { min, max };
+    if (centerValue > -1000.0f)
+        range.setSkewForCentre (centerValue);
+
+    emplace_param<VTSParam> (params, id, name, String(), range, defaultValue, &gainValToString, &stringToGainVal);
 }
 
-inline Params createBaseParams()
+inline auto createBaseParams()
 {
     Params params;
-    params.push_back (std::make_unique<AudioParameterBool> ("on_off", "On/Off", true));
+    emplace_param<AudioParameterBool> (params, "on_off", "On/Off", true);
 
     return std::move (params);
 }

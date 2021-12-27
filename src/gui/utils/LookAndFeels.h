@@ -30,6 +30,7 @@ public:
     Font getComboBoxFont (ComboBox& box) override;
 
     Slider::SliderLayout getSliderLayout (Slider& slider) override;
+    Label* createSliderTextBox (Slider& slider) override;
 
     void drawLabel (Graphics& g, Label& label) override;
     Font getLabelFont (Label& label) override;

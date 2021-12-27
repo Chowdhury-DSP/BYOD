@@ -9,6 +9,7 @@ public:
     TextSlider()
     {
         setLookAndFeel (lnfAllocator->getLookAndFeel<BottomBarLNF>());
+        setMouseDragSensitivity (500);
     }
 
     ~TextSlider() override
