@@ -16,3 +16,6 @@
 [submodule "modules/chowdsp_juce_dsp"]
 	path = modules/chowdsp_juce_dsp
 	url = https://github.com/Chowdhury-DSP/chowdsp_juce_dsp
+[submodule "modules/cpp_data_structures"]
+	path = modules/cpp_data_structures
+	url = https://github.com/eyalamirmusic/cpp_data_structures

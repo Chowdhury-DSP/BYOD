@@ -17,7 +17,7 @@ public:
     inline float processSample (float x)
     {
         Vin.setVoltage (x);
-        
+
         Vin.incident (S1.reflected());
         S1.incident (Vin.reflected());
 

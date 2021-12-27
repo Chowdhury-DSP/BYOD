@@ -94,7 +94,7 @@ public:
         actionHelper.addConnection ({ merger, 0, output, 0 });
 
         // set to stereo
-        input->getVTS().getParameter ("mono_stereo")->setValueNotifyingHost (1.0f);
+        input->getVTS().getParameter ("mono_stereo")->setValueNotifyingHost (0.35f);
 
         AudioBuffer<float> buffer (2, blockSize);
         chain.processAudio (buffer);
@@ -131,7 +131,7 @@ public:
         actionHelper.addConnection ({ splitter, 0, output, 0 });
 
         // set to stereo
-        input->getVTS().getParameter ("mono_stereo")->setValueNotifyingHost (1.0f);
+        input->getVTS().getParameter ("mono_stereo")->setValueNotifyingHost (0.35f);
 
         AudioBuffer<float> buffer (2, blockSize);
         chain.processAudio (buffer);
@@ -168,7 +168,7 @@ public:
         actionHelper.addConnection ({ splitter, 1, output, 0 });
 
         // set to stereo
-        input->getVTS().getParameter ("mono_stereo")->setValueNotifyingHost (1.0f);
+        input->getVTS().getParameter ("mono_stereo")->setValueNotifyingHost (0.35f);
 
         AudioBuffer<float> buffer (2, blockSize);
         chain.processAudio (buffer);
