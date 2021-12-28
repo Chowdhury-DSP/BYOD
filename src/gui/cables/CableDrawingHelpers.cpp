@@ -47,7 +47,7 @@ struct CubicBezier
 
 using namespace CableConstants;
 
-void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float> end, Colour endColour, float scaleFactor)
+auto createCablePath (Point<float> start, Point<float> end, float scaleFactor)
 {
     const auto pointOff = portOffset + scaleFactor;
     auto bezier = CubicBezier (start, start.translated (pointOff, 0.0f), end.translated (-pointOff, 0.0f), end);
@@ -59,22 +59,36 @@ void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float
     for (int i = 1; i <= numPoints; ++i)
         bezierPath.lineTo (bezier.pointOnCubicBezier ((float) i / (float) numPoints));
 
+    return std::move (bezierPath);
+}
+
+void drawCableShadow (Graphics& g, const Path& cablePath)
+{
+    auto cableShadow = Path (cablePath);
+    cableShadow.applyTransform (AffineTransform::translation (0.0f, cableThickness * 0.55f));
+    g.setColour (Colours::black.withAlpha (0.3f));
+    g.strokePath (cableShadow, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
+}
+
+void drawCableEndCircle (Graphics& g, Point<float> centre, Colour colour, float scaleFactor)
+{
+    auto circle = (Rectangle { 10.0f, 10.0f } * scaleFactor).withCentre (centre);
+    g.setColour (colour);
+    g.fillEllipse (circle);
+
+    g.setColour (Colours::white);
+    g.drawEllipse (circle, portCircleThickness);
+}
+
+void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float> end, Colour endColour, float scaleFactor)
+{
+    auto cablePath = createCablePath (start, end, scaleFactor);
+    drawCableShadow (g, cablePath);
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
-    g.strokePath (bezierPath, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
+    g.strokePath (cablePath, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
 
-    auto startCircle = (Rectangle { 10.0f, 10.0f } * scaleFactor).withCentre (start);
-    g.setColour (startColour);
-    g.fillEllipse (startCircle);
-
-    g.setColour (Colours::white);
-    g.drawEllipse (startCircle, 1.0f);
-
-    auto endCircle = (Rectangle { 10.0f, 10.0f } * scaleFactor).withCentre (end);
-    g.setColour (endColour);
-    g.fillEllipse (endCircle);
-
-    g.setColour (Colours::white);
-    g.drawEllipse (endCircle, 1.0f);
+    drawCableEndCircle (g, start, startColour, scaleFactor);
+    drawCableEndCircle (g, end, endColour, scaleFactor);
 }
 
 void drawCablePortGlow (Graphics& g, Point<int> location)

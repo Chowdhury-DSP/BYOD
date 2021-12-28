@@ -25,7 +25,7 @@ void Port::paint (Graphics& g)
         g.fillPath (arcPath);
 
         g.setColour (Colours::white);
-        g.drawEllipse (pb, 1.0f);
+        g.drawEllipse (pb, CableConstants::portCircleThickness);
     }
     else
     {
