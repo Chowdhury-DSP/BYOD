@@ -13,7 +13,7 @@ void Port::paint (Graphics& g)
         Path arcPath;
         arcPath.startNewSubPath (portBounds.getCentreX() - 1.0f, portBounds.getY());
         arcPath.addArc (portBounds.getX(), portBounds.getY(), portBounds.getWidth(), portBounds.getHeight(), 0.0f, MathConstants<float>::pi + 0.1f);
-        auto pb = portBounds.reduced (width * 0.31f);
+        auto pb = portBounds.reduced (width * 0.31f).translated (0.0f, -0.5f);
         arcPath.lineTo (pb.getCentreX() - 1.0f, pb.getBottom());
         arcPath.addArc (pb.getX(), pb.getY(), pb.getWidth(), pb.getHeight(), MathConstants<float>::pi, -0.1f);
         arcPath.closeSubPath();
