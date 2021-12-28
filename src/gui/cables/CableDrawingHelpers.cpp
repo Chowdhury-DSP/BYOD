@@ -53,14 +53,14 @@ void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float
     auto bezier = CubicBezier (start, start.translated (pointOff, 0.0f), end.translated (-pointOff, 0.0f), end);
     auto numPoints = (int) start.getDistanceFrom (end) + 1;
 
-    Path bezierPath1;
-    bezierPath1.preallocateSpace (numPoints * 3 / 2);
-    bezierPath1.startNewSubPath (start);
+    Path bezierPath;
+    bezierPath.preallocateSpace (numPoints * 3 / 2);
+    bezierPath.startNewSubPath (start);
     for (int i = 1; i <= numPoints; ++i)
-        bezierPath1.lineTo (bezier.pointOnCubicBezier ((float) i / (float) numPoints));
+        bezierPath.lineTo (bezier.pointOnCubicBezier ((float) i / (float) numPoints));
 
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
-    g.strokePath (bezierPath1, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
+    g.strokePath (bezierPath, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
 
     auto startCircle = (Rectangle { 10.0f, 10.0f } * scaleFactor).withCentre (start);
     g.setColour (startColour);

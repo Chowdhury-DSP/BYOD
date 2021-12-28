@@ -21,6 +21,15 @@ ConnectionInfo cableToConnection (const Cable& cable)
     return { cable.startProc, cable.startIdx, cable.endProc, cable.endIdx };
 }
 
+void updateConnectionStatuses (const BoardComponent* board, const ConnectionInfo& connection, bool isConnected)
+{
+    if (auto* editor = board->findEditorForProcessor (connection.startProc))
+        editor->setConnectionStatus (isConnected, connection.startPort, false);
+
+    if (auto* editor = board->findEditorForProcessor (connection.endProc))
+        editor->setConnectionStatus (isConnected, connection.endPort, true);
+}
+
 void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent* board)
 {
     for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
@@ -31,8 +40,7 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc,
             const auto& connection = proc->getOutputConnection (portIdx, cIdx);
             cables.add (connectionToCable (connection));
 
-            if (auto* editor = board->findEditorForProcessor (connection.endProc))
-                editor->setConnectionStatus (true, connection.endPort);
+            updateConnectionStatuses (board, connection, true);
         }
     }
 }
@@ -200,9 +208,7 @@ void CableView::processorBeingRemoved (const BaseProcessor* proc)
     {
         if (cables[i]->startProc == proc || cables[i]->endProc == proc)
         {
-            if (auto* editor = board->findEditorForProcessor (cables[i]->endProc))
-                editor->setConnectionStatus (false, cables[i]->endIdx);
-
+            updateConnectionStatuses (board, cableToConnection (*cables[i]), false);
             cables.remove (i);
         }
     }
@@ -222,8 +228,7 @@ void CableView::refreshConnections()
 
 void CableView::connectionAdded (const ConnectionInfo& info)
 {
-    if (auto* editor = board->findEditorForProcessor (info.endProc))
-        editor->setConnectionStatus (true, info.endPort);
+    updateConnectionStatuses (board, info, true);
 
     if (ignoreConnectionCallbacks)
         return;
@@ -235,8 +240,7 @@ void CableView::connectionAdded (const ConnectionInfo& info)
 
 void CableView::connectionRemoved (const ConnectionInfo& info)
 {
-    if (auto* editor = board->findEditorForProcessor (info.endProc))
-        editor->setConnectionStatus (false, info.endPort);
+    updateConnectionStatuses (board, info, false);
 
     if (ignoreConnectionCallbacks)
         return;
