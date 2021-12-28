@@ -25,7 +25,7 @@ public:
 
 private:
     chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange3rd> delay { 1 << 18 };
-    float feedbackGain;
+    float feedbackGain = 0.0f;
 
     chowdsp::StateVariableFilter<float> dcBlocker;
 
@@ -37,7 +37,7 @@ private:
     Random rand;
     SmoothedValue<float, ValueSmoothingTypes::Linear> chaosSmooth;
 
-    float z[2];
+    float z[2] { 0.0f, 0.0f };
     float fs = 48000.0f;
     int maxBlockSize = 256;
 

@@ -7,12 +7,12 @@ constexpr int mSize = 16;
 
 constexpr float highQ = 5.0f;
 constexpr float lowQ = 1.0f / MathConstants<float>::sqrt2;
-static float getQ (float param01)
+float getQ (float param01)
 {
     return lowQ * std::pow ((highQ / lowQ), param01);
 }
 
-static NormalisableRange<float> speedRange (5.0f, 100.0f);
+NormalisableRange<float> speedRange (5.0f, 100.0f);
 } // namespace
 
 EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor ("Envelope Filter", createParameterLayout(), um)
@@ -143,7 +143,7 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
 
         default:
             jassertfalse;
-    };
+    }
 
     buffer.applyGain (Decibels::decibelsToGain (-6.0f));
 }

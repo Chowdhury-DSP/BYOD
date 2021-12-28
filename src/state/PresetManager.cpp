@@ -3,8 +3,8 @@
 
 namespace
 {
-static String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
-static String presetTag = "preset";
+String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
+String presetTag = "preset";
 } // namespace
 
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),

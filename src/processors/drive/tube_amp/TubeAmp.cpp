@@ -32,8 +32,8 @@ void TubeAmp::prepare (double sampleRate, int samplesPerBlock)
 
     doubleBuffer.setSize (2, samplesPerBlock);
 
-    for (int ch = 0; ch < 2; ++ch)
-        tube[ch] = std::make_unique<TubeProc> (sampleRate);
+    for (auto& tubeProc : tube)
+        tubeProc = std::make_unique<TubeProc> (sampleRate);
 
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);

@@ -6,7 +6,7 @@
 class DiodeRectifier : public BaseProcessor
 {
 public:
-    DiodeRectifier (UndoManager* um = nullptr);
+    explicit DiodeRectifier (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

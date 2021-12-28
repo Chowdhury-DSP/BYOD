@@ -6,7 +6,7 @@
 class DiodeClipper : public BaseProcessor
 {
 public:
-    DiodeClipper (UndoManager* um = nullptr);
+    explicit DiodeClipper (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

@@ -5,7 +5,7 @@
 class HighCut : public BaseProcessor
 {
 public:
-    HighCut (UndoManager* um = nullptr);
+    explicit HighCut (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Tone; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

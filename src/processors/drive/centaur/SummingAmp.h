@@ -8,7 +8,7 @@ namespace GainStageSpace
 class SummingAmp : public chowdsp::IIRFilter<1>
 {
 public:
-    SummingAmp() {}
+    SummingAmp() = default;
 
     void prepare (float sampleRate)
     {
@@ -20,8 +20,8 @@ public:
 
     void calcCoefs()
     {
-        constexpr float R20 = (float) 392e3;
-        constexpr float C13 = (float) 820e-12;
+        constexpr auto R20 = 392e3f;
+        constexpr auto C13 = 820e-12f;
 
         // analog coefficients
         float as[2], bs[2];

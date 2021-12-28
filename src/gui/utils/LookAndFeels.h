@@ -49,7 +49,7 @@ public:
     ~BottomBarLNF() override = default;
 
 protected:
-    int getNameWidth (int height, const String& text);
+    static int getNameWidth (int height, const String& text);
     void drawRotarySlider (Graphics& g, int, int, int, int height, float, const float, const float, Slider& slider) override;
     Slider::SliderLayout getSliderLayout (Slider& slider) override;
     Label* createSliderTextBox (Slider& slider) override;

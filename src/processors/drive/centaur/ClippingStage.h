@@ -11,8 +11,8 @@ using namespace chowdsp::WDFT;
 class ClippingWDF
 {
 public:
-    ClippingWDF (double sampleRate) : C9 (1.0e-6, sampleRate),
-                                      C10 (1.0e-6, sampleRate)
+    explicit ClippingWDF (double sampleRate) : C9 (1.0e-6, sampleRate),
+                                               C10 (1.0e-6, sampleRate)
     {
         reset();
     }

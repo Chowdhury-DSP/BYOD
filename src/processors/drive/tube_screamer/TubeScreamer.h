@@ -7,7 +7,7 @@
 class TubeScreamer : public BaseProcessor
 {
 public:
-    TubeScreamer (UndoManager* um = nullptr);
+    explicit TubeScreamer (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

@@ -15,7 +15,7 @@ public:
 private:
     TextButton xButton;
     String procName, authors, description;
-    int numAuthors;
+    int numAuthors = 0;
     HyperlinkButton linkButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InfoComponent)

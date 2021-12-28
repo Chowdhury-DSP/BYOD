@@ -15,7 +15,7 @@ void OutputStageProc::calcCoefs (float curLevel)
 {
     const float R1 = 560.0f + (1.0f - curLevel) * 10000.0f;
     const float R2 = curLevel * 10000.0f + 1.0f;
-    constexpr float C1 = (float) 4.7e-6;
+    constexpr auto C1 = 4.7e-6f;
 
     // analog coefficients
     float as[2], bs[2];

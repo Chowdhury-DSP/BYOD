@@ -30,10 +30,10 @@ AudioProcessorValueTreeState::ParameterLayout DiodeClipper::createParameterLayou
 void DiodeClipper::prepare (double sampleRate, int samplesPerBlock)
 {
     int diodeType = static_cast<int> (*diodeTypeParam);
-    for (int ch = 0; ch < 2; ++ch)
+    for (auto& wdfProc : wdf)
     {
-        wdf[ch].prepare ((float) sampleRate);
-        wdf[ch].setParameters (*cutoffParam, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
+        wdfProc.prepare ((float) sampleRate);
+        wdfProc.setParameters (*cutoffParam, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
     }
 
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };

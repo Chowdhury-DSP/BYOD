@@ -3,7 +3,7 @@
 
 namespace
 {
-const static StringArray irNames {
+const StringArray irNames {
     "Casio 1",
     "Casio 2",
     "Cassette Speaker",
@@ -16,9 +16,9 @@ const static StringArray irNames {
     "Yamaha 4",
 };
 
-const static String irTag = "ir";
-const static String mixTag = "mix";
-const static String gainTag = "gain";
+const String irTag = "ir";
+const String mixTag = "mix";
+const String gainTag = "gain";
 } // namespace
 
 LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterLayout(), um),

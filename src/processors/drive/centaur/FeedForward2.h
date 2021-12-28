@@ -10,7 +10,7 @@ using namespace chowdsp::WDFT;
 class FeedForward2WDF
 {
 public:
-    FeedForward2WDF (double sampleRate);
+    explicit FeedForward2WDF (double sampleRate);
 
     void reset();
     void setGain (float gain);

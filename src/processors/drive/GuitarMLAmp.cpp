@@ -1,9 +1,8 @@
 #include "GuitarMLAmp.h"
-#include "../ParameterHelpers.h"
 
 namespace
 {
-const static std::map<String, String> guitarMLModels {
+const std::map<String, String> guitarMLModels {
     { "BluesJR_FullD_json", "Blues Jr." },
     { "TS9_FullD_json", "TS9" },
 };
@@ -65,10 +64,10 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
 
     for (const auto& modelConfig : guitarMLModels)
     {
-        for (int ch = 0; ch < 2; ++ch)
+        for (auto& model : models)
         {
-            models[ch].insert (std::make_pair (modelConfig.first, ModelType {}));
-            load_json (modelConfig.first, models[ch].at (modelConfig.first));
+            model.insert (std::make_pair (modelConfig.first, ModelType {}));
+            load_json (modelConfig.first, model.at (modelConfig.first));
         }
 
         modelTypes.push_back (modelConfig.first);
@@ -106,9 +105,9 @@ void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
     inGain.prepare (spec);
     inGain.setRampDurationSeconds (0.01);
 
-    for (int ch = 0; ch < 2; ++ch)
+    for (auto& chModels : models)
     {
-        for (auto& model : models[ch])
+        for (auto& model : chModels)
             model.second.reset();
     }
 

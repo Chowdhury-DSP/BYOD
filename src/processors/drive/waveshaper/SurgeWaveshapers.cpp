@@ -73,7 +73,7 @@ Vec4 CLIP (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
     return Vec4::max (Vec4::min ((in * drive), x_max), x_min);
 }
 
-Vec4 DIGI_SSE2 (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
+[[maybe_unused]] Vec4 DIGI_SSE2 (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 {
     // v1.2: return (double)((int)((double)(x*p0inv*16.f+1.0)))*p0*0.0625f;
     const Vec4 m16 = Vec4 (16.f);
@@ -198,7 +198,7 @@ float FuzzTable (const float x)
 }
 
 template <int scale, Vec4 C (QuadFilterWaveshaperState* __restrict, Vec4, Vec4)>
-Vec4 Fuzz (QuadFilterWaveshaperState* __restrict s, Vec4 x, Vec4 drive)
+[[maybe_unused]] Vec4 Fuzz (QuadFilterWaveshaperState* __restrict s, Vec4 x, Vec4 drive)
 {
     static LUTBase<1024, FuzzTable<scale>> table;
     return dcBlock<0, 1> (s, WS_PM1_LUT<1024> (table.data, C (s, x, drive)));
@@ -258,7 +258,7 @@ Vec4 TableEval (QuadFilterWaveshaperState* __restrict s, Vec4 x, Vec4 drive)
         return dcBlock<0, 1> (s, WS_PM1_LUT<N> (table.data, C (s, x, drive)));
     else
         return WS_PM1_LUT<N> (table.data, C (s, x, drive));
-};
+}
 
 template <Vec4 (*K) (Vec4), bool useDCBlock>
 Vec4 CHEBY_CORE (QuadFilterWaveshaperState* __restrict s, Vec4 x, Vec4 drive)
@@ -776,7 +776,12 @@ WaveshaperQFPtr GetQFPtrWaveshaper (int type)
             return OJD;
         case wst_softfold:
             return SoftOneFold;
+
+        default:
+            break;
     }
+
+    jassertfalse;
     return nullptr;
 }
 

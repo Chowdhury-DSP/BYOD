@@ -7,7 +7,7 @@ using ButtonAttachment = AudioProcessorValueTreeState::ButtonAttachment;
 class PowerButton : public Component
 {
 public:
-    PowerButton (const Colour& powerColour) : button ("", DrawableButton::ImageStretched)
+    explicit PowerButton (const Colour& powerColour) : button ("", DrawableButton::ImageStretched)
     {
         button.setColour (DrawableButton::backgroundColourId, Colours::transparentBlack);
         button.setColour (DrawableButton::backgroundOnColourId, Colours::transparentBlack);

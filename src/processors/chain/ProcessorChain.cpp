@@ -1,5 +1,4 @@
 #include "ProcessorChain.h"
-#include "../ParameterHelpers.h"
 #include "ProcessorChainActionHelper.h"
 #include "ProcessorChainStateHelper.h"
 #include "processors/chain/ChainIOProcessor.h"

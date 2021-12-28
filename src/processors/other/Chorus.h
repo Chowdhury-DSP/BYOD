@@ -6,7 +6,7 @@
 class Chorus : public BaseProcessor
 {
 public:
-    Chorus (UndoManager* um = nullptr);
+    explicit Chorus (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Other; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -35,7 +35,7 @@ private:
 
     chowdsp::StateVariableFilter<float> aaFilter;
 
-    float feedbackState[2];
+    float feedbackState[2] { 0.0f, 0.0f };
     SmoothedValue<float, ValueSmoothingTypes::Linear> fbSmooth[2];
     chowdsp::StateVariableFilter<float> dcBlocker;
 

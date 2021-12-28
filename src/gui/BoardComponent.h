@@ -24,8 +24,6 @@ public:
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
 
-    static constexpr auto yOffset = 35;
-
 private:
     void showNewProcMenu() const;
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});

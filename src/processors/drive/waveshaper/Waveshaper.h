@@ -21,7 +21,7 @@ private:
     std::atomic<float>* shapeParam = nullptr;
 
     int lastShape = 0;
-    SurgeWaveshapers::QuadFilterWaveshaperState wss;
+    SurgeWaveshapers::QuadFilterWaveshaperState wss {};
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> driveSmooth;
 

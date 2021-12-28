@@ -8,11 +8,11 @@ class RONN : public BaseProcessor,
              private AudioProcessorValueTreeState::Listener
 {
 public:
-    RONN (UndoManager* um = nullptr);
+    explicit RONN (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    void parameterChanged (const String& parameterID, float newValue) override;
+    void parameterChanged (const String& parameterID, float newValue) final;
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;

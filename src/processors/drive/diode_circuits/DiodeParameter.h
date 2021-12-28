@@ -6,7 +6,7 @@ namespace DiodeParameter
 {
 using namespace ParameterHelpers;
 
-static inline float getDiodeIs (int diodeType)
+inline float getDiodeIs (int diodeType)
 {
     switch (diodeType)
     {
@@ -16,13 +16,15 @@ static inline float getDiodeIs (int diodeType)
             return 15.0e-6f;
         case 2: // 1N4148
             return 2.64e-9f;
+        default:
+            break;
     }
 
     jassertfalse;
     return 1.0e-9f;
 }
 
-static inline void createDiodeParam (Params& params, const String& id)
+inline void createDiodeParam (Params& params, const String& id)
 {
     params.push_back (std::make_unique<AudioParameterChoice> (id,
                                                               "Diodes",
@@ -30,7 +32,7 @@ static inline void createDiodeParam (Params& params, const String& id)
                                                               0));
 }
 
-static inline void createNDiodesParam (Params& params, const String& id)
+inline void createNDiodesParam (Params& params, const String& id)
 {
     NormalisableRange<float> nDiodesRange { 0.3f, 3.0f };
     nDiodesRange.setSkewForCentre (1.0f);

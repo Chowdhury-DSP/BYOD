@@ -6,7 +6,7 @@
 class DCBlocker : public BaseProcessor
 {
 public:
-    DCBlocker (UndoManager* um = nullptr) : BaseProcessor ("DC Blocker", createParameterLayout(), um)
+    explicit DCBlocker (UndoManager* um = nullptr) : BaseProcessor ("DC Blocker", createParameterLayout(), um)
     {
         freqHzParam = vts.getRawParameterValue ("freq");
 

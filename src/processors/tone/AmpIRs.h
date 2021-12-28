@@ -9,13 +9,13 @@ class AmpIRs : public BaseProcessor, private AudioProcessorValueTreeState::Liste
         listeners,
         virtual void irChanged() {})
 public:
-    AmpIRs (UndoManager* um = nullptr);
-    ~AmpIRs();
+    explicit AmpIRs (UndoManager* um = nullptr);
+    ~AmpIRs() override;
 
     ProcessorType getProcessorType() const override { return Tone; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-    void parameterChanged (const String& parameterID, float newValue) override;
+    void parameterChanged (const String& parameterID, float newValue) final;
     void loadIRFromFile (const File& file);
 
     void prepare (double sampleRate, int samplesPerBlock) override;

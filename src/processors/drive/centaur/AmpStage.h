@@ -33,8 +33,8 @@ public:
     void calcCoefs (float curR10b)
     {
         // component values
-        constexpr float C7 = (float) 82e-9;
-        constexpr float C8 = (float) 390e-12;
+        constexpr auto C7 = 82e-9f;
+        constexpr auto C8 = 390e-12f;
 
         // analog coeffs
         float as[3], bs[3];

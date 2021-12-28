@@ -6,7 +6,7 @@
 class Tremolo : public BaseProcessor
 {
 public:
-    Tremolo (UndoManager* um = nullptr);
+    explicit Tremolo (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Other; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -15,7 +15,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    void fillWaveBuffer (float* waveBuffer, const int numSamples, float& phase);
+    void fillWaveBuffer (float* waveBuff, const int numSamples, float& p);
 
     std::atomic<float>* rateParam = nullptr;
     std::atomic<float>* waveParam = nullptr;
@@ -31,7 +31,7 @@ private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> depthAddSmooth;
 
     float fs = 48000.0f;
-    float phase;
+    float phase = 0.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Tremolo)
 };

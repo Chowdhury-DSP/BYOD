@@ -5,7 +5,7 @@
 class Mixer : public BaseProcessor
 {
 public:
-    Mixer (UndoManager* um);
+    explicit Mixer (UndoManager* um);
 
     ProcessorType getProcessorType() const override { return Utility; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -16,7 +16,7 @@ public:
 
 private:
     static constexpr int numIns = 4;
-    std::array<std::atomic<float>*, numIns> gainDBParams;
+    std::array<std::atomic<float>*, numIns> gainDBParams { nullptr };
     std::array<dsp::Gain<float>, numIns> gains;
 
     AudioBuffer<float> monoBuffer;

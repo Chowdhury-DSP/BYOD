@@ -7,7 +7,7 @@
 class TubeAmp : public BaseProcessor
 {
 public:
-    TubeAmp (UndoManager* um = nullptr);
+    explicit TubeAmp (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

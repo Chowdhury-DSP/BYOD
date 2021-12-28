@@ -5,7 +5,7 @@
 class BassCleaner : public BaseProcessor
 {
 public:
-    BassCleaner (UndoManager* um = nullptr);
+    explicit BassCleaner (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Tone; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

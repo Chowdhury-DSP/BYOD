@@ -7,7 +7,7 @@
 class ZenDrive : public BaseProcessor
 {
 public:
-    ZenDrive (UndoManager* um = nullptr);
+    explicit ZenDrive (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

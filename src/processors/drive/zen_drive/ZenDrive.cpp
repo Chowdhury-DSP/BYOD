@@ -1,5 +1,4 @@
 #include "ZenDrive.h"
-#include "../../ParameterHelpers.h"
 
 ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Zen Drive", createParameterLayout(), um)
 {
@@ -24,8 +23,8 @@ AudioProcessorValueTreeState::ParameterLayout ZenDrive::createParameterLayout()
 
 void ZenDrive::prepare (double sampleRate, int samplesPerBlock)
 {
-    for (int ch = 0; ch < 2; ++ch)
-        wdf[ch] = std::make_unique<ZenDriveWDF> ((float) sampleRate);
+    for (auto& wdfProc : wdf)
+        wdfProc = std::make_unique<ZenDriveWDF> ((float) sampleRate);
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
 

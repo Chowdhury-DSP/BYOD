@@ -6,7 +6,7 @@
 class InputBufferProcessor : chowdsp::IIRFilter<1>
 {
 public:
-    InputBufferProcessor() {}
+    InputBufferProcessor() = default;
 
     void prepare (float sampleRate);
     void calcCoefs();

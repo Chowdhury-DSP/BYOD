@@ -7,7 +7,8 @@ ScreenshotGenerator::ScreenshotGenerator()
     this->argumentDescription = "--screenshots --out=[DIR]";
     this->shortDescription = "Generates screenshots for ChowMatrix documentation";
     this->longDescription = "";
-    this->command = std::bind (&ScreenshotGenerator::takeScreenshots, this, std::placeholders::_1);
+    this->command = [=] (const ArgumentList& args)
+    { takeScreenshots (args); };
 }
 
 void ScreenshotGenerator::takeScreenshots (const ArgumentList& args)
@@ -45,6 +46,6 @@ void ScreenshotGenerator::screenshotForBounds (Component* editor, Rectangle<int>
     if (pngStream->openedOk())
     {
         PNGImageFormat pngImage;
-        pngImage.writeImageToStream (screenshot, *pngStream.get());
+        pngImage.writeImageToStream (screenshot, *pngStream);
     }
 }

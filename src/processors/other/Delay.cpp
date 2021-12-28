@@ -51,8 +51,8 @@ void Delay::prepare (double sampleRate, int samplesPerBlock)
 
     delaySmooth.reset (sampleRate, 0.1);
     freqSmooth.reset (sampleRate, 0.1);
-    for (int ch = 0; ch < 2; ++ch)
-        fbSmooth[ch].reset (sampleRate, 0.01);
+    for (auto& sm : fbSmooth)
+        sm.reset (sampleRate, 0.01);
 }
 
 void Delay::processAudio (AudioBuffer<float>& buffer)
