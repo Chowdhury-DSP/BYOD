@@ -24,7 +24,10 @@ ConnectionInfo cableToConnection (const Cable& cable)
 void updateConnectionStatuses (const BoardComponent* board, const ConnectionInfo& connection, bool isConnected)
 {
     if (auto* editor = board->findEditorForProcessor (connection.startProc))
-        editor->setConnectionStatus (isConnected, connection.startPort, false);
+    {
+        bool shouldBeConnected = isConnected || connection.startProc->getNumOutputConnections (connection.startPort) > 0;
+        editor->setConnectionStatus (shouldBeConnected, connection.startPort, false);
+    }
 
     if (auto* editor = board->findEditorForProcessor (connection.endProc))
         editor->setConnectionStatus (isConnected, connection.endPort, true);
