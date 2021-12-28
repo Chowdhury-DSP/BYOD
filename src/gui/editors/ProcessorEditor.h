@@ -34,7 +34,7 @@ public:
     void refreshCable (const MouseEvent& e) override;
     void releaseCable (const MouseEvent& e) override;
     void destroyCable (Port* origin) override;
-    
+
     Point<int> getPortLocation (int portIndex, bool isInput) const;
     void setConnectionStatus (bool isConnected, int portIndex, bool isInput);
     Colour getColour() const noexcept { return procUI.backgroundColour; }

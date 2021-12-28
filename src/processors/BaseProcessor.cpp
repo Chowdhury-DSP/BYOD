@@ -60,7 +60,7 @@ void BaseProcessor::addConnection (ConnectionInfo&& info)
 {
     jassert (info.startProc == this);
     outputConnections[info.startPort].add (info);
-    
+
     info.endProc->inputsConnected.addUsingDefaultSort (info.endPort);
 }
 
