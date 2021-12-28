@@ -45,6 +45,9 @@ public:
 
         auto startProcIndex = rand.nextInt (procs.size() + 1);
         auto* startProc = startProcIndex < procs.size() ? procs[startProcIndex] : &chain.getInputProcessor();
+        if (startProc->getNumOutputs() < 1)
+            return false;
+
         int startPortIndex = rand.nextInt (startProc->getNumOutputs());
 
         auto endProcIndex = rand.nextInt (procs.size() + 1);
