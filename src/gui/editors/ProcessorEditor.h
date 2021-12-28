@@ -34,10 +34,10 @@ public:
     void refreshCable (const MouseEvent& e) override;
     void releaseCable (const MouseEvent& e) override;
     void destroyCable (Port* origin) override;
-
-    void setConnectionStatus (bool isConnected, int portIndex) { inputPorts[portIndex]->setConnectionStatus (isConnected); }
-
+    
     Point<int> getPortLocation (int portIndex, bool isInput) const;
+    void setConnectionStatus (bool isConnected, int portIndex, bool isInput);
+    Colour getColour() const noexcept { return procUI.backgroundColour; }
 
 private:
     void resetProcParameters();

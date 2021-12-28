@@ -6,8 +6,8 @@
 class BoardViewport : public Viewport
 {
 public:
-    BoardViewport (ProcessorChain& procChain);
-    ~BoardViewport();
+    explicit BoardViewport (ProcessorChain& procChain);
+    ~BoardViewport() override;
 
     void resized() override;
 

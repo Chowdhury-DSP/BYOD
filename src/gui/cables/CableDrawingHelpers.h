@@ -4,8 +4,9 @@
 
 namespace CableConstants
 {
-const Colour cableColour (0xFFD0592C);
+const Colour cableColour (0xFFD0592C); // currently only used for "glow"
 constexpr float cableThickness = 5.0f;
+constexpr float portCircleThickness = 1.5f;
 
 constexpr int portDistanceLimit = 25;
 constexpr auto portOffset = 50.0f;
@@ -13,7 +14,7 @@ constexpr auto portOffset = 50.0f;
 
 namespace CableDrawingHelpers
 {
-void drawCable (Graphics& g, Point<float> start, Point<float> end, float scaleFactor);
+void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float> end, Colour endColour, float scaleFactor);
 
 void drawCablePortGlow (Graphics& g, Point<int> location);
 

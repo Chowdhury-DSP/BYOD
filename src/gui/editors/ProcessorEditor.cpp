@@ -236,3 +236,11 @@ Point<int> ProcessorEditor::getPortLocation (int portIndex, bool isInput) const
     jassert (portIndex < outputPorts.size());
     return outputPorts[portIndex]->getBounds().getCentre();
 }
+
+void ProcessorEditor::setConnectionStatus (bool isConnected, int portIndex, bool isInput)
+{
+    if (isInput)
+        inputPorts[portIndex]->setConnectionStatus (isConnected);
+    else
+        outputPorts[portIndex]->setConnectionStatus (isConnected);
+}
