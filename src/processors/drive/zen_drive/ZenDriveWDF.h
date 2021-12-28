@@ -12,7 +12,7 @@ using Cap = wdft::CapacitorT<float>;
 class InputBufferWDF
 {
 public:
-    InputBufferWDF (float sampleRate) : C3 (47.0e-9f, sampleRate)
+    explicit InputBufferWDF (float sampleRate) : C3 (47.0e-9f, sampleRate)
     {
         R4.setVoltage (4.5f);
     }
@@ -40,7 +40,7 @@ private:
 class VoiceCircuitWDF
 {
 public:
-    VoiceCircuitWDF (float sampleRate) : C5 (100.0e-9f, sampleRate)
+    explicit VoiceCircuitWDF (float sampleRate) : C5 (100.0e-9f, sampleRate)
     {
         Vref.setVoltage (4.5f);
     }
@@ -76,7 +76,7 @@ private:
 class DriveStageWDF
 {
 public:
-    DriveStageWDF (float sampleRate) : C5 (100.0e-12f, sampleRate)
+    explicit DriveStageWDF (float sampleRate) : C5 (100.0e-12f, sampleRate)
     {
     }
 
@@ -110,9 +110,9 @@ private:
 class ZenDriveWDF
 {
 public:
-    ZenDriveWDF (float sampleRate) : inputBuffer (sampleRate),
-                                     voiceCircuit (sampleRate),
-                                     driveStage (sampleRate)
+    explicit ZenDriveWDF (float sampleRate) : inputBuffer (sampleRate),
+                                              voiceCircuit (sampleRate),
+                                              driveStage (sampleRate)
     {
         voiceSmooth.reset ((double) sampleRate, 0.01);
         gainSmooth.reset ((double) sampleRate, 0.01);

@@ -20,7 +20,7 @@ public:
 private:
     ProcessorChain& chain;
     BaseProcessor::Ptr actionProc;
-    BaseProcessor* actionProcPtr;
+    BaseProcessor* actionProcPtr = nullptr;
     const bool isRemoving;
     const bool wasDirty;
 

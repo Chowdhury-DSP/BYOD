@@ -3,16 +3,16 @@
 
 namespace
 {
-const static StringArray irNames {
+const StringArray irNames {
     "Fender",
     "Marshall",
     "Bogner",
     "Custom",
 };
 
-const static String irTag = "ir";
-const static String mixTag = "mix";
-const static String gainTag = "gain";
+const String irTag = "ir";
+const String mixTag = "mix";
+const String gainTag = "gain";
 } // namespace
 
 AmpIRs::AmpIRs (UndoManager* um) : BaseProcessor ("Amp IRs", createParameterLayout(), um),

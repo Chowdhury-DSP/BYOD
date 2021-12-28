@@ -201,4 +201,4 @@ public:
     }
 };
 
-class StereoTest stereoTest;
+static StereoTest stereoTest;

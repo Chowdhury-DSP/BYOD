@@ -5,7 +5,7 @@
 class FreqBandSplitter : public BaseProcessor
 {
 public:
-    FreqBandSplitter (UndoManager* um);
+    explicit FreqBandSplitter (UndoManager* um);
 
     ProcessorType getProcessorType() const override { return Utility; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

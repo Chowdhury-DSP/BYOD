@@ -5,7 +5,7 @@
 class OutputProcessor : public BaseProcessor
 {
 public:
-    OutputProcessor (UndoManager* um = nullptr) : BaseProcessor ("Output", createParameterLayout(), um, 1, 0)
+    explicit OutputProcessor (UndoManager* um = nullptr) : BaseProcessor ("Output", createParameterLayout(), um, 1, 0)
     {
         uiOptions.backgroundColour = Colours::lightskyblue;
     }

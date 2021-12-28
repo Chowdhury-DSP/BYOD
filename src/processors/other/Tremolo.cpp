@@ -60,7 +60,7 @@ void Tremolo::prepare (double sampleRate, int samplesPerBlock)
     phase = 0.0f;
 }
 
-void Tremolo::fillWaveBuffer (float* waveBuffer, const int numSamples, float& phase)
+void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
 {
     bool isSmoothing = phaseSmooth.isSmoothing() || waveSmooth.isSmoothing();
 
@@ -73,12 +73,12 @@ void Tremolo::fillWaveBuffer (float* waveBuffer, const int numSamples, float& ph
             auto squareGain = jmax (2.0f * (curWave - 0.5f), 0.0f);
             auto triGain = 1.0f - 2.0f * std::abs (0.5f - curWave);
 
-            waveBuffer[n] = sineGain * dsp::FastMathApproximations::sin (phase); // sine
-            waveBuffer[n] += triGain * phase / MathConstants<float>::pi; // triangle
-            waveBuffer[n] += squareGain * (phase > 0.0f ? 1.0f : -1.0f); // square
+            waveBuff[n] = sineGain * dsp::FastMathApproximations::sin (p); // sine
+            waveBuff[n] += triGain * p / MathConstants<float>::pi; // triangle
+            waveBuff[n] += squareGain * (p > 0.0f ? 1.0f : -1.0f); // square
 
-            phase += phaseSmooth.getNextValue();
-            phase = phase > MathConstants<float>::pi ? phase - MathConstants<float>::twoPi : phase;
+            p += phaseSmooth.getNextValue();
+            p = p > MathConstants<float>::pi ? p - MathConstants<float>::twoPi : p;
         }
     }
     else
@@ -91,11 +91,11 @@ void Tremolo::fillWaveBuffer (float* waveBuffer, const int numSamples, float& ph
             auto triGain = 1.0f - 2.0f * std::abs (0.5f - curWave);
             for (int n = 0; n < numSamples; ++n)
             {
-                waveBuffer[n] = sineGain * dsp::FastMathApproximations::sin (phase); // sine
-                waveBuffer[n] += triGain * phase / MathConstants<float>::pi; // triangle
+                waveBuff[n] = sineGain * dsp::FastMathApproximations::sin (p); // sine
+                waveBuff[n] += triGain * p / MathConstants<float>::pi; // triangle
 
-                phase += phaseInc;
-                phase = phase > MathConstants<float>::pi ? phase - MathConstants<float>::twoPi : phase;
+                p += phaseInc;
+                p = p > MathConstants<float>::pi ? p - MathConstants<float>::twoPi : p;
             }
         }
         else
@@ -104,11 +104,11 @@ void Tremolo::fillWaveBuffer (float* waveBuffer, const int numSamples, float& ph
             auto triGain = 1.0f - 2.0f * std::abs (0.5f - curWave);
             for (int n = 0; n < numSamples; ++n)
             {
-                waveBuffer[n] = triGain * phase / MathConstants<float>::pi; // triangle
-                waveBuffer[n] += squareGain * (phase > 0.0f ? 1.0f : -1.0f); // square
+                waveBuff[n] = triGain * p / MathConstants<float>::pi; // triangle
+                waveBuff[n] += squareGain * (p > 0.0f ? 1.0f : -1.0f); // square
 
-                phase += phaseInc;
-                phase = phase > MathConstants<float>::pi ? phase - MathConstants<float>::twoPi : phase;
+                p += phaseInc;
+                p = p > MathConstants<float>::pi ? p - MathConstants<float>::twoPi : p;
             }
         }
     }

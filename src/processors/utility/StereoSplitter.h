@@ -5,7 +5,7 @@
 class StereoSplitter : public BaseProcessor
 {
 public:
-    StereoSplitter (UndoManager* um);
+    explicit StereoSplitter (UndoManager* um);
 
     ProcessorType getProcessorType() const override { return Utility; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

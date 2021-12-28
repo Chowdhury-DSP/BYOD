@@ -12,7 +12,7 @@ using Cap = wdft::CapacitorT<float>;
 class InputBufferWDF
 {
 public:
-    InputBufferWDF (float sampleRate) : C2 (1.0e-6f, sampleRate)
+    explicit InputBufferWDF (float sampleRate) : C2 (1.0e-6f, sampleRate)
     {
         R5.setVoltage (4.5f);
     }
@@ -39,7 +39,7 @@ private:
 class VplusWDF
 {
 public:
-    VplusWDF (float sampleRate) : C3 (0.047e-6f, sampleRate)
+    explicit VplusWDF (float sampleRate) : C3 (0.047e-6f, sampleRate)
     {
     }
 
@@ -65,7 +65,7 @@ private:
 class DriveStageWDF
 {
 public:
-    DriveStageWDF (float sampleRate) : C4 (51.0e-12f, sampleRate)
+    explicit DriveStageWDF (float sampleRate) : C4 (51.0e-12f, sampleRate)
     {
     }
 
@@ -107,9 +107,9 @@ private:
 class TubeScreamerWDF
 {
 public:
-    TubeScreamerWDF (float sampleRate) : inputBuffer (sampleRate),
-                                         vplusCircuit (sampleRate),
-                                         driveStage (sampleRate)
+    explicit TubeScreamerWDF (float sampleRate) : inputBuffer (sampleRate),
+                                                  vplusCircuit (sampleRate),
+                                                  driveStage (sampleRate)
     {
         nDiodesSmooth.reset ((double) sampleRate, 0.01);
         gainSmooth.reset ((double) sampleRate, 0.01);
@@ -186,7 +186,7 @@ private:
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> nDiodesSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> gainSmooth;
-    float curDiodeIs;
+    float curDiodeIs = 0.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TubeScreamerWDF)
 };

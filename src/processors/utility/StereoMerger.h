@@ -5,7 +5,7 @@
 class StereoMerger : public BaseProcessor
 {
 public:
-    StereoMerger (UndoManager* um);
+    explicit StereoMerger (UndoManager* um);
 
     ProcessorType getProcessorType() const override { return Utility; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

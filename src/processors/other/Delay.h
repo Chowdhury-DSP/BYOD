@@ -5,7 +5,7 @@
 class Delay : public BaseProcessor
 {
 public:
-    Delay (UndoManager* um = nullptr);
+    explicit Delay (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Other; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

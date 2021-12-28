@@ -38,14 +38,14 @@ inline auto createBaseParams()
     return std::move (params);
 }
 
-static inline float logPot (float x)
+inline float logPot (float x)
 {
     return (std::pow (10.0f, x) - 1.0f) / 9.0f;
 }
 
-static inline float iLogPot (float x)
+inline float iLogPot (float x)
 {
     return (std::pow (0.1f, x) - 1.0f) / -0.9f;
 }
 
-}; // namespace ParameterHelpers
+} // namespace ParameterHelpers

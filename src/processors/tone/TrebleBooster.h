@@ -5,7 +5,7 @@
 class TrebleBooster : public BaseProcessor
 {
 public:
-    TrebleBooster (UndoManager* um = nullptr);
+    explicit TrebleBooster (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Tone; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

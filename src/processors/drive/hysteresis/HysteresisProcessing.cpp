@@ -36,13 +36,14 @@ void HysteresisProcessing::cook (float drive, float width, float sat)
     hpState.k = 0.47875;
     upperLim = 20.0;
 
+    constexpr auto alpha = HysteresisOps::HysteresisState::alpha;
     hpState.nc = 1.0 - hpState.c;
     hpState.M_s_oa = hpState.M_s / hpState.a;
-    hpState.M_s_oa_talpha = hpState.alpha * hpState.M_s_oa;
+    hpState.M_s_oa_talpha = alpha * hpState.M_s_oa;
     hpState.M_s_oa_tc = hpState.c * hpState.M_s_oa;
-    hpState.M_s_oa_tc_talpha = hpState.alpha * hpState.M_s_oa_tc;
+    hpState.M_s_oa_tc_talpha = alpha * hpState.M_s_oa_tc;
     hpState.M_s_oaSq_tc_talpha = hpState.M_s_oa_tc_talpha / hpState.a;
-    hpState.M_s_oaSq_tc_talphaSq = hpState.alpha * hpState.M_s_oaSq_tc_talpha;
+    hpState.M_s_oaSq_tc_talphaSq = alpha * hpState.M_s_oaSq_tc_talpha;
 }
 
 void HysteresisProcessing::processBlock (double* bufferLeft, double* bufferRight, const int numSamples)

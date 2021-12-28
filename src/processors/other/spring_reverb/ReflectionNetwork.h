@@ -73,7 +73,7 @@ private:
                                             ReflectionDelay { 1 << 18 },
                                             ReflectionDelay { 1 << 18 } };
 
-    VecType feedback;
+    VecType feedback {};
     float fs = 48000.0f;
 
     chowdsp::ShelfFilter<float> shelfFilter;

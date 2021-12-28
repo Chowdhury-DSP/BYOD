@@ -88,7 +88,7 @@ public:
     }
 
 private:
-    ProcChainActions() {} // static use only!
+    ProcChainActions() = default; // static use only!
 };
 
 //=========================================================

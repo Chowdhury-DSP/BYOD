@@ -10,7 +10,7 @@ using namespace chowdsp::WDFT;
 class PreAmpWDF
 {
 public:
-    PreAmpWDF (double sampleRate);
+    explicit PreAmpWDF (double sampleRate);
 
     void setGain (float gain);
     void reset();

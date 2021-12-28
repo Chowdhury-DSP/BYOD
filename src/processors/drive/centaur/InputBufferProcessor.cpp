@@ -10,9 +10,9 @@ void InputBufferProcessor::prepare (float sampleRate)
 
 void InputBufferProcessor::calcCoefs()
 {
-    constexpr float R1 = 10000.0f;
-    constexpr float R2 = 1000000.0f;
-    constexpr float C1 = (float) 0.1e-6;
+    constexpr auto R1 = 10000.0f;
+    constexpr auto R2 = 1000000.0f;
+    constexpr auto C1 = 0.1e-6f;
 
     // analog coefficients
     float as[2], bs[2];

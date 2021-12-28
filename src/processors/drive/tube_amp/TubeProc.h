@@ -5,9 +5,9 @@
 class TubeProc
 {
 public:
-    TubeProc (double sampleRate) : Cpk (0.33e-12, sampleRate, alpha),
-                                   Cgp (1.7e-12, sampleRate, alpha),
-                                   Cgk (1.6e-12, sampleRate, alpha)
+    explicit TubeProc (double sampleRate) : Cpk (0.33e-12, sampleRate, alpha),
+                                            Cgp (1.7e-12, sampleRate, alpha),
+                                            Cgk (1.6e-12, sampleRate, alpha)
     {
         Vp = 0.0;
     }
@@ -24,9 +24,9 @@ public:
         return sgn (x) * std::pow (std::abs (x), y);
     }
 
-    inline double getCurrent (double _Vg, double _Vp) const noexcept
+    inline double getCurrent (double curVg, double curVp) const noexcept
     {
-        return 2.0e-9 * pwrs (0.1 * _Vg - 0.01 * _Vp, 0.33);
+        return 2.0e-9 * pwrs (0.1 * curVg - 0.01 * curVp, 0.33);
     }
 
     inline double processSample (double Vg) noexcept

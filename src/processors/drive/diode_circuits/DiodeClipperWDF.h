@@ -98,7 +98,7 @@ private:
 
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> cutoffSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> nDiodesSmooth;
-    float curDiodeIs;
+    float curDiodeIs = 0.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DiodeClipperWDF)
 };

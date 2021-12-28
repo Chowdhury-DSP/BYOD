@@ -6,7 +6,7 @@
 class GuitarMLAmp : public BaseProcessor
 {
 public:
-    GuitarMLAmp (UndoManager* um = nullptr);
+    explicit GuitarMLAmp (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

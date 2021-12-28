@@ -29,10 +29,10 @@ void TubeScreamer::prepare (double sampleRate, int samplesPerBlock)
 {
     int diodeType = static_cast<int> (*diodeTypeParam);
     auto gainParamSkew = ParameterHelpers::logPot (*gainParam);
-    for (int ch = 0; ch < 2; ++ch)
+    for (auto& wdfProc : wdf)
     {
-        wdf[ch] = std::make_unique<TubeScreamerWDF> ((float) sampleRate);
-        wdf[ch]->setParameters (gainParamSkew, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
+        wdfProc = std::make_unique<TubeScreamerWDF> ((float) sampleRate);
+        wdfProc->setParameters (gainParamSkew, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);

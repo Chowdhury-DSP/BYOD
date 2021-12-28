@@ -98,7 +98,7 @@ static inline Float deriv (Float x_n, Float x_n1, Float x_d_n1, Float T) noexcep
 template <typename Float>
 static inline Float hysteresisFunc (Float M, Float H, Float H_d, HysteresisState& hp) noexcept
 {
-    hp.Q = (H + M * hp.alpha) * (1.0 / hp.a);
+    hp.Q = (H + M * HysteresisOps::HysteresisState::alpha) * (1.0 / hp.a);
 
 #if HYSTERESIS_USE_SIMD
     hp.coth = (Float) 1.0 / tanhSIMD (hp.Q);
@@ -122,7 +122,7 @@ static inline Float hysteresisFunc (Float M, Float H, Float H_d, HysteresisState
 
     hp.L_prime = langevinD (hp.Q, hp.coth, hp.nearZero);
 
-    hp.f1Denom = ((Float) hp.nc * delta) * hp.k - (Float) hp.alpha * hp.M_diff;
+    hp.f1Denom = ((Float) hp.nc * delta) * hp.k - (Float) HysteresisOps::HysteresisState::alpha * hp.M_diff;
     hp.f1 = hp.kap1 * hp.M_diff / hp.f1Denom;
     hp.f2 = hp.L_prime * hp.M_s_oa_tc;
     hp.f3 = (Float) 1.0 - (hp.L_prime * hp.M_s_oa_tc_talpha);
@@ -137,7 +137,7 @@ static inline Float hysteresisFuncPrime (Float H_d, Float dMdt, HysteresisState&
     const Float L_prime2 = langevinD2 (hp.Q, hp.coth, hp.nearZero);
     const Float M_diff2 = hp.L_prime * hp.M_s_oa_talpha - 1.0;
 
-    const Float f1_p = hp.kap1 * ((M_diff2 / hp.f1Denom) + hp.M_diff * hp.alpha * M_diff2 / (hp.f1Denom * hp.f1Denom));
+    const Float f1_p = hp.kap1 * ((M_diff2 / hp.f1Denom) + hp.M_diff * HysteresisOps::HysteresisState::alpha * M_diff2 / (hp.f1Denom * hp.f1Denom));
     const Float f2_p = L_prime2 * hp.M_s_oaSq_tc_talpha;
     const Float f3_p = L_prime2 * (-hp.M_s_oaSq_tc_talphaSq);
 

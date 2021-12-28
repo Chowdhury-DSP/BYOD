@@ -6,7 +6,7 @@
 class Hysteresis : public BaseProcessor
 {
 public:
-    Hysteresis (UndoManager* um = nullptr);
+    explicit Hysteresis (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

@@ -6,7 +6,7 @@
 class SpringReverbProcessor : public BaseProcessor
 {
 public:
-    SpringReverbProcessor (UndoManager* um = nullptr);
+    explicit SpringReverbProcessor (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Other; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

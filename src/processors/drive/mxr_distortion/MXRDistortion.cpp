@@ -31,10 +31,10 @@ AudioProcessorValueTreeState::ParameterLayout MXRDistortion::createParameterLayo
 
 void MXRDistortion::prepare (double sampleRate, int samplesPerBlock)
 {
-    for (int ch = 0; ch < 2; ++ch)
+    for (auto& wdfProc : wdf)
     {
-        wdf[ch].prepare (sampleRate);
-        wdf[ch].setParams (paramSkew (*distParam));
+        wdfProc.prepare (sampleRate);
+        wdfProc.setParams (paramSkew (*distParam));
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);

@@ -7,7 +7,8 @@ PresetResaver::PresetResaver()
     this->argumentDescription = "--presets-resave --dir=[PRESET DIR]";
     this->shortDescription = "Resaves factory presets";
     this->longDescription = "";
-    this->command = std::bind (&PresetResaver::savePresets, this, std::placeholders::_1);
+    this->command = [=] (const ArgumentList& args)
+    { savePresets (args); };
 }
 
 void PresetResaver::savePresets (const ArgumentList& args)

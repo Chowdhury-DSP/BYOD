@@ -5,7 +5,7 @@
 class EnvelopeFilter : public BaseProcessor
 {
 public:
-    EnvelopeFilter (UndoManager* um = nullptr);
+    explicit EnvelopeFilter (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Other; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

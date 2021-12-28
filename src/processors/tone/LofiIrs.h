@@ -5,8 +5,8 @@
 class LofiIrs : public BaseProcessor, private AudioProcessorValueTreeState::Listener
 {
 public:
-    LofiIrs (UndoManager* um = nullptr);
-    ~LofiIrs();
+    explicit LofiIrs (UndoManager* um = nullptr);
+    ~LofiIrs() override;
 
     ProcessorType getProcessorType() const override { return Tone; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();

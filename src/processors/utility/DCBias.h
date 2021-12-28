@@ -6,7 +6,7 @@
 class DCBias : public BaseProcessor
 {
 public:
-    DCBias (UndoManager* um = nullptr) : BaseProcessor ("DC Bias", createParameterLayout(), um)
+    explicit DCBias (UndoManager* um = nullptr) : BaseProcessor ("DC Bias", createParameterLayout(), um)
     {
         biasParam = vts.getRawParameterValue ("bias");
 

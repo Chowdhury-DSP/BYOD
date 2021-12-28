@@ -5,7 +5,7 @@
 class GraphicEQ : public BaseProcessor
 {
 public:
-    GraphicEQ (UndoManager* um = nullptr);
+    explicit GraphicEQ (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Tone; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
@@ -15,7 +15,7 @@ public:
 
 private:
     static constexpr int nBands = 6;
-    std::atomic<float>* gainDBParams[nBands];
+    std::atomic<float>* gainDBParams[nBands] { nullptr };
 
     static constexpr std::array<float, nBands> bandFreqs { 100.0f, 220.0f, 500.0f, 1000.0f, 2200.0f, 5000.0f };
     std::array<chowdsp::PeakingFilter<float>, nBands> filter[2];
