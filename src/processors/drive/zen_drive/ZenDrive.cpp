@@ -49,4 +49,6 @@ void ZenDrive::processAudio (AudioBuffer<float>& buffer)
     }
 
     dcBlocker.processAudio (buffer);
+
+    buffer.applyGain (Decibels::decibelsToGain (-10.0f));
 }
