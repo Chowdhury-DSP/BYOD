@@ -70,9 +70,6 @@ public:
     /** if your processor has custom UI componenets, create them here! */
     virtual void getCustomComponents (OwnedArray<Component>& /*customComps*/) {}
 
-    /** if your processor can't pass a unit test (for a justifiable reason) say so here! */
-    virtual StringArray getTestsToSkip() const { return {}; }
-
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
 

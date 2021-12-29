@@ -42,7 +42,8 @@ public:
 
     void runTest() override
     {
-        runTestForAllProcessors (this, [=] (BaseProcessor* proc)
+        runTestForAllProcessors (this,
+                                 [=] (BaseProcessor* proc)
                                  {
                                      auto params = proc->getVTS().processor.getParameters();
                                      for (auto* p : params)
@@ -60,7 +61,8 @@ public:
                                          proc->prepare (testSampleRate, testBlockSize);
                                          testParameter (proc, floatParam);
                                      }
-                                 });
+                                 },
+                                 { "Delay" });
     }
 };
 
