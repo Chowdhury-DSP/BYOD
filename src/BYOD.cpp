@@ -38,7 +38,7 @@ void BYOD::releaseResources()
 
 void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
-    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer };
+    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
     procs.processAudio (buffer);
 }

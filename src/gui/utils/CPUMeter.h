@@ -64,8 +64,7 @@ public:
 
         g.setColour (background);
         g.fillRoundedRectangle (barBounds, cornerSize);
-
-        progress = jlimit (0.0, 1.0, progress);
+        
         {
             Path p;
             p.addRoundedRectangle (barBounds, cornerSize);
