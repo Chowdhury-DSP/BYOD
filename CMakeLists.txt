@@ -55,7 +55,7 @@ target_compile_definitions(BYOD PUBLIC
 target_link_libraries(BYOD PRIVATE juce_plugin_modules)
 
 # we need these flags for notarization on MacOS
-if(BUILD_RELEASE and APPLE)
+if(BUILD_RELEASE AND APPLE)
     message(STATUS "Setting MacOS release flags...")
     set_target_properties(BYOD_Standalone PROPERTIES
         XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES)
