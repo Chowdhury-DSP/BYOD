@@ -19,7 +19,7 @@ cmake -Bbuild -GXcode -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY="Developer ID A
     -D"CMAKE_OSX_ARCHITECTURES=arm64;x86_64" \
     -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
     -DCMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS="--timestamp" \
-    -DMACOS_RELEASE=ON
+    -DBUILD_RELEASE=ON
 cmake --build build --config Release -j10 | xcpretty
 
 # copy builds to bin

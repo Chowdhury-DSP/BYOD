@@ -7,6 +7,7 @@ add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
 # set default plugin formats to build
+option(BUILD_RELEASE "Set build flags for release builds" OFF)
 if(IOS)
     set(JUCE_FORMATS Standalone AUv3)
 else()
@@ -54,8 +55,7 @@ target_compile_definitions(BYOD PUBLIC
 target_link_libraries(BYOD PRIVATE juce_plugin_modules)
 
 # we need these flags for notarization on MacOS
-option(MACOS_RELEASE "Set build flags for MacOS Release" OFF)
-if(MACOS_RELEASE)
+if(BUILD_RELEASE and APPLE)
     message(STATUS "Setting MacOS release flags...")
     set_target_properties(BYOD_Standalone PROPERTIES
         XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES)

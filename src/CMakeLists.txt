@@ -1,4 +1,4 @@
-if(NOT (IOS OR MACOS_RELEASE))
+if(NOT (IOS OR BUILD_RELEASE))
     message(STATUS "Configuring BYOD headless")
     add_subdirectory(headless)
 endif()
