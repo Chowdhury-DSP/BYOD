@@ -51,13 +51,10 @@ public:
     const String getName() const override { return JuceProcWrapper::getName(); }
 
     // audio processing methods
-    void prepareInputBuffers (int numSamples);
-    virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
-    virtual void processAudio (AudioBuffer<float>& buffer) = 0;
-
-    // bypass methods
     bool isBypassed() const { return ! static_cast<bool> (onOffParam->load()); }
-    virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) {}
+    void prepareProcessing (double sampleRate, int numSamples);
+    void processAudioBlock (AudioBuffer<float>& buffer);
+    float getInputLevelDB (int portIndex) const noexcept;
 
     // state save/load methods
     virtual std::unique_ptr<XmlElement> toXML();
@@ -67,7 +64,7 @@ public:
     AudioProcessorValueTreeState& getVTS() { return vts; }
     const ProcessorUIOptions& getUIOptions() const { return uiOptions; }
 
-    /** if your processor has custom UI componenets, create them here! */
+    /** if your processor has custom UI components, create them here! */
     virtual void getCustomComponents (OwnedArray<Component>& /*customComps*/) {}
 
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
@@ -96,6 +93,10 @@ public:
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
 
 protected:
+    virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
+    virtual void processAudio (AudioBuffer<float>& buffer) = 0;
+    virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) {}
+
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
 
@@ -123,6 +124,9 @@ private:
     int inputIdx = 0;
 
     Point<float> editorPosition;
+
+    Array<SmoothedValue<float, ValueSmoothingTypes::Linear>> bufferMagnitudes; // smoothed values to track magnitudes at input ports
+    Array<Atomic<float>> portMagnitudes;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };

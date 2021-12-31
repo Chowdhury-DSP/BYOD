@@ -52,6 +52,7 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc,
 CableView::CableView (const BoardComponent* comp) : board (comp)
 {
     setInterceptsMouseClicks (false, false);
+    startTimerHz (24);
 }
 
 void CableView::paint (Graphics& g)
@@ -76,7 +77,8 @@ void CableView::paint (Graphics& g)
 
             auto startColour = startEditor->getColour();
             auto endColour = endEditor->getColour();
-            drawCable (g, startPortLocation.toFloat(), startColour, endPortLocation.toFloat(), endColour, scaleFactor);
+            auto levelDB = cable->endProc->getInputLevelDB (cable->endIdx);
+            drawCable (g, startPortLocation.toFloat(), startColour, endPortLocation.toFloat(), endColour, scaleFactor, levelDB);
         }
         else if (cableMouse != nullptr)
         {

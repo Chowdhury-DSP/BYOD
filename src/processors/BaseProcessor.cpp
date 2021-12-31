@@ -17,17 +17,70 @@ BaseProcessor::BaseProcessor (const String& name,
 
     inputBuffers.resize (numInputs);
     inputsConnected.resize (0);
+    bufferMagnitudes.resize (numInputs);
+    portMagnitudes.resize (numInputs);
 
     uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>();
 }
 
-void BaseProcessor::prepareInputBuffers (int numSamples)
+void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
 {
+    prepare (sampleRate, numSamples);
+
     for (auto& b : inputBuffers)
     {
         b.setSize (2, numSamples);
         b.clear();
     }
+
+    for (auto& mag : bufferMagnitudes)
+    {
+        mag.reset (sampleRate, 0.05);
+        mag.setCurrentAndTargetValue (-100.0f);
+    }
+
+    for (auto& mag : portMagnitudes)
+        mag = -100.0f;
+}
+
+void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
+{
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+    auto updateBufferMag = [&] (const AudioBuffer<float>& inBuffer, int inputIndex)
+    {
+        auto rmsAvg = 0.0f;
+        for (int ch = 0; ch < numChannels; ++ch)
+            rmsAvg += Decibels::gainToDecibels (inBuffer.getRMSLevel (ch, 0, numSamples)); // @TODO: not sure if getRMSLevel is optimized enough...
+
+        rmsAvg /= (float) numChannels;
+
+        auto& bufferMagSmoother = bufferMagnitudes.getReference (inputIndex);
+        bufferMagSmoother.setTargetValue (rmsAvg);
+        portMagnitudes.getReference (inputIndex).set (bufferMagSmoother.skip (numSamples));
+    };
+
+    // track input levels
+    if (numInputs == 1)
+    {
+        updateBufferMag (buffer, 0);
+    }
+    else if (numInputs > 1)
+    {
+        for (int i = 0; i < numInputs; ++i)
+            updateBufferMag (getInputBuffer (i), i);
+    }
+
+    if (isBypassed())
+        processAudioBypassed (buffer);
+    else
+        processAudio (buffer);
+}
+
+float BaseProcessor::getInputLevelDB (int portIndex) const noexcept
+{
+    jassert (isPositiveAndBelow (portIndex, numInputs));
+    return portMagnitudes.getReference (portIndex).get();
 }
 
 std::unique_ptr<XmlElement> BaseProcessor::toXML()

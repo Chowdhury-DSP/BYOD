@@ -25,8 +25,7 @@ public:
         Logger::writeToLog (String ("Creating processor: ") + newProc->getName());
 
         auto osFactor = chain.ioProcessor.getOversamplingFactor();
-        newProc->prepare (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
-        newProc->prepareInputBuffers (osFactor * chain.mySamplesPerBlock);
+        newProc->prepareProcessing (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
 
         SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
         auto* newProcPtr = chain.procs.add (std::move (newProc));

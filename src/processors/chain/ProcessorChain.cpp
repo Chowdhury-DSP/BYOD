@@ -43,17 +43,11 @@ void ProcessorChain::initializeProcessors()
     const double osSampleRate = mySampleRate * osFactor;
     const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
 
-    auto prepProcessor = [=] (BaseProcessor& proc)
-    {
-        proc.prepare (osSampleRate, osSamplesPerBlock);
-        proc.prepareInputBuffers (osSamplesPerBlock);
-    };
-
-    prepProcessor (inputProcessor);
-    prepProcessor (outputProcessor);
+    inputProcessor.prepareProcessing (osSampleRate, osSamplesPerBlock);
+    outputProcessor.prepareProcessing (osSampleRate, osSamplesPerBlock);
 
     for (auto* processor : procs)
-        prepProcessor (*processor);
+        processor->prepareProcessing (osSampleRate, osSamplesPerBlock);
 }
 
 void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
@@ -82,24 +76,21 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
 
     if (proc == &outputProcessor) // we've reached the output processor, so we're done!
     {
-        proc->processAudio (buffer);
+        proc->processAudioBlock (buffer);
         outProcessed = true;
         return;
     }
 
     if (numOutputs == 0) // this processor has no outputs, so after we process, we're done!
     {
-        proc->processAudio (buffer);
+        proc->processAudioBlock (buffer);
         return;
     }
 
     if (nextNumProcs == 0) // the output of this processor is connected to nothing, so let's not waste our processing...
         return;
 
-    if (proc->isBypassed())
-        proc->processAudioBypassed (buffer);
-    else
-        proc->processAudio (buffer);
+    proc->processAudioBlock (buffer);
 
     auto processBuffer = [&] (BaseProcessor* nextProc, AudioBuffer<float>& nextBuffer)
     {

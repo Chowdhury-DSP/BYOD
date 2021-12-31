@@ -6,7 +6,8 @@
 class BoardComponent;
 class CableView : public Component,
                   public ProcessorEditor::PortListener,
-                  public ProcessorChain::Listener
+                  public ProcessorChain::Listener,
+                  private Timer
 {
 public:
     explicit CableView (const BoardComponent* comp);
@@ -27,6 +28,8 @@ public:
     void setScaleFactor (float newScaleFactor);
 
 private:
+    void timerCallback() override { repaint(); }
+
     std::pair<ProcessorEditor*, int> getNearestInputPort (const Point<int>& pos) const;
 
     const BoardComponent* board = nullptr;
