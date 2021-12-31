@@ -37,14 +37,13 @@ public:
     {
         runTestForAllProcessors (this, [=] (BaseProcessor* proc)
                                  {
-                                     proc->prepare (testSampleRate, testBlockSize);
+                                     proc->prepareProcessing(testSampleRate, testBlockSize);
 
                                      AudioBuffer<float> buffer (1, testBlockSize);
                                      buffer.clear();
-                                     proc->processAudio (buffer);
+                                     proc->processAudioBlock (buffer);
 
-                                     testBuffer (buffer.getReadPointer (0));
-                                 });
+                                     testBuffer (buffer.getReadPointer (0)); });
     }
 };
 

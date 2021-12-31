@@ -30,13 +30,13 @@ public:
                                      if (proc->getNumInputs() != 1)
                                          return;
 
-                                     proc->prepare (testSampleRate, testBlockSize);
+                                     proc->prepareProcessing (testSampleRate, testBlockSize);
 
                                      AudioBuffer<float> buffer (1, testBlockSize);
                                      for (int n = 0; n < testBlockSize; ++n)
                                          buffer.setSample (0, n, r.nextFloat() * 2.0f - 1.0f);
 
-                                     proc->processAudio (buffer);
+                                     proc->processAudioBlock (buffer);
 
                                      testBuffer (buffer.getReadPointer (0));
                                  });
