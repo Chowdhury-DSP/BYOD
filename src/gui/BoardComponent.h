@@ -25,7 +25,7 @@ public:
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
 
 private:
-    void showNewProcMenu() const;
+    void showNewProcMenu();
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
 
     ProcessorChain& procChain;

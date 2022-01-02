@@ -9,7 +9,6 @@ public:
     ~ByodLNF() override = default;
 
     void drawPopupMenuItem (Graphics& g, const Rectangle<int>& area, const bool isSeparator, const bool isActive, const bool isHighlighted, const bool /*isTicked*/, const bool hasSubMenu, const String& text, const String& shortcutKeyText, const Drawable* icon, const Colour* const textColourToUse) override;
-    Component* getParentComponentForMenuOptions (const PopupMenu::Options& options) override;
     void drawPopupMenuBackground (Graphics& g, int width, int height) override;
 
     void drawButtonBackground (Graphics& g, Button& button, const Colour& backgroundColour, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;

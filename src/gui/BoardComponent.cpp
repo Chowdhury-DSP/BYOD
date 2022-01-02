@@ -122,7 +122,7 @@ void BoardComponent::showInfoComp (const BaseProcessor& proc)
     infoComp.toFront (true);
 }
 
-void BoardComponent::showNewProcMenu() const
+void BoardComponent::showNewProcMenu()
 {
     auto& procStore = procChain.getProcStore();
 
@@ -138,6 +138,7 @@ void BoardComponent::showNewProcMenu() const
     }
 
     auto options = PopupMenu::Options()
+                       .withParentComponent (this)
                        .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
                        .withMinimumWidth (125)
                        .withStandardItemHeight (27);

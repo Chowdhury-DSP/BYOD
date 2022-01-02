@@ -67,6 +67,8 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         {
             menu.addItem ("Info", [&, boardComp = dynamic_cast<BoardComponent*> (p)]
                           { boardComp->showInfoComp (proc); });
+            
+            options = options.withParentComponent (p);
         }
 
         menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());

@@ -6,18 +6,6 @@ void ByodLNF::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area, const 
     LookAndFeel_V4::drawPopupMenuItem (g, area, isSeparator, isActive, isHighlighted, false /*isTicked*/, hasSubMenu, text, shortcutKeyText, icon, textColourToUse);
 }
 
-Component* ByodLNF::getParentComponentForMenuOptions (const PopupMenu::Options& options)
-{
-#if JUCE_IOS
-    if (PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_AudioUnitv3)
-    {
-        if (options.getParentComponent() == nullptr && options.getTargetComponent() != nullptr)
-            return options.getTargetComponent()->getTopLevelComponent();
-    }
-#endif
-    return LookAndFeel_V2::getParentComponentForMenuOptions (options);
-}
-
 void ByodLNF::drawPopupMenuBackground (Graphics& g, int width, int height)
 {
     g.fillAll (findColour (PopupMenu::backgroundColourId));
