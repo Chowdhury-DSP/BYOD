@@ -52,7 +52,7 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc,
 CableView::CableView (const BoardComponent* comp) : board (comp)
 {
     setInterceptsMouseClicks (false, false);
-    startTimerHz (24);
+    startTimerHz (36);
 }
 
 void CableView::paint (Graphics& g)

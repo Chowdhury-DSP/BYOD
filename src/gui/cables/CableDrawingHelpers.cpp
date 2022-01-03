@@ -50,8 +50,8 @@ using namespace CableConstants;
 float getCableThickness (float levelDB)
 {
     levelDB = jlimit (floorDB, 0.0f, levelDB);
-    auto levelMult = jmap (levelDB, floorDB, 0.0f, 0.0f, 4.0f);
-    return cableThickness * (1.0f + levelMult);
+    auto levelMult = std::pow (jmap (levelDB, floorDB, 0.0f, 0.0f, 1.0f), 0.9f);
+    return cableThickness * (1.0f + 0.9f * levelMult);
 }
 
 auto createCablePath (Point<float> start, Point<float> end, float scaleFactor)
@@ -69,17 +69,17 @@ auto createCablePath (Point<float> start, Point<float> end, float scaleFactor)
     return std::move (bezierPath);
 }
 
-void drawCableShadow (Graphics& g, const Path& cablePath, float thicknes)
+void drawCableShadow (Graphics& g, const Path& cablePath, float thickness)
 {
     auto cableShadow = Path (cablePath);
-    cableShadow.applyTransform (AffineTransform::translation (0.0f, thicknes * 0.55f));
+    cableShadow.applyTransform (AffineTransform::translation (0.0f, thickness * 0.6f));
     g.setColour (Colours::black.withAlpha (0.3f));
-    g.strokePath (cableShadow, PathStrokeType (thicknes, PathStrokeType::JointStyle::curved));
+    g.strokePath (cableShadow, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
 }
 
 void drawCableEndCircle (Graphics& g, Point<float> centre, Colour colour, float scaleFactor)
 {
-    auto circle = (Rectangle { 10.0f, 10.0f } * scaleFactor).withCentre (centre);
+    auto circle = (Rectangle { cableThickness * 2.0f, cableThickness * 2.0f } * scaleFactor).withCentre (centre);
     g.setColour (colour);
     g.fillEllipse (circle);
 
@@ -92,6 +92,7 @@ void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float
     auto thickness = getCableThickness (levelDB);
     auto cablePath = createCablePath (start, end, scaleFactor);
     drawCableShadow (g, cablePath, thickness);
+
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
     g.strokePath (cablePath, PathStrokeType (thickness, PathStrokeType::JointStyle::curved));
 

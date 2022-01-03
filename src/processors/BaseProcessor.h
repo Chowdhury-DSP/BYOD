@@ -125,8 +125,16 @@ private:
 
     Point<float> editorPosition;
 
-    Array<SmoothedValue<float, ValueSmoothingTypes::Linear>> bufferMagnitudes; // smoothed values to track magnitudes at input ports
-    Array<Atomic<float>> portMagnitudes;
+    struct PortMagnitude
+    {
+        PortMagnitude() = default;
+        PortMagnitude (PortMagnitude&&) noexcept {}
+
+        chowdsp::LevelDetector<float> smoother;
+        Atomic<float> currentMagnitudeDB;
+    };
+
+    std::vector<PortMagnitude> portMagnitudes;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };

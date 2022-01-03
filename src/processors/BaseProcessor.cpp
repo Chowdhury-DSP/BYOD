@@ -17,7 +17,6 @@ BaseProcessor::BaseProcessor (const String& name,
 
     inputBuffers.resize (numInputs);
     inputsConnected.resize (0);
-    bufferMagnitudes.resize (numInputs);
     portMagnitudes.resize (numInputs);
 
     uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>();
@@ -33,14 +32,12 @@ void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
         b.clear();
     }
 
-    for (auto& mag : bufferMagnitudes)
-    {
-        mag.reset (sampleRate, 0.05);
-        mag.setCurrentAndTargetValue (-100.0f);
-    }
-
     for (auto& mag : portMagnitudes)
-        mag = -100.0f;
+    {
+        mag.smoother.prepare ({ sampleRate, (uint32) numSamples, 1 });
+        mag.smoother.setParameters (15.0f, 150.0f);
+        mag.currentMagnitudeDB = -100.0f;
+    }
 }
 
 void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
@@ -55,9 +52,11 @@ void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
 
         rmsAvg /= (float) numChannels;
 
-        auto& bufferMagSmoother = bufferMagnitudes.getReference (inputIndex);
-        bufferMagSmoother.setTargetValue (rmsAvg);
-        portMagnitudes.getReference (inputIndex).set (bufferMagSmoother.skip (numSamples));
+        auto& portMag = portMagnitudes[(size_t) inputIndex];
+        float curMag = 0.0f;
+        for (int n = 0; n < numSamples; ++n)
+            curMag = portMag.smoother.processSample (rmsAvg);
+        portMag.currentMagnitudeDB.set (curMag);
     };
 
     // track input levels
@@ -80,7 +79,7 @@ void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
 float BaseProcessor::getInputLevelDB (int portIndex) const noexcept
 {
     jassert (isPositiveAndBelow (portIndex, numInputs));
-    return portMagnitudes.getReference (portIndex).get();
+    return portMagnitudes[(size_t) portIndex].currentMagnitudeDB.get();
 }
 
 std::unique_ptr<XmlElement> BaseProcessor::toXML()
