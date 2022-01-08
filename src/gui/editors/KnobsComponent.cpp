@@ -70,7 +70,6 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
             {
                 if (comp->getName().contains (rangedParam->paramID + "__"))
                 {
-                    //                    comp->setName (rangedParam->name);
                     found = true;
                     break;
                 }

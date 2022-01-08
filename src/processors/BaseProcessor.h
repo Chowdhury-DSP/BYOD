@@ -67,6 +67,9 @@ public:
     /** if your processor has custom UI components, create them here! */
     virtual void getCustomComponents (OwnedArray<Component>& /*customComps*/) {}
 
+    /** add options to the processor's popup menu */
+    virtual void addToPopupMenu (PopupMenu& /*menu*/) {}
+
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
 
@@ -86,7 +89,6 @@ public:
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }
 
-    virtual void addToPopupMenu (PopupMenu& /*menu*/) {}
     void setPosition (Point<int> pos, Rectangle<int> parentBounds);
     void setPosition (const BaseProcessor& other) { editorPosition = other.editorPosition; }
     Point<int> getPosition (Rectangle<int> parentBounds);
