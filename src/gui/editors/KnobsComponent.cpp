@@ -6,7 +6,7 @@ namespace
 constexpr float nameHeightScale = 0.115f;
 }
 
-KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac, const std::function<void()>& paramLambda)
+KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac)
     : contrastColour (cc), accentColour (ac)
 {
     auto addSlider = [=, &vts] (AudioParameterFloat* param)
@@ -23,7 +23,6 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         newSlide->setColour (Slider::textBoxBackgroundColourId, Colours::transparentWhite);
         newSlide->setColour (Slider::textBoxHighlightColourId, accentColour.withAlpha (0.55f));
         newSlide->setColour (Slider::thumbColourId, accentColour);
-        newSlide->onValueChange = paramLambda;
 
         sliders.add (std::move (newSlide));
     };
@@ -38,7 +37,6 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         newBox->setColour (ComboBox::outlineColourId, contrastColour);
         newBox->setColour (ComboBox::textColourId, contrastColour);
         newBox->setColour (ComboBox::arrowColourId, contrastColour);
-        newBox->onChange = paramLambda;
 
         newBox->attachment = std::make_unique<ComboBoxAttachment> (vts, param->paramID, *newBox);
 
@@ -55,7 +53,6 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         newButton->setButtonText (param->name);
         newButton->setClickingTogglesState (true);
         newButton->setColour (TextButton::buttonOnColourId, Colours::red);
-        newButton->onStateChange = paramLambda;
 
         newButton->attachment = std::make_unique<ButtonAttachment> (vts, param->paramID, *newButton);
 
@@ -73,7 +70,6 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
             {
                 if (comp->getName().contains (rangedParam->paramID + "__"))
                 {
-                    comp->setName (rangedParam->name);
                     found = true;
                     break;
                 }
@@ -96,7 +92,19 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
     for (auto* comp : customComponents)
     {
         addAndMakeVisible (comp);
-        if (auto* boxComp = dynamic_cast<ComboBox*> (comp))
+        if (auto* sliderComp = dynamic_cast<Slider*> (comp))
+        {
+            sliderComp->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
+            sliderComp->setColour (Slider::textBoxOutlineColourId, contrastColour);
+            sliderComp->setColour (Slider::textBoxTextColourId, contrastColour);
+            sliderComp->setColour (Slider::textBoxBackgroundColourId, Colours::transparentWhite);
+            sliderComp->setColour (Slider::textBoxHighlightColourId, accentColour.withAlpha (0.55f));
+            sliderComp->setColour (Slider::thumbColourId, accentColour);
+
+            customComponents.removeObject (comp, false);
+            sliders.add (sliderComp);
+        }
+        else if (auto* boxComp = dynamic_cast<ComboBox*> (comp))
         {
             boxComp->setColour (ComboBox::outlineColourId, contrastColour);
             boxComp->setColour (ComboBox::textColourId, contrastColour);
@@ -118,8 +126,11 @@ void KnobsComponent::paint (Graphics& g)
     const auto nameOffset = proportionOfHeight (0.157f);
     auto makeName = [&g, nameHeight, nameOffset] (Component& comp, const String& name, int offset = 0)
     {
-        auto font = Font ((float) nameHeight - 2.0f).boldened();
         const auto textWidth = comp.proportionOfWidth (0.8f);
+        if (textWidth == 0)
+            return;
+
+        auto font = Font ((float) nameHeight - 2.0f).boldened();
         while (font.getStringWidth (name) > textWidth)
             font = Font (font.getHeight() - 0.5f).boldened();
 
@@ -151,8 +162,8 @@ void KnobsComponent::resized()
 
         if (sliders.size() > 0)
         {
-            sliders[0]->setBounds (x, yPad, compWidth - 5, compWidth - 5);
             sliders[0]->setTextBoxStyle (Slider::TextBoxBelow, false, compWidth * 4 / 5, proportionOfHeight (0.137f));
+            sliders[0]->setBounds (x, yPad, compWidth - 5, compWidth - 5);
         }
 
         if (boxes.size() > 0)
@@ -179,8 +190,8 @@ void KnobsComponent::resized()
 
         for (auto* s : sliders)
         {
-            s->setBounds (x + (compIdx++) * compWidth, yPad, compWidth, compWidth);
             s->setTextBoxStyle (Slider::TextBoxBelow, false, compWidth * 4 / 5, proportionOfHeight (0.137f));
+            s->setBounds (x + (compIdx++) * compWidth, yPad, compWidth, compWidth);
         }
 
         for (auto* b : boxes)
@@ -203,8 +214,8 @@ void KnobsComponent::resized()
 
         for (auto* s : sliders)
         {
-            s->setBounds (x + (compIdx++) * compWidth, yDim, compWidth, compWidth);
             s->setTextBoxStyle (Slider::TextBoxBelow, false, compWidth * 4 / 5, proportionOfHeight (0.137f));
+            s->setBounds (x + (compIdx++) * compWidth, yDim, compWidth, compWidth);
         }
 
         for (auto* b : boxes)
@@ -231,8 +242,8 @@ void KnobsComponent::resized()
 
         for (auto* s : sliders)
         {
-            s->setBounds (bounds[compIdx++]);
             s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 15, proportionOfHeight (0.123f));
+            s->setBounds (bounds[compIdx++]);
         }
 
         const auto yDim = proportionOfHeight (0.214f);
@@ -270,8 +281,8 @@ void KnobsComponent::resized()
 
         for (auto* s : sliders)
         {
-            s->setBounds (bounds[compIdx++]);
             s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 10, proportionOfHeight (0.123f));
+            s->setBounds (bounds[compIdx++]);
         }
 
         for (auto* b : boxes)

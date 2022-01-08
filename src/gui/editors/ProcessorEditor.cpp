@@ -56,6 +56,8 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         if (proc.getNumInputs() == 0 || proc.getNumOutputs() == 0)
             return; // no menu for I/O processors
 
+        proc.addToPopupMenu (menu);
+
         menu.addItem ("Reset", [&]
                       { resetProcParameters(); });
 

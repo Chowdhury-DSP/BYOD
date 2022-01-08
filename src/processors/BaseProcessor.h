@@ -67,6 +67,9 @@ public:
     /** if your processor has custom UI components, create them here! */
     virtual void getCustomComponents (OwnedArray<Component>& /*customComps*/) {}
 
+    /** add options to the processor's popup menu */
+    virtual void addToPopupMenu (PopupMenu& /*menu*/) {}
+
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
 
