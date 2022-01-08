@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../BaseProcessor.h"
-#include "BigMuffToneWDF.h"
 
 class BigMuffTone : public BaseProcessor
 {
