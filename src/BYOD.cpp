@@ -9,6 +9,7 @@
 
 namespace
 {
+const String settingsFilePath = "ChowdhuryDSP/BYOD/.plugin_settings.txt";
 const String logFileSubDir = "ChowdhuryDSP/BYOD/Logs";
 const String logFileNameRoot = "BYOD_Log_";
 } // namespace
@@ -19,6 +20,7 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                procs (procStore, vts, presetManager),
                paramForwarder (vts, procs)
 {
+    pluginSettings->initialise (settingsFilePath);
     presetManager = std::make_unique<PresetManager> (&procs, vts);
 }
 

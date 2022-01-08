@@ -25,6 +25,7 @@ public:
 
 private:
     chowdsp::PluginLogger logger;
+    chowdsp::SharedPluginSettings pluginSettings;
 
     ProcessorStore procStore;
     ProcessorChain procs;

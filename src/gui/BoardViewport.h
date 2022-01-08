@@ -3,7 +3,8 @@
 #include "../BYOD.h"
 #include "BoardComponent.h"
 
-class BoardViewport : public Viewport
+class BoardViewport : public Viewport,
+                      private chowdsp::GlobalPluginSettings::Listener
 {
 public:
     explicit BoardViewport (ProcessorChain& procChain);
@@ -11,7 +12,13 @@ public:
 
     void resized() override;
 
+    void propertyChanged (const Identifier& settingID, const var& property) final;
+
+    static const Identifier defaultZoomSettingID;
+
 private:
+    void setScaleFactor (float newScaleFactor);
+
     BoardComponent comp;
 
     TextButton plusButton { "+" };
@@ -20,6 +27,8 @@ private:
     Label scaleLabel;
 
     float scaleFactor = 1.0f;
+
+    chowdsp::SharedPluginSettings pluginSettings;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardViewport)
 };

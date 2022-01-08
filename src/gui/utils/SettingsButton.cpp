@@ -1,4 +1,10 @@
 #include "SettingsButton.h"
+#include "gui/BoardViewport.h"
+
+namespace
+{
+const Array<Identifier> settingsIDs { BoardViewport::defaultZoomSettingID };
+}
 
 SettingsButton::SettingsButton (const AudioProcessor& processor) : DrawableButton ("Settings", DrawableButton::ImageFitted),
                                                                    proc (processor)
@@ -10,9 +16,14 @@ SettingsButton::SettingsButton (const AudioProcessor& processor) : DrawableButto
     { showSettingsMenu(); };
 }
 
+SettingsButton::~SettingsButton() = default;
+
 void SettingsButton::showSettingsMenu()
 {
     PopupMenu menu;
+
+    defaultZoomMenu (menu, 100);
+
     menu.addSeparator();
     menu.addItem ("Copy Diagnostic Info", [=]
                   { copyDiagnosticInfo(); });
@@ -22,6 +33,28 @@ void SettingsButton::showSettingsMenu()
                        .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::upwards)
                        .withStandardItemHeight (27);
     menu.showMenuAsync (options);
+}
+
+void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
+{
+    PopupMenu defaultZoomMenu;
+
+    const auto curDefaultZoomLevel = (double) pluginSettings->getProperty (BoardViewport::defaultZoomSettingID);
+    for (auto zoomExp : { -4, -3, -2, -1, 0, 1, 2, 3, 4 })
+    {
+        auto zoomLevel = std::pow (1.1, (double) zoomExp);
+
+        PopupMenu::Item item;
+        item.itemID = ++itemID;
+        item.text = String (int (zoomLevel * 100.0)) + "%";
+        item.action = [=]
+        { pluginSettings->setProperty (BoardViewport::defaultZoomSettingID, zoomLevel); };
+        item.colour = isWithin (zoomLevel, curDefaultZoomLevel, 0.001) ? Colours::yellow : Colours::white;
+
+        defaultZoomMenu.addItem (item);
+    }
+
+    menu.addSubMenu ("Default Zoom", defaultZoomMenu);
 }
 
 void SettingsButton::copyDiagnosticInfo()

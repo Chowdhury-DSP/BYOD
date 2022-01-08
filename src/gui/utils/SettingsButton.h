@@ -6,13 +6,16 @@ class SettingsButton : public DrawableButton
 {
 public:
     explicit SettingsButton (const AudioProcessor& processor);
-
-    void showSettingsMenu();
-
-    void copyDiagnosticInfo();
+    ~SettingsButton() override;
 
 private:
+    void showSettingsMenu();
+    void defaultZoomMenu (PopupMenu& menu, int itemID);
+    void copyDiagnosticInfo();
+
     const AudioProcessor& proc;
+
+    chowdsp::SharedPluginSettings pluginSettings;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsButton)
 };
