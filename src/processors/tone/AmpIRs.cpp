@@ -206,9 +206,9 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
 
     struct IRComboBox : public ComboBox, private AmpIRs::AmpIRListener
     {
-        IRComboBox (AudioProcessorValueTreeState& vts, const String& paramID, AmpIRs& airs) : ampIRs (airs)
+        IRComboBox (AudioProcessorValueTreeState& vtState, AmpIRs& airs) : ampIRs (airs), vts (vtState)
         {
-            auto* param = vts.getParameter (paramID);
+            auto* param = vts.getParameter (irTag);
             attachment = std::make_unique<CustomBoxAttach> (*param, *this, vts.undoManager);
             refreshBox();
 
@@ -219,6 +219,11 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
         ~IRComboBox() override
         {
             ampIRs.removeAmpIRListener (this);
+        }
+
+        void visibilityChanged() override
+        {
+            setName (vts.getParameter (irTag)->name);
         }
 
         void irChanged() override { refreshBox(); }
@@ -272,9 +277,10 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
         }
 
         AmpIRs& ampIRs;
+        AudioProcessorValueTreeState& vts;
         std::unique_ptr<CustomBoxAttach> attachment;
         std::shared_ptr<FileChooser> fileChooser;
     };
 
-    customComps.add (std::make_unique<IRComboBox> (vts, irTag, *this));
+    customComps.add (std::make_unique<IRComboBox> (vts, *this));
 }

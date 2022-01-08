@@ -157,14 +157,19 @@ void Waveshaper::getCustomComponents (OwnedArray<Component>& customComps)
 
     struct WaveshapeComboBox : public ComboBox
     {
-        WaveshapeComboBox (AudioProcessorValueTreeState& vts, const String& paramID)
+        explicit WaveshapeComboBox (AudioProcessorValueTreeState& vtState) : vts (vtState)
         {
-            auto* param = vts.getParameter (paramID);
+            auto* param = vts.getParameter (shapeTag);
             attachment = std::make_unique<CustomBoxAttach> (*param, *this, vts.undoManager);
             shapeParam = vts.getRawParameterValue (shapeTag);
             refreshBox();
 
             setName (shapeTag + "__box");
+        }
+
+        void visibilityChanged() override
+        {
+            setName (vts.getParameter (shapeTag)->name);
         }
 
         void refreshBox()
@@ -195,9 +200,10 @@ void Waveshaper::getCustomComponents (OwnedArray<Component>& customComps)
             setSelectedId (currentShape + 1);
         }
 
+        AudioProcessorValueTreeState& vts;
         std::atomic<float>* shapeParam = nullptr;
         std::unique_ptr<CustomBoxAttach> attachment;
     };
 
-    customComps.add (std::make_unique<WaveshapeComboBox> (vts, shapeTag));
+    customComps.add (std::make_unique<WaveshapeComboBox> (vts));
 }
