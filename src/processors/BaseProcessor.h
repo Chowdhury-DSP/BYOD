@@ -86,6 +86,7 @@ public:
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }
 
+    virtual void addToPopupMenu (PopupMenu& /*menu*/) {}
     void setPosition (Point<int> pos, Rectangle<int> parentBounds);
     void setPosition (const BaseProcessor& other) { editorPosition = other.editorPosition; }
     Point<int> getPosition (Rectangle<int> parentBounds);
