@@ -8,6 +8,13 @@ float paramSkew (float paramVal)
 {
     return 1.0f - iLogPot (iLogPot (0.5f * paramVal + 0.5f));
 }
+
+float getSkewForCentre (float start, float end, float centre)
+{
+    return std::log (0.5f) / std::log ((centre - start) / (end - start));
+}
+
+const NormalisableRange levelSkew { -60.0f, 0.0f, 0.0f, getSkewForCentre (-60.0f, 0.0f, -12.0f) };
 } // namespace
 
 MXRDistortion::MXRDistortion (UndoManager* um) : BaseProcessor ("MXR Distortion", createParameterLayout(), um)
@@ -68,6 +75,6 @@ void MXRDistortion::processAudio (AudioBuffer<float>& buffer)
 
     dcBlocker.processAudio (buffer);
 
-    gain.setGainLinear (Decibels::decibelsToGain (-80.0f * (1.0f - iLogPot (*levelParam)), -80.0f));
+    gain.setGainLinear (Decibels::decibelsToGain (levelSkew.convertFrom0to1 (*levelParam), levelSkew.start));
     gain.process (context);
 }
