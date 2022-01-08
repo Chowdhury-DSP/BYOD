@@ -134,7 +134,7 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
 
     auto filterFreqHz = freqParam->load();
     filter.setResonance (getQ (resParam->load()));
-    
+
     auto freqModGain = directControlOn ? 10.0f : (20.0f * senseParam->load());
     auto* levelPtr = levelBuffer.getReadPointer (0);
     FloatVectorOperations::clip (levelBuffer.getWritePointer (0), levelPtr, 0.0f, 2.0f, numSamples);
