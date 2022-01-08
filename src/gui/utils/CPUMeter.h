@@ -64,7 +64,7 @@ public:
 
         g.setColour (background);
         g.fillRoundedRectangle (barBounds, cornerSize);
-        
+
         {
             Path p;
             p.addRoundedRectangle (barBounds, cornerSize);
