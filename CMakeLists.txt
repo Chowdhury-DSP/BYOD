@@ -48,8 +48,16 @@ add_subdirectory(src)
 include_directories(src)
 add_subdirectory(res)
 
+include(modules/cmake/VersionInfo.cmake)
+
 target_compile_definitions(BYOD PUBLIC
     JUCE_VST3_CAN_REPLACE_VST2=0
+
+    BYOD_GIT_BRANCH="${GIT_BRANCH}"
+    BYOD_GIT_COMMIT_HASH="${GIT_COMMIT_HASH}"
+    BYOD_BUILD_FQDN="${PLUGIN_BUILD_FQDN}"
+    BYOD_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
+    BYOD_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
 )
 
 target_link_libraries(BYOD PRIVATE juce_plugin_modules)

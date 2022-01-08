@@ -2,6 +2,7 @@
 #include "gui/BoardViewport.h"
 #include "gui/utils/CPUMeter.h"
 #include "gui/utils/LookAndFeels.h"
+#include "gui/utils/SettingsButton.h"
 #include "gui/utils/TextSliderItem.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
 #include "state/PresetManager.h"
@@ -28,6 +29,8 @@ void BYOD::addParameters (Parameters& params)
 
 void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
+
     procs.prepare (sampleRate, samplesPerBlock);
     loadMeasurer.reset (sampleRate, samplesPerBlock);
 }
@@ -49,6 +52,7 @@ AudioProcessorEditor* BYOD::createEditor()
     builder->registerFactory ("Board", &BoardItem::factory);
     builder->registerFactory ("PresetsItem", &chowdsp::PresetsItem<BYOD>::factory);
     builder->registerFactory ("TextSlider", &TextSliderItem::factory);
+    builder->registerFactory ("SettingsButton", &SettingsButtonItem::factory);
     builder->registerFactory ("CPUMeter", &CPUMeterItem<BYOD>::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
     builder->registerLookAndFeel ("CPUMeterLNF", std::make_unique<CPUMeterLNF>());
