@@ -53,7 +53,10 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
                 auto* procParam = procParams[numParams - j];
 
                 if (auto* paramCast = dynamic_cast<RangedAudioParameter*> (procParam))
+                {
                     forwardParam->setParam (paramCast, proc->getName() + ": " + paramCast->name);
+                    forwardParam->setValueNotifyingHost (paramCast->getValue());
+                }
             }
 
             break;
