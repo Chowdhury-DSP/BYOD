@@ -27,6 +27,7 @@
 #include "tone/TrebleBooster.h"
 #include "tone/bassman/BassmanTone.h"
 #include "tone/baxandall/BaxandallEQ.h"
+#include "tone/big_muff_tone/BigMuffTone.h"
 
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
@@ -60,6 +61,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Bass Cleaner", &processorFactory<BassCleaner> },
     { "Bassman Tone", &processorFactory<BassmanTone> },
     { "Baxandall EQ", &processorFactory<BaxandallEQ> },
+    { "Big Muff Tone", &processorFactory<BigMuffTone> },
     { "Graphic EQ", &processorFactory<GraphicEQ> },
     { "High Cut", &processorFactory<HighCut> },
     { "Amp IRs", &processorFactory<AmpIRs> },
