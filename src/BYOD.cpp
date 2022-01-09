@@ -2,23 +2,28 @@
 #include "gui/BoardViewport.h"
 #include "gui/utils/CPUMeter.h"
 #include "gui/utils/LookAndFeels.h"
+#include "gui/utils/SettingsButton.h"
 #include "gui/utils/TextSliderItem.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
 #include "state/PresetManager.h"
 
 namespace
 {
+const String settingsFilePath = "ChowdhuryDSP/BYOD/.plugin_settings.txt";
 const String logFileSubDir = "ChowdhuryDSP/BYOD/Logs";
 const String logFileNameRoot = "BYOD_Log_";
 } // namespace
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                logger (logFileSubDir, logFileNameRoot),
-               procStore (&undoManager),
-               procs (procStore, vts, presetManager),
-               paramForwarder (vts, procs)
+               procStore (&undoManager)
 {
-    presetManager = std::make_unique<PresetManager> (&procs, vts);
+    pluginSettings->initialise (settingsFilePath);
+
+    procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager);
+    paramForwarder = std::make_unique<ParamForwardManager> (vts, *procs);
+
+    presetManager = std::make_unique<PresetManager> (procs.get(), vts);
 }
 
 void BYOD::addParameters (Parameters& params)
@@ -28,7 +33,9 @@ void BYOD::addParameters (Parameters& params)
 
 void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    procs.prepare (sampleRate, samplesPerBlock);
+    setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
+
+    procs->prepare (sampleRate, samplesPerBlock);
     loadMeasurer.reset (sampleRate, samplesPerBlock);
 }
 
@@ -40,7 +47,7 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
     AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
-    procs.processAudio (buffer);
+    procs->processAudio (buffer);
 }
 
 AudioProcessorEditor* BYOD::createEditor()
@@ -49,6 +56,7 @@ AudioProcessorEditor* BYOD::createEditor()
     builder->registerFactory ("Board", &BoardItem::factory);
     builder->registerFactory ("PresetsItem", &chowdsp::PresetsItem<BYOD>::factory);
     builder->registerFactory ("TextSlider", &TextSliderItem::factory);
+    builder->registerFactory ("SettingsButton", &SettingsButtonItem::factory);
     builder->registerFactory ("CPUMeter", &CPUMeterItem<BYOD>::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
     builder->registerLookAndFeel ("CPUMeterLNF", std::make_unique<CPUMeterLNF>());
@@ -77,7 +85,7 @@ void BYOD::getStateInformation (MemoryBlock& destData)
 
     auto state = vts.copyState();
     xml->addChildElement (state.createXml().release());
-    xml->addChildElement (procs.getStateHelper().saveProcChain().release());
+    xml->addChildElement (procs->getStateHelper().saveProcChain().release());
     xml->addChildElement (presetManager->saveXmlState().release());
 
     copyXmlToBinary (*xml, destData);
@@ -100,7 +108,7 @@ void BYOD::setStateInformation (const void* data, int sizeInBytes)
 
     presetManager->loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
     vts.replaceState (ValueTree::fromXml (*vtsXml));
-    procs.getStateHelper().loadProcChain (procChainXml);
+    procs->getStateHelper().loadProcChain (procChainXml);
 }
 
 // This creates new instances of the plugin

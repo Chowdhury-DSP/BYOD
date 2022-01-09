@@ -1,5 +1,6 @@
 #include "ProcessorChain.h"
 #include "ProcessorChainActionHelper.h"
+#include "ProcessorChainPortMagnitudesHelper.h"
 #include "ProcessorChainStateHelper.h"
 #include "processors/chain/ChainIOProcessor.h"
 
@@ -28,6 +29,7 @@ ProcessorChain::ProcessorChain (ProcessorStore& store,
 {
     actionHelper = std::make_unique<ProcessorChainActionHelper> (*this);
     stateHelper = std::make_unique<ProcessorChainStateHelper> (*this);
+    portMagsHelper = std::make_unique<ProcessorChainPortMagnitudesHelper> (*this);
 }
 
 ProcessorChain::~ProcessorChain() = default;
@@ -147,6 +149,9 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     auto osBlock = ioProcessor.processAudioInput (buffer, sampleRateChange);
     if (sampleRateChange)
         initializeProcessors();
+
+    // prepare port magnitudes
+    portMagsHelper->preparePortMagnitudes();
 
     const auto osNumSamples = (int) osBlock.getNumSamples();
     const auto numChannels = buffer.getNumChannels();

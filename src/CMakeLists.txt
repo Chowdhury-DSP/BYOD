@@ -15,6 +15,7 @@ target_sources(BYOD PRIVATE
     gui/editors/Port.cpp
     gui/editors/ProcessorEditor.cpp
     gui/utils/LookAndFeels.cpp
+    gui/utils/SettingsButton.cpp
 
     state/ParamForwardManager.cpp
     state/PresetManager.cpp
@@ -27,6 +28,7 @@ target_sources(BYOD PRIVATE
     processors/chain/ProcessorChain.cpp
     processors/chain/ProcessorChainActions.cpp
     processors/chain/ProcessorChainActionHelper.cpp
+    processors/chain/ProcessorChainPortMagnitudesHelper.cpp
     processors/chain/ProcessorChainStateHelper.cpp
 
     processors/drive/GuitarMLAmp.cpp

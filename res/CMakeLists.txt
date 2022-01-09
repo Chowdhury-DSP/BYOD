@@ -10,6 +10,7 @@ juce_add_binary_data(BinaryData SOURCES
     ui_assets/LeftArrow.svg
     ui_assets/RightArrow.svg
     ui_assets/x-solid.svg
+    ui_assets/cog-solid.svg
 
     guitar_ml_models/BluesJR_FullD.json
     guitar_ml_models/TS9_FullD.json

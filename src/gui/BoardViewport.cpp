@@ -2,6 +2,9 @@
 
 BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
 {
+    pluginSettings->addProperties ({ { defaultZoomSettingID, 1.0 } }, this);
+    setScaleFactor ((float) (double) pluginSettings->getProperty (defaultZoomSettingID));
+
     setViewedComponent (&comp, false);
 
     getHorizontalScrollBar().setColour (ScrollBar::thumbColourId, Colour (0xFF0EDED4));
@@ -13,8 +16,7 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     addAndMakeVisible (plusButton);
     plusButton.onClick = [=]
     {
-        scaleFactor *= 1.1f;
-        scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
+        setScaleFactor (scaleFactor * 1.1f);
         resized();
     };
 
@@ -22,18 +24,37 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     addAndMakeVisible (minusButton);
     minusButton.onClick = [=]
     {
-        scaleFactor /= 1.1f;
-        scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
+        setScaleFactor (scaleFactor / 1.1f);
         resized();
     };
 
-    scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
     addAndMakeVisible (scaleLabel);
 }
 
 BoardViewport::~BoardViewport()
 {
+    pluginSettings->removePropertyListener (this);
     getHorizontalScrollBar().setLookAndFeel (nullptr);
+}
+
+void BoardViewport::propertyChanged (const Identifier& settingID, const var& property)
+{
+    if (settingID != defaultZoomSettingID)
+        return;
+
+    if (! property.isDouble())
+        return;
+
+    setScaleFactor ((float) (double) property);
+    resized();
+
+    Logger::writeToLog ("Default zoom level set to: " + scaleLabel.getText());
+}
+
+void BoardViewport::setScaleFactor (float newScaleFactor)
+{
+    scaleFactor = newScaleFactor;
+    scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
 }
 
 void BoardViewport::resized()
@@ -50,3 +71,5 @@ void BoardViewport::resized()
     minusButton.setBounds (buttonRect.withX (buttonDim).reduced (1));
     scaleLabel.setBounds (2 * buttonDim, height - buttonDim, 100, buttonDim);
 }
+
+const Identifier BoardViewport::defaultZoomSettingID { "default_zoom" };
