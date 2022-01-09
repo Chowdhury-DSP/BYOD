@@ -19,7 +19,7 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    ProcessorChain& getProcChain() { return procs; }
+    ProcessorChain& getProcChain() { return *procs; }
     AudioProcessorValueTreeState& getVTS() { return vts; }
     AudioProcessLoadMeasurer& getLoadMeasurer() { return loadMeasurer; }
 
@@ -28,8 +28,8 @@ private:
     chowdsp::SharedPluginSettings pluginSettings;
 
     ProcessorStore procStore;
-    ProcessorChain procs;
-    ParamForwardManager paramForwarder;
+    std::unique_ptr<ProcessorChain> procs;
+    std::unique_ptr<ParamForwardManager> paramForwarder;
 
     UndoManager undoManager { 500000 };
 

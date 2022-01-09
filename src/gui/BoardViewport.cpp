@@ -47,6 +47,8 @@ void BoardViewport::propertyChanged (const Identifier& settingID, const var& pro
 
     setScaleFactor ((float) (double) property);
     resized();
+
+    Logger::writeToLog ("Default zoom level set to: " + scaleLabel.getText());
 }
 
 void BoardViewport::setScaleFactor (float newScaleFactor)

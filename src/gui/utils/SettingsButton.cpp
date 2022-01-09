@@ -1,10 +1,12 @@
 #include "SettingsButton.h"
 #include "gui/BoardViewport.h"
+#include "processors/chain/ProcessorChainPortMagnitudesHelper.h"
 
 namespace
 {
-const Array<Identifier> settingsIDs { BoardViewport::defaultZoomSettingID };
-}
+const Colour onColour = Colours::yellow;
+const Colour offColour = Colours::white;
+} // namespace
 
 SettingsButton::SettingsButton (const AudioProcessor& processor) : DrawableButton ("Settings", DrawableButton::ImageFitted),
                                                                    proc (processor)
@@ -22,7 +24,8 @@ void SettingsButton::showSettingsMenu()
 {
     PopupMenu menu;
 
-    defaultZoomMenu (menu, 100);
+    cableVizMenu (menu, 100);
+    defaultZoomMenu (menu, 200);
 
     menu.addSeparator();
     menu.addItem ("Copy Diagnostic Info", [=]
@@ -33,6 +36,20 @@ void SettingsButton::showSettingsMenu()
                        .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::upwards)
                        .withStandardItemHeight (27);
     menu.showMenuAsync (options);
+}
+
+void SettingsButton::cableVizMenu (PopupMenu& menu, int itemID)
+{
+    const auto isCurrentlyOn = (bool) pluginSettings->getProperty (ProcessorChainPortMagnitudesHelper::cableVizOnOffID);
+
+    PopupMenu::Item item;
+    item.itemID = ++itemID;
+    item.text = "Cable Visualizations";
+    item.action = [=]
+    { pluginSettings->setProperty (ProcessorChainPortMagnitudesHelper::cableVizOnOffID, ! isCurrentlyOn); };
+    item.colour = isCurrentlyOn ? onColour : offColour;
+
+    menu.addItem (item);
 }
 
 void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
@@ -49,7 +66,7 @@ void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
         item.text = String (int (zoomLevel * 100.0)) + "%";
         item.action = [=]
         { pluginSettings->setProperty (BoardViewport::defaultZoomSettingID, zoomLevel); };
-        item.colour = isWithin (zoomLevel, curDefaultZoomLevel, 0.001) ? Colours::yellow : Colours::white;
+        item.colour = isWithin (zoomLevel, curDefaultZoomLevel, 0.001) ? onColour : offColour;
 
         defaultZoomMenu.addItem (item);
     }
@@ -59,6 +76,8 @@ void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
 
 void SettingsButton::copyDiagnosticInfo()
 {
+    Logger::writeToLog ("Copying diagnostic info...");
+
     String diagString;
     diagString += "Version: " + proc.getName() + " " + String (JucePlugin_VersionString) + "\n";
     diagString += "Commit: " + String (BYOD_GIT_COMMIT_HASH) + " on " + String (BYOD_GIT_BRANCH)

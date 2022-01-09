@@ -28,6 +28,7 @@ target_sources(BYOD PRIVATE
     processors/chain/ProcessorChain.cpp
     processors/chain/ProcessorChainActions.cpp
     processors/chain/ProcessorChainActionHelper.cpp
+    processors/chain/ProcessorChainPortMagnitudesHelper.cpp
     processors/chain/ProcessorChainStateHelper.cpp
 
     processors/drive/GuitarMLAmp.cpp

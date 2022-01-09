@@ -59,15 +59,17 @@ void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
         portMag.currentMagnitudeDB.set (curMag);
     };
 
-    // track input levels
-    if (numInputs == 1)
+    if (portMagnitudesOn) // track input levels
     {
-        updateBufferMag (buffer, 0);
-    }
-    else if (numInputs > 1)
-    {
-        for (int i = 0; i < numInputs; ++i)
-            updateBufferMag (getInputBuffer (i), i);
+        if (numInputs == 1)
+        {
+            updateBufferMag (buffer, 0);
+        }
+        else if (numInputs > 1)
+        {
+            for (int i = 0; i < numInputs; ++i)
+                updateBufferMag (getInputBuffer (i), i);
+        }
     }
 
     if (isBypassed())
@@ -80,6 +82,17 @@ float BaseProcessor::getInputLevelDB (int portIndex) const noexcept
 {
     jassert (isPositiveAndBelow (portIndex, numInputs));
     return portMagnitudes[(size_t) portIndex].currentMagnitudeDB.get();
+}
+
+void BaseProcessor::resetPortMagnitudes (bool shouldPortMagsBeOn)
+{
+    portMagnitudesOn = shouldPortMagsBeOn;
+
+    for (auto& mag : portMagnitudes)
+    {
+        mag.smoother.reset();
+        mag.currentMagnitudeDB = -100.0f;
+    }
 }
 
 std::unique_ptr<XmlElement> BaseProcessor::toXML()

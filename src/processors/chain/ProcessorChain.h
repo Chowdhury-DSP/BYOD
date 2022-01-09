@@ -7,6 +7,7 @@
 #include "../utility/OutputProcessor.h"
 
 class ProcessorChainActionHelper;
+class ProcessorChainPortMagnitudesHelper;
 class ProcessorChainStateHelper;
 class ProcessorChain : private AudioProcessorValueTreeState::Listener
 {
@@ -30,8 +31,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer);
 
     auto& getProcessors() { return procs; }
+    const auto& getProcessors() const { return procs; }
     ProcessorStore& getProcStore() { return procStore; }
-    const SpinLock& getProcChainLock() const { return processingLock; }
 
     InputProcessor& getInputProcessor() { return inputProcessor; }
     OutputProcessor& getOutputProcessor() { return outputProcessor; }
@@ -68,6 +69,9 @@ private:
 
     friend class ProcessorChainStateHelper;
     std::unique_ptr<ProcessorChainStateHelper> stateHelper;
+
+    friend class ProcessorChainPortMagnitudesHelper;
+    std::unique_ptr<ProcessorChainPortMagnitudesHelper> portMagsHelper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

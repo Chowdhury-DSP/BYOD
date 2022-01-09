@@ -54,7 +54,10 @@ public:
     bool isBypassed() const { return ! static_cast<bool> (onOffParam->load()); }
     void prepareProcessing (double sampleRate, int numSamples);
     void processAudioBlock (AudioBuffer<float>& buffer);
+
+    // methods for working with port input levels
     float getInputLevelDB (int portIndex) const noexcept;
+    void resetPortMagnitudes (bool shouldPortMagsBeOn);
 
     // state save/load methods
     virtual std::unique_ptr<XmlElement> toXML();
@@ -137,6 +140,7 @@ private:
         Atomic<float> currentMagnitudeDB;
     };
 
+    bool portMagnitudesOn = false;
     std::vector<PortMagnitude> portMagnitudes;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)

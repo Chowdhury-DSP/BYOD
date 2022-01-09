@@ -10,6 +10,7 @@ public:
 
 private:
     void showSettingsMenu();
+    void cableVizMenu (PopupMenu& menu, int itemID);
     void defaultZoomMenu (PopupMenu& menu, int itemID);
     void copyDiagnosticInfo();
 

@@ -16,12 +16,14 @@ const String logFileNameRoot = "BYOD_Log_";
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                logger (logFileSubDir, logFileNameRoot),
-               procStore (&undoManager),
-               procs (procStore, vts, presetManager),
-               paramForwarder (vts, procs)
+               procStore (&undoManager)
 {
     pluginSettings->initialise (settingsFilePath);
-    presetManager = std::make_unique<PresetManager> (&procs, vts);
+
+    procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager);
+    paramForwarder = std::make_unique<ParamForwardManager> (vts, *procs);
+
+    presetManager = std::make_unique<PresetManager> (procs.get(), vts);
 }
 
 void BYOD::addParameters (Parameters& params)
@@ -33,7 +35,7 @@ void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     setRateAndBufferSizeDetails (sampleRate, samplesPerBlock);
 
-    procs.prepare (sampleRate, samplesPerBlock);
+    procs->prepare (sampleRate, samplesPerBlock);
     loadMeasurer.reset (sampleRate, samplesPerBlock);
 }
 
@@ -45,7 +47,7 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
     AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
-    procs.processAudio (buffer);
+    procs->processAudio (buffer);
 }
 
 AudioProcessorEditor* BYOD::createEditor()
@@ -83,7 +85,7 @@ void BYOD::getStateInformation (MemoryBlock& destData)
 
     auto state = vts.copyState();
     xml->addChildElement (state.createXml().release());
-    xml->addChildElement (procs.getStateHelper().saveProcChain().release());
+    xml->addChildElement (procs->getStateHelper().saveProcChain().release());
     xml->addChildElement (presetManager->saveXmlState().release());
 
     copyXmlToBinary (*xml, destData);
@@ -106,7 +108,7 @@ void BYOD::setStateInformation (const void* data, int sizeInBytes)
 
     presetManager->loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
     vts.replaceState (ValueTree::fromXml (*vtsXml));
-    procs.getStateHelper().loadProcChain (procChainXml);
+    procs->getStateHelper().loadProcChain (procChainXml);
 }
 
 // This creates new instances of the plugin
