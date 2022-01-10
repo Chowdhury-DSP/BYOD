@@ -19,7 +19,7 @@ AudioProcessorValueTreeState::ParameterLayout Delay::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    auto timeRangeMs = createNormRange (0.1f, 2000.0f, 200.0f);
+    auto timeRangeMs = createNormalisableRange (0.1f, 2000.0f, 200.0f);
     params.push_back (std::make_unique<VTSParam> ("time_ms",
                                                   "Delay Time",
                                                   String(),

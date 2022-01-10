@@ -3,14 +3,14 @@
 
 namespace
 {
-const auto cutoffRange = ParameterHelpers::createNormRange (500.0f, 22000.0f, 1200.0f);
+const auto cutoffRange = ParameterHelpers::createNormalisableRange (500.0f, 22000.0f, 1200.0f);
 float harmParamToCutoffHz (float harmParam)
 {
     return cutoffRange.convertFrom0to1 (harmParam);
 }
 
-const auto sustainRange = ParameterHelpers::createNormRange (0.4f, 2.0f, 1.0f);
-const auto levelRange = ParameterHelpers::createNormRange (-60.0f, 0.0f, -9.0f);
+const auto sustainRange = ParameterHelpers::createNormalisableRange (0.4f, 2.0f, 1.0f);
+const auto levelRange = ParameterHelpers::createNormalisableRange (-60.0f, 0.0f, -9.0f);
 } // namespace
 
 BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Big Muff Drive", createParameterLayout(), um)
