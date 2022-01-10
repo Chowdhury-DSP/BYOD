@@ -12,7 +12,7 @@ float getQ (float param01)
     return lowQ * std::pow ((highQ / lowQ), param01);
 }
 
-NormalisableRange<float> speedRange (5.0f, 100.0f);
+const auto speedRange = ParameterHelpers::createNormRange (5.0f, 100.0f, 20.0f);
 
 const String senseTag = "sense";
 const String directControlTag = "direct_control";
@@ -28,8 +28,6 @@ EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor ("Envelope Filt
     freqModParam = vts.getRawParameterValue (freqModTag);
     filterTypeParam = vts.getRawParameterValue ("filter_type");
     directControlParam = vts.getRawParameterValue (directControlTag);
-
-    speedRange.setSkewForCentre (20.0f);
 
     uiOptions.backgroundColour = Colours::purple.brighter();
     uiOptions.powerColour = Colours::yellow.darker (0.1f);

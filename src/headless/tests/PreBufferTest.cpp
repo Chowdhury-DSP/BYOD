@@ -35,16 +35,17 @@ public:
 
     void runTest() override
     {
-        runTestForAllProcessors (this, [=] (BaseProcessor* proc)
-                                 {
+        runTestForAllProcessors (
+            this, [=] (BaseProcessor* proc)
+            {
                                      proc->prepareProcessing (testSampleRate, testBlockSize);
 
                                      AudioBuffer<float> buffer (1, testBlockSize);
                                      buffer.clear();
                                      proc->processAudioBlock (buffer);
 
-                                     testBuffer (buffer.getReadPointer (0));
-                                 });
+                                     testBuffer (buffer.getReadPointer (0)); },
+            StringArray { "Big Muff Drive" });
     }
 };
 

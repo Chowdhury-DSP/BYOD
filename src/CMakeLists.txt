@@ -33,6 +33,8 @@ target_sources(BYOD PRIVATE
 
     processors/drive/GuitarMLAmp.cpp
     processors/drive/RONN.cpp
+    processors/drive/big_muff/BigMuffDrive.cpp
+    processors/drive/big_muff/BigMuffClippingStage.cpp
     processors/drive/centaur/Centaur.cpp
     processors/drive/centaur/FeedForward2.cpp
     processors/drive/centaur/GainStageProc.cpp
@@ -59,6 +61,7 @@ target_sources(BYOD PRIVATE
 
     processors/tone/AmpIRs.cpp
     processors/tone/BassCleaner.cpp
+    processors/tone/BigMuffTone.cpp
     processors/tone/GraphicEQ.cpp
     processors/tone/HighCut.cpp
     processors/tone/LofiIrs.cpp
@@ -68,7 +71,6 @@ target_sources(BYOD PRIVATE
     processors/tone/bassman/BassmanToneStack.cpp
     processors/tone/baxandall/BaxandallEQ.cpp
     processors/tone/baxandall/BaxandallWDF.cpp
-    processors/tone/big_muff_tone/BigMuffTone.cpp
 
     processors/utility/FreqBandSplitter.cpp
     processors/utility/Mixer.cpp
