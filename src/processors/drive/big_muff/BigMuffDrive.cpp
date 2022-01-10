@@ -69,6 +69,14 @@ void BigMuffDrive::prepare (double sampleRate, int samplesPerBlock)
         filt.calcCoefs (16.0f, fs);
         filt.reset();
     }
+
+    // pre-buffering
+    AudioBuffer<float> buffer (2, samplesPerBlock);
+    for (int i = 0; i < 10000; i += samplesPerBlock)
+    {
+        buffer.clear();
+        processAudio (buffer);
+    }
 }
 
 void BigMuffDrive::processInputStage (AudioBuffer<float>& buffer)

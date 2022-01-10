@@ -29,7 +29,7 @@ inline auto sinh_cosh (float x) noexcept
 
     auto B = std::exp (x);
     auto Br = 0.5f / B;
-    B *= 0.5;
+    B *= 0.5f;
 
     auto sinh = B - Br;
     auto cosh = B + Br;
