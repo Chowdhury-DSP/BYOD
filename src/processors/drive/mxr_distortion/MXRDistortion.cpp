@@ -9,12 +9,7 @@ float paramSkew (float paramVal)
     return 1.0f - iLogPot (iLogPot (0.5f * paramVal + 0.5f));
 }
 
-float getSkewForCentre (float start, float end, float centre)
-{
-    return std::log (0.5f) / std::log ((centre - start) / (end - start));
-}
-
-const NormalisableRange levelSkew { -60.0f, 0.0f, 0.0f, getSkewForCentre (-60.0f, 0.0f, -12.0f) };
+const auto levelSkew = ParameterHelpers::createNormRange (-60.0f, 0.0f, -12.0f);
 } // namespace
 
 MXRDistortion::MXRDistortion (UndoManager* um) : BaseProcessor ("MXR Distortion", createParameterLayout(), um)

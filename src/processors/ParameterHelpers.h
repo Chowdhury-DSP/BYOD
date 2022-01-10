@@ -7,10 +7,18 @@ namespace ParameterHelpers
 using namespace chowdsp::ParamUtils;
 using Params = chowdsp::Parameters;
 
+template <typename T>
+NormalisableRange<T> createNormRange (T start, T end, T centre)
+{
+    auto range = NormalisableRange { start, end };
+    range.setSkewForCentre (centre);
+
+    return range;
+}
+
 inline void createFreqParameter (Params& params, const String& id, const String& name, float min, float max, float centre, float defaultValue)
 {
-    NormalisableRange<float> freqRange { min, max };
-    freqRange.setSkewForCentre (centre);
+    auto freqRange = createNormRange (min, max, centre);
 
     emplace_param<VTSParam> (params, id, name, String(), freqRange, defaultValue, &freqValToString, &stringToFreqVal);
 }
