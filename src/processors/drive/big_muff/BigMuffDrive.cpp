@@ -11,7 +11,7 @@ float harmParamToCutoffHz (float harmParam)
 
 const auto sustainRange = ParameterHelpers::createNormRange (0.4f, 2.0f, 1.0f);
 const auto levelRange = ParameterHelpers::createNormRange (-60.0f, 0.0f, -9.0f);
-}
+} // namespace
 
 BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Big Muff Drive", createParameterLayout(), um)
 {
@@ -36,7 +36,7 @@ AudioProcessorValueTreeState::ParameterLayout BigMuffDrive::createParameterLayou
     createPercentParameter (params, "harmonics", "Harmonics", 0.65f);
     createPercentParameter (params, "level", "Level", 0.65f);
 
-    emplace_param<AudioParameterChoice>(params, "n_stages", "Stages", StringArray { "1 Stage", "2 Stages", "3 Stages", "4 Stages" }, 1);
+    emplace_param<AudioParameterChoice> (params, "n_stages", "Stages", StringArray { "1 Stage", "2 Stages", "3 Stages", "4 Stages" }, 1);
 
     return { params.begin(), params.end() };
 }
