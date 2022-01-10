@@ -47,8 +47,6 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         -Wzero-as-null-pointer-constant -Wcast-align -Wno-implicit-fallthrough
         -Wno-maybe-uninitialized -Wno-missing-field-initializers -Wno-pedantic
         -Wno-ignored-qualifiers -Wno-unused-function -Wno-pessimizing-move
-        # Because [=] default capture list is deprecated in GCC C++20
-        -Wno-deprecated
         # From LV2 Wrapper
         -Wno-parentheses -Wno-deprecated-declarations -Wno-redundant-decls
         # For XSIMD
