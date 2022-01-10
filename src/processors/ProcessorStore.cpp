@@ -2,6 +2,7 @@
 
 #include "drive/GuitarMLAmp.h"
 #include "drive/RONN.h"
+#include "drive/big_muff/BigMuffDrive.h"
 #include "drive/centaur/Centaur.h"
 #include "drive/diode_circuits/DiodeClipper.h"
 #include "drive/diode_circuits/DiodeRectifier.h"
@@ -20,6 +21,7 @@
 
 #include "tone/AmpIRs.h"
 #include "tone/BassCleaner.h"
+#include "tone/BigMuffTone.h"
 #include "tone/GraphicEQ.h"
 #include "tone/HighCut.h"
 #include "tone/LofiIrs.h"
@@ -27,7 +29,6 @@
 #include "tone/TrebleBooster.h"
 #include "tone/bassman/BassmanTone.h"
 #include "tone/baxandall/BaxandallEQ.h"
-#include "tone/big_muff_tone/BigMuffTone.h"
 
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
@@ -46,6 +47,7 @@ static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 }
 
 ProcessorStore::StoreMap ProcessorStore::store = {
+    { "Big Muff Drive", &processorFactory<BigMuffDrive> },
     { "Centaur", &processorFactory<Centaur> },
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
