@@ -1,5 +1,5 @@
 #include "BigMuffTone.h"
-#include "../../ParameterHelpers.h"
+#include "../ParameterHelpers.h"
 
 namespace
 {

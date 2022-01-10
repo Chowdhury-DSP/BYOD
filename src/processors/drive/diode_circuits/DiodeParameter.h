@@ -34,8 +34,8 @@ inline void createDiodeParam (Params& params, const String& id)
 
 inline void createNDiodesParam (Params& params, const String& id)
 {
-    NormalisableRange<float> nDiodesRange { 0.3f, 3.0f };
-    nDiodesRange.setSkewForCentre (1.0f);
+    auto nDiodesRange = createNormRange (0.3f, 3.0f, 1.0f);
+
     params.push_back (std::make_unique<VTSParam> (id,
                                                   "# Diodes",
                                                   String(),
