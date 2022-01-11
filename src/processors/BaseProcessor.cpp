@@ -19,7 +19,10 @@ BaseProcessor::BaseProcessor (const String& name,
     inputsConnected.resize (0);
     portMagnitudes.resize (numInputs);
 
-    uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>();
+    if (MessageManager::getInstance()->isThisTheMessageThread())
+
+    MessageManager::callAsync ([=]
+                               { uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>(); });
 }
 
 void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)

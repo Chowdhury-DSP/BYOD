@@ -26,6 +26,7 @@ public:
 private:
     chowdsp::PluginLogger logger;
     chowdsp::SharedPluginSettings pluginSettings;
+    chowdsp::SharedLNFAllocator lnfAllocator;
 
     ProcessorStore procStore;
     std::unique_ptr<ProcessorChain> procs;

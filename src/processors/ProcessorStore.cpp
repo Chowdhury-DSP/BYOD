@@ -90,12 +90,25 @@ ProcessorStore::StoreMap ProcessorStore::store = {
 
 ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
 {
+    // load processor info asynchronously
+    std::vector<std::future<std::pair<String, ProcInfo>>> futureProcInfos;
+    futureProcInfos.reserve (store.size());
+
     for (auto& [name, procFactory] : store)
     {
-        auto proc = procFactory (undoManager);
-        jassert (name == proc->getName());
+        futureProcInfos.push_back(std::async (std::launch::async, [this, name = name, procFactory = procFactory]
+                                               {
+                                                   auto proc = procFactory (undoManager);
+                                                   jassert (name == proc->getName());
 
-        procTypeStore[name] = { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() };
+                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
+                                               }));
+    }
+
+    for (auto& f : futureProcInfos)
+    {
+        const auto& [name, info] = f.get();
+        procTypeStore[name] = info;
     }
 }
 
