@@ -46,7 +46,7 @@ private:
     BaseProcessor& proc;
     ProcessorChain& procChain;
 
-    const ProcessorUIOptions& procUI;
+    ProcessorUIOptions& procUI;
     Colour contrastColour;
 
     KnobsComponent knobs;

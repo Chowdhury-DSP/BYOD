@@ -16,7 +16,7 @@ struct ProcessorUIOptions
     Colour backgroundColour = Colours::red;
     Colour powerColour = Colour (0xFFFF4D29);
     std::unique_ptr<Drawable> backgroundImage;
-    LookAndFeel* lnf = nullptr;
+    std::future<LookAndFeel*> lnf;
 
     struct ProcInfo
     {
@@ -65,6 +65,7 @@ public:
 
     // interface for processor editors
     AudioProcessorValueTreeState& getVTS() { return vts; }
+    ProcessorUIOptions& getUIOptions() { return uiOptions; }
     const ProcessorUIOptions& getUIOptions() const { return uiOptions; }
 
     /** if your processor has custom UI components, create them here! */

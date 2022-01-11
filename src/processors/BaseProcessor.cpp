@@ -19,10 +19,8 @@ BaseProcessor::BaseProcessor (const String& name,
     inputsConnected.resize (0);
     portMagnitudes.resize (numInputs);
 
-    if (MessageManager::getInstance()->isThisTheMessageThread())
-
-    MessageManager::callAsync ([=]
-                               { uiOptions.lnf = lnfAllocator->getLookAndFeel<ProcessorLNF>(); });
+    uiOptions.lnf = std::async (std::launch::deferred, [=]
+                                { return lnfAllocator->getLookAndFeel<ProcessorLNF>(); });
 }
 
 void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)

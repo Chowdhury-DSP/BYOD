@@ -29,8 +29,9 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     { MessageManager::callAsync ([=]
                                  { procChain.getActionHelper().removeProcessor (&proc); }); };
 
-    if (procUI.lnf != nullptr)
-        setLookAndFeel (procUI.lnf);
+    auto* lnf = procUI.lnf.get();
+    if (lnf != nullptr)
+        setLookAndFeel (lnf);
     else
         setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
 
