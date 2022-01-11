@@ -7,14 +7,16 @@ class BoardViewport : public Viewport,
                       private chowdsp::GlobalPluginSettings::Listener
 {
 public:
+    using SettingID = chowdsp::GlobalPluginSettings::SettingID;
+
     explicit BoardViewport (ProcessorChain& procChain);
     ~BoardViewport() override;
 
     void resized() override;
 
-    void propertyChanged (const Identifier& settingID, const var& property) final;
+    void globalSettingChanged (SettingID settingID) override;
 
-    static const Identifier defaultZoomSettingID;
+    static constexpr SettingID defaultZoomSettingID = "default_zoom";
 
 private:
     void setScaleFactor (float newScaleFactor);

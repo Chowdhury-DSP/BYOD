@@ -2,7 +2,13 @@ cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment target")
 project(BYOD VERSION 0.2.0)
 
-set(CMAKE_CXX_STANDARD 20)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_STANDARD 17)
+else()
+    set(CMAKE_CXX_STANDARD 20)
+endif()
+
+
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)

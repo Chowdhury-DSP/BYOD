@@ -12,7 +12,7 @@ float getQ (float param01)
     return lowQ * std::pow ((highQ / lowQ), param01);
 }
 
-const auto speedRange = ParameterHelpers::createNormRange (5.0f, 100.0f, 20.0f);
+const auto speedRange = ParameterHelpers::createNormalisableRange (5.0f, 100.0f, 20.0f);
 
 const String senseTag = "sense";
 const String directControlTag = "direct_control";

@@ -6,15 +6,17 @@ class ProcessorChainPortMagnitudesHelper : private chowdsp::GlobalPluginSettings
                                            private ProcessorChain::Listener
 {
 public:
+    using SettingID = chowdsp::GlobalPluginSettings::SettingID;
+
     explicit ProcessorChainPortMagnitudesHelper (ProcessorChain& procChain);
     ~ProcessorChainPortMagnitudesHelper() override;
 
     void processorAdded (BaseProcessor* proc) override;
 
-    void propertyChanged (const Identifier& settingID, const var& property) override;
+    void globalSettingChanged (SettingID settingID) override;
     void preparePortMagnitudes();
 
-    static const Identifier cableVizOnOffID;
+    static constexpr SettingID cableVizOnOffID = "cable_viz_onoff";
 
 private:
     ProcessorChain& chain;

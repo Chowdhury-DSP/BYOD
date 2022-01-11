@@ -40,7 +40,7 @@ void SettingsButton::showSettingsMenu()
 
 void SettingsButton::cableVizMenu (PopupMenu& menu, int itemID)
 {
-    const auto isCurrentlyOn = (bool) pluginSettings->getProperty (ProcessorChainPortMagnitudesHelper::cableVizOnOffID);
+    const auto isCurrentlyOn = pluginSettings->getProperty<bool> (ProcessorChainPortMagnitudesHelper::cableVizOnOffID);
 
     PopupMenu::Item item;
     item.itemID = ++itemID;
@@ -56,7 +56,7 @@ void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
 {
     PopupMenu defaultZoomMenu;
 
-    const auto curDefaultZoomLevel = (double) pluginSettings->getProperty (BoardViewport::defaultZoomSettingID);
+    const auto curDefaultZoomLevel = pluginSettings->getProperty<double> (BoardViewport::defaultZoomSettingID);
     for (auto zoomExp : { -4, -3, -2, -1, 0, 1, 2, 3, 4 })
     {
         auto zoomLevel = std::pow (1.1, (double) zoomExp);

@@ -20,7 +20,7 @@ AudioProcessorValueTreeState::ParameterLayout StateVariableFilter::createParamet
     auto params = createBaseParams();
     createFreqParameter (params, "freq", "Freq.", 20.0f, 20000.0f, 2000.0f, 8000.0f);
 
-    auto qRange = createNormRange (0.2f, 5.0f, 0.7071f);
+    auto qRange = createNormalisableRange (0.2f, 5.0f, 0.7071f);
     params.push_back (std::make_unique<VTSParam> ("q_value",
                                                   "Q",
                                                   String(),

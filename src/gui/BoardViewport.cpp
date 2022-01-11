@@ -3,7 +3,7 @@
 BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
 {
     pluginSettings->addProperties ({ { defaultZoomSettingID, 1.0 } }, this);
-    setScaleFactor ((float) (double) pluginSettings->getProperty (defaultZoomSettingID));
+    setScaleFactor ((float) pluginSettings->getProperty<double> (defaultZoomSettingID));
 
     setViewedComponent (&comp, false);
 
@@ -37,15 +37,12 @@ BoardViewport::~BoardViewport()
     getHorizontalScrollBar().setLookAndFeel (nullptr);
 }
 
-void BoardViewport::propertyChanged (const Identifier& settingID, const var& property)
+void BoardViewport::globalSettingChanged (SettingID settingID)
 {
     if (settingID != defaultZoomSettingID)
         return;
 
-    if (! property.isDouble())
-        return;
-
-    setScaleFactor ((float) (double) property);
+    setScaleFactor ((float) pluginSettings->getProperty<double> (settingID));
     resized();
 
     Logger::writeToLog ("Default zoom level set to: " + scaleLabel.getText());
@@ -71,5 +68,3 @@ void BoardViewport::resized()
     minusButton.setBounds (buttonRect.withX (buttonDim).reduced (1));
     scaleLabel.setBounds (2 * buttonDim, height - buttonDim, 100, buttonDim);
 }
-
-const Identifier BoardViewport::defaultZoomSettingID { "default_zoom" };

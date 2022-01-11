@@ -9,7 +9,7 @@
 
 namespace
 {
-const String settingsFilePath = "ChowdhuryDSP/BYOD/.plugin_settings.txt";
+const String settingsFilePath = "ChowdhuryDSP/BYOD/.plugin_settings.json";
 const String logFileSubDir = "ChowdhuryDSP/BYOD/Logs";
 const String logFileNameRoot = "BYOD_Log_";
 } // namespace

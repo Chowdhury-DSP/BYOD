@@ -7,37 +7,6 @@ namespace ParameterHelpers
 using namespace chowdsp::ParamUtils;
 using Params = chowdsp::Parameters;
 
-template <typename T>
-NormalisableRange<T> createNormRange (T start, T end, T centre)
-{
-    auto range = NormalisableRange { start, end };
-    range.setSkewForCentre (centre);
-
-    return range;
-}
-
-inline void createFreqParameter (Params& params, const String& id, const String& name, float min, float max, float centre, float defaultValue)
-{
-    auto freqRange = createNormRange (min, max, centre);
-
-    emplace_param<VTSParam> (params, id, name, String(), freqRange, defaultValue, &freqValToString, &stringToFreqVal);
-}
-
-inline void createPercentParameter (Params& params, const String& id, const String& name, float defaultValue)
-{
-    NormalisableRange<float> range { 0.0f, 1.0f };
-    emplace_param<VTSParam> (params, id, name, String(), range, defaultValue, &percentValToString, &stringToPercentVal);
-}
-
-inline void createGainDBParameter (Params& params, const String& id, const String& name, float min, float max, float defaultValue, float centerValue = -1000.0f)
-{
-    NormalisableRange<float> range { min, max };
-    if (centerValue > -1000.0f)
-        range.setSkewForCentre (centerValue);
-
-    emplace_param<VTSParam> (params, id, name, String(), range, defaultValue, &gainValToString, &stringToGainVal);
-}
-
 inline auto createBaseParams()
 {
     Params params;
