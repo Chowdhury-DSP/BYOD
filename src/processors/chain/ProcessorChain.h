@@ -23,7 +23,10 @@ class ProcessorChain : private AudioProcessorValueTreeState::Listener
     )
     // clang-format on
 public:
-    ProcessorChain (ProcessorStore& store, AudioProcessorValueTreeState& vts, std::unique_ptr<chowdsp::PresetManager>& presetMgr);
+    ProcessorChain (ProcessorStore& store,
+                    AudioProcessorValueTreeState& vts,
+                    std::unique_ptr<chowdsp::PresetManager>& presetMgr,
+                    std::function<void (int)>&& latencyChangedCallback);
     ~ProcessorChain() override;
 
     static void createParameters (Parameters& params);

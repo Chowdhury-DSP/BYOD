@@ -5,7 +5,7 @@
 class ChainIOProcessor
 {
 public:
-    ChainIOProcessor (AudioProcessorValueTreeState& vts);
+    explicit ChainIOProcessor (AudioProcessorValueTreeState& vts, std::function<void (int)>&& latencyChangedCallback);
 
     static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);
@@ -15,6 +15,8 @@ public:
     void processAudioOutput (AudioBuffer<float>& buffer);
 
 private:
+    std::function<void (int)> latencyChangedCallbackFunc;
+
     std::atomic<float>* oversamplingParam = nullptr;
     std::unique_ptr<dsp::Oversampling<float>> overSample[5];
     int prevOS = 0;

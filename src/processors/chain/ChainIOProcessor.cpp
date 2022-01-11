@@ -9,7 +9,7 @@ const String outGainTag = "out_gain";
 const String dryWetTag = "dry_wet";
 } // namespace
 
-ChainIOProcessor::ChainIOProcessor (AudioProcessorValueTreeState& vts)
+ChainIOProcessor::ChainIOProcessor (AudioProcessorValueTreeState& vts, std::function<void (int)>&& latencyChangedCallback) : latencyChangedCallbackFunc (std::move (latencyChangedCallback))
 {
     oversamplingParam = vts.getRawParameterValue (oversamplingTag);
     inGainParam = vts.getRawParameterValue (inGainTag);
@@ -17,7 +17,7 @@ ChainIOProcessor::ChainIOProcessor (AudioProcessorValueTreeState& vts)
     dryWetParam = vts.getRawParameterValue (dryWetTag);
 
     for (int i = 0; i < 5; ++i)
-        overSample[i] = std::make_unique<dsp::Oversampling<float>> (2, i, dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
+        overSample[i] = std::make_unique<dsp::Oversampling<float>> (2, i, dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, true);
 }
 
 void ChainIOProcessor::createParameters (Parameters& params)
@@ -37,8 +37,8 @@ void ChainIOProcessor::prepare (double sampleRate, int samplesPerBlock)
 {
     int curOS = static_cast<int> (*oversamplingParam);
     prevOS = curOS;
-    for (int i = 0; i < 5; ++i)
-        overSample[i]->initProcessing ((size_t) samplesPerBlock);
+    for (auto& oversamplingProc : overSample)
+        oversamplingProc->initProcessing ((size_t) samplesPerBlock);
 
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
     for (auto* gain : { &inGain, &outGain })
@@ -48,6 +48,7 @@ void ChainIOProcessor::prepare (double sampleRate, int samplesPerBlock)
     }
 
     dryWetMixer.prepare (spec);
+    latencyChangedCallbackFunc ((int) overSample[curOS]->getLatencyInSamples());
 }
 
 int ChainIOProcessor::getOversamplingFactor() const
@@ -63,6 +64,8 @@ dsp::AudioBlock<float> ChainIOProcessor::processAudioInput (AudioBuffer<float>& 
     {
         sampleRateChanged = true;
         prevOS = curOS;
+
+        latencyChangedCallbackFunc ((int) overSample[curOS]->getLatencyInSamples());
     }
 
     dsp::AudioBlock<float> block (buffer);
@@ -83,7 +86,7 @@ void ChainIOProcessor::processAudioOutput (AudioBuffer<float>& buffer)
     dsp::AudioBlock<float> block (buffer);
     overSample[curOS]->processSamplesDown (block);
 
-    auto latencySamples = overSample[curOS]->getLatencyInSamples();
+    const auto latencySamples = (int) overSample[curOS]->getLatencyInSamples();
     dryWetMixer.processBlock (buffer, latencySamples);
 
     dsp::ProcessContextReplacing<float> context (block);

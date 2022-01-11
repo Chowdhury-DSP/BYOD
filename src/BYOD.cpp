@@ -20,7 +20,8 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
 {
     pluginSettings->initialise (settingsFilePath);
 
-    procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager);
+    procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager, [&] (int l)
+                                              { setLatencySamples (l); });
     paramForwarder = std::make_unique<ParamForwardManager> (vts, *procs);
 
     presetManager = std::make_unique<PresetManager> (procs.get(), vts);

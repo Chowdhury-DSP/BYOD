@@ -20,11 +20,12 @@ namespace
 
 ProcessorChain::ProcessorChain (ProcessorStore& store,
                                 AudioProcessorValueTreeState& vts,
-                                std::unique_ptr<chowdsp::PresetManager>& presetMgr) : procStore (store),
+                                std::unique_ptr<chowdsp::PresetManager>& presetMgr,
+                                std::function<void (int)>&& latencyChangedCallback) : procStore (store),
                                                                                       um (vts.undoManager),
                                                                                       inputProcessor (um),
                                                                                       outputProcessor (um),
-                                                                                      ioProcessor (vts),
+                                                                                      ioProcessor (vts, std::move (latencyChangedCallback)),
                                                                                       presetManager (presetMgr)
 {
     actionHelper = std::make_unique<ProcessorChainActionHelper> (*this);

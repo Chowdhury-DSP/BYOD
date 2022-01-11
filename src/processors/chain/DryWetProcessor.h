@@ -16,7 +16,7 @@ public:
     void copyDryBuffer (const AudioBuffer<float>& buffer);
 
     /** Mix dry and wet buffer. */
-    void processBlock (AudioBuffer<float>& buffer, float latencySamples);
+    void processBlock (AudioBuffer<float>& buffer, int latencySamples);
 
 private:
     float dryWet = 0.0f;
@@ -24,7 +24,7 @@ private:
 
     AudioBuffer<float> dryBuffer;
 
-    using DelayType = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th>;
+    using DelayType = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::None>;
     DelayType dryDelay { 1 << 10 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DryWetProcessor)
