@@ -1,17 +1,6 @@
 #pragma once
 
-#include "state/PresetManager.h"
-
-class PresetsComp : public chowdsp::PresetsComp
-{
-public:
-    explicit PresetsComp (chowdsp::PresetManager& presetMgr) : chowdsp::PresetsComp (presetMgr)
-    {
-    }
-
-private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComp)
-};
+#include "PresetsComp.h"
 
 template <typename ProcType>
 class PresetsItem : public foleys::GuiItem
@@ -39,7 +28,6 @@ public:
 
     void update() override
     {
-#if FOLEYS_ENABLE_BINARY_DATA
         auto getDrawable = [] (const juce::String& name)
         {
             int dataSize = 0;
@@ -58,7 +46,6 @@ public:
             presetsComp->setNextPrevButton (getDrawable (prevButtonName).get(), false);
         else
             presetsComp->setNextPrevButton (nullptr, false);
-#endif // FOLEYS_ENABLE_BINARY_DATA
     }
 
     std::vector<foleys::SettableProperty> getSettableProperties() const override

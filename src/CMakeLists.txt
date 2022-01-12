@@ -18,7 +18,7 @@ target_sources(BYOD PRIVATE
     gui/utils/SettingsButton.cpp
 
     state/ParamForwardManager.cpp
-    state/PresetManager.cpp
+    state/presets/PresetManager.cpp
 
     processors/BaseProcessor.cpp
     processors/ProcessorStore.cpp
