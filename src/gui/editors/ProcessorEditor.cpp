@@ -26,11 +26,9 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.setImages (xSvg.get());
     addAndMakeVisible (xButton);
     xButton.onClick = [=]
-    { MessageManager::callAsync ([=]
-                                 { procChain.getActionHelper().removeProcessor (&proc); }); };
-
-    auto* lnf = procUI.lnf.get();
-    if (lnf != nullptr)
+    { procChain.getActionHelper().removeProcessor (&proc); };
+    
+    if (auto* lnf = proc.getCustomLookAndFeel())
         setLookAndFeel (lnf);
     else
         setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());

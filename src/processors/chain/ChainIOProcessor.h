@@ -15,7 +15,7 @@ public:
     void processAudioOutput (AudioBuffer<float>& buffer);
 
 private:
-    std::function<void (int)> latencyChangedCallbackFunc;
+    const std::function<void (int)> latencyChangedCallbackFunc;
 
     std::atomic<float>* oversamplingParam = nullptr;
     std::unique_ptr<dsp::Oversampling<float>> overSample[5];

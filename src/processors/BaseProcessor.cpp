@@ -18,9 +18,6 @@ BaseProcessor::BaseProcessor (const String& name,
     inputBuffers.resize (numInputs);
     inputsConnected.resize (0);
     portMagnitudes.resize (numInputs);
-
-    uiOptions.lnf = std::async (std::launch::deferred, [=]
-                                { return lnfAllocator->getLookAndFeel<ProcessorLNF>(); });
 }
 
 void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)

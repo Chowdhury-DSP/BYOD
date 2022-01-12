@@ -16,7 +16,6 @@ struct ProcessorUIOptions
     Colour backgroundColour = Colours::red;
     Colour powerColour = Colour (0xFFFF4D29);
     std::unique_ptr<Drawable> backgroundImage;
-    std::future<LookAndFeel*> lnf;
 
     struct ProcInfo
     {
@@ -71,6 +70,9 @@ public:
     /** if your processor has custom UI components, create them here! */
     virtual void getCustomComponents (OwnedArray<Component>& /*customComps*/) {}
 
+    /** if your processor needs a custom looks and feel, create it here! (with the shared lnfAllocator) */
+    virtual LookAndFeel* getCustomLookAndFeel() const { return nullptr; }
+
     /** add options to the processor's popup menu */
     virtual void addToPopupMenu (PopupMenu& /*menu*/) {}
 
@@ -112,13 +114,12 @@ protected:
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 
-    struct ConvolutionMessageQueue : public dsp::ConvolutionMessageQueue
-    {
-        ConvolutionMessageQueue() : dsp::ConvolutionMessageQueue (2048) {}
-    };
-
+    /**
+     * If your processor uses convolution, you can use this shared
+     * messaging queue to avoid creating a new background thread
+     * for each instance.
+     */
     auto& getSharedConvolutionMessageQueue() { return convolutionMessageQueue.get(); }
-    SharedResourcePointer<ConvolutionMessageQueue> convolutionMessageQueue;
 
 private:
     std::atomic<float>* onOffParam = nullptr;
@@ -131,6 +132,12 @@ private:
     int inputIdx = 0;
 
     Point<float> editorPosition;
+
+    struct ConvolutionMessageQueue : public dsp::ConvolutionMessageQueue
+    {
+        ConvolutionMessageQueue() : dsp::ConvolutionMessageQueue (2048) {}
+    };
+    SharedResourcePointer<ConvolutionMessageQueue> convolutionMessageQueue;
 
     struct PortMagnitude
     {
