@@ -53,6 +53,8 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
         username = newUsername;
         password = newPassword;
         isLoggedIn = true;
+
+        listeners.call (&Listener::presetLoginStatusChanged);
     }
 }
 

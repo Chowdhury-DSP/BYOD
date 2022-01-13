@@ -4,6 +4,9 @@
 
 class PresetsServerUserManager
 {
+    CREATE_LISTENER (Listener,
+                     listeners,
+                     virtual void presetLoginStatusChanged() {})
 public:
     PresetsServerUserManager();
     ~PresetsServerUserManager();

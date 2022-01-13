@@ -10,6 +10,11 @@ String presetTag = "preset";
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
                                                                                               procChain (chain)
 {
+    if (userManager->getUsername().isNotEmpty())
+        setUserPresetName (userManager->getUsername());
+
+    userManager->addListener (this);
+
     setUserPresetConfigFile (userPresetPath);
     setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
 
@@ -19,6 +24,16 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
     addPresets (factoryPresets);
 
     loadDefaultPreset();
+}
+
+PresetManager::~PresetManager()
+{
+    userManager->removeListener (this);
+}
+
+void PresetManager::presetLoginStatusChanged()
+{
+    setUserPresetName (userManager->getUsername());
 }
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
