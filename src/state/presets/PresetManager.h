@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PresetsServerSyncManager.h"
 #include "PresetsServerUserManager.h"
 
 class ProcessorChain;
@@ -15,10 +16,13 @@ public:
 
     void presetLoginStatusChanged() override;
 
+    void syncLocalPresetsToServer() const;
+
 private:
     ProcessorChain* procChain;
 
     SharedResourcePointer<PresetsServerUserManager> userManager;
+    SharedResourcePointer<PresetsServerSyncManager> syncManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };

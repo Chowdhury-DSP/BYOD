@@ -20,6 +20,7 @@ public:
     void logOut();
 
     String getUsername() const { return username; }
+    String getPassword() const { return password; }
 
 private:
     bool isLoggedIn = false;

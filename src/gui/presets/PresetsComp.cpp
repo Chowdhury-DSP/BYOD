@@ -1,10 +1,11 @@
 #include "PresetsComp.h"
 
-PresetsComp::PresetsComp (chowdsp::PresetManager& presetMgr) : chowdsp::PresetsComp (presetMgr),
-                                                               loginWindow (*this)
+PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (presetMgr),
+                                                      presetManager (presetMgr),
+                                                      loginWindow (*this)
 {
     presetListUpdated();
-    
+
     auto& loginWindowComp = loginWindow.getViewComponent();
     loginWindowComp.loginChangeCallback = [&]
     { presetListUpdated(); };
@@ -28,6 +29,15 @@ int PresetsComp::addPresetServerMenuOptions (int optionID)
     if (userManager->getIsLoggedIn())
     {
         menu->addSectionHeader ("Logged in as: " + userManager->getUsername());
+
+        PopupMenu::Item syncLocalToServerItem { "Sync Local -> Server" };
+        syncLocalToServerItem.itemID = ++optionID;
+        syncLocalToServerItem.action = [=]
+        {
+            updatePresetBoxText();
+            presetManager.syncLocalPresetsToServer();
+        };
+        menu->addItem (syncLocalToServerItem);
 
         PopupMenu::Item loginItem { "Log Out" };
         loginItem.itemID = ++optionID;

@@ -36,6 +36,12 @@ void PresetManager::presetLoginStatusChanged()
     setUserPresetName (userManager->getUsername());
 }
 
+void PresetManager::syncLocalPresetsToServer() const
+{
+    auto userPresets = getUserPresets();
+    syncManager->syncLocalPresetsToServer (userPresets);
+}
+
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
 {
     return procChain->getStateHelper().saveProcChain();

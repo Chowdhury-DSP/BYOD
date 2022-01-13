@@ -7,12 +7,14 @@
 class PresetsComp : public chowdsp::PresetsComp
 {
 public:
-    explicit PresetsComp (chowdsp::PresetManager& presetMgr);
+    explicit PresetsComp (PresetManager& presetMgr);
 
     void presetListUpdated() final;
     int addPresetServerMenuOptions (int optionID);
 
 private:
+    PresetManager& presetManager;
+
     WindowInPlugin<PresetsLoginDialog> loginWindow;
 
     SharedResourcePointer<PresetsServerUserManager> userManager;

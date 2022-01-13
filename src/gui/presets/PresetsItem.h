@@ -22,7 +22,7 @@ public:
         auto* proc = dynamic_cast<ProcType*> (builder.getMagicState().getProcessor());
         jassert (proc != nullptr);
 
-        presetsComp = std::make_unique<PresetsComp> (proc->getPresetManager());
+        presetsComp = std::make_unique<PresetsComp> (*dynamic_cast<PresetManager*> (&proc->getPresetManager()));
         addAndMakeVisible (presetsComp.get());
     }
 
