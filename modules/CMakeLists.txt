@@ -47,6 +47,7 @@ target_compile_definitions(juce_plugin_modules
         JUCE_MODAL_LOOPS_PERMITTED=1
         FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
         FOLEYS_ENABLE_BINARY_DATA=1
+        FOLEYS_ENABLE_OPEN_GL_CONTEXT=0 # Foley's editor should NOT use OpenGL by default
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
 )
@@ -82,5 +83,4 @@ endif()
 if(NOT APPLE)
     message(STATUS "Linking with OpenGL")
     target_link_libraries(juce_plugin_modules PRIVATE juce::juce_opengl)
-    target_compile_definitions(juce_plugin_modules PUBLIC FOLEYS_ENABLE_OPEN_GL_CONTEXT=1)
 endif()

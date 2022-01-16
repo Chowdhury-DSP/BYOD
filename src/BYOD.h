@@ -19,22 +19,25 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    ProcessorChain& getProcChain() { return *procs; }
-    AudioProcessorValueTreeState& getVTS() { return vts; }
-    AudioProcessLoadMeasurer& getLoadMeasurer() { return loadMeasurer; }
+    auto& getProcChain() { return *procs; }
+    auto& getVTS() { return vts; }
+    auto& getLoadMeasurer() { return loadMeasurer; }
+    auto& getOpenGLHelper() { return openGLHelper; }
 
 private:
     chowdsp::PluginLogger logger;
     chowdsp::SharedPluginSettings pluginSettings;
-    chowdsp::SharedLNFAllocator lnfAllocator;
+    [[maybe_unused]] chowdsp::SharedLNFAllocator lnfAllocator; // keep alive!
 
     ProcessorStore procStore;
     std::unique_ptr<ProcessorChain> procs;
-    std::unique_ptr<ParamForwardManager> paramForwarder;
+    [[maybe_unused]] std::unique_ptr<ParamForwardManager> paramForwarder;
 
     UndoManager undoManager { 500000 };
 
     AudioProcessLoadMeasurer loadMeasurer;
+
+    chowdsp::OpenGLHelper openGLHelper;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BYOD)
 };

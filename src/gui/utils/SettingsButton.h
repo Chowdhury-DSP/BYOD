@@ -1,22 +1,32 @@
 #pragma once
 
-#include <pch.h>
+#include "BYOD.h"
 
-class SettingsButton : public DrawableButton
+class SettingsButton : public DrawableButton,
+                       private chowdsp::GlobalPluginSettings::Listener
 {
+    using SettingID = chowdsp::GlobalPluginSettings::SettingID;
+
 public:
-    explicit SettingsButton (const AudioProcessor& processor);
+    SettingsButton (const AudioProcessor& processor, chowdsp::OpenGLHelper& openGLHelper);
     ~SettingsButton() override;
+
+    void globalSettingChanged (SettingID settingID) final;
 
 private:
     void showSettingsMenu();
     void cableVizMenu (PopupMenu& menu, int itemID);
     void defaultZoomMenu (PopupMenu& menu, int itemID);
+    void openGLManu (PopupMenu& menu, int itemID);
     void copyDiagnosticInfo();
 
     const AudioProcessor& proc;
+    chowdsp::OpenGLHelper& openGLHelper;
 
     chowdsp::SharedPluginSettings pluginSettings;
+    chowdsp::SharedLNFAllocator lnfAllocator;
+
+    static constexpr SettingID openglID = "use_opengl";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsButton)
 };
@@ -28,7 +38,8 @@ public:
 
     SettingsButtonItem (foleys::MagicGUIBuilder& builder, const ValueTree& node) : foleys::GuiItem (builder, node)
     {
-        button = std::make_unique<SettingsButton> (*builder.getMagicState().getProcessor());
+        auto* plugin = dynamic_cast<BYOD*> (builder.getMagicState().getProcessor());
+        button = std::make_unique<SettingsButton> (*plugin, plugin->getOpenGLHelper());
 
         addAndMakeVisible (button.get());
     }
