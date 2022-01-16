@@ -28,6 +28,8 @@ If applicable, add screenshots to help explain your problem.
  - DAW [e.g. Ableton Live, FL Studio, Audacity]
  - Version [e.g. 2.3]
  - 32/64 bit (Windows only)
+ 
+If you are unsure about any of this information, please use the "Copy Diagnostic Info" tool in the plugin settings menu.
 
 **Additional context**
 Add any other context about the problem here.
