@@ -77,6 +77,8 @@ AudioProcessorEditor* BYOD::createEditor()
     // we need to set resize limits for StandalonePluginHolder
     editor->setResizeLimits (10, 10, 2000, 2000);
 
+    openGLHelper.setComponent (editor);
+
     return editor;
 }
 
