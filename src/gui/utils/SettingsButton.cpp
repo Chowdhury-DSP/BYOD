@@ -33,6 +33,9 @@ void SettingsButton::globalSettingChanged (SettingID settingID)
         return;
 
     const auto shouldUseOpenGL = pluginSettings->getProperty<bool> (openglID);
+    if (shouldUseOpenGL == openGLHelper.isAttached())
+        return; // no change
+
     Logger::writeToLog ("Using OpenGL: " + String (shouldUseOpenGL ? "TRUE" : "FALSE"));
     shouldUseOpenGL ? openGLHelper.attach() : openGLHelper.detach();
 }

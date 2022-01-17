@@ -27,7 +27,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     addAndMakeVisible (xButton);
     xButton.onClick = [=]
     { procChain.getActionHelper().removeProcessor (&proc); };
-    
+
     if (auto* lnf = proc.getCustomLookAndFeel())
         setLookAndFeel (lnf);
     else

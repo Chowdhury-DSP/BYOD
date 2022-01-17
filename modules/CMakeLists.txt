@@ -12,7 +12,11 @@ juce_add_modules(chowdsp_juce_dsp)
 set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
 add_subdirectory(RTNeural)
 
+# add sst-cpputils
+add_subdirectory(sst-cpputils)
+
 include(cmake/WarningFlags.cmake)
+include(cmake/ConfigFlags.cmake)
 add_library(juce_plugin_modules STATIC)
 target_link_libraries(juce_plugin_modules
     PRIVATE
@@ -26,7 +30,7 @@ target_link_libraries(juce_plugin_modules
         foleys_gui_magic
         RTNeural
     PUBLIC
-        juce::juce_recommended_config_flags
+        config_flags
         juce::juce_recommended_lto_flags
         warning_flags
 )
@@ -60,6 +64,7 @@ target_include_directories(juce_plugin_modules
         ${CMAKE_SOURCE_DIR}/modules/RTNeural
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/Eigen
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/xsimd/include
+        $<TARGET_PROPERTY:sst-cpputils,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 set_target_properties(juce_plugin_modules PROPERTIES

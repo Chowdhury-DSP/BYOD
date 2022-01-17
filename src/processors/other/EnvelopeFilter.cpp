@@ -31,7 +31,8 @@ EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor ("Envelope Filt
 
     uiOptions.backgroundColour = Colours::purple.brighter();
     uiOptions.powerColour = Colours::yellow.darker (0.1f);
-    uiOptions.info.description = "A envelope filter with lowpass, bandpass, and highpass filter types.";
+    uiOptions.paramIDsToSkip = { directControlTag };
+    uiOptions.info.description = "A envelope filter with lowpass, bandpass, and highpass filter types. Use the right-click menu to control the filter modulation directly";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
@@ -168,7 +169,7 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
 void EnvelopeFilter::addToPopupMenu (PopupMenu& menu)
 {
     directControlAttach = std::make_unique<ParameterAttachment> (
-        *vts.getParameter ("direct_control"), [=] (float) {}, vts.undoManager);
+        *vts.getParameter (directControlTag), [=] (float) {}, vts.undoManager);
 
     PopupMenu::Item directControlItem;
     directControlItem.itemID = 1;
@@ -194,7 +195,7 @@ void EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
             freqModAttach = std::make_unique<SliderAttachment> (vts, freqModTag, freqModSlider);
             senseAttach = std::make_unique<SliderAttachment> (vts, senseTag, sensitivitySlider);
 
-            setName (senseTag + "__" + freqModTag + "__" + directControlTag + "__");
+            setName (senseTag + "__" + freqModTag + "__");
 
             vts.addParameterListener (directControlTag, this);
         }
