@@ -16,6 +16,7 @@ struct ProcessorUIOptions
     Colour backgroundColour = Colours::red;
     Colour powerColour = Colour (0xFFFF4D29);
     std::unique_ptr<Drawable> backgroundImage;
+    StringArray paramIDsToSkip;
 
     struct ProcInfo
     {

@@ -65,6 +65,9 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
     {
         if (auto* rangedParam = dynamic_cast<RangedAudioParameter*> (param))
         {
+            if (baseProc.getUIOptions().paramIDsToSkip.contains (rangedParam->paramID))
+                continue;
+
             bool found = false;
             for (auto* comp : customComponents)
             {

@@ -42,7 +42,7 @@ void InfoComponent::paint (Graphics& g)
     if (linkButton.isVisible())
         bounds.removeFromBottom (30);
 
-    g.drawFittedText (description, bounds.reduced (10, 0), Justification::centred, 10);
+    g.drawFittedText (description, bounds.reduced (5, 0), Justification::centred, 10);
 }
 
 void InfoComponent::resized()
