@@ -96,7 +96,7 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
 
     for (auto& [name, procFactory] : store)
     {
-        futureProcInfos.push_back(std::async (std::launch::async, [this, name = name, procFactory = procFactory]
+        futureProcInfos.push_back (std::async (std::launch::async, [this, name = name, procFactory = procFactory]
                                                {
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());

@@ -5,7 +5,7 @@ namespace
 {
 const String delayTypeTag = "delay_type";
 const String pingPongTag = "ping_pong";
-}
+} // namespace
 
 Delay::Delay (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
 {
@@ -40,7 +40,7 @@ AudioProcessorValueTreeState::ParameterLayout Delay::createParameterLayout()
     createPercentParameter (params, "feedback", "Feedback", 0.0f);
     createPercentParameter (params, "mix", "Mix", 0.5f);
 
-    emplace_param<AudioParameterChoice>(params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
+    emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
     emplace_param<AudioParameterBool> (params, pingPongTag, "Ping-Pong", false);
 
     return { params.begin(), params.end() };
