@@ -14,11 +14,16 @@ target_sources(BYOD PRIVATE
     gui/editors/KnobsComponent.cpp
     gui/editors/Port.cpp
     gui/editors/ProcessorEditor.cpp
+    gui/presets/PresetsComp.cpp
+    gui/presets/PresetsLoginDialog.cpp
     gui/utils/LookAndFeels.cpp
     gui/utils/SettingsButton.cpp
 
     state/ParamForwardManager.cpp
-    state/PresetManager.cpp
+    state/presets/PresetManager.cpp
+    state/presets/PresetsServerSyncManager.cpp
+    state/presets/PresetsServerUserManager.cpp
+    state/presets/PresetsServerCommunication.cpp
 
     processors/BaseProcessor.cpp
     processors/ProcessorStore.cpp

@@ -10,6 +10,11 @@ String presetTag = "preset";
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
                                                                                               procChain (chain)
 {
+    if (userManager->getUsername().isNotEmpty())
+        setUserPresetName (userManager->getUsername());
+
+    userManager->addListener (this);
+
     setUserPresetConfigFile (userPresetPath);
     setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
 
@@ -19,6 +24,33 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
     addPresets (factoryPresets);
 
     loadDefaultPreset();
+}
+
+PresetManager::~PresetManager()
+{
+    userManager->removeListener (this);
+}
+
+void PresetManager::presetLoginStatusChanged()
+{
+    setUserPresetName (userManager->getUsername());
+}
+
+void PresetManager::syncLocalPresetsToServer() const
+{
+    auto userPresets = getUserPresets();
+    syncManager->syncLocalPresetsToServer (userPresets);
+}
+
+void PresetManager::syncServerPresetsToLocal()
+{
+    std::vector<chowdsp::Preset> serverPresets;
+    syncManager->syncServerPresetsToLocal (serverPresets);
+
+    for (const auto& preset : serverPresets)
+        preset.toFile (getUserPresetPath().getChildFile (preset.getName() + ".chowpreset"));
+
+    loadUserPresetsFromFolder (getUserPresetPath());
 }
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()

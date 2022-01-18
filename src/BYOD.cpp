@@ -1,11 +1,12 @@
 #include "BYOD.h"
 #include "gui/BoardViewport.h"
+#include "gui/presets/PresetsItem.h"
 #include "gui/utils/CPUMeter.h"
 #include "gui/utils/LookAndFeels.h"
 #include "gui/utils/SettingsButton.h"
 #include "gui/utils/TextSliderItem.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
-#include "state/PresetManager.h"
+#include "state/presets/PresetManager.h"
 
 namespace
 {
@@ -55,7 +56,7 @@ AudioProcessorEditor* BYOD::createEditor()
 {
     auto builder = chowdsp::createGUIBuilder (magicState);
     builder->registerFactory ("Board", &BoardItem::factory);
-    builder->registerFactory ("PresetsItem", &chowdsp::PresetsItem<BYOD>::factory);
+    builder->registerFactory ("PresetsItem", &PresetsItem<BYOD>::factory);
     builder->registerFactory ("TextSlider", &TextSliderItem::factory);
     builder->registerFactory ("SettingsButton", &SettingsButtonItem::factory);
     builder->registerFactory ("CPUMeter", &CPUMeterItem<BYOD>::factory);
