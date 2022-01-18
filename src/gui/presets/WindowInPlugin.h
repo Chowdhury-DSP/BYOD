@@ -7,7 +7,7 @@ class WindowInPlugin : public Component,
                        private ComponentListener
 {
 public:
-    static_assert (std::is_base_of<Component, OwnedCompType>::value, "Owned Component buse be derived from juce::Component");
+    static_assert (std::is_base_of<Component, OwnedCompType>::value, "Owned Component must be derived from juce::Component");
 
     // @TODO enable_if default constructible
     WindowInPlugin (Component& creatorComponent) : creatorComp (creatorComponent)
@@ -43,7 +43,8 @@ public:
 
         auto parentBounds = parent->getLocalBounds();
 
-        auto bounds = Rectangle { viewComponent.getWidth(), viewComponent.getHeight() + nameHeight }.expanded (1);
+        auto bounds = Rectangle { viewComponent.getWidth(), viewComponent.getHeight() + nameHeight };
+        bounds.expand (1, 1);
         setBounds (bounds.withCentre (parentBounds.getCentre()));
     }
 
