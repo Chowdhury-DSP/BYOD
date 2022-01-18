@@ -17,6 +17,7 @@ public:
     void presetLoginStatusChanged() override;
 
     void syncLocalPresetsToServer() const;
+    void syncServerPresetsToLocal();
 
 private:
     ProcessorChain* procChain;

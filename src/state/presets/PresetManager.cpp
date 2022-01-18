@@ -42,6 +42,17 @@ void PresetManager::syncLocalPresetsToServer() const
     syncManager->syncLocalPresetsToServer (userPresets);
 }
 
+void PresetManager::syncServerPresetsToLocal()
+{
+    std::vector<chowdsp::Preset> serverPresets;
+    syncManager->syncServerPresetsToLocal (serverPresets);
+
+    for (const auto& preset : serverPresets)
+        preset.toFile (getUserPresetPath().getChildFile (preset.getName() + ".chowpreset"));
+
+    loadUserPresetsFromFolder (getUserPresetPath());
+}
+
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
 {
     return procChain->getStateHelper().saveProcChain();

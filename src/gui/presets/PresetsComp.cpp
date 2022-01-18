@@ -39,6 +39,15 @@ int PresetsComp::addPresetServerMenuOptions (int optionID)
         };
         menu->addItem (syncLocalToServerItem);
 
+        PopupMenu::Item syncServerToLocalItem { "Sync Server -> Local" };
+        syncServerToLocalItem.itemID = ++optionID;
+        syncServerToLocalItem.action = [=]
+        {
+            updatePresetBoxText();
+            presetManager.syncServerPresetsToLocal();
+        };
+        menu->addItem (syncServerToLocalItem);
+
         PopupMenu::Item loginItem { "Log Out" };
         loginItem.itemID = ++optionID;
         loginItem.action = [=]
