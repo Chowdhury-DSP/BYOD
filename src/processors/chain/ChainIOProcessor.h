@@ -17,9 +17,7 @@ public:
 private:
     const std::function<void (int)> latencyChangedCallbackFunc;
 
-    std::atomic<float>* oversamplingParam = nullptr;
-    std::unique_ptr<dsp::Oversampling<float>> overSample[5];
-    int prevOS = 0;
+    chowdsp::VariableOversampling<float> oversampling;
 
     std::atomic<float>* inGainParam = nullptr;
     std::atomic<float>* outGainParam = nullptr;
