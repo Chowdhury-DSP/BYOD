@@ -248,7 +248,7 @@ void Delay::addToPopupMenu (PopupMenu& menu)
     delayTypeAttach = std::make_unique<ParameterAttachment> (
         *delayTypeChoiceParam, [=] (float) {}, vts.undoManager);
 
-    for (const auto& [index, delayTypeChoice] : sst::cpputils::enumerate (delayTypeChoiceParam->choices))
+    for (const auto [index, delayTypeChoice] : sst::cpputils::enumerate (delayTypeChoiceParam->choices))
     {
         PopupMenu::Item delayTypeItem;
         delayTypeItem.itemID = ++itemID;
