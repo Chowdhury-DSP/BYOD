@@ -1,7 +1,6 @@
 #pragma once
 
 #include "PresetsLoginDialog.h"
-#include "WindowInPlugin.h"
 #include "state/presets/PresetManager.h"
 
 class PresetsComp : public chowdsp::PresetsComp
@@ -15,7 +14,7 @@ public:
 private:
     PresetManager& presetManager;
 
-    WindowInPlugin<PresetsLoginDialog> loginWindow;
+    chowdsp::WindowInPlugin<PresetsLoginDialog> loginWindow;
 
     SharedResourcePointer<PresetsServerUserManager> userManager;
 
