@@ -2,6 +2,8 @@
 
 PresetsLoginDialog::PresetsLoginDialog()
 {
+    setName ("Preset Server Login");
+
     auto setupEditor = [=] (TextEditor& entryBox, const String& emptyText)
     {
         entryBox.setText (String(), dontSendNotification);
