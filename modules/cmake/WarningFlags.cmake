@@ -53,7 +53,7 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         -Wno-zero-as-null-pointer-constant
         # These lines suppress some custom warnings.
         # Comment them out to be more strict.
-        -Wno-redundant-move
+        -Wno-redundant-move -Wno-attributes
     )
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "7.0.0")
