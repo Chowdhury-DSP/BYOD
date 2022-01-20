@@ -42,6 +42,7 @@ public:
 
     auto& getActionHelper() { return *actionHelper; }
     auto& getStateHelper() { return *stateHelper; }
+    auto& getOversampling() { return ioProcessor.getOversampling(); }
 
 private:
     void initializeProcessors();

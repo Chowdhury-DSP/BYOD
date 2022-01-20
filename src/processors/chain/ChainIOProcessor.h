@@ -14,6 +14,8 @@ public:
     dsp::AudioBlock<float> processAudioInput (AudioBuffer<float>& buffer, bool& sampleRateChanged);
     void processAudioOutput (AudioBuffer<float>& buffer);
 
+    auto& getOversampling() { return oversampling; }
+
 private:
     const std::function<void (int)> latencyChangedCallbackFunc;
 

@@ -21,6 +21,7 @@ public:
 
     auto& getProcChain() { return *procs; }
     auto& getVTS() { return vts; }
+    auto& getOversampling() { return procs->getOversampling(); }
     auto& getLoadMeasurer() { return loadMeasurer; }
     auto& getOpenGLHelper() { return openGLHelper; }
 

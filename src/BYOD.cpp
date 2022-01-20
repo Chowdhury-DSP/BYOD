@@ -60,6 +60,7 @@ AudioProcessorEditor* BYOD::createEditor()
     builder->registerFactory ("TextSlider", &TextSliderItem::factory);
     builder->registerFactory ("SettingsButton", &SettingsButtonItem::factory);
     builder->registerFactory ("CPUMeter", &CPUMeterItem<BYOD>::factory);
+    builder->registerFactory ("OSMenu", &chowdsp::OversamplingMenuItem<BYOD>::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
     builder->registerLookAndFeel ("CPUMeterLNF", std::make_unique<CPUMeterLNF>());
 
