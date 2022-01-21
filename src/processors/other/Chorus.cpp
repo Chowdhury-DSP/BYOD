@@ -24,7 +24,7 @@ Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus", createParameterLayou
     uiOptions.backgroundColour = Colours::purple.brighter (0.25f);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
     uiOptions.paramIDsToSkip = { delayTypeTag };
-    uiOptions.info.description = "A chorus effect using BBD-emulated delay lines. Note that this effect works best in stereo.";
+    uiOptions.info.description = "A multi-phase chorus effect. Use the right-click menu to enable lo-fi mode.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
