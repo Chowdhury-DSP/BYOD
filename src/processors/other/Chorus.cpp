@@ -9,6 +9,8 @@ constexpr float rate2High = 40.0f;
 
 constexpr float delay1Ms = 0.6f;
 constexpr float delay2Ms = 0.2f;
+
+const String delayTypeTag = "delay_type";
 } // namespace
 
 Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus", createParameterLayout(), um)
@@ -17,9 +19,11 @@ Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus", createParameterLayou
     depthParam = vts.getRawParameterValue ("depth");
     fbParam = vts.getRawParameterValue ("feedback");
     mixParam = vts.getRawParameterValue ("mix");
+    delayTypeParam = vts.getRawParameterValue (delayTypeTag);
 
     uiOptions.backgroundColour = Colours::purple.brighter (0.25f);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
+    uiOptions.paramIDsToSkip = { delayTypeTag };
     uiOptions.info.description = "A chorus effect using BBD-emulated delay lines. Note that this effect works best in stereo.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -32,6 +36,8 @@ AudioProcessorValueTreeState::ParameterLayout Chorus::createParameterLayout()
     createPercentParameter (params, "depth", "Depth", 0.5f);
     createPercentParameter (params, "feedback", "Feedback", 0.0f);
     createPercentParameter (params, "mix", "Mix", 0.5f);
+
+    emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
 
     return { params.begin(), params.end() };
 }
@@ -46,7 +52,8 @@ void Chorus::prepare (double sampleRate, int samplesPerBlock)
     {
         for (int i = 0; i < delaysPerChannel; ++i)
         {
-            delay[ch][i].prepare (monoSpec);
+            cleanDelay[ch][i].prepare (monoSpec);
+            lofiDelay[ch][i].prepare (monoSpec);
 
             slowLFOs[ch][i].prepare (monoSpec);
             fastLFOs[ch][i].prepare (monoSpec);
@@ -77,13 +84,15 @@ void Chorus::prepare (double sampleRate, int samplesPerBlock)
     stereoBuffer.setSize (2, samplesPerBlock);
 }
 
-void Chorus::processAudio (AudioBuffer<float>& buffer)
+template <typename DelayArrType>
+void Chorus::processChorus (AudioBuffer<float>& buffer, DelayArrType& delay)
 {
     const auto numSamples = buffer.getNumSamples();
 
     auto slowRate = rate1Low * std::pow (rate1High / rate1Low, *rateParam);
     auto fastRate = rate2Low * std::pow (rate2High / rate2Low, *rateParam);
-    for (int ch = 0; ch < 2; ++ch)
+
+    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
         for (int i = 0; i < delaysPerChannel; ++i)
         {
@@ -91,31 +100,18 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
             fastLFOs[ch][i].setFrequency (fastRate);
             delay[ch][i].setFilterFreq (10000.0f);
         }
-    }
 
-    // always have a stereo output!
-    auto& processBuffer = buffer;
-    if (buffer.getNumChannels() == 1)
-    {
-        stereoBuffer.setSize (2, numSamples, false, false, true);
-        stereoBuffer.copyFrom (0, 0, buffer, 0, 0, numSamples);
-        stereoBuffer.copyFrom (1, 0, buffer, 0, 0, numSamples);
-        processBuffer = stereoBuffer;
-    }
+        auto fbAmount = std::sqrt (fbParam->load());
+        if constexpr (std::is_same_v<DelayArrType, decltype (lofiDelay)>)
+            fbAmount *= 0.4f;
+        else
+            fbAmount *= 0.5f;
 
-    dsp::AudioBlock<float> block { processBuffer };
-
-    dryWetMixer.setWetMixProportion (*mixParam);
-    dryWetMixer.pushDrySamples (block);
-
-    for (int ch = 0; ch < processBuffer.getNumChannels(); ++ch)
-    {
-        fbSmooth[ch].setTargetValue (0.45f * std::sqrt (fbParam->load()));
-
+        fbSmooth[ch].setTargetValue (fbAmount);
         slowSmooth[ch].setTargetValue (delay1Ms * 0.001f * fs * *depthParam);
         fastSmooth[ch].setTargetValue (delay2Ms * 0.001f * fs * *depthParam);
 
-        auto* x = processBuffer.getWritePointer (ch);
+        auto* x = buffer.getWritePointer (ch);
         for (int n = 0; n < numSamples; ++n)
         {
             auto xIn = std::tanh (x[n] * 0.75f - feedbackState[ch]);
@@ -140,8 +136,74 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
             feedbackState[ch] = dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, feedbackState[ch]);
         }
     }
+}
+
+void Chorus::processAudio (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+
+    // always have a stereo output!
+    auto& processBuffer = buffer;
+    if (buffer.getNumChannels() == 1)
+    {
+        stereoBuffer.setSize (2, numSamples, false, false, true);
+        stereoBuffer.copyFrom (0, 0, buffer, 0, 0, numSamples);
+        stereoBuffer.copyFrom (1, 0, buffer, 0, 0, numSamples);
+        processBuffer = stereoBuffer;
+    }
+
+    dsp::AudioBlock<float> block { processBuffer };
+
+    dryWetMixer.setWetMixProportion (*mixParam);
+    dryWetMixer.pushDrySamples (block);
+
+    const auto delayTypeIndex = (int) *delayTypeParam;
+    if (delayTypeIndex != prevDelayTypeIndex)
+    {
+        for (auto& delaySet : cleanDelay)
+            for (auto& delay : delaySet)
+                delay.reset();
+
+        for (auto& delaySet : lofiDelay)
+            for (auto& delay : delaySet)
+                delay.reset();
+
+        prevDelayTypeIndex = delayTypeIndex;
+    }
+
+    if (delayTypeIndex == 0)
+        processChorus (processBuffer, cleanDelay);
+    else if (delayTypeIndex == 1)
+        processChorus (processBuffer, lofiDelay);
 
     dryWetMixer.mixWetSamples (block);
 
     outputBuffers.getReference (0) = &processBuffer;
+}
+
+
+void Chorus::addToPopupMenu (PopupMenu& menu)
+{
+    menu.addSectionHeader ("Delay Type");
+    int itemID = 0;
+
+    auto* delayTypeChoiceParam = dynamic_cast<AudioParameterChoice*> (vts.getParameter (delayTypeTag));
+    delayTypeAttach = std::make_unique<ParameterAttachment> (
+        *delayTypeChoiceParam, [=] (float) {}, vts.undoManager);
+
+    for (const auto [index, delayTypeChoice] : sst::cpputils::enumerate (delayTypeChoiceParam->choices))
+    {
+        PopupMenu::Item delayTypeItem;
+        delayTypeItem.itemID = ++itemID;
+        delayTypeItem.text = delayTypeChoice;
+        delayTypeItem.action = [&, newParamVal = delayTypeChoiceParam->convertTo0to1 ((float) index)]
+        {
+            delayTypeAttach->setValueAsCompleteGesture (newParamVal);
+        };
+        delayTypeItem.colour = (delayTypeChoiceParam->getIndex() == (int) index) ? uiOptions.powerColour : Colours::white;
+
+        menu.addItem (delayTypeItem);
+    }
+
+    menu.addSeparator();
 }
