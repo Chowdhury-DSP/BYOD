@@ -181,7 +181,6 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
     outputBuffers.getReference (0) = &processBuffer;
 }
 
-
 void Chorus::addToPopupMenu (PopupMenu& menu)
 {
     menu.addSectionHeader ("Delay Type");
