@@ -38,19 +38,18 @@ void PresetManager::presetLoginStatusChanged()
 
 void PresetManager::syncLocalPresetsToServer() const
 {
-    auto userPresets = getUserPresets();
-    syncManager->syncLocalPresetsToServer (userPresets);
+    syncManager->syncLocalPresetsToServer (getUserPresets());
 }
 
-void PresetManager::syncServerPresetsToLocal()
+void PresetManager::syncServerPresetsToLocal (std::vector<chowdsp::Preset>& presetsToUpdate)
 {
-    std::vector<chowdsp::Preset> serverPresets;
-    syncManager->syncServerPresetsToLocal (serverPresets);
+    syncManager->syncServerPresetsToLocal (presetsToUpdate);
 
-    for (const auto& preset : serverPresets)
-        preset.toFile (getUserPresetPath().getChildFile (preset.getName() + ".chowpreset"));
-
-    loadUserPresetsFromFolder (getUserPresetPath());
+    // if an equivalent preset already exists, then we don't need to update it!
+    const auto& userPresets = getUserPresets();
+    std::erase_if (presetsToUpdate, [&userPresets] (const auto& serverPreset)
+                   { return sst::cpputils::contains_if (userPresets, [&serverPreset] (const auto* userPreset)
+                                                        { return *userPreset == serverPreset; }); });
 }
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()

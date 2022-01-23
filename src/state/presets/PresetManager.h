@@ -17,7 +17,7 @@ public:
     void presetLoginStatusChanged() override;
 
     void syncLocalPresetsToServer() const;
-    void syncServerPresetsToLocal();
+    void syncServerPresetsToLocal (std::vector<chowdsp::Preset>& presetsToUpdate);
 
 private:
     ProcessorChain* procChain;

@@ -7,7 +7,7 @@ class PresetsServerSyncManager
 public:
     PresetsServerSyncManager() = default;
 
-    void syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*> presets);
+    void syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*>& presets);
     void syncServerPresetsToLocal (std::vector<chowdsp::Preset>& serverPresets);
 
 private:
