@@ -42,8 +42,8 @@ void OutputProcessor::processAudio (AudioBuffer<float>& buffer)
     // update meter levels
     {
         const auto& outBuffer = outputBuffers.getReference (0);
-        rmsLevels[0] = outBuffer->getRMSLevel (0, 0, numSamples);
-        rmsLevels[1] = outBuffer->getRMSLevel (1, 0, numSamples);
+        rmsLevels[0] = outBuffer->getMagnitude (0, 0, numSamples);
+        rmsLevels[1] = outBuffer->getMagnitude (1, 0, numSamples);
     }
 }
 
