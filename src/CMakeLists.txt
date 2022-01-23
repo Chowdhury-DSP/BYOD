@@ -17,6 +17,7 @@ target_sources(BYOD PRIVATE
     gui/presets/PresetsComp.cpp
     gui/presets/PresetsLoginDialog.cpp
     gui/presets/PresetsSyncDialog.cpp
+    gui/utils/LevelMeterComponent.cpp
     gui/utils/LookAndFeels.cpp
     gui/utils/SettingsButton.cpp
 
@@ -79,8 +80,10 @@ target_sources(BYOD PRIVATE
     processors/tone/baxandall/BaxandallWDF.cpp
 
     processors/utility/FreqBandSplitter.cpp
+    processors/utility/InputProcessor.cpp
     processors/utility/Mixer.cpp
     processors/utility/Oscilloscope.cpp
+    processors/utility/OutputProcessor.cpp
     processors/utility/StereoMerger.cpp
     processors/utility/StereoSplitter.cpp
     processors/utility/Tuner.cpp

@@ -16,6 +16,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, *newSlide);
 
         newSlide->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
+        newSlide->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         newSlide->setName (param->name);
         newSlide->setTextBoxStyle (Slider::TextBoxBelow, false, 80, 20);
         newSlide->setColour (Slider::textBoxOutlineColourId, contrastColour);
@@ -204,7 +205,7 @@ void KnobsComponent::resized()
             b->setBounds (x + (compIdx++) * compWidth, yPad + (compHeight - yDim) / 2, compWidth - 5, yDim);
 
         for (auto* c : customComponents)
-            c->setBounds (x + (compIdx++) * compWidth, yPad + (compHeight - yDim) / 2, compWidth - 5, yDim);
+            c->setBounds (x + (compIdx++) * compWidth, 0, compWidth, getHeight());
 
         return;
     }
