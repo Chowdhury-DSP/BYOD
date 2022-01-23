@@ -21,7 +21,7 @@ private:
 
     chowdsp::WindowInPlugin<PresetsLoginDialog> loginWindow;
     chowdsp::WindowInPlugin<PresetsSyncDialog> syncWindow;
-    
+
     PresetManager::PresetUpdateList presetsToUpdate;
 
     SharedResourcePointer<PresetsServerUserManager> userManager;
