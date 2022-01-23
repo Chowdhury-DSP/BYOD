@@ -8,6 +8,14 @@ class PresetManager : public chowdsp::PresetManager,
                       private PresetsServerUserManager::Listener
 {
 public:
+    enum PresetUpdate
+    {
+        Overwriting,
+        Adding,
+    };
+
+    using PresetUpdateList = std::vector<std::pair<chowdsp::Preset, PresetManager::PresetUpdate>>;
+
     PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vts);
     ~PresetManager() override;
 
@@ -17,7 +25,7 @@ public:
     void presetLoginStatusChanged() override;
 
     void syncLocalPresetsToServer() const;
-    void syncServerPresetsToLocal();
+    void syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate);
 
 private:
     ProcessorChain* procChain;

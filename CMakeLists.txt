@@ -8,7 +8,6 @@ else()
     set(CMAKE_CXX_STANDARD 20)
 endif()
 
-
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)

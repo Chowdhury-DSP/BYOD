@@ -38,19 +38,31 @@ void PresetManager::presetLoginStatusChanged()
 
 void PresetManager::syncLocalPresetsToServer() const
 {
-    auto userPresets = getUserPresets();
-    syncManager->syncLocalPresetsToServer (userPresets);
+    syncManager->syncLocalPresetsToServer (getUserPresets());
 }
 
-void PresetManager::syncServerPresetsToLocal()
+void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)
 {
     std::vector<chowdsp::Preset> serverPresets;
     syncManager->syncServerPresetsToLocal (serverPresets);
 
-    for (const auto& preset : serverPresets)
-        preset.toFile (getUserPresetPath().getChildFile (preset.getName() + ".chowpreset"));
+    // if an equivalent preset already exists, then we don't need to update it!
+    const auto& userPresets = getUserPresets();
+    serverPresets.erase (std::remove_if (serverPresets.begin(), serverPresets.end(), [&userPresets] (const auto& serverPreset)
+                                         { return sst::cpputils::contains_if (userPresets, [&serverPreset] (const auto* userPreset)
+                                                                              { return *userPreset == serverPreset; }); }),
+                         serverPresets.end());
 
-    loadUserPresetsFromFolder (getUserPresetPath());
+    // mark if presets are being added or overwritten
+    presetsToUpdate.reserve (serverPresets.size());
+    for (auto& preset : serverPresets)
+    {
+        auto updateType = sst::cpputils::contains_if (userPresets, [&preset] (const auto* userPreset)
+                                                      { return userPreset->getName() == preset.getName(); })
+                              ? PresetUpdate::Overwriting
+                              : PresetUpdate::Adding;
+        presetsToUpdate.emplace_back (std::move (preset), updateType);
+    }
 }
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()

@@ -1,7 +1,7 @@
 #include "PresetsServerSyncManager.h"
 #include "PresetsServerCommunication.h"
 
-void PresetsServerSyncManager::syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*> presets)
+void PresetsServerSyncManager::syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*>& presets)
 {
     Logger::writeToLog ("Syncing local user presets to server");
 
@@ -35,6 +35,12 @@ void PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Pr
             auto presetXML = XmlDocument::parse (presetInfo["data"].get<String>());
             auto serverPreset = chowdsp::Preset (presetXML.get());
             if (! serverPreset.isValid())
+                continue;
+
+            // make sure we don't have duplicates
+            // @TODO: figure out why there are duplicates on the server
+            if (sst::cpputils::contains_if (serverPresets, [&serverPreset] (const auto& preset)
+                                            { return serverPreset.getName() == preset.getName(); }))
                 continue;
 
             serverPresets.push_back (std::move (serverPreset));

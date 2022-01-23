@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PresetsLoginDialog.h"
+#include "PresetsSyncDialog.h"
 #include "state/presets/PresetManager.h"
 
 class PresetsComp : public chowdsp::PresetsComp
@@ -11,10 +12,17 @@ public:
     void presetListUpdated() final;
     int addPresetServerMenuOptions (int optionID);
 
+    void updatePresetsToUpdate();
+
 private:
+    void syncServerPresetsToLocal();
+
     PresetManager& presetManager;
 
     chowdsp::WindowInPlugin<PresetsLoginDialog> loginWindow;
+    chowdsp::WindowInPlugin<PresetsSyncDialog> syncWindow;
+
+    PresetManager::PresetUpdateList presetsToUpdate;
 
     SharedResourcePointer<PresetsServerUserManager> userManager;
 
