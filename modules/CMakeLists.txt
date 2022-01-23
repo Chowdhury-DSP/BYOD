@@ -67,8 +67,6 @@ target_include_directories(juce_plugin_modules
         $<TARGET_PROPERTY:sst-cpputils,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
-target_compile_features(juce_plugin_modules PRIVATE cxx_std_17)
-
 set_target_properties(juce_plugin_modules PROPERTIES
     POSITION_INDEPENDENT_CODE TRUE
     VISIBILITY_INLINES_HIDDEN TRUE

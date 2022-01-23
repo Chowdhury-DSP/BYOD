@@ -54,6 +54,8 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # These lines suppress some custom warnings.
         # Comment them out to be more strict.
         -Wno-redundant-move -Wno-attributes
+        # Extra flags for C++20
+        -Wno-deprecated -fconcepts
     )
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "7.0.0")
