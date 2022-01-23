@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment target")
 project(BYOD VERSION 0.2.0)
-set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(modules)
 
@@ -59,6 +58,8 @@ target_compile_definitions(BYOD PUBLIC
     BYOD_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
     BYOD_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
 )
+
+target_compile_features(BYOD PRIVATE cxx_std_20)
 
 target_link_libraries(BYOD PRIVATE juce_plugin_modules)
 

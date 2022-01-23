@@ -54,8 +54,6 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         # These lines suppress some custom warnings.
         # Comment them out to be more strict.
         -Wno-redundant-move -Wno-attributes
-        # C++20 deprecated something with lambda default capture lists
-        -Wno-deprecated
     )
 
     if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "7.0.0")
