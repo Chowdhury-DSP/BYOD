@@ -48,9 +48,10 @@ void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)
 
     // if an equivalent preset already exists, then we don't need to update it!
     const auto& userPresets = getUserPresets();
-    std::erase_if (serverPresets, [&userPresets] (const auto& serverPreset)
-                   { return sst::cpputils::contains_if (userPresets, [&serverPreset] (const auto* userPreset)
-                                                        { return *userPreset == serverPreset; }); });
+    serverPresets.erase (std::remove_if (serverPresets.begin(), serverPresets.end(), [&userPresets] (const auto& serverPreset)
+                                         { return sst::cpputils::contains_if (userPresets, [&serverPreset] (const auto* userPreset)
+                                                                              { return *userPreset == serverPreset; }); }),
+                         serverPresets.end());
 
     // mark if presets are being added or overwritten
     presetsToUpdate.reserve (serverPresets.size());
