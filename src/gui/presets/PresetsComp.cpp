@@ -2,13 +2,16 @@
 
 PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (presetMgr),
                                                       presetManager (presetMgr),
-                                                      loginWindow (*this)
+                                                      loginWindow (*this),
+                                                      syncWindow (*this)
 {
     presetListUpdated();
 
-    auto& loginWindowComp = loginWindow.getViewComponent();
-    loginWindowComp.loginChangeCallback = [&]
+    loginWindow.getViewComponent().loginChangeCallback = [&]
     { presetListUpdated(); };
+
+    syncWindow.getViewComponent().runUpdateCallback = [&]
+    { updatePresetsToUpdate(); };
 }
 
 void PresetsComp::presetListUpdated()
@@ -19,6 +22,24 @@ void PresetsComp::presetListUpdated()
     optionID = createPresetsMenu (optionID);
     optionID = addPresetOptions (optionID);
     addPresetServerMenuOptions (optionID);
+}
+
+void PresetsComp::syncServerPresetsToLocal()
+{
+    presetsToUpdate.clear();
+    presetManager.syncServerPresetsToLocal (presetsToUpdate);
+
+    syncWindow.getViewComponent().updatePresetsList (presetsToUpdate);
+    syncWindow.show();
+}
+
+void PresetsComp::updatePresetsToUpdate()
+{
+    const auto& userPresetPath = presetManager.getUserPresetPath();
+    for (const auto& [preset, _] : presetsToUpdate)
+        preset.toFile (userPresetPath.getChildFile (preset.getName() + ".chowpreset"));
+
+    presetManager.loadUserPresetsFromFolder (userPresetPath);
 }
 
 int PresetsComp::addPresetServerMenuOptions (int optionID)
@@ -44,7 +65,7 @@ int PresetsComp::addPresetServerMenuOptions (int optionID)
         syncServerToLocalItem.action = [=]
         {
             updatePresetBoxText();
-            presetManager.syncServerPresetsToLocal();
+            syncServerPresetsToLocal();
         };
         menu->addItem (syncServerToLocalItem);
 
