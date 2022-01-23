@@ -18,7 +18,7 @@ public:
 
 private:
     AudioBuffer<float> stereoBuffer;
-    
+
     LevelMeterComponent::LevelDataType rmsLevels {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OutputProcessor)
