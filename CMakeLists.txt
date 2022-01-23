@@ -1,13 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment target")
 project(BYOD VERSION 0.2.0)
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_STANDARD 17)
-else()
-    set(CMAKE_CXX_STANDARD 20)
-endif()
-
+set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(modules)
 
