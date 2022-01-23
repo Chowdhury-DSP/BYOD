@@ -21,8 +21,8 @@ private:
 
     chowdsp::WindowInPlugin<PresetsLoginDialog> loginWindow;
     chowdsp::WindowInPlugin<PresetsSyncDialog> syncWindow;
-
-    std::vector<chowdsp::Preset> presetsToUpdate;
+    
+    PresetManager::PresetUpdateList presetsToUpdate;
 
     SharedResourcePointer<PresetsServerUserManager> userManager;
 

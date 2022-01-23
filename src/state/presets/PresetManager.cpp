@@ -41,15 +41,27 @@ void PresetManager::syncLocalPresetsToServer() const
     syncManager->syncLocalPresetsToServer (getUserPresets());
 }
 
-void PresetManager::syncServerPresetsToLocal (std::vector<chowdsp::Preset>& presetsToUpdate)
+void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)
 {
-    syncManager->syncServerPresetsToLocal (presetsToUpdate);
+    std::vector<chowdsp::Preset> serverPresets;
+    syncManager->syncServerPresetsToLocal (serverPresets);
 
     // if an equivalent preset already exists, then we don't need to update it!
     const auto& userPresets = getUserPresets();
-    std::erase_if (presetsToUpdate, [&userPresets] (const auto& serverPreset)
+    std::erase_if (serverPresets, [&userPresets] (const auto& serverPreset)
                    { return sst::cpputils::contains_if (userPresets, [&serverPreset] (const auto* userPreset)
                                                         { return *userPreset == serverPreset; }); });
+
+    // mark if presets are being added or overwritten
+    presetsToUpdate.reserve (serverPresets.size());
+    for (auto& preset : serverPresets)
+    {
+        auto updateType = sst::cpputils::contains_if (userPresets, [&preset] (const auto* userPreset)
+                                                      { return userPreset->getName() == preset.getName(); })
+                              ? PresetUpdate::Overwriting
+                              : PresetUpdate::Adding;
+        presetsToUpdate.emplace_back (std::move (preset), updateType);
+    }
 }
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()

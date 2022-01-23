@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pch.h>
+#include "state/presets/PresetManager.h"
 
 class PresetsSyncDialog : public Component
 {
@@ -10,7 +10,7 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-    void updatePresetsList (const std::vector<chowdsp::Preset>& presetsToUpdate);
+    void updatePresetsList (const PresetManager::PresetUpdateList& presetsToUpdate);
 
     std::function<void()> runUpdateCallback = [] {};
 

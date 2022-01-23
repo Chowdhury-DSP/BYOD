@@ -14,31 +14,45 @@ constexpr int rowHeight = 25;
 
 struct PresetsListModel : public ListBoxModel
 {
-    explicit PresetsListModel (const std::vector<chowdsp::Preset>& presetsToUpdate)
+    explicit PresetsListModel (const PresetManager::PresetUpdateList& presetsToUpdate)
     {
-        for (const auto& preset : presetsToUpdate)
-            presetNames.add (preset.getName());
+        for (const auto& [preset, updateType] : presetsToUpdate)
+            updateInfo.add (PresetUpdateInfo { preset.getName(), updateType });
     }
 
     int getNumRows() override
     {
-        return presetNames.size();
+        return updateInfo.size();
     }
 
-    void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override
+    void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool /*rowIsSelected*/) override
     {
         auto bounds = Rectangle { width, height };
 
-        g.setColour (Colours::white);
-        g.setFont ((float) height * 0.6f);
-        g.drawFittedText (presetNames[rowNumber], bounds, Justification::centred, 1);
-
         g.setColour (Colours::white.withAlpha (0.4f));
         g.drawLine (Line { bounds.getTopLeft(), bounds.getTopRight() }.toFloat(), 1.0f);
-        g.drawLine (Line { bounds.getBottomLeft(), bounds.getBottomRight() }.toFloat(), 1.0f);
+        if (rowNumber >= updateInfo.size() - 1)
+            g.drawLine (Line { bounds.getBottomLeft(), bounds.getBottomRight() }.toFloat(), 1.0f);
+
+        g.setFont ((float) height * 0.6f);
+        g.setColour (Colours::white);
+        auto name = updateInfo[rowNumber].name;
+        auto nameBounds = bounds.removeFromLeft (width * 2 / 3);
+        g.drawFittedText (name, nameBounds, Justification::centred, 1);
+
+        auto updateType = updateInfo[rowNumber].updateType;
+        g.setColour (updateType == PresetManager::Adding ? Colours::lightgreen : Colours::yellow);
+        auto typeStr = "(" + String (magic_enum::enum_name (updateType).data()) + ")";
+        g.drawFittedText (typeStr, bounds, Justification::centred, 1);
     }
 
-    StringArray presetNames;
+    struct PresetUpdateInfo
+    {
+        String name;
+        PresetManager::PresetUpdate updateType;
+    };
+
+    Array<PresetUpdateInfo> updateInfo;
 };
 } // namespace
 
@@ -64,7 +78,7 @@ PresetsSyncDialog::PresetsSyncDialog()
     { getParentComponent()->setVisible (false); };
 }
 
-void PresetsSyncDialog::updatePresetsList (const std::vector<chowdsp::Preset>& presetsToUpdate)
+void PresetsSyncDialog::updatePresetsList (const PresetManager::PresetUpdateList& presetsToUpdate)
 {
     if (presetsToUpdate.empty())
     {
@@ -97,7 +111,7 @@ void PresetsSyncDialog::paint (Graphics& g)
 
     auto headerBounds = getLocalBounds().removeFromTop (headerHeight);
     g.setColour (Colours::white);
-    g.setFont ((float) headerHeight * 0.4f);
+    g.setFont ((float) headerHeight * 0.5f);
     g.drawFittedText (presetUpdateText, headerBounds, Justification::centred, 1);
 }
 
