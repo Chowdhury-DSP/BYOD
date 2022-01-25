@@ -20,7 +20,7 @@ private:
     std::atomic<float>* diodeTypeParam = nullptr;
     std::atomic<float>* nDiodesParam = nullptr;
 
-    std::unique_ptr<TubeScreamerWDF> wdf[2];
+    TubeScreamerWDF wdf[2];
     DCBlocker dcBlocker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TubeScreamer)

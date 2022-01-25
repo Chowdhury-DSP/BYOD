@@ -9,7 +9,7 @@ TubeScreamer::TubeScreamer (UndoManager* um) : BaseProcessor ("Tube Screamer", c
 
     uiOptions.backgroundColour = Colours::tomato.darker (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter (0.2f);
-    uiOptions.info.description = "Virtual analog emulation of the Tube Screamer overdrive pedal.";
+    uiOptions.info.description = "Virtual analog emulation of the clipping stage from the Tube Screamer overdrive pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
@@ -31,8 +31,8 @@ void TubeScreamer::prepare (double sampleRate, int samplesPerBlock)
     auto gainParamSkew = ParameterHelpers::logPot (*gainParam);
     for (auto& wdfProc : wdf)
     {
-        wdfProc = std::make_unique<TubeScreamerWDF> ((float) sampleRate);
-        wdfProc->setParameters (gainParamSkew, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
+        wdfProc.prepare (sampleRate);
+        wdfProc.setParameters (gainParamSkew, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam, true);
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
@@ -48,18 +48,17 @@ void TubeScreamer::prepare (double sampleRate, int samplesPerBlock)
 
 void TubeScreamer::processAudio (AudioBuffer<float>& buffer)
 {
-    buffer.applyGain (Decibels::decibelsToGain (-18.0f));
+    buffer.applyGain (Decibels::decibelsToGain (-6.0f));
 
     int diodeType = static_cast<int> (*diodeTypeParam);
     auto gainParamSkew = ParameterHelpers::logPot (*gainParam);
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch]->setParameters (gainParamSkew, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam);
-        auto* x = buffer.getWritePointer (ch);
-        wdf[ch]->process (x, buffer.getNumSamples());
+        wdf[ch].setParameters (gainParamSkew, DiodeParameter::getDiodeIs (diodeType), *nDiodesParam);
+        wdf[ch].process (buffer.getWritePointer (ch), buffer.getNumSamples());
     }
 
     dcBlocker.processAudio (buffer);
 
-    buffer.applyGain (Decibels::decibelsToGain (6.0f));
+    buffer.applyGain (Decibels::decibelsToGain (-6.0f));
 }

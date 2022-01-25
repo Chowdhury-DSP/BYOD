@@ -24,7 +24,10 @@ AudioProcessorValueTreeState::ParameterLayout ZenDrive::createParameterLayout()
 void ZenDrive::prepare (double sampleRate, int samplesPerBlock)
 {
     for (auto& wdfProc : wdf)
-        wdfProc = std::make_unique<ZenDriveWDF> ((float) sampleRate);
+    {
+        wdfProc.prepare (sampleRate);
+        wdfProc.setParameters (1.0f - *voiceParam, ParameterHelpers::logPot (*gainParam));
+    }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
 
@@ -43,9 +46,8 @@ void ZenDrive::processAudio (AudioBuffer<float>& buffer)
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch]->setParameters (1.0f - *voiceParam, ParameterHelpers::logPot (*gainParam));
-        auto* x = buffer.getWritePointer (ch);
-        wdf[ch]->process (x, buffer.getNumSamples());
+        wdf[ch].setParameters (1.0f - *voiceParam, ParameterHelpers::logPot (*gainParam));
+        wdf[ch].process (buffer.getWritePointer (ch), buffer.getNumSamples());
     }
 
     dcBlocker.processAudio (buffer);
