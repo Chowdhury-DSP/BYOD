@@ -13,7 +13,7 @@ inline float getDiodeIs (int diodeType)
         case 0: // GZ34
             return 2.52e-9f;
         case 1: // 1N34
-            return 15.0e-6f;
+            return 200.0e-12f;
         case 2: // 1N4148
             return 2.64e-9f;
         default:

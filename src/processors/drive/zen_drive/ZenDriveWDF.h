@@ -2,120 +2,21 @@
 
 #include <pch.h>
 
-namespace ZenDriveWDFs
-{
-using Res = wdft::ResistorT<float>;
-using ResVs = wdft::ResistiveVoltageSourceT<float>;
-using ResIs = wdft::ResistiveCurrentSourceT<float>;
-using Cap = wdft::CapacitorT<float>;
-
-class InputBufferWDF
-{
-public:
-    explicit InputBufferWDF (float sampleRate) : C3 (47.0e-9f, sampleRate)
-    {
-        R4.setVoltage (4.5f);
-    }
-
-    inline float process (float V_in) noexcept
-    {
-        Vin.setVoltage (V_in);
-        Vin.incident (I1.reflected());
-        I1.incident (Vin.reflected());
-        return wdft::voltage<float> (R4);
-    }
-
-private:
-    ResVs R4 { 470.0e3f };
-    Cap C3;
-
-    wdft::WDFSeriesT<float, ResVs, Cap> S1 { R4, C3 };
-    wdft::PolarityInverterT<float, decltype (S1)> I1 { S1 };
-
-    wdft::IdealVoltageSourceT<float, decltype (I1)> Vin { I1 };
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputBufferWDF)
-};
-
-class VoiceCircuitWDF
-{
-public:
-    explicit VoiceCircuitWDF (float sampleRate) : C5 (100.0e-9f, sampleRate)
-    {
-        Vref.setVoltage (4.5f);
-    }
-
-    void setVoiceParameter (float voiceParam)
-    {
-        R6.setResistanceValue (voiceParam * R6Val);
-    }
-
-    inline float process (float Vplus) noexcept
-    {
-        R5.setVoltage (Vplus);
-        Vref.incident (S2.reflected());
-        S2.incident (Vref.reflected());
-        return wdft::current<float> (R5);
-    }
-
-private:
-    static constexpr auto R6Val = 10.0e3f;
-    ResVs R5 { 1.0e3f };
-    Res R6 { R6Val };
-    Cap C5;
-
-    wdft::PolarityInverterT<float, ResVs> I1 { R5 };
-    wdft::WDFSeriesT<float, Res, decltype (I1)> S1 { R6, I1 };
-    wdft::WDFSeriesT<float, Cap, decltype (S1)> S2 { C5, S1 };
-
-    wdft::IdealVoltageSourceT<float, decltype (S2)> Vref { S2 };
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VoiceCircuitWDF)
-};
-
-class DriveStageWDF
-{
-public:
-    explicit DriveStageWDF (float sampleRate) : C5 (100.0e-12f, sampleRate)
-    {
-    }
-
-    void setGainParam (float gainParam)
-    {
-        Rv9.setResistanceValue (Rv9Val * gainParam);
-    }
-
-    inline float process (float I0) noexcept
-    {
-        Rv9.setCurrent (I0);
-
-        diodes.incident (P1.reflected());
-        P1.incident (diodes.reflected());
-
-        return wdft::voltage<float> (C5);
-    }
-
-private:
-    static constexpr auto Rv9Val = 500.0e3f;
-    ResIs Rv9 { Rv9Val };
-    Cap C5;
-
-    wdft::WDFParallelT<float, Cap, ResIs> P1 { C5, Rv9 };
-    wdft::DiodePairT<float, decltype (P1)> diodes { P1, 5.241435962608312e-10f, 0.07877217375325735f };
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DriveStageWDF)
-};
-} // namespace ZenDriveWDFs
-
 class ZenDriveWDF
 {
 public:
-    explicit ZenDriveWDF (float sampleRate) : inputBuffer (sampleRate),
-                                              voiceCircuit (sampleRate),
-                                              driveStage (sampleRate)
+    ZenDriveWDF() = default;
+
+    void prepare (double sampleRate)
     {
-        voiceSmooth.reset ((double) sampleRate, 0.01);
-        gainSmooth.reset ((double) sampleRate, 0.01);
+        voiceSmooth.reset (sampleRate, 0.02);
+        gainSmooth.reset (sampleRate, 0.02);
+
+        R4.setVoltage (4.5f);
+
+        C3.prepare ((float) sampleRate);
+        C4.prepare ((float) sampleRate);
+        C5.prepare ((float) sampleRate);
     }
 
     void setParameters (float voiceParam, float gainParam, bool force = false)
@@ -125,8 +26,8 @@ public:
             voiceSmooth.setCurrentAndTargetValue (voiceParam);
             gainSmooth.setCurrentAndTargetValue (gainParam);
 
-            voiceCircuit.setVoiceParameter (voiceSmooth.getTargetValue());
-            driveStage.setGainParam (gainSmooth.getTargetValue());
+            R5_R6.setResistanceValue (R5 + voiceSmooth.getTargetValue() * R6);
+            Rv9.setResistanceValue (R9 * gainSmooth.getTargetValue());
         }
         else
         {
@@ -137,54 +38,86 @@ public:
 
     inline float processSample (float x) noexcept
     {
-        auto Vplus = inputBuffer.process (x);
-        auto I0 = voiceCircuit.process (Vplus);
-        auto Vf = driveStage.process (I0);
-        return Vf + Vplus;
+        Vin.setVoltage (x);
+
+        diodes.incident (P3.reflected());
+        P3.incident (diodes.reflected());
+
+        return wdft::voltage<float> (RL);
     }
 
     void process (float* buffer, const int numSamples)
     {
-        if (voiceSmooth.isSmoothing() && gainSmooth.isSmoothing())
+        if (voiceSmooth.isSmoothing() || gainSmooth.isSmoothing())
         {
             for (int n = 0; n < numSamples; ++n)
             {
-                voiceCircuit.setVoiceParameter (voiceSmooth.getNextValue());
-                driveStage.setGainParam (gainSmooth.getNextValue());
+                R5_R6.setResistanceValue (R5 + voiceSmooth.getNextValue() * R6);
+                Rv9.setResistanceValue (R9 * gainSmooth.getNextValue());
 
                 buffer[n] = processSample (buffer[n]);
             }
             return;
         }
 
-        if (voiceSmooth.isSmoothing())
-        {
-            for (int n = 0; n < numSamples; ++n)
-            {
-                voiceCircuit.setVoiceParameter (voiceSmooth.getNextValue());
-                buffer[n] = processSample (buffer[n]);
-            }
-            return;
-        }
-
-        if (gainSmooth.isSmoothing())
-        {
-            for (int n = 0; n < numSamples; ++n)
-            {
-                driveStage.setGainParam (gainSmooth.getNextValue());
-                buffer[n] = processSample (buffer[n]);
-            }
-            return;
-        }
-
+        R5_R6.setResistanceValue (R5 + voiceSmooth.getNextValue() * R6);
+        Rv9.setResistanceValue (R9 * gainSmooth.getNextValue());
         for (int n = 0; n < numSamples; ++n)
             buffer[n] = processSample (buffer[n]);
     }
 
 private:
-    ZenDriveWDFs::InputBufferWDF inputBuffer;
-    ZenDriveWDFs::VoiceCircuitWDF voiceCircuit;
-    ZenDriveWDFs::DriveStageWDF driveStage;
+    // Port B
+    wdft::ResistiveVoltageSourceT<float> Vin;
+    wdft::CapacitorT<float> C3 { 47.0e-9f };
+    wdft::WDFSeriesT<float, decltype (Vin), decltype (C3)> S1 { Vin, C3 };
+
+    wdft::ResistiveVoltageSourceT<float> R4 { 470.0e3f };
+    wdft::WDFParallelT<float, decltype (S1), decltype (R4)> P1 { S1, R4 };
+
+    // Port C
+    static constexpr auto R5 = 1.0e3f;
+    static constexpr auto R6 = 10.0e3f;
+    wdft::ResistorT<float> R5_R6 { R5 + R6 };
+    wdft::CapacitorT<float> C5 { 100.0e-9f };
+    wdft::WDFSeriesT<float, decltype (R5_R6), decltype (C5)> S2 { R5_R6, C5 };
+
+    // Port D
+    wdft::ResistorT<float> RL { 1.0e6f };
+
+    struct ImpedanceCalc
+    {
+        template <typename RType>
+        static float calcImpedance (RType& R)
+        {
+            constexpr float Ag = 100.0f; // op-amp gain
+            constexpr float Ri = 1.0e9f; // op-amp input impedance
+            constexpr float Ro = 1.0e-1f; // op-amp output impedance
+
+            const auto [Rb, Rc, Rd] = R.getPortImpedances();
+
+            // This scattering matrix was derived using the R-Solver python script (https://github.com/jatinchowdhury18/R-Solver),
+            // invoked with command: r_solver.py --adapt 0 --out scratch/tube_screamer_scatt.txt scratch/tube_screamer.txt
+            R.setSMatrixData ({ { 0, (Ag * Rd * Ri - Rc * Rd + Rc * Ro) / ((Rb + Rc) * Rd + Rd * Ri - (Rb + Rc + Ri) * Ro), -((Ag + 1) * Rd * Ri + Rb * Rd - (Rb + Ri) * Ro) / ((Rb + Rc) * Rd + Rd * Ri - (Rb + Rc + Ri) * Ro), -Ro / (Rd - Ro) },
+                                { -(Rb * Rc * Rd - Rb * Rc * Ro) / ((Ag + 1) * Rc * Rd * Ri + Rb * Rc * Rd - (Rb * Rc + (Rb + Rc) * Rd + (Rc + Rd) * Ri) * Ro), ((Ag + 1) * Rc * Rc * Rd * Ri + (Ag + 1) * Rc * Rd * Ri * Ri - Rb * Rb * Rc * Rd + (Rb * Rb * Rc - (Rc + Rd) * Ri * Ri + (Rb * Rb - Rc * Rc) * Rd - (Rc * Rc + 2 * Rc * Rd) * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Ri * Ri + ((Ag + 2) * Rb * Rc + (Ag + 1) * Rc * Rc) * Rd * Ri + (Rb * Rb * Rc + Rb * Rc * Rc) * Rd - (Rb * Rb * Rc + Rb * Rc * Rc + (Rc + Rd) * Ri * Ri + (Rb * Rb + 2 * Rb * Rc + Rc * Rc) * Rd + (2 * Rb * Rc + Rc * Rc + 2 * (Rb + Rc) * Rd) * Ri) * Ro), ((Ag + 1) * Rb * Rc * Rd * Ri + Rb * Rb * Rc * Rd - (Rb * Rb * Rc + 2 * (Rb * Rb + Rb * Rc) * Rd + (Rb * Rc + 2 * Rb * Rd) * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Ri * Ri + ((Ag + 2) * Rb * Rc + (Ag + 1) * Rc * Rc) * Rd * Ri + (Rb * Rb * Rc + Rb * Rc * Rc) * Rd - (Rb * Rb * Rc + Rb * Rc * Rc + (Rc + Rd) * Ri * Ri + (Rb * Rb + 2 * Rb * Rc + Rc * Rc) * Rd + (2 * Rb * Rc + Rc * Rc + 2 * (Rb + Rc) * Rd) * Ri) * Ro), -Rb * Rc * Ro / ((Ag + 1) * Rc * Rd * Ri + Rb * Rc * Rd - (Rb * Rc + (Rb + Rc) * Rd + (Rc + Rd) * Ri) * Ro) },
+                                { -(Rb * Rc * Rd + Rc * Rd * Ri - (Rb * Rc + Rc * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Ri + Rb * Rc * Rd - (Rb * Rc + (Rb + Rc) * Rd + (Rc + Rd) * Ri) * Ro), (Ag * Rc * Rd * Ri * Ri + Rb * Rc * Rc * Rd + (Ag * Rb * Rc + (2 * Ag + 1) * Rc * Rc) * Rd * Ri - (Rb * Rc * Rc + 2 * (Rb * Rc + Rc * Rc) * Rd + (Rc * Rc + 2 * Rc * Rd) * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Ri * Ri + ((Ag + 2) * Rb * Rc + (Ag + 1) * Rc * Rc) * Rd * Ri + (Rb * Rb * Rc + Rb * Rc * Rc) * Rd - (Rb * Rb * Rc + Rb * Rc * Rc + (Rc + Rd) * Ri * Ri + (Rb * Rb + 2 * Rb * Rc + Rc * Rc) * Rd + (2 * Rb * Rc + Rc * Rc + 2 * (Rb + Rc) * Rd) * Ri) * Ro), -((Ag + 1) * Rc * Rc * Rd * Ri + Rb * Rc * Rc * Rd - (Rb * Rc * Rc - Rd * Ri * Ri - (Rb * Rb - Rc * Rc) * Rd + (Rc * Rc - 2 * Rb * Rd) * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Ri * Ri + ((Ag + 2) * Rb * Rc + (Ag + 1) * Rc * Rc) * Rd * Ri + (Rb * Rb * Rc + Rb * Rc * Rc) * Rd - (Rb * Rb * Rc + Rb * Rc * Rc + (Rc + Rd) * Ri * Ri + (Rb * Rb + 2 * Rb * Rc + Rc * Rc) * Rd + (2 * Rb * Rc + Rc * Rc + 2 * (Rb + Rc) * Rd) * Ri) * Ro), -(Rb * Rc + Rc * Ri) * Ro / ((Ag + 1) * Rc * Rd * Ri + Rb * Rc * Rd - (Rb * Rc + (Rb + Rc) * Rd + (Rc + Rd) * Ri) * Ro) },
+                                { (Ag * Rc * Rd * Ri - ((Rb + Rc) * Rd + Rd * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Ri + Rb * Rc * Rd - (Rb * Rc + (Rb + Rc) * Rd + (Rc + Rd) * Ri) * Ro), ((Ag * Ag + 2 * Ag) * Rc * Rd * Rd * Ri * Ri + (2 * Ag * Rb * Rc + Ag * Rc * Rc) * Rd * Rd * Ri + (Rc * Rd * Ri + (Rb * Rc + Rc * Rc) * Rd) * Ro * Ro - ((Rb * Rc + Rc * Rc) * Rd * Rd + (2 * Ag * Rc * Rd + Ag * Rd * Rd) * Ri * Ri + ((Ag * Rb + (Ag + 1) * Rc) * Rd * Rd + (2 * Ag * Rb * Rc + Ag * Rc * Rc) * Rd) * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Rd * Ri * Ri + ((Ag + 2) * Rb * Rc + (Ag + 1) * Rc * Rc) * Rd * Rd * Ri + (Rb * Rb * Rc + Rb * Rc * Rc) * Rd * Rd + (Rb * Rb * Rc + Rb * Rc * Rc + (Rc + Rd) * Ri * Ri + (Rb * Rb + 2 * Rb * Rc + Rc * Rc) * Rd + (2 * Rb * Rc + Rc * Rc + 2 * (Rb + Rc) * Rd) * Ri) * Ro * Ro - ((Rb * Rb + 2 * Rb * Rc + Rc * Rc) * Rd * Rd + ((Ag + 2) * Rc * Rd + Rd * Rd) * Ri * Ri + 2 * (Rb * Rb * Rc + Rb * Rc * Rc) * Rd + (2 * (Rb + Rc) * Rd * Rd + ((Ag + 4) * Rb * Rc + (Ag + 2) * Rc * Rc) * Rd) * Ri) * Ro), -(Ag * Rb * Rc * Rd * Rd * Ri + (Ag * Ag + Ag) * Rc * Rd * Rd * Ri * Ri - ((2 * Rb + Rc) * Rd * Ri + Rd * Ri * Ri + (Rb * Rb + Rb * Rc) * Rd) * Ro * Ro + ((Rb * Rb + Rb * Rc) * Rd * Rd - (Ag * Rc * Rd + (Ag - 1) * Rd * Rd) * Ri * Ri - (Ag * Rb * Rc * Rd + ((Ag - 2) * Rb + (Ag - 1) * Rc) * Rd * Rd) * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Rd * Ri * Ri + ((Ag + 2) * Rb * Rc + (Ag + 1) * Rc * Rc) * Rd * Rd * Ri + (Rb * Rb * Rc + Rb * Rc * Rc) * Rd * Rd + (Rb * Rb * Rc + Rb * Rc * Rc + (Rc + Rd) * Ri * Ri + (Rb * Rb + 2 * Rb * Rc + Rc * Rc) * Rd + (2 * Rb * Rc + Rc * Rc + 2 * (Rb + Rc) * Rd) * Ri) * Ro * Ro - ((Rb * Rb + 2 * Rb * Rc + Rc * Rc) * Rd * Rd + ((Ag + 2) * Rc * Rd + Rd * Rd) * Ri * Ri + 2 * (Rb * Rb * Rc + Rb * Rc * Rc) * Rd + (2 * (Rb + Rc) * Rd * Rd + ((Ag + 4) * Rb * Rc + (Ag + 2) * Rc * Rc) * Rd) * Ri) * Ro), -((Ag + 1) * Rc * Rd * Rd * Ri + Rb * Rc * Rd * Rd - (Rb * Rc + Rc * Ri) * Ro * Ro - ((Rb + Rc) * Rd * Rd + Rd * Rd * Ri) * Ro) / ((Ag + 1) * Rc * Rd * Rd * Ri + Rb * Rc * Rd * Rd + (Rb * Rc + (Rb + Rc) * Rd + (Rc + Rd) * Ri) * Ro * Ro - (2 * Rb * Rc * Rd + (Rb + Rc) * Rd * Rd + ((Ag + 2) * Rc * Rd + Rd * Rd) * Ri) * Ro) } });
+
+            const auto Ra = ((Ag + 1) * Rc * Rd * Ri + Rb * Rc * Rd - (Rb * Rc + (Rb + Rc) * Rd + (Rc + Rd) * Ri) * Ro) / ((Rb + Rc) * Rd + Rd * Ri - (Rb + Rc + Ri) * Ro);
+            return Ra;
+        }
+    };
+
+    wdft::RtypeAdaptor<float, 0, ImpedanceCalc, decltype (P1), decltype (S2), decltype (RL)> R { std::tie (P1, S2, RL) };
+
+    // Port A
+    static constexpr auto R9 = 500.0e3f;
+    wdft::ResistorT<float> Rv9 { R9 };
+    wdft::CapacitorT<float> C4 { 100.0e-12f };
+    wdft::WDFParallelT<float, decltype (Rv9), decltype (C4)> P2 { Rv9, C4 };
+    wdft::WDFParallelT<float, decltype (P2), decltype (R)> P3 { P2, R };
+
+    wdft::DiodePairT<float, decltype (P1)> diodes { P1, 5.241435962608312e-10f, 0.07877217375325735f };
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> voiceSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> gainSmooth;

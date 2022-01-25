@@ -76,6 +76,8 @@ PresetsSyncDialog::PresetsSyncDialog()
 
     cancelButton.onClick = [&]
     { getParentComponent()->setVisible (false); };
+
+    setSize (noUpdateWidth, noUpdateHeight);
 }
 
 void PresetsSyncDialog::updatePresetsList (const PresetManager::PresetUpdateList& presetsToUpdate)

@@ -19,7 +19,7 @@ private:
     std::atomic<float>* voiceParam = nullptr;
     std::atomic<float>* gainParam = nullptr;
 
-    std::unique_ptr<ZenDriveWDF> wdf[2];
+    ZenDriveWDF wdf[2];
     DCBlocker dcBlocker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenDrive)
