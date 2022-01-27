@@ -7,7 +7,7 @@ LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsL
     for (int ch = 0; ch < 2; ++ch)
     {
         levelDetector[ch].prepare ({ (double) timerHz, 128, 2 });
-        levelDetector[ch].setParameters (100.0f, 500.0f);
+        levelDetector[ch].setParameters (80.0f, 300.0f);
     }
 
     startTimerHz (timerHz);
@@ -15,16 +15,16 @@ LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsL
 
 void LevelMeterComponent::paint (Graphics& g)
 {
-    auto meterBounds = Rectangle { 27, getHeight() }.withCentre (getLocalBounds().getCentre());
-    meterBounds.reduce (0, 4);
+    auto meterBounds = Rectangle { 35, getHeight() - 2 }.withCentre (getLocalBounds().getCentre());
+
+    g.setColour (Colours::black);
+    g.fillRoundedRectangle (meterBounds.toFloat(), 4.0f);
+
+    meterBounds.reduce (4, 5);
     const auto height = meterBounds.getHeight();
     //    const auto meterMarkBounds = meterBounds.removeFromLeft (meterBounds.getWidth() / 3);
     const auto leftChBounds = meterBounds.removeFromLeft (meterBounds.getWidth() / 2).translated (-1, 0);
     const auto rightChBounds = meterBounds.translated (1, 0);
-
-    g.setColour (Colours::black);
-    g.fillRect (leftChBounds);
-    g.fillRect (rightChBounds);
 
     auto getYForDB = [height] (float dB)
     {
