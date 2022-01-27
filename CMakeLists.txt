@@ -57,6 +57,8 @@ juce_add_plugin(BYOD
     PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST}
 )
 
+clap_juce_extensions_plugin(TARGET BYOD CLAP_ID "org.chowdsp.byod")
+
 juce_generate_juce_header(BYOD)
 add_subdirectory(src)
 include_directories(src)

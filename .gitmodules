@@ -22,3 +22,6 @@
 [submodule "modules/rapidfuzz-cpp"]
 	path = modules/rapidfuzz-cpp
 	url = https://github.com/maxbachmann/rapidfuzz-cpp
+[submodule "modules/clap-juce-extensions"]
+	path = modules/clap-juce-extensions
+	url = https://github.com/free-audio/clap-juce-extensions
