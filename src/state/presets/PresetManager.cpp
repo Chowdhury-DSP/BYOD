@@ -74,5 +74,5 @@ void PresetManager::loadPresetState (const XmlElement* xml)
 {
     Logger::writeToLog ("Loading preset: " + getCurrentPreset()->getName());
 
-    procChain->getStateHelper().loadProcChain (xml);
+    procChain->getStateHelper().loadProcChain (xml, true);
 }

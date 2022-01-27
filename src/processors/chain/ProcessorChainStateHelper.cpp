@@ -39,20 +39,21 @@ void ProcessorChainStateHelper::handleAsyncUpdate()
     ScopedLock sl (crit);
     if (xmlStateToLoad != nullptr)
     {
-        loadProcChainInternal (xmlStateToLoad.get());
+        loadProcChainInternal (xmlStateToLoad.get(), isLoadingPreset);
         xmlStateToLoad.reset();
     }
 }
 
-void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml)
+void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, bool loadingPreset)
 {
     if (MessageManager::existsAndIsCurrentThread())
     {
-        loadProcChainInternal (xml);
+        loadProcChainInternal (xml, loadingPreset);
         return;
     }
 
     ScopedLock sl (crit);
+    isLoadingPreset = loadingPreset;
     xmlStateToLoad = std::make_unique<XmlElement> (*xml);
     triggerAsyncUpdate();
 }
@@ -103,7 +104,7 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
     return std::move (xml);
 }
 
-void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
+void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bool loadingPreset)
 {
     um->beginNewTransaction();
 
@@ -114,9 +115,9 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps)
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps, bool shouldLoadState = true)
     {
-        if (procXml->getNumChildElements() > 0)
+        if (procXml->getNumChildElements() > 0 && shouldLoadState)
             newProc->fromXML (procXml->getChildElement (0));
 
         ProcConnectionMap connectionMap;
@@ -156,13 +157,13 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml)
         auto procName = getProcessorName (procXml->getTagName());
         if (procName == chain.inputProcessor.getName())
         {
-            loadProcessorState (procXml, &chain.inputProcessor, connectionMaps);
+            loadProcessorState (procXml, &chain.inputProcessor, connectionMaps, ! loadingPreset);
             continue;
         }
 
         if (procName == chain.outputProcessor.getName())
         {
-            loadProcessorState (procXml, &chain.outputProcessor, connectionMaps);
+            loadProcessorState (procXml, &chain.outputProcessor, connectionMaps, ! loadingPreset);
             continue;
         }
 
