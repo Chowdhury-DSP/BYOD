@@ -45,12 +45,12 @@ private:
         auto curThresh = threshSmooth.getNextValue();
         auto curRatio = ratioSmooth.getNextValue();
 
-        auto xAbs = std::fabsf (level);
+        auto xAbs = std::abs (level);
         if (xAbs <= kneeLower) // below thresh
             return 1.0f;
 
         if (xAbs >= kneeUpper) // compression range
-            return std::powf (level / curThresh, (1.0f / curRatio) - 1.0f);
+            return std::pow (level / curThresh, (1.0f / curRatio) - 1.0f);
 
         // knee range
         auto gainCorr = Decibels::gainToDecibels (xAbs / curThresh) + 0.5f * kneeDB;
