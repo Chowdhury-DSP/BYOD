@@ -71,17 +71,17 @@ private:
 
 Compressor::Compressor (UndoManager* um) : BaseProcessor ("Compressor", createParameterLayout(), um)
 {
-    threshDBParam = vts.getRawParameterValue("thresh");
-    ratioParam = vts.getRawParameterValue("ratio");
-    kneeDBParam = vts.getRawParameterValue("knee");
-    attackMsParam = vts.getRawParameterValue("attack");
-    releaseMsParam = vts.getRawParameterValue("release");
+    threshDBParam = vts.getRawParameterValue ("thresh");
+    ratioParam = vts.getRawParameterValue ("ratio");
+    kneeDBParam = vts.getRawParameterValue ("knee");
+    attackMsParam = vts.getRawParameterValue ("attack");
+    releaseMsParam = vts.getRawParameterValue ("release");
     makeupDBParam = vts.getRawParameterValue ("makeup");
 
     gainComputer = std::make_unique<GainComputer>();
 
     uiOptions.backgroundColour = Colours::gold.darker (0.1f);
-    uiOptions.powerColour = Colours::cyan.brighter(0.1f);
+    uiOptions.powerColour = Colours::cyan.brighter (0.1f);
     uiOptions.paramIDsToSkip = { "knee", "makeup" };
     uiOptions.info.description = "A dynamic range compressor.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
@@ -95,9 +95,11 @@ AudioProcessorValueTreeState::ParameterLayout Compressor::createParameterLayout(
     auto params = createBaseParams();
 
     createGainDBParameter (params, "thresh", "Threshold", -30.0f, 6.0f, 0.0f);
-    emplace_param<VTSParam>(params, "ratio", "Ratio", String(), createNormalisableRange (1.0f, 10.0f, 2.0f), 2.0f,
-                             [] (float val) { return String (val, 1) + " : 1"; },
-                              [] (const String& s) { return s.upToFirstOccurrenceOf (":", false, true).getFloatValue(); });
+    emplace_param<VTSParam> (
+        params, "ratio", "Ratio", String(), createNormalisableRange (1.0f, 10.0f, 2.0f), 2.0f, [] (float val)
+        { return String (val, 1) + " : 1"; },
+        [] (const String& s)
+        { return s.upToFirstOccurrenceOf (":", false, true).getFloatValue(); });
     createGainDBParameter (params, "knee", "Knee", 0.0f, 18.0f, 6.0f);
 
     emplace_param<VTSParam> (params, "attack", "Attack", String(), createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f, &timeMsValToString, &stringToTimeMsVal);
