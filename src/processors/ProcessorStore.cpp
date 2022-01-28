@@ -14,6 +14,7 @@
 #include "drive/zen_drive/ZenDrive.h"
 
 #include "other/Chorus.h"
+#include "other/Compressor.h"
 #include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
 #include "other/Tremolo.h"
@@ -82,6 +83,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Tuner", &processorFactory<Tuner> },
 
     { "Chorus", &processorFactory<Chorus> },
+    { "Compressor", &processorFactory<Compressor> },
     { "Delay", &processorFactory<Delay> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Tremolo", &processorFactory<Tremolo> },
