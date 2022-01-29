@@ -19,13 +19,13 @@ public:
         gainBuffer.setSize (1, samplesPerBlock);
         gainBlock = dsp::AudioBlock<float> { gainBuffer };
 
-        threshSmooth.reset (sampleRate, 0.02);
-        ratioSmooth.reset (sampleRate, 0.02);
+        threshSmooth.reset (sampleRate, 0.05);
+        ratioSmooth.reset (sampleRate, 0.05);
     }
 
     void process (const dsp::AudioBlock<float>& block) noexcept
     {
-        const auto threshDB = Decibels::gainToDecibels (threshSmooth.getTargetValue());
+        const auto threshDB = Decibels::gainToDecibels (threshSmooth.getCurrentValue());
         const auto kneeLower = Decibels::decibelsToGain (threshDB - kneeDB / 2.0f);
         const auto kneeUpper = Decibels::decibelsToGain (threshDB + kneeDB / 2.0f);
 
