@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PresetsLoginDialog.h"
+#include "PresetsSaveDialog.h"
 #include "PresetsSyncDialog.h"
 #include "state/presets/PresetManager.h"
 
@@ -10,6 +11,7 @@ public:
     explicit PresetsComp (PresetManager& presetMgr);
 
     void presetListUpdated() final;
+    int addPresetOptions (int optionID) override;
     int addPresetServerMenuOptions (int optionID);
 
     void updatePresetsToUpdate();
@@ -20,6 +22,7 @@ private:
     PresetManager& presetManager;
 
     chowdsp::WindowInPlugin<PresetsLoginDialog> loginWindow;
+    chowdsp::WindowInPlugin<PresetsSaveDialog> saveWindow;
     chowdsp::WindowInPlugin<PresetsSyncDialog> syncWindow;
 
     PresetManager::PresetUpdateList presetsToUpdate;

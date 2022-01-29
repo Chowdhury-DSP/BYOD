@@ -3,6 +3,7 @@
 PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (presetMgr),
                                                       presetManager (presetMgr),
                                                       loginWindow (*this),
+                                                      saveWindow (*this),
                                                       syncWindow (*this)
 {
     presetListUpdated();
@@ -40,6 +41,58 @@ void PresetsComp::updatePresetsToUpdate()
         preset.toFile (userPresetPath.getChildFile (preset.getName() + ".chowpreset"));
 
     presetManager.loadUserPresetsFromFolder (userPresetPath);
+}
+
+int PresetsComp::addPresetOptions (int optionID)
+{
+    auto menu = presetBox.getRootMenu();
+    menu->addSeparator();
+
+    juce::PopupMenu::Item saveItem { "Save Preset" };
+    saveItem.itemID = ++optionID;
+    saveItem.action = [=]
+    {
+        updatePresetBoxText();
+        saveWindow.getViewComponent().prepareToShow (true);
+        saveWindow.show();
+    };
+    menu->addItem (saveItem);
+
+    juce::PopupMenu::Item editItem { "Edit Preset" };
+    editItem.itemID = ++optionID;
+    editItem.action = [=]
+    {
+        updatePresetBoxText();
+        saveWindow.getViewComponent().prepareToShow (false);
+        saveWindow.show();
+    };
+    menu->addItem (editItem);
+
+#if ! JUCE_IOS
+    juce::PopupMenu::Item goToFolderItem { "Go to Preset folder..." };
+    goToFolderItem.itemID = ++optionID;
+    goToFolderItem.action = [=]
+    {
+        updatePresetBoxText();
+        auto folder = manager.getUserPresetPath();
+        if (folder.isDirectory())
+            folder.startAsProcess();
+        else
+            chooseUserPresetFolder ({});
+    };
+    menu->addItem (goToFolderItem);
+
+    juce::PopupMenu::Item chooseFolderItem { "Choose Preset folder..." };
+    chooseFolderItem.itemID = ++optionID;
+    chooseFolderItem.action = [=]
+    {
+        updatePresetBoxText();
+        chooseUserPresetFolder ({});
+    };
+    menu->addItem (chooseFolderItem);
+#endif
+
+    return optionID;
 }
 
 int PresetsComp::addPresetServerMenuOptions (int optionID)
