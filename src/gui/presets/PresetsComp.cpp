@@ -13,6 +13,21 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
 
     syncWindow.getViewComponent().runUpdateCallback = [&]
     { updatePresetsToUpdate(); };
+
+    saveWindow.getViewComponent().presetSaveCallback = [&] (const String& name, const String& category, bool isPublic)
+    {
+        auto presetPath = manager.getUserPresetPath();
+        if (presetPath == juce::File() || ! presetPath.isDirectory())
+        {
+            presetPath.deleteRecursively();
+            chooseUserPresetFolder ([&]
+                                    { presetMgr.saveUserPreset (name, category, isPublic); });
+        }
+        else
+        {
+            presetMgr.saveUserPreset (name, category, isPublic);
+        }
+    };
 }
 
 void PresetsComp::presetListUpdated()
@@ -58,15 +73,16 @@ int PresetsComp::addPresetOptions (int optionID)
     };
     menu->addItem (saveItem);
 
-    juce::PopupMenu::Item editItem { "Edit Preset" };
-    editItem.itemID = ++optionID;
-    editItem.action = [=]
-    {
-        updatePresetBoxText();
-        saveWindow.getViewComponent().prepareToShow (false);
-        saveWindow.show();
-    };
-    menu->addItem (editItem);
+    // @TODO
+    //    juce::PopupMenu::Item editItem { "Edit Preset" };
+    //    editItem.itemID = ++optionID;
+    //    editItem.action = [=]
+    //    {
+    //        updatePresetBoxText();
+    //        saveWindow.getViewComponent().prepareToShow (false);
+    //        saveWindow.show();
+    //    };
+    //    menu->addItem (editItem);
 
 #if ! JUCE_IOS
     juce::PopupMenu::Item goToFolderItem { "Go to Preset folder..." };

@@ -38,8 +38,26 @@ PresetsSaveDialog::PresetsSaveDialog()
     setupLabel (categoryLabel);
 
     addAndMakeVisible (publicSwitch);
+    publicSwitch.setEnabled (false); // @TODO: temporary, until this works...
 
     addAndMakeVisible (okButton);
+    okButton.onClick = [&]
+    {
+        const auto nameText = nameLabel->getText (true);
+        const auto categoryText = categoryLabel->getText (true);
+        const auto isPublic = publicSwitch.getToggleState();
+
+        if (nameText.isEmpty())
+        {
+            NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Preset Save Error!", "Preset name must not be empty");
+            return;
+        }
+
+        presetSaveCallback (nameText, categoryText, isPublic);
+
+        getParentComponent()->setVisible (false);
+    };
+
     addAndMakeVisible (cancelButton);
     cancelButton.onClick = [&]
     { getParentComponent()->setVisible (false); };
@@ -53,7 +71,8 @@ void PresetsSaveDialog::prepareToShow (bool shouldSave)
     getParentComponent()->setName (isSaveMode ? "Preset Saving" : "Preset Editing");
 
     nameLabel->setText ("MyPreset", dontSendNotification);
-    categoryLabel->setText ("None", dontSendNotification);
+    categoryLabel->setText ("", dontSendNotification);
+    publicSwitch.setToggleState (false, dontSendNotification);
 }
 
 void PresetsSaveDialog::paint (Graphics& g)

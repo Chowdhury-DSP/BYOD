@@ -22,6 +22,8 @@ public:
     std::unique_ptr<XmlElement> savePresetState() override;
     void loadPresetState (const XmlElement* xml) override;
 
+    void saveUserPreset (const String& name, const String& category, bool isPublic);
+
     void presetLoginStatusChanged() override;
 
     void syncLocalPresetsToServer() const;

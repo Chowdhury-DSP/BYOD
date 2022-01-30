@@ -76,3 +76,24 @@ void PresetManager::loadPresetState (const XmlElement* xml)
 
     procChain->getStateHelper().loadProcChain (xml, true);
 }
+
+void PresetManager::saveUserPreset (const String& name, const String& category, bool isPublic)
+{
+    Logger::writeToLog ("Saving user preset, name: \"" + name + "\", category: \"" + category + "\"");
+
+    auto stateXml = savePresetState();
+
+    auto savePath = getUserPresetPath();
+    if (category.isNotEmpty())
+        savePath = savePath.getChildFile (category);
+    savePath = savePath.getChildFile (name + ".chowpreset");
+
+    keepAlivePreset = std::make_unique<chowdsp::Preset> (name, getUserPresetName(), *stateXml, category);
+    if (keepAlivePreset != nullptr)
+    {
+        keepAlivePreset->toFile (savePath);
+        loadPreset (*keepAlivePreset);
+
+        loadUserPresetsFromFolder (getUserPresetPath());
+    }
+}
