@@ -100,7 +100,10 @@ void PresetManager::setUserPresetName (const String& newName)
         {
             auto& preset = presetMap.at (presetID++);
 
-            preset.getPresetFile().deleteFile();
+            const auto prevPresetFile = preset.getPresetFile();
+            if (prevPresetFile != File())
+                prevPresetFile.deleteFile();
+
             preset.setVendor (newName);
             preset.toFile (getPresetFile (preset));
         }
@@ -109,6 +112,7 @@ void PresetManager::setUserPresetName (const String& newName)
     userIDMap[actualNewName] = userUserIDStart;
     userIDMap.erase (userPresetsName);
 
+    getUserPresetPath().getChildFile (userPresetsName).deleteRecursively();
     userPresetsName = actualNewName;
 
     loadUserPresetsFromFolder (getUserPresetPath());

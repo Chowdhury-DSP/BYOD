@@ -116,21 +116,27 @@ int PresetsComp::addPresetOptions (int optionID)
     saveItem.action = [=]
     {
         updatePresetBoxText();
-        saveWindow.getViewComponent().prepareToShow (true);
+        saveWindow.getViewComponent().prepareToShow();
         saveWindow.show();
     };
     menu->addItem (saveItem);
 
-    // @TODO
-    //    juce::PopupMenu::Item editItem { "Edit Preset" };
-    //    editItem.itemID = ++optionID;
-    //    editItem.action = [=]
-    //    {
-    //        updatePresetBoxText();
-    //        saveWindow.getViewComponent().prepareToShow (false);
-    //        saveWindow.show();
-    //    };
-    //    menu->addItem (editItem);
+    juce::PopupMenu::Item editItem { "Edit Preset" };
+    editItem.itemID = ++optionID;
+    editItem.action = [&]
+    {
+        if (auto* currentPreset = manager.getCurrentPreset())
+        {
+            auto presetFile = currentPreset->getPresetFile();
+            if (presetFile == File())
+                presetFile = presetManager.getPresetFile (*currentPreset);
+
+            updatePresetBoxText();
+            saveWindow.getViewComponent().prepareToShow (currentPreset, presetFile);
+            saveWindow.show();
+        }
+    };
+    menu->addItem (editItem);
 
 #if ! JUCE_IOS
     juce::PopupMenu::Item goToFolderItem { "Go to Preset folder..." };

@@ -41,22 +41,6 @@ PresetsSaveDialog::PresetsSaveDialog()
     publicSwitch.setEnabled (false); // @TODO: temporary, until this works...
 
     addAndMakeVisible (okButton);
-    okButton.onClick = [&]
-    {
-        const auto nameText = nameLabel->getText (true);
-        const auto categoryText = categoryLabel->getText (true);
-        const auto isPublic = publicSwitch.getToggleState();
-
-        if (nameText.isEmpty())
-        {
-            NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Preset Save Error!", "Preset name must not be empty");
-            return;
-        }
-
-        presetSaveCallback (nameText, categoryText, isPublic);
-
-        getParentComponent()->setVisible (false);
-    };
 
     addAndMakeVisible (cancelButton);
     cancelButton.onClick = [&]
@@ -65,14 +49,39 @@ PresetsSaveDialog::PresetsSaveDialog()
     setSize (400, 240);
 }
 
-void PresetsSaveDialog::prepareToShow (bool shouldSave)
+void PresetsSaveDialog::prepareToShow (const chowdsp::Preset* presetToEdit, const File& presetFile)
 {
-    isSaveMode = shouldSave;
+    isSaveMode = presetToEdit == nullptr;
     getParentComponent()->setName (isSaveMode ? "Preset Saving" : "Preset Editing");
 
-    nameLabel->setText ("MyPreset", dontSendNotification);
-    categoryLabel->setText ("", dontSendNotification);
-    publicSwitch.setToggleState (false, dontSendNotification);
+    if (isSaveMode)
+    {
+        nameLabel->setText ("MyPreset", dontSendNotification);
+        categoryLabel->setText ("", dontSendNotification);
+        publicSwitch.setToggleState (false, dontSendNotification);
+    }
+    else
+    {
+        nameLabel->setText (presetToEdit->getName(), dontSendNotification);
+        categoryLabel->setText (presetToEdit->getCategory(), dontSendNotification);
+        publicSwitch.setToggleState (false, dontSendNotification);
+    }
+
+    okButton.onClick = [&, presetFileToDelete = presetFile]
+    {
+        const auto nameText = nameLabel->getText (true);
+        if (nameText.isEmpty())
+        {
+            NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Preset Save Error!", "Preset name must not be empty");
+            return;
+        }
+
+        if (! isSaveMode && presetFileToDelete != File())
+            presetFileToDelete.deleteFile();
+
+        presetSaveCallback (nameText, categoryLabel->getText (true), publicSwitch.getToggleState());
+        getParentComponent()->setVisible (false);
+    };
 }
 
 void PresetsSaveDialog::paint (Graphics& g)
