@@ -80,6 +80,7 @@ target_sources(BYOD PRIVATE
     processors/tone/bassman/BassmanToneStack.cpp
     processors/tone/baxandall/BaxandallEQ.cpp
     processors/tone/baxandall/BaxandallWDF.cpp
+    processors/tone/tube_screamer_tone/TubeScreamerTone.cpp
 
     processors/utility/FreqBandSplitter.cpp
     processors/utility/InputProcessor.cpp

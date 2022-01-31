@@ -31,6 +31,7 @@
 #include "tone/TrebleBooster.h"
 #include "tone/bassman/BassmanTone.h"
 #include "tone/baxandall/BaxandallEQ.h"
+#include "tone/tube_screamer_tone/TubeScreamerTone.h"
 
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
@@ -72,6 +73,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "LoFi IRs", &processorFactory<LofiIrs> },
     { "SVF", &processorFactory<StateVariableFilter> },
     { "Treble Booster", &processorFactory<TrebleBooster> },
+    { "TS-Tone", &processorFactory<TubeScreamerTone> },
 
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
