@@ -58,6 +58,54 @@ void PresetsComp::updatePresetsToUpdate()
     presetManager.loadUserPresetsFromFolder (userPresetPath);
 }
 
+int PresetsComp::createPresetsMenu (int optionID)
+{
+    struct VendorPresetCollection
+    {
+        std::map<juce::String, PopupMenu> categoryPresetMenus;
+        std::vector<PopupMenu::Item> nonCategoryItems;
+    };
+
+    std::map<juce::String, VendorPresetCollection> presetMapItems;
+    for (const auto& presetIDPair : manager.getPresetMap())
+    {
+        const auto presetID = presetIDPair.first;
+        const auto& preset = presetIDPair.second;
+
+        juce::PopupMenu::Item presetItem { preset.getName() };
+        presetItem.itemID = presetID + 1;
+        presetItem.action = [=, &preset]
+        {
+            updatePresetBoxText();
+            manager.loadPreset (preset);
+        };
+
+        const auto& presetCategory = preset.getCategory();
+        if (presetCategory.isEmpty()) // || presetCategory == "None")
+            presetMapItems[preset.getVendor()].nonCategoryItems.push_back (presetItem);
+        else
+            presetMapItems[preset.getVendor()].categoryPresetMenus[presetCategory].addItem (presetItem);
+
+        optionID = juce::jmax (optionID, presetItem.itemID);
+    }
+
+    for (auto& [vendorName, vendorCollection] : presetMapItems)
+    {
+        PopupMenu vendorMenu;
+        for (auto& [category, categoryMenu] : vendorCollection.categoryPresetMenus)
+            vendorMenu.addSubMenu (category, categoryMenu);
+
+        std::sort (vendorCollection.nonCategoryItems.begin(), vendorCollection.nonCategoryItems.end(), [] (auto& item1, auto& item2)
+                   { return item1.text < item2.text; });
+        for (auto& extraItem : vendorCollection.nonCategoryItems)
+            vendorMenu.addItem (extraItem);
+
+        presetBox.getRootMenu()->addSubMenu (vendorName, vendorMenu);
+    }
+
+    return optionID;
+}
+
 int PresetsComp::addPresetOptions (int optionID)
 {
     auto menu = presetBox.getRootMenu();

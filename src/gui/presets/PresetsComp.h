@@ -11,6 +11,7 @@ public:
     explicit PresetsComp (PresetManager& presetMgr);
 
     void presetListUpdated() final;
+    int createPresetsMenu (int optionID) override;
     int addPresetOptions (int optionID) override;
     int addPresetServerMenuOptions (int optionID);
 
