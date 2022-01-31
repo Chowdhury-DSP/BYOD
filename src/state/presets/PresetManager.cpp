@@ -79,10 +79,15 @@ void PresetManager::loadPresetState (const XmlElement* xml)
 
 File PresetManager::getPresetFile (const chowdsp::Preset& preset) const
 {
+    return getPresetFile (preset.getVendor(), preset.getCategory(), preset.getName());
+}
+
+File PresetManager::getPresetFile (const String& vendor, const String& category, const String& name) const
+{
     return getUserPresetPath()
-        .getChildFile (preset.getVendor())
-        .getChildFile (preset.getCategory())
-        .getChildFile (preset.getName() + ".chowpreset");
+        .getChildFile (vendor)
+        .getChildFile (category)
+        .getChildFile (name + ".chowpreset");
 }
 
 void PresetManager::setUserPresetName (const String& newName)

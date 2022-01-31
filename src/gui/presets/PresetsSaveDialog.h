@@ -13,7 +13,6 @@ public:
     void resized() override;
 
     std::function<void (const String& /*name*/, const String& /*category*/, bool /*isPublic*/)> presetSaveCallback;
-    std::function<void (const String& /*name*/, const String& /*category*/, bool /*isPublic*/)> presetEditCallback;
 
 private:
     bool isSaveMode = true;

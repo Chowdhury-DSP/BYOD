@@ -16,16 +16,29 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
 
     saveWindow.getViewComponent().presetSaveCallback = [&] (const String& name, const String& category, bool isPublic)
     {
+        auto savePresetLambda = [this, name, category, isPublic]
+        {
+            if (presetManager.getPresetFile (presetManager.getUserPresetName(), category, name).existsAsFile())
+            {
+                const String warningBoxTitle = "Preset Save Warning!";
+                const String warningBoxMessage = "You are about to overwrite an existing preset! Are you sure you want to continue?";
+                if (NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, warningBoxTitle, warningBoxMessage) == 0)
+                    return;
+            }
+
+            presetManager.saveUserPreset (name, category, isPublic);
+        };
+
         auto presetPath = manager.getUserPresetPath();
         if (presetPath == juce::File() || ! presetPath.isDirectory())
         {
             presetPath.deleteRecursively();
             chooseUserPresetFolder ([&]
-                                    { presetMgr.saveUserPreset (name, category, isPublic); });
+                                    { savePresetLambda(); });
         }
         else
         {
-            presetMgr.saveUserPreset (name, category, isPublic);
+            savePresetLambda();
         }
     };
 }
