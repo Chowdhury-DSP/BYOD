@@ -22,6 +22,7 @@ public:
     std::unique_ptr<XmlElement> savePresetState() override;
     void loadPresetState (const XmlElement* xml) override;
 
+    void setUserPresetName (const String& newName) final;
     void saveUserPreset (const String& name, const String& category, bool isPublic);
 
     void presetLoginStatusChanged() override;
@@ -30,6 +31,8 @@ public:
     void syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate);
 
 private:
+    File getPresetFile (const chowdsp::Preset& preset) const;
+
     ProcessorChain* procChain;
 
     SharedResourcePointer<PresetsServerUserManager> userManager;

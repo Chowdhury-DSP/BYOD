@@ -52,7 +52,7 @@ void PresetsComp::syncServerPresetsToLocal()
 void PresetsComp::updatePresetsToUpdate()
 {
     const auto& userPresetPath = presetManager.getUserPresetPath();
-    for (const auto& [preset, _] : presetsToUpdate)
+    for (auto& [preset, _] : presetsToUpdate)
         preset.toFile (userPresetPath.getChildFile (preset.getName() + ".chowpreset"));
 
     presetManager.loadUserPresetsFromFolder (userPresetPath);

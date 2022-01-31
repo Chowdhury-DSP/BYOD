@@ -77,21 +77,52 @@ void PresetManager::loadPresetState (const XmlElement* xml)
     procChain->getStateHelper().loadProcChain (xml, true);
 }
 
-void PresetManager::saveUserPreset (const String& name, const String& category, bool isPublic)
+File PresetManager::getPresetFile (const chowdsp::Preset& preset) const
+{
+    return getUserPresetPath()
+        .getChildFile (preset.getVendor())
+        .getChildFile (preset.getCategory())
+        .getChildFile (preset.getName() + ".chowpreset");
+}
+
+void PresetManager::setUserPresetName (const String& newName)
+{
+    if (newName == userPresetsName)
+        return;
+
+    auto actualNewName = newName.isEmpty() ? "User" : newName;
+
+    if (userIDMap.find (userPresetsName) != userIDMap.end()) // previous user name was the default!
+    {
+        // move existing user presets to new username
+        int presetID = userIDMap[userPresetsName];
+        while (presetMap.find (presetID) != presetMap.end())
+        {
+            auto& preset = presetMap.at (presetID++);
+
+            preset.getPresetFile().deleteFile();
+            preset.setVendor (newName);
+            preset.toFile (getPresetFile (preset));
+        }
+    }
+
+    userIDMap[actualNewName] = userUserIDStart;
+    userIDMap.erase (userPresetsName);
+
+    userPresetsName = actualNewName;
+
+    loadUserPresetsFromFolder (getUserPresetPath());
+}
+
+void PresetManager::saveUserPreset (const String& name, const String& category, bool /*isPublic*/)
 {
     Logger::writeToLog ("Saving user preset, name: \"" + name + "\", category: \"" + category + "\"");
 
     auto stateXml = savePresetState();
-
-    auto savePath = getUserPresetPath();
-    if (category.isNotEmpty())
-        savePath = savePath.getChildFile (category);
-    savePath = savePath.getChildFile (name + ".chowpreset");
-
     keepAlivePreset = std::make_unique<chowdsp::Preset> (name, getUserPresetName(), *stateXml, category);
     if (keepAlivePreset != nullptr)
     {
-        keepAlivePreset->toFile (savePath);
+        keepAlivePreset->toFile (getPresetFile (*keepAlivePreset));
         loadPreset (*keepAlivePreset);
 
         loadUserPresetsFromFolder (getUserPresetPath());
