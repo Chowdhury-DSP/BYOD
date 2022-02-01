@@ -112,8 +112,12 @@ void BYOD::setStateInformation (const void* data, int sizeInBytes)
         return;
 
     presetManager->loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
+    const auto presetWasDirty = presetManager->getIsDirty();
+
     vts.replaceState (ValueTree::fromXml (*vtsXml));
     procs->getStateHelper().loadProcChain (procChainXml);
+
+    presetManager->setIsDirty (presetWasDirty);
 }
 
 // This creates new instances of the plugin

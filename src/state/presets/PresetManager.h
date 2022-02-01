@@ -21,6 +21,11 @@ public:
 
     std::unique_ptr<XmlElement> savePresetState() override;
     void loadPresetState (const XmlElement* xml) override;
+    File getPresetFile (const chowdsp::Preset& preset) const;
+    File getPresetFile (const String& vendor, const String& category, const String& name) const;
+
+    void setUserPresetName (const String& newName) final;
+    void saveUserPreset (const String& name, const String& category, bool isPublic);
 
     void presetLoginStatusChanged() override;
 

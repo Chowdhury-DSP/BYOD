@@ -16,6 +16,7 @@ target_sources(BYOD PRIVATE
     gui/editors/ProcessorEditor.cpp
     gui/presets/PresetsComp.cpp
     gui/presets/PresetsLoginDialog.cpp
+    gui/presets/PresetsSaveDialog.cpp
     gui/presets/PresetsSyncDialog.cpp
     gui/utils/LevelMeterComponent.cpp
     gui/utils/LookAndFeels.cpp
