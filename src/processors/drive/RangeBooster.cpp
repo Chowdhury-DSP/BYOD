@@ -7,7 +7,7 @@ RangeBooster::RangeBooster (UndoManager* um) : BaseProcessor ("Range Booster", c
     boostParam = vts.getRawParameterValue ("boost");
 
     uiOptions.backgroundColour = Colours::grey.brighter (0.7f);
-    uiOptions.powerColour = Colours::orangered.brighter(0.1f);
+    uiOptions.powerColour = Colours::orangered.brighter (0.1f);
     uiOptions.info.description = "Range booster effect inspired by the Dallas Rangemaster pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -115,13 +115,13 @@ void RangeBooster::processAudio (AudioBuffer<float>& buffer)
             c3State[ch] = i_e;
 
             const double v_be = v_b - veState[ch];
-            const double exp_v_be = std::exp(v_be / Vt);
+            const double exp_v_be = std::exp (v_be / Vt);
 
-            double v_bc = Vt * std::log(((i_b / I_s) - (1.0 / Beta_F) * (exp_v_be - 1.0)) * Beta_R + 1.0);
+            double v_bc = Vt * std::log (((i_b / I_s) - (1.0 / Beta_F) * (exp_v_be - 1.0)) * Beta_R + 1.0);
             double i_c = 0.0;
             for (int k = 0; k < 5; ++k)
             {
-                const double exp_v_bc = std::exp(v_bc / Vt);
+                const double exp_v_bc = std::exp (v_bc / Vt);
                 i_c = I_s * ((exp_v_be - exp_v_bc) - (1.0 / Beta_R) * (exp_v_bc - 1.0));
 
                 double F_y = i_b + i_e - i_c;
@@ -130,8 +130,8 @@ void RangeBooster::processAudio (AudioBuffer<float>& buffer)
                 v_bc -= F_y / (dF_y + 1.0e-24);
             }
 
-            const double exp_v_bc = std::exp(v_bc / Vt);
-            veState[ch] = v_b - Vt * std::log((i_c / I_s) + (1.0 / Beta_R) * (exp_v_bc - 1.0) + exp_v_bc);
+            const double exp_v_bc = std::exp (v_bc / Vt);
+            veState[ch] = v_b - Vt * std::log ((i_c / I_s) + (1.0 / Beta_R) * (exp_v_bc - 1.0) + exp_v_bc);
 
             x[n] = float ((i_c * RV) * 1e16 - 5e5 - 1.0);
         }
