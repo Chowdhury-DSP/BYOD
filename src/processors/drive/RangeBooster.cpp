@@ -1,6 +1,51 @@
 #include "RangeBooster.h"
 #include "../ParameterHelpers.h"
 
+namespace PNPHelper
+{
+static constexpr double V_plus = 9.0;
+static constexpr double R1 = 470e3;
+static constexpr double R2 = 68e3;
+static constexpr double RV = 10e3;
+static constexpr double R_bias = R1 / (R1 + R2);
+static constexpr double Z_T = 12.5e3;
+
+static constexpr double Vt = 0.02585;
+static constexpr double I_s = 10.0e-15;
+static constexpr double Beta_F = 200.0;
+static constexpr double Beta_R = 2.0;
+
+inline double processSamplePNP (double x, double& veState, double& c3State, double c3Coef_b0, double c3Coef_b1)
+{
+    const double v_b = x + R_bias * V_plus;
+    const double i_b = v_b / Z_T;
+
+    const double i_e = c3Coef_b0 * (V_plus - veState) + c3Coef_b1 * c3State;
+    c3State = i_e;
+
+    const double v_be = v_b - veState;
+    const double exp_v_be = std::exp (v_be / Vt);
+
+    double v_bc = Vt * std::log (((i_b / I_s) - (1.0 / Beta_F) * (exp_v_be - 1.0)) * Beta_R + 1.0);
+    double i_c = 0.0;
+    for (int k = 0; k < 5; ++k)
+    {
+        const double exp_v_bc = std::exp (v_bc / Vt);
+        i_c = I_s * ((exp_v_be - exp_v_bc) - (1.0 / Beta_R) * (exp_v_bc - 1.0));
+
+        double F_y = i_b + i_e - i_c;
+        double dF_y = -I_s * ((-1.0 / Vt) * exp_v_bc - (1.0 / Vt / Beta_R) * exp_v_bc);
+
+        v_bc -= F_y / (dF_y + 1.0e-24);
+    }
+
+    const double exp_v_bc = std::exp (v_bc / Vt);
+    veState = v_b - Vt * std::log ((i_c / I_s) + (1.0 / Beta_R) * (exp_v_bc - 1.0) + exp_v_bc);
+
+    return ((i_c * RV) * 1e16 - 5e5 - 1.0);
+}
+} // namespace PNPHelper
+
 RangeBooster::RangeBooster (UndoManager* um) : BaseProcessor ("Range Booster", createParameterLayout(), um)
 {
     rangeParam = vts.getRawParameterValue ("range");
@@ -94,52 +139,20 @@ void RangeBooster::processAudio (AudioBuffer<float>& buffer)
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* x = buffer.getWritePointer (ch);
+
+        chowdsp::ScopedValue ve_z { veState[ch] };
+        chowdsp::ScopedValue c3_z { c3State[ch] };
         for (int n = 0; n < numSamples; ++n)
-        {
-            static constexpr double V_plus = 9.0;
-            static constexpr double R1 = 470e3;
-            static constexpr double R2 = 68e3;
-            static constexpr double RV = 10e3;
-            static constexpr double R_bias = R1 / (R1 + R2);
-            static constexpr double Z_T = 12.5e3;
-
-            static constexpr double Vt = 0.02585;
-            static constexpr double I_s = 10.0e-15;
-            static constexpr double Beta_F = 200.0;
-            static constexpr double Beta_R = 2.0;
-
-            const double v_b = (double) x[n] + R_bias * V_plus;
-            const double i_b = v_b / Z_T;
-
-            const double i_e = c3Coefs[0] * (V_plus - veState[ch]) + c3Coefs[1] * c3State[ch];
-            c3State[ch] = i_e;
-
-            const double v_be = v_b - veState[ch];
-            const double exp_v_be = std::exp (v_be / Vt);
-
-            double v_bc = Vt * std::log (((i_b / I_s) - (1.0 / Beta_F) * (exp_v_be - 1.0)) * Beta_R + 1.0);
-            double i_c = 0.0;
-            for (int k = 0; k < 5; ++k)
-            {
-                const double exp_v_bc = std::exp (v_bc / Vt);
-                i_c = I_s * ((exp_v_be - exp_v_bc) - (1.0 / Beta_R) * (exp_v_bc - 1.0));
-
-                double F_y = i_b + i_e - i_c;
-                double dF_y = -I_s * ((-1.0 / Vt) * exp_v_bc - (1.0 / Vt / Beta_R) * exp_v_bc);
-
-                v_bc -= F_y / (dF_y + 1.0e-24);
-            }
-
-            const double exp_v_bc = std::exp (v_bc / Vt);
-            veState[ch] = v_b - Vt * std::log ((i_c / I_s) + (1.0 / Beta_R) * (exp_v_bc - 1.0) + exp_v_bc);
-
-            x[n] = float ((i_c * RV) * 1e16 - 5e5 - 1.0);
-        }
+            x[n] = (float) PNPHelper::processSamplePNP ((double) x[n], ve_z.get(), c3_z.get(), c3Coefs[0], c3Coefs[1]);
     }
 
     dcBlocker.processAudio (buffer);
 
     // process output level
-    outGain.setGainDecibels (*boostParam + 56.0f);
+    outGain.setGainDecibels (*boostParam + 54.0f);
     outGain.process (context);
+
+    dsp::AudioBlock<float>::process (block, block, [] (float x)
+                                     { return std::tanh (x); });
+    block *= 0.95f;
 }

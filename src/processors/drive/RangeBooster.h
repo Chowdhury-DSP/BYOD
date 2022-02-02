@@ -6,7 +6,7 @@
 class RangeBooster : public BaseProcessor
 {
 public:
-    RangeBooster (UndoManager* um = nullptr);
+    explicit RangeBooster (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
