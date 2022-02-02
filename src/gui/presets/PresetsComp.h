@@ -18,6 +18,7 @@ public:
     void updatePresetsToUpdate();
 
 private:
+    void selectedPresetChanged() override;
     void syncServerPresetsToLocal();
 
     PresetManager& presetManager;

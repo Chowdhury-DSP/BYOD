@@ -1,4 +1,5 @@
 #include "PresetsSaveDialog.h"
+#include "state/presets/PresetManager.h"
 
 namespace
 {
@@ -38,7 +39,6 @@ PresetsSaveDialog::PresetsSaveDialog()
     setupLabel (categoryLabel);
 
     addAndMakeVisible (publicSwitch);
-    publicSwitch.setEnabled (false); // @TODO: temporary, until this works...
 
     addAndMakeVisible (okButton);
 
@@ -64,7 +64,7 @@ void PresetsSaveDialog::prepareToShow (const chowdsp::Preset* presetToEdit, cons
     {
         nameLabel->setText (presetToEdit->getName(), dontSendNotification);
         categoryLabel->setText (presetToEdit->getCategory(), dontSendNotification);
-        publicSwitch.setToggleState (false, dontSendNotification);
+        publicSwitch.setToggleState (presetToEdit->extraInfo.getBoolAttribute (PresetManager::isPublicTag), dontSendNotification);
     }
 
     okButton.onClick = [&, presetFileToDelete = presetFile]

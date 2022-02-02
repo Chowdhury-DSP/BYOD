@@ -32,6 +32,8 @@ public:
     void syncLocalPresetsToServer() const;
     void syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate);
 
+    static const Identifier isPublicTag;
+
 private:
     ProcessorChain* procChain;
 
