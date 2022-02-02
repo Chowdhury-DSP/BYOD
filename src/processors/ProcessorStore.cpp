@@ -1,6 +1,7 @@
 #include "ProcessorStore.h"
 
 #include "drive/GuitarMLAmp.h"
+#include "drive/RangeBooster.h"
 #include "drive/RONN.h"
 #include "drive/big_muff/BigMuffDrive.h"
 #include "drive/centaur/Centaur.h"
@@ -58,6 +59,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "GuitarML", &processorFactory<GuitarMLAmp> },
     { "Hysteresis", &processorFactory<Hysteresis> },
     { "MXR Distortion", &processorFactory<MXRDistortion> },
+    { "Range Booster", &processorFactory<RangeBooster> },
     { "RONN", &processorFactory<RONN> },
     { "Tube Screamer", &processorFactory<TubeScreamer> },
     { "Waveshaper", &processorFactory<Waveshaper> },

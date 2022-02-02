@@ -40,6 +40,7 @@ target_sources(BYOD PRIVATE
     processors/chain/ProcessorChainStateHelper.cpp
 
     processors/drive/GuitarMLAmp.cpp
+    processors/drive/RangeBooster.cpp
     processors/drive/RONN.cpp
     processors/drive/big_muff/BigMuffDrive.cpp
     processors/drive/big_muff/BigMuffClippingStage.cpp
