@@ -10,7 +10,7 @@ endif()
 
 add_subdirectory(modules)
 
-# juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
+ juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
 # set default plugin formats to build
 option(BUILD_RELEASE "Set build flags for release builds" OFF)
 if(IOS)

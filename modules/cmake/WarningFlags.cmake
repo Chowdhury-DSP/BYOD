@@ -15,6 +15,7 @@ if(WIN32)
             /wd4458 # declaration hides class member (from Foley's GUI Magic)
             /wd4505 # since VS2019 doesn't handle [[ maybe_unused ]] for static functions
             /wd4244 # for XSIMD
+            /wd5051 # for [[maybe-unused]] in RTNeural
             /wd5054 # for Eigen
         )
     endif()
