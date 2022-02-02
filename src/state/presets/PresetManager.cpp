@@ -3,8 +3,8 @@
 
 namespace
 {
-String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
-String presetTag = "preset";
+const String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
+const String presetTag = "preset";
 } // namespace
 
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
@@ -123,12 +123,13 @@ void PresetManager::setUserPresetName (const String& newName)
     loadUserPresetsFromFolder (getUserPresetPath());
 }
 
-void PresetManager::saveUserPreset (const String& name, const String& category, bool /*isPublic*/)
+void PresetManager::saveUserPreset (const String& name, const String& category, bool isPublic)
 {
     Logger::writeToLog ("Saving user preset, name: \"" + name + "\", category: \"" + category + "\"");
 
     auto stateXml = savePresetState();
     keepAlivePreset = std::make_unique<chowdsp::Preset> (name, getUserPresetName(), *stateXml, category);
+    keepAlivePreset->extraInfo.setAttribute (isPublicTag, isPublic);
     if (keepAlivePreset != nullptr)
     {
         keepAlivePreset->toFile (getPresetFile (*keepAlivePreset));
@@ -137,3 +138,5 @@ void PresetManager::saveUserPreset (const String& name, const String& category, 
         loadUserPresetsFromFolder (getUserPresetPath());
     }
 }
+
+const Identifier PresetManager::isPublicTag { "is_public" };

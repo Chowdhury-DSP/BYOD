@@ -134,22 +134,26 @@ int PresetsComp::addPresetOptions (int optionID)
     };
     menu->addItem (saveItem);
 
-    juce::PopupMenu::Item editItem { "Edit Preset" };
-    editItem.itemID = ++optionID;
-    editItem.action = [&]
+    // editing should only be allowed for user presets!
+    if (presetManager.getCurrentPreset()->getVendor() == presetManager.getUserPresetName())
     {
-        if (auto* currentPreset = manager.getCurrentPreset())
+        juce::PopupMenu::Item editItem { "Edit Preset" };
+        editItem.itemID = ++optionID;
+        editItem.action = [&]
         {
-            auto presetFile = currentPreset->getPresetFile();
-            if (presetFile == File())
-                presetFile = presetManager.getPresetFile (*currentPreset);
+            if (auto* currentPreset = manager.getCurrentPreset())
+            {
+                auto presetFile = currentPreset->getPresetFile();
+                if (presetFile == File())
+                    presetFile = presetManager.getPresetFile (*currentPreset);
 
-            updatePresetBoxText();
-            saveWindow.getViewComponent().prepareToShow (currentPreset, presetFile);
-            saveWindow.show();
-        }
-    };
-    menu->addItem (editItem);
+                updatePresetBoxText();
+                saveWindow.getViewComponent().prepareToShow (currentPreset, presetFile);
+                saveWindow.show();
+            }
+        };
+        menu->addItem (editItem);
+    }
 
 #if ! JUCE_IOS
     juce::PopupMenu::Item goToFolderItem { "Go to Preset folder..." };
@@ -228,4 +232,9 @@ int PresetsComp::addPresetServerMenuOptions (int optionID)
     }
 
     return optionID;
+}
+
+void PresetsComp::selectedPresetChanged()
+{
+    presetListUpdated();
 }
