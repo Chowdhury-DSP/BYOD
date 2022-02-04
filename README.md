@@ -50,6 +50,7 @@ $ cmake --build build --config Release --parallel 4
 - C++ Utilities:
   - [Magic Enum](https://github.com/Neargye/magic_enum)
   - [Surge Synth Team cpputils](https://github.com/surge-synthesizer/sst-cpputils)
+  - [RapidFuzz](https://github.com/maxbachmann/rapidfuzz-cpp)
 
 Credits for the individual processing blocks are shown on
 the information page for each block. Big thanks to all who

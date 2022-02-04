@@ -16,6 +16,7 @@
 #include <Eigen/Dense>
 #include <RTNeural/RTNeural.h>
 #include <magic_enum.hpp>
+#include <rapidfuzz/fuzz.hpp>
 #include <sst/cpputils.h>
 
 // global definitions
