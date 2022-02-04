@@ -4,6 +4,7 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
                                                       presetManager (presetMgr),
                                                       loginWindow (*this),
                                                       saveWindow (*this),
+                                                      searchWindow (*this, presetMgr),
                                                       syncWindow (*this)
 {
     presetListUpdated();
@@ -154,6 +155,14 @@ int PresetsComp::addPresetOptions (int optionID)
         };
         menu->addItem (editItem);
     }
+
+    juce::PopupMenu::Item searchItem { "Search" };
+    searchItem.itemID = ++optionID;
+    searchItem.action = [&]
+    {
+        searchWindow.show();
+    };
+    menu->addItem (searchItem);
 
 #if ! JUCE_IOS
     juce::PopupMenu::Item goToFolderItem { "Go to Preset folder..." };
