@@ -15,6 +15,9 @@ add_subdirectory(RTNeural)
 # add sst-cpputils
 add_subdirectory(sst-cpputils)
 
+# add rapidfuzz
+add_subdirectory(rapidfuzz-cpp)
+
 include(cmake/WarningFlags.cmake)
 include(cmake/ConfigFlags.cmake)
 add_library(juce_plugin_modules STATIC)
@@ -29,6 +32,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp_plugin_utils
         foleys_gui_magic
         RTNeural
+        rapidfuzz::rapidfuzz
     PUBLIC
         config_flags
         juce::juce_recommended_lto_flags
@@ -65,6 +69,7 @@ target_include_directories(juce_plugin_modules
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/Eigen
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/xsimd/include
         $<TARGET_PROPERTY:sst-cpputils,INTERFACE_INCLUDE_DIRECTORIES>
+        ${CMAKE_SOURCE_DIR}/modules/rapidfuzz-cpp
 )
 
 set_target_properties(juce_plugin_modules PROPERTIES

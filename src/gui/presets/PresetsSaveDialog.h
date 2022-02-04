@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pch.h>
+#include "gui/utils/LabelWithCentredEditor.h"
 
 class PresetsSaveDialog : public Component
 {
@@ -17,7 +17,7 @@ public:
 private:
     bool isSaveMode = true;
 
-    std::unique_ptr<Label> nameLabel, categoryLabel;
+    LabelWithCentredEditor nameLabel, categoryLabel;
     ToggleButton publicSwitch { "Public" };
     TextButton okButton { "OK" }, cancelButton { "Cancel" };
 

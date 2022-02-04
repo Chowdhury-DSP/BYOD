@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PresetSearchWindow.h"
 #include "PresetsLoginDialog.h"
 #include "PresetsSaveDialog.h"
 #include "PresetsSyncDialog.h"
@@ -25,6 +26,7 @@ private:
 
     chowdsp::WindowInPlugin<PresetsLoginDialog> loginWindow;
     chowdsp::WindowInPlugin<PresetsSaveDialog> saveWindow;
+    chowdsp::WindowInPlugin<PresetSearchWindow> searchWindow;
     chowdsp::WindowInPlugin<PresetsSyncDialog> syncWindow;
 
     PresetManager::PresetUpdateList presetsToUpdate;
