@@ -1,8 +1,8 @@
 #pragma once
 
+#include "PresetSearchWindow.h"
 #include "PresetsLoginDialog.h"
 #include "PresetsSaveDialog.h"
-#include "PresetSearchWindow.h"
 #include "PresetsSyncDialog.h"
 #include "state/presets/PresetManager.h"
 

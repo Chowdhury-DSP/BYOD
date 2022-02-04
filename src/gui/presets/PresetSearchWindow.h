@@ -21,7 +21,7 @@ private:
 
     struct SearchLabel;
     std::unique_ptr<SearchLabel> searchEntryBox;
-    
+
     struct ResultsListModel;
     std::unique_ptr<ResultsListModel> resultsBoxModel;
     ListBox resultsBox;
