@@ -31,6 +31,7 @@ if(TARGET juce_vst2_sdk)
     list(APPEND JUCE_FORMATS VST)
 endif()
 
+include (modules/cmake/AppleLocalNetworkPlist.cmake)
 juce_add_plugin(BYOD
     COMPANY_NAME chowdsp
     PLUGIN_MANUFACTURER_CODE Chow
@@ -46,6 +47,9 @@ juce_add_plugin(BYOD
     REQUIRES_FULL_SCREEN TRUE
     IPHONE_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
     IPAD_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+
+    # Apple won't let you use local network unless...
+    PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST}
 )
 
 juce_generate_juce_header(BYOD)

@@ -24,7 +24,7 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
     addPresets (factoryPresets);
 
     loadDefaultPreset();
-    
+
 #if JUCE_IOS
     File appDataDir = File::getSpecialLocation (File::userApplicationDataDirectory);
     auto userPresetFolder = appDataDir.getChildFile (userPresetPath).getSiblingFile ("Presets");
@@ -124,6 +124,15 @@ void PresetManager::setUserPresetName (const String& newName)
             preset.setVendor (newName);
             preset.toFile (getPresetFile (preset));
         }
+    }
+
+    // delete existing presets with this username from the preset map
+    for (auto presetMapIter = presetMap.begin(); presetMapIter != presetMap.end();)
+    {
+        if (presetMapIter->second.getVendor() == actualNewName)
+            presetMapIter = presetMap.erase (presetMapIter);
+        else
+            ++presetMapIter;
     }
 
     userIDMap[actualNewName] = userUserIDStart;

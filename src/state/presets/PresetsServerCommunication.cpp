@@ -2,7 +2,8 @@
 
 namespace PresetsServerCommunication
 {
-const juce::URL presetServerURL = juce::URL ("https://preset-sharing-server-f4gzy6tzkq-uc.a.run.app");
+//const juce::URL presetServerURL = juce::URL ("https://preset-sharing-server-f4gzy6tzkq-uc.a.run.app");
+const juce::URL presetServerURL = juce::URL ("http://localhost:8080");
 
 String makeMessageString (const String& message)
 {
@@ -32,7 +33,7 @@ String pingServer (const URL& requestURL)
     {
         responseMessage += makeMessageString ("Unable to connect!");
     }
-    
+
     return responseMessage;
 }
 
@@ -76,7 +77,7 @@ juce::String sendAddPresetRequest (const juce::String& user, const juce::String&
 
 juce::String parseMessageResponse (const String& messageResponse)
 {
-    return messageResponse.fromLastOccurrenceOf("Message: ", false, false).upToLastOccurrenceOf("\n", false, false);
+    return messageResponse.fromLastOccurrenceOf ("Message: ", false, false).upToLastOccurrenceOf ("\n", false, false);
 }
 
 } // namespace PresetsServerCommunication
