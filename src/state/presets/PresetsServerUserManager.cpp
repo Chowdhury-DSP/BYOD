@@ -46,8 +46,6 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
     using namespace PresetsServerCommunication;
     auto response = sendServerRequest (CommType::validate_user, newUsername, newPassword);
 
-    // @TODO: show alert message on failure
-
     if (response.contains ("OK"))
     {
         username = newUsername;
@@ -55,7 +53,11 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
         isLoggedIn = true;
 
         listeners.call (&Listener::presetLoginStatusChanged);
+        return;
     }
+    
+    const auto messageString = response.fromLastOccurrenceOf("Message: ", false, false).upToFirstOccurrenceOf("\n", false, false);
+    NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Login attmempt failed!", messageString);
 }
 
 void PresetsServerUserManager::createNewUser (const String& newUsername, const String& newPassword)
@@ -66,10 +68,14 @@ void PresetsServerUserManager::createNewUser (const String& newUsername, const S
     using namespace PresetsServerCommunication;
     auto response = sendServerRequest (CommType::register_user, newUsername, newPassword);
 
-    // @TODO: show alert message on failure
-
     if (response.contains ("Successfully added user"))
+    {
         attemptToLogIn (newUsername, newPassword);
+        return;
+    }
+    
+    const auto messageString = response.fromLastOccurrenceOf("Message: ", false, false).upToFirstOccurrenceOf("\n", false, false);
+    NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Registration attempt failed!", messageString);
 }
 
 void PresetsServerUserManager::logOut()

@@ -39,7 +39,7 @@ juce::String sendServerRequest (CommType type, const juce::String& user, const j
     }
     else
     {
-        responseMessage += "Unable to connect!";
+        responseMessage += "Message: Unable to connect!\n";
     }
 
     Logger::writeToLog ("Pinging Presets Server: " + responseMessage);
@@ -77,7 +77,7 @@ juce::String sendAddPresetRequest (const juce::String& user, const juce::String&
     }
     else
     {
-        responseMessage += "Unable to connect!";
+        responseMessage += "Message: Unable to connect!\n";
     }
 
     Logger::writeToLog ("Pinging Presets Server: " + responseMessage);
