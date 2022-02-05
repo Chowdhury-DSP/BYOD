@@ -1,4 +1,5 @@
 #include "PresetManager.h"
+#include "PresetInfoHelpers.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
 
 namespace
@@ -48,9 +49,24 @@ void PresetManager::presetLoginStatusChanged()
     setUserPresetName (userManager->getUsername());
 }
 
-void PresetManager::syncLocalPresetsToServer() const
+void PresetManager::syncLocalPresetsToServer()
 {
-    syncManager->syncLocalPresetsToServer (getUserPresets());
+    std::vector<PresetsServerSyncManager::AddedPresetInfo> addedPresetInfo;
+    syncManager->syncLocalPresetsToServer (getUserPresets(), addedPresetInfo);
+
+    // update preset ID's of newly added presets
+    for (auto [constPreset, newPresetID] : addedPresetInfo)
+    {
+        for (auto& [_, preset] : presetMap)
+        {
+            if (preset == *constPreset)
+            {
+                PresetInfoHelpers::setPresetID (preset, newPresetID);
+                preset.toFile (getPresetFile (preset));
+                break;
+            }
+        }
+    }
 }
 
 void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)
@@ -144,20 +160,21 @@ void PresetManager::setUserPresetName (const String& newName)
     loadUserPresetsFromFolder (getUserPresetPath());
 }
 
-void PresetManager::saveUserPreset (const String& name, const String& category, bool isPublic)
+void PresetManager::saveUserPreset (const String& name, const String& category, bool isPublic, const String& presetID)
 {
     Logger::writeToLog ("Saving user preset, name: \"" + name + "\", category: \"" + category + "\"");
 
     auto stateXml = savePresetState();
     keepAlivePreset = std::make_unique<chowdsp::Preset> (name, getUserPresetName(), *stateXml, category);
-    keepAlivePreset->extraInfo.setAttribute (isPublicTag, isPublic);
     if (keepAlivePreset != nullptr)
     {
+        PresetInfoHelpers::setIsPublic (*keepAlivePreset, isPublic);
+        if (presetID.isNotEmpty())
+            PresetInfoHelpers::setPresetID (*keepAlivePreset, presetID);
+
         keepAlivePreset->toFile (getPresetFile (*keepAlivePreset));
         loadPreset (*keepAlivePreset);
 
         loadUserPresetsFromFolder (getUserPresetPath());
     }
 }
-
-const Identifier PresetManager::isPublicTag { "is_public" };

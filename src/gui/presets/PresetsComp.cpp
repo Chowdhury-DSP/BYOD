@@ -15,9 +15,9 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
     syncWindow.getViewComponent().runUpdateCallback = [&]
     { updatePresetsToUpdate(); };
 
-    saveWindow.getViewComponent().presetSaveCallback = [&] (const String& name, const String& category, bool isPublic)
+    saveWindow.getViewComponent().presetSaveCallback = [&] (const String& name, const String& category, bool isPublic, const String& presetID)
     {
-        auto savePresetLambda = [this, name, category, isPublic]
+        auto savePresetLambda = [this, name, category, isPublic, presetID]
         {
             if (presetManager.getPresetFile (presetManager.getUserPresetName(), category, name).existsAsFile())
             {
@@ -27,7 +27,7 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
                     return;
             }
 
-            presetManager.saveUserPreset (name, category, isPublic);
+            presetManager.saveUserPreset (name, category, isPublic, presetID);
         };
 
         auto presetPath = manager.getUserPresetPath();

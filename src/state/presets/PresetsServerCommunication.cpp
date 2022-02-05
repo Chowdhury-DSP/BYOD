@@ -10,7 +10,7 @@ String makeMessageString (const String& message)
     return "Message: " + message + "\n";
 }
 
-String pingServer (const URL& requestURL)
+String pingServer (const URL& requestURL, const String& httpRequest = "GET")
 {
     String responseMessage = "URL: " + requestURL.toString (true) + "\n";
 
@@ -22,7 +22,7 @@ String pingServer (const URL& requestURL)
                 .withNumRedirectsToFollow (5)
                 .withStatusCode (&statusCode)
                 .withResponseHeaders (&responseHeaders)
-                .withHttpRequestCmd ("GET")))
+                .withHttpRequestCmd (httpRequest)))
     {
         auto streamString = inputStream->readEntireStreamAsString();
 
@@ -51,24 +51,44 @@ juce::String sendServerRequest (CommType type, const juce::String& user, const j
     requestHeaders.set ("pass", pass);
 
     auto requestURL = presetServerURL.getChildURL (magic_enum::enum_name (type).data()).withParameters (requestHeaders);
-    const auto responseMessage = pingServer (requestURL);
+    auto responseMessage = pingServer (requestURL);
 
     Logger::writeToLog ("Pinging Presets Server: " + responseMessage);
 
     return responseMessage;
 }
 
-juce::String sendAddPresetRequest (const juce::String& user, const juce::String& pass, const juce::String& presetName, const String& presetData)
+juce::String sendAddPresetRequest (const PresetRequestInfo& info)
 {
     juce::StringPairArray requestHeaders;
-    requestHeaders.set ("user", user);
-    requestHeaders.set ("pass", pass);
-    requestHeaders.set ("preset", presetName);
+    requestHeaders.set ("user", info.user);
+    requestHeaders.set ("pass", info.pass);
+    requestHeaders.set ("preset", info.presetName);
+    requestHeaders.set ("is_public", info.isPublic ? "TRUE" : "FALSE");
 
     auto requestURL = presetServerURL.getChildURL (magic_enum::enum_name (CommType::add_preset).data())
                           .withParameters (requestHeaders)
-                          .withPOSTData (presetData);
-    const auto responseMessage = pingServer (requestURL);
+                          .withPOSTData (info.presetData);
+    auto responseMessage = pingServer (requestURL, "POST");
+
+    Logger::writeToLog ("Pinging Presets Server: " + responseMessage);
+
+    return responseMessage;
+}
+
+juce::String sendUpdatePresetRequest (const PresetRequestInfo& info)
+{
+    juce::StringPairArray requestHeaders;
+    requestHeaders.set ("user", info.user);
+    requestHeaders.set ("pass", info.pass);
+    requestHeaders.set ("preset", info.presetName);
+    requestHeaders.set ("is_public", info.isPublic ? "TRUE" : "FALSE");
+    requestHeaders.set ("preset_id", info.presetID);
+
+    auto requestURL = presetServerURL.getChildURL (magic_enum::enum_name (CommType::update_preset).data())
+                          .withParameters (requestHeaders)
+                          .withPOSTData (info.presetData);
+    auto responseMessage = pingServer (requestURL, "POST");
 
     Logger::writeToLog ("Pinging Presets Server: " + responseMessage);
 

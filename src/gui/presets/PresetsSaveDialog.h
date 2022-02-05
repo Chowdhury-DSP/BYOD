@@ -12,10 +12,11 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-    std::function<void (const String& /*name*/, const String& /*category*/, bool /*isPublic*/)> presetSaveCallback;
+    std::function<void (const String& /*name*/, const String& /*category*/, bool /*isPublic*/, const String& /*presetID*/)> presetSaveCallback;
 
 private:
     bool isSaveMode = true;
+    String presetID {};
 
     LabelWithCentredEditor nameLabel, categoryLabel;
     ToggleButton publicSwitch { "Public" };
