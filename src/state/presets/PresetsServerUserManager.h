@@ -13,7 +13,7 @@ public:
 
     bool getIsLoggedIn() const { return isLoggedIn; }
 
-    void attemptToLogIn (const String& username, const String& password);
+    void attemptToLogIn (const String& username, const String& password, bool failSilently = false);
 
     void createNewUser (const String& username, const String& password);
 

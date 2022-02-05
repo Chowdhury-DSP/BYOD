@@ -26,7 +26,7 @@ PresetsServerUserManager::PresetsServerUserManager()
     Base64::convertFromBase64 (passwordStream, passwordEncoded);
     auto initialPassword = passwordStream.toString();
 
-    attemptToLogIn (initialUsername, initialPassword);
+    attemptToLogIn (initialUsername, initialPassword, true);
 }
 
 PresetsServerUserManager::~PresetsServerUserManager()
@@ -35,7 +35,7 @@ PresetsServerUserManager::~PresetsServerUserManager()
     pluginSettings->setProperty (userTokenSettingID, Base64::toBase64 (password));
 }
 
-void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const String& newPassword)
+void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const String& newPassword, bool failSilently)
 {
     if (! isUsernamePasswordPairValid (newUsername, newPassword))
     {
@@ -56,8 +56,8 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
         return;
     }
     
-    const auto messageString = response.fromLastOccurrenceOf("Message: ", false, false).upToFirstOccurrenceOf("\n", false, false);
-    NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Login attmempt failed!", messageString);
+    if (! failSilently)
+        NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Login attmempt failed!", parseMessageResponse (response));
 }
 
 void PresetsServerUserManager::createNewUser (const String& newUsername, const String& newPassword)
@@ -74,8 +74,7 @@ void PresetsServerUserManager::createNewUser (const String& newUsername, const S
         return;
     }
     
-    const auto messageString = response.fromLastOccurrenceOf("Message: ", false, false).upToFirstOccurrenceOf("\n", false, false);
-    NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Registration attempt failed!", messageString);
+    NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Registration attempt failed!", parseMessageResponse (response));
 }
 
 void PresetsServerUserManager::logOut()

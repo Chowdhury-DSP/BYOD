@@ -56,6 +56,14 @@ void PresetsComp::presetListUpdated()
 
 void PresetsComp::syncServerPresetsToLocal()
 {
+    // user must have selected a preset path before trying to sync server presets
+    if (presetManager.getUserPresetPath() == File())
+    {
+        chooseUserPresetFolder ([&]
+                                { syncServerPresetsToLocal(); });
+        return;
+    }
+
     presetsToUpdate.clear();
     presetManager.syncServerPresetsToLocal (presetsToUpdate);
 
@@ -66,6 +74,12 @@ void PresetsComp::syncServerPresetsToLocal()
 void PresetsComp::updatePresetsToUpdate()
 {
     const auto& userPresetPath = presetManager.getUserPresetPath();
+    if (userPresetPath == File())
+    {
+        jassertfalse;
+        return;
+    }
+
     for (auto& [preset, _] : presetsToUpdate)
         preset.toFile (userPresetPath.getChildFile (preset.getName() + ".chowpreset"));
 

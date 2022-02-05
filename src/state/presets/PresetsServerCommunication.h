@@ -15,4 +15,6 @@ enum class CommType
 juce::String sendServerRequest (CommType type, const juce::String& user, const juce::String& pass);
 juce::String sendAddPresetRequest (const juce::String& user, const juce::String& pass, const juce::String& presetName, const String& presetData);
 
+juce::String parseMessageResponse (const String& messageResponse);
+
 } // namespace PresetsServerCommunication

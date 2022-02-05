@@ -23,7 +23,14 @@ void PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Pr
     const auto& username = userManager->getUsername();
     auto response = sendServerRequest (CommType::get_presets, username, userManager->getPassword());
 
-    auto presetsReturned = response.fromFirstOccurrenceOf ("{", true, false);
+    auto presetsReturned = parseMessageResponse (response);
+    if (! (presetsReturned.containsChar('{') && presetsReturned.containsChar('}')))
+    {
+        NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Presets sync failed!", "Unable to fetch presets from server!");
+        serverPresets.clear();
+        return;
+    }
+    
     try
     {
         chowdsp::json presetsJson = chowdsp::json::parse (presetsReturned.toStdString());
@@ -49,8 +56,8 @@ void PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Pr
     catch (...)
     {
         Logger::writeToLog ("Exception happened while trying to sync server presets!");
-        jassertfalse; // Something bad happened when syncing server presets
-
+        NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Presets sync failed!", {});
+        
         serverPresets.clear();
         return;
     }
