@@ -133,6 +133,7 @@ void Delay::processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType& delay
     }
 
     dryWet.mixWetSamples (block);
+    outputBuffers.getReference (0) = &buffer;
 }
 
 template <typename DelayType>
@@ -204,8 +205,7 @@ void Delay::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLi
     dryWetMixer.mixWetSamples (block);
 
     // tell future processors to use stereo buffer
-    if (numChannels == 1)
-        outputBuffers.getReference (0) = &stereoBuffer;
+    outputBuffers.getReference (0) = &bufferToProcess;
 }
 
 void Delay::processAudio (AudioBuffer<float>& buffer)
@@ -237,6 +237,15 @@ void Delay::processAudio (AudioBuffer<float>& buffer)
         else if (delayTypeIndex == 1)
             processPingPongDelay (buffer, lofiDelayLine);
     }
+}
+
+void Delay::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    cleanDelayLine.reset();
+    lofiDelayLine.reset();
+    stereoBuffer.clear();
+
+    outputBuffers.getReference (0) = &buffer;
 }
 
 void Delay::addToPopupMenu (PopupMenu& menu)

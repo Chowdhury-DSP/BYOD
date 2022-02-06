@@ -181,6 +181,19 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
     outputBuffers.getReference (0) = &processBuffer;
 }
 
+void Chorus::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    for (auto& delaySet : cleanDelay)
+        for (auto& delay : delaySet)
+            delay.reset();
+
+    for (auto& delaySet : lofiDelay)
+        for (auto& delay : delaySet)
+            delay.reset();
+
+    outputBuffers.getReference (0) = &buffer;
+}
+
 void Chorus::addToPopupMenu (PopupMenu& menu)
 {
     menu.addSectionHeader ("Delay Type");
