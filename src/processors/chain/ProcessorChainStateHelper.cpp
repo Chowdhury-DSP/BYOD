@@ -117,8 +117,13 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bo
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
     auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps, bool shouldLoadState = true)
     {
-        if (procXml->getNumChildElements() > 0 && shouldLoadState)
-            newProc->fromXML (procXml->getChildElement (0));
+        if (procXml->getNumChildElements() > 0)
+        {
+            if (shouldLoadState)
+                newProc->fromXML (procXml->getChildElement (0));
+            else // don't load state, only load position
+                newProc->loadPositionInfoFromXML (procXml->getChildElement (0));
+        }
 
         ProcConnectionMap connectionMap;
         for (int portIdx = 0; portIdx < newProc->getNumOutputs(); ++portIdx)
