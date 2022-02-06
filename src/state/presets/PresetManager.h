@@ -3,6 +3,12 @@
 #include "PresetsServerSyncManager.h"
 #include "PresetsServerUserManager.h"
 
+namespace PresetConstants
+{
+const String presetExt = ".chowpreset";
+const String factoryPresetVendor = "CHOW";
+} // namespace PresetConstants
+
 class ProcessorChain;
 class PresetManager : public chowdsp::PresetManager,
                       private PresetsServerUserManager::Listener
@@ -26,6 +32,7 @@ public:
 
     void setUserPresetName (const String& newName) final;
     void saveUserPreset (const String& name, const String& category, bool isPublic, const String& presetID = {});
+    void loadUserPresetsFromFolder (const juce::File& file) final;
 
     void presetLoginStatusChanged() override;
 

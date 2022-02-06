@@ -16,7 +16,6 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
 
     userManager->addListener (this);
 
-    setUserPresetConfigFile (userPresetPath);
     setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
 
     std::vector<chowdsp::Preset> factoryPresets;
@@ -37,6 +36,8 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
     addPresets (factoryPresets);
 
     loadDefaultPreset();
+
+    setUserPresetConfigFile (userPresetPath);
 
 #if JUCE_IOS
     File appDataDir = File::getSpecialLocation (File::userApplicationDataDirectory);
@@ -127,7 +128,7 @@ File PresetManager::getPresetFile (const String& vendor, const String& category,
     return getUserPresetPath()
         .getChildFile (vendor)
         .getChildFile (category)
-        .getChildFile (name + ".chowpreset");
+        .getChildFile (name + PresetConstants::presetExt);
 }
 
 void PresetManager::setUserPresetName (const String& newName)
@@ -155,13 +156,8 @@ void PresetManager::setUserPresetName (const String& newName)
     }
 
     // delete existing presets with this username from the preset map
-    for (auto presetMapIter = presetMap.begin(); presetMapIter != presetMap.end();)
-    {
-        if (presetMapIter->second.getVendor() == actualNewName)
-            presetMapIter = presetMap.erase (presetMapIter);
-        else
-            ++presetMapIter;
-    }
+    sst::cpputils::nodal_erase_if (presetMap, [actualNewName] (const auto& presetPair)
+                                   { return presetPair.second.getVendor() == actualNewName; });
 
     userIDMap[actualNewName] = userUserIDStart;
     userIDMap.erase (userPresetsName);
@@ -189,4 +185,21 @@ void PresetManager::saveUserPreset (const String& name, const String& category, 
 
         loadUserPresetsFromFolder (getUserPresetPath());
     }
+}
+
+void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
+{
+    std::vector<chowdsp::Preset> presets;
+    for (const auto& f : file.findChildFiles (juce::File::findFiles, true, "*" + PresetConstants::presetExt))
+        presets.push_back (loadUserPresetFromFile (f));
+
+    // delete old user presets
+    sst::cpputils::nodal_erase_if (presetMap, [] (const auto& presetPair)
+                                   { return presetPair.second.getVendor() != PresetConstants::factoryPresetVendor; });
+
+    int presetID = userIDMap[userPresetsName];
+    while (presetMap.find (presetID) != presetMap.end())
+        presetMap.erase (presetID++);
+
+    addPresets (presets);
 }

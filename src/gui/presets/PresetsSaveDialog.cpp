@@ -68,7 +68,7 @@ void PresetsSaveDialog::prepareToShow (const chowdsp::Preset* presetToEdit, cons
         if (! isSaveMode && presetFileToDelete != File())
             presetFileToDelete.deleteFile();
 
-        presetSaveCallback (nameText, categoryLabel.getText (true), publicSwitch.getToggleState(), presetID);
+        presetSaveCallback ({ nameText, categoryLabel.getText (true), publicSwitch.getToggleState(), presetID });
         getParentComponent()->setVisible (false);
     };
 }

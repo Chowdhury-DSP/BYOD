@@ -2,6 +2,14 @@
 
 #include "gui/utils/LabelWithCentredEditor.h"
 
+struct PresetSaveInfo
+{
+    const String name;
+    const String category;
+    bool isPublic;
+    const String presetID;
+};
+
 class PresetsSaveDialog : public Component
 {
 public:
@@ -12,7 +20,7 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-    std::function<void (const String& /*name*/, const String& /*category*/, bool /*isPublic*/, const String& /*presetID*/)> presetSaveCallback;
+    std::function<void (const PresetSaveInfo&)> presetSaveCallback;
 
 private:
     bool isSaveMode = true;

@@ -21,6 +21,7 @@ public:
 private:
     void selectedPresetChanged() override;
     void syncServerPresetsToLocal();
+    void savePreset (const PresetSaveInfo& saveInfo);
 
     PresetManager& presetManager;
 
