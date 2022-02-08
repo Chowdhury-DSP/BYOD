@@ -26,7 +26,7 @@ PresetsServerUserManager::PresetsServerUserManager()
     Base64::convertFromBase64 (passwordStream, passwordEncoded);
     auto initialPassword = passwordStream.toString();
 
-    attemptToLogIn (initialUsername, initialPassword);
+    attemptToLogIn (initialUsername, initialPassword, true);
 }
 
 PresetsServerUserManager::~PresetsServerUserManager()
@@ -35,7 +35,7 @@ PresetsServerUserManager::~PresetsServerUserManager()
     pluginSettings->setProperty (userTokenSettingID, Base64::toBase64 (password));
 }
 
-void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const String& newPassword)
+void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const String& newPassword, bool failSilently)
 {
     if (! isUsernamePasswordPairValid (newUsername, newPassword))
     {
@@ -46,8 +46,6 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
     using namespace PresetsServerCommunication;
     auto response = sendServerRequest (CommType::validate_user, newUsername, newPassword);
 
-    // @TODO: show alert message on failure
-
     if (response.contains ("OK"))
     {
         username = newUsername;
@@ -55,7 +53,11 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
         isLoggedIn = true;
 
         listeners.call (&Listener::presetLoginStatusChanged);
+        return;
     }
+    
+    if (! failSilently)
+        NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Login attmempt failed!", parseMessageResponse (response));
 }
 
 void PresetsServerUserManager::createNewUser (const String& newUsername, const String& newPassword)
@@ -66,10 +68,13 @@ void PresetsServerUserManager::createNewUser (const String& newUsername, const S
     using namespace PresetsServerCommunication;
     auto response = sendServerRequest (CommType::register_user, newUsername, newPassword);
 
-    // @TODO: show alert message on failure
-
     if (response.contains ("Successfully added user"))
+    {
         attemptToLogIn (newUsername, newPassword);
+        return;
+    }
+    
+    NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Registration attempt failed!", parseMessageResponse (response));
 }
 
 void PresetsServerUserManager::logOut()

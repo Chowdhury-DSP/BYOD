@@ -1,5 +1,5 @@
 #include "PresetsSaveDialog.h"
-#include "state/presets/PresetManager.h"
+#include "state/presets/PresetInfoHelpers.h"
 
 namespace
 {
@@ -46,12 +46,14 @@ void PresetsSaveDialog::prepareToShow (const chowdsp::Preset* presetToEdit, cons
         nameLabel.setText ("MyPreset", dontSendNotification);
         categoryLabel.setText ("", dontSendNotification);
         publicSwitch.setToggleState (false, dontSendNotification);
+        presetID = {};
     }
     else
     {
         nameLabel.setText (presetToEdit->getName(), dontSendNotification);
         categoryLabel.setText (presetToEdit->getCategory(), dontSendNotification);
-        publicSwitch.setToggleState (presetToEdit->extraInfo.getBoolAttribute (PresetManager::isPublicTag), dontSendNotification);
+        publicSwitch.setToggleState (PresetInfoHelpers::getIsPublic (*presetToEdit), dontSendNotification);
+        presetID = PresetInfoHelpers::getPresetID (*presetToEdit);
     }
 
     okButton.onClick = [&, presetFileToDelete = presetFile]
@@ -66,7 +68,7 @@ void PresetsSaveDialog::prepareToShow (const chowdsp::Preset* presetToEdit, cons
         if (! isSaveMode && presetFileToDelete != File())
             presetFileToDelete.deleteFile();
 
-        presetSaveCallback (nameText, categoryLabel.getText (true), publicSwitch.getToggleState());
+        presetSaveCallback ({ nameText, categoryLabel.getText (true), publicSwitch.getToggleState(), presetID });
         getParentComponent()->setVisible (false);
     };
 }

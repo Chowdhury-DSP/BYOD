@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="John Mayer" plugin="BYOD" vendor="CHOW" category="Players" version="0.2.0">
+  <proc_chain>
+    <Compressor>
+      <Parameters x_pos="0.1845559775829315" y_pos="0.02547770738601685">
+        <PARAM id="attack" value="10.0"/>
+        <PARAM id="knee" value="6.0"/>
+        <PARAM id="makeup" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ratio" value="1.5"/>
+        <PARAM id="release" value="99.99999237060547"/>
+        <PARAM id="thresh" value="-9.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Compressor>
+    <Tremolo>
+      <Parameters x_pos="0.4486486613750458" y_pos="0.0270700640976429">
+        <PARAM id="depth" value="0.1500000059604645"/>
+        <PARAM id="on_off" value="0.0"/>
+        <PARAM id="rate" value="15.0"/>
+        <PARAM id="wave" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Tremolo>
+    <Centaur>
+      <Parameters x_pos="0.00231660227291286" y_pos="0.3885350227355957">
+        <PARAM id="gain" value="0.2000000029802322"/>
+        <PARAM id="level" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="5" connection_end_0="0"/>
+    </Centaur>
+    <Spring_Reverb>
+      <Parameters x_pos="0.7552123665809631" y_pos="0.5859872698783875">
+        <PARAM id="chaos" value="0.25"/>
+        <PARAM id="damping" value="0.5"/>
+        <PARAM id="decay" value="0.3499999940395355"/>
+        <PARAM id="mix" value="0.1800000071525574"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="reflect" value="0.5"/>
+        <PARAM id="shake" value="0.0"/>
+        <PARAM id="size" value="0.25"/>
+        <PARAM id="spin" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Spring_Reverb>
+    <Envelope_Filter>
+      <Parameters x_pos="0.5081080794334412" y_pos="0.5859872698783875">
+        <PARAM id="direct_control" value="0.0"/>
+        <PARAM id="filter_type" value="0.0"/>
+        <PARAM id="freq" value="350.0"/>
+        <PARAM id="freq_mod" value="0.0"/>
+        <PARAM id="on_off" value="0.0"/>
+        <PARAM id="res" value="0.5"/>
+        <PARAM id="sense" value="0.800000011920929"/>
+        <PARAM id="speed" value="0.8500000238418579"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Envelope_Filter>
+    <Bassman_Tone>
+      <Parameters x_pos="0.2555984556674957" y_pos="0.3949044644832611">
+        <PARAM id="bass" value="0.699999988079071"/>
+        <PARAM id="mid" value="0.4020810425281525"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.8999999761581421"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Bassman_Tone>
+    <Input>
+      <Parameters x_pos="0.003154574194923043" y_pos="0.01605839468538761">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.869498074054718" y_pos="0.1449044644832611">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>

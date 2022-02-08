@@ -62,6 +62,7 @@ public:
     // state save/load methods
     virtual std::unique_ptr<XmlElement> toXML();
     virtual void fromXML (XmlElement* xml);
+    void loadPositionInfoFromXML (XmlElement* xml);
 
     // interface for processor editors
     AudioProcessorValueTreeState& getVTS() { return vts; }
