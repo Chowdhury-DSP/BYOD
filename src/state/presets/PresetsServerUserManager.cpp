@@ -55,9 +55,9 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
         listeners.call (&Listener::presetLoginStatusChanged);
         return;
     }
-    
+
     if (! failSilently)
-        NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Login attmempt failed!", parseMessageResponse (response));
+        NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attmempt failed!", parseMessageResponse (response));
 }
 
 void PresetsServerUserManager::createNewUser (const String& newUsername, const String& newPassword)
@@ -73,8 +73,8 @@ void PresetsServerUserManager::createNewUser (const String& newUsername, const S
         attemptToLogIn (newUsername, newPassword);
         return;
     }
-    
-    NativeMessageBox::showOkCancelBox(MessageBoxIconType::WarningIcon, "Registration attempt failed!", parseMessageResponse (response));
+
+    NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Registration attempt failed!", parseMessageResponse (response));
 }
 
 void PresetsServerUserManager::logOut()
