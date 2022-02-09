@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Centaur" plugin="BYOD" vendor="CHOW" category="Pedals" version="0.2.0">
+<Preset name="Centaur" plugin="BYOD" vendor="CHOW" category="Pedals" version="0.3.0">
   <proc_chain>
     <Centaur>
       <Parameters x_pos="0.2083704322576523" y_pos="0.2785571217536926">

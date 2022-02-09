@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="J Mascis" plugin="BYOD" vendor="CHOW" category="Players"
-        version="0.2.0">
+        version="0.3.0">
   <proc_chain>
     <Range_Booster>
       <Parameters x_pos="0.1380126178264618" y_pos="0.01605839468538761">

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="Tube Screamer" plugin="BYOD" vendor="CHOW" category="Pedals"
-        version="0.2.0">
+        version="0.3.0">
   <proc_chain>
     <Tube_Screamer>
       <Parameters x_pos="0.2334384918212891" y_pos="0.2788321077823639">

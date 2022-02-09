@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Neil Young" plugin="BYOD" vendor="CHOW" category="Players" version="0.2.0">
+<Preset name="Neil Young" plugin="BYOD" vendor="CHOW" category="Players" version="0.3.0">
   <proc_chain>
     <Delay>
       <Parameters x_pos="0.1937799006700516" y_pos="0.5142349004745483">

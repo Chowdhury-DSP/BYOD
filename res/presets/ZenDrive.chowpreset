@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="ZenDrive" plugin="BYOD" vendor="CHOW" category="Pedals" version="0.2.0">
+<Preset name="ZenDrive" plugin="BYOD" vendor="CHOW" category="Pedals" version="0.3.0">
   <proc_chain>
     <Zen_Drive>
       <Parameters x_pos="0.1978022009134293" y_pos="0.2385542094707489">

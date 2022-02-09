@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Nirvana" plugin="BYOD" vendor="CHOW" category="Players" version="0.2.0">
+<Preset name="Nirvana" plugin="BYOD" vendor="CHOW" category="Players" version="0.3.0">
   <proc_chain>
     <MXR_Distortion>
       <Parameters x_pos="0.2272727340459824" y_pos="0.02846975065767765">
