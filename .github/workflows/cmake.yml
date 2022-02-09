@@ -56,4 +56,5 @@ jobs:
       run: bash scripts/validate.sh
 
     - name: Setup debug session
+      if: always()
       uses: mxschmitt/action-tmate@v3
