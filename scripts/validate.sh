@@ -36,7 +36,7 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     declare -a plugins=("build/BYOD_artefacts/VST3/BYOD.vst3")
 else
     pluginval=$(install_pluginval_win)
-    declare -a plugins=("build/BYOD_artefacts/Release/VST3/BYOD.vst3")
+    declare -a plugins=("build/BYOD_artefacts/Debug/VST3/BYOD.vst3")
 fi
 
 echo "Pluginval installed at ${pluginval}"
