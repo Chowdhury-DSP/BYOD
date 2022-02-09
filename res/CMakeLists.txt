@@ -1,7 +1,7 @@
-juce_add_binary_data(BinaryData SOURCES
+set(binary_data_files
     gui.xml
     gui_ios.xml
-    
+
     ui_assets/PowerButton.svg
     ui_assets/info.svg
     ui_assets/swap.svg
@@ -29,11 +29,11 @@ juce_add_binary_data(BinaryData SOURCES
     "lofi_irs/Yamaha 2.wav"
     "lofi_irs/Yamaha 3.wav"
     "lofi_irs/Yamaha 4.wav"
-
-    presets/Centaur.chowpreset
-    presets/Default.chowpreset
-    presets/ZenDrive.chowpreset
 )
+
+file(GLOB PRESET_FILES presets/*.chowpreset)
+list(APPEND binary_data_files ${PRESET_FILES})
+juce_add_binary_data(BinaryData SOURCES ${binary_data_files})
 
 # Need to build BinaryData with -fPIC flag on Linux
 set_target_properties(BinaryData PROPERTIES

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="The Strokes" plugin="BYOD" vendor="CHOW" category="Players" version="0.3.0">
+  <proc_chain>
+    <Tube_Screamer>
+      <Parameters x_pos="0.02232854813337326" y_pos="0.4786476790904999">
+        <PARAM id="diode" value="1.0"/>
+        <PARAM id="gain" value="0.25"/>
+        <PARAM id="num_diodes" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Tube_Screamer>
+    <TS-Tone>
+      <Parameters x_pos="0.3149920403957367" y_pos="0.4661921560764313">
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.800000011920929"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </TS-Tone>
+    <Centaur>
+      <Parameters x_pos="0.1411483287811279" y_pos="0.01423487532883883">
+        <PARAM id="gain" value="0.25"/>
+        <PARAM id="level" value="0.699999988079071"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Centaur>
+    <Baxandall_EQ>
+      <Parameters x_pos="0.5917065143585205" y_pos="0.4626334607601166">
+        <PARAM id="bass" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.1000000014901161"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Baxandall_EQ>
+    <Bass_Cleaner>
+      <Parameters x_pos="0.4082934558391571" y_pos="0.01245551556348801">
+        <PARAM id="clean" value="0.3499999940395355"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Bass_Cleaner>
+    <Input>
+      <Parameters x_pos="0.003154574194923043" y_pos="0.01605839468538761">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.869498074054718" y_pos="0.1449044644832611">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>

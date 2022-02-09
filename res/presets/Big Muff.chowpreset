@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Big Muff" plugin="BYOD" vendor="CHOW" category="Pedals"
+        version="0.3.0">
+  <proc_chain>
+    <Big_Muff_Drive>
+      <Parameters x_pos="0.287066251039505" y_pos="0.2189781069755554">
+        <PARAM id="harmonics" value="0.6499999761581421"/>
+        <PARAM id="level" value="0.6499999761581421"/>
+        <PARAM id="n_stages" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="sustain" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Big_Muff_Drive>
+    <Big_Muff_Tone>
+      <Parameters x_pos="0.5686119794845581" y_pos="0.3167883157730103">
+        <PARAM id="mids" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+        <PARAM id="type" value="2.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Big_Muff_Tone>
+    <Bass_Cleaner>
+      <Parameters x_pos="0.1569400578737259" y_pos="0.5532846450805664">
+        <PARAM id="clean" value="0.25"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Bass_Cleaner>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.2845849692821503">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8817034959793091" y_pos="0.2846715450286865">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>

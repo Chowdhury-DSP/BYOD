@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment target")
-project(BYOD VERSION 0.2.0)
+project(BYOD VERSION 0.3.0)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_STANDARD 17)
@@ -31,6 +31,12 @@ if(TARGET juce_vst2_sdk)
     list(APPEND JUCE_FORMATS VST)
 endif()
 
+option(BYOD_USE_LOCAL_PRESET_SERVER "Set build flag to use local preset server" OFF)
+if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)
+    message(STATUS "Configuring for testing with local preset server")
+    include (modules/cmake/AppleLocalNetworkPlist.cmake)
+endif()
+
 juce_add_plugin(BYOD
     COMPANY_NAME chowdsp
     PLUGIN_MANUFACTURER_CODE Chow
@@ -46,6 +52,9 @@ juce_add_plugin(BYOD
     REQUIRES_FULL_SCREEN TRUE
     IPHONE_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
     IPAD_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
+
+    # Apple won't let you use local network unless...
+    PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST}
 )
 
 juce_generate_juce_header(BYOD)
@@ -64,6 +73,10 @@ target_compile_definitions(BYOD PUBLIC
     BYOD_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
     BYOD_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
 )
+
+if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)
+    target_compile_definitions(BYOD PRIVATE BYOD_USE_LOCAL_PRESET_SERVER=1)
+endif()
 
 target_link_libraries(BYOD PRIVATE juce_plugin_modules)
 

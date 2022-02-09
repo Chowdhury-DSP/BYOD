@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Nirvana" plugin="BYOD" vendor="CHOW" category="Players" version="0.3.0">
+  <proc_chain>
+    <MXR_Distortion>
+      <Parameters x_pos="0.2272727340459824" y_pos="0.02846975065767765">
+        <PARAM id="dist" value="0.300000011920929"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </MXR_Distortion>
+    <Big_Muff_Drive>
+      <Parameters x_pos="0.2153110057115555" y_pos="0.4644128084182739">
+        <PARAM id="harmonics" value="0.449999988079071"/>
+        <PARAM id="level" value="0.6499999761581421"/>
+        <PARAM id="n_stages" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="sustain" value="0.6000000238418579"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Big_Muff_Drive>
+    <Big_Muff_Tone>
+      <Parameters x_pos="0.5063796043395996" y_pos="0.4661921560764313">
+        <PARAM id="mids" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+        <PARAM id="type" value="6.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Big_Muff_Tone>
+    <Chorus>
+      <Parameters x_pos="0.5861244201660156" y_pos="0.05338078364729881">
+        <PARAM id="delay_type" value="1.0"/>
+        <PARAM id="depth" value="0.25"/>
+        <PARAM id="feedback" value="0.3499999940395355"/>
+        <PARAM id="mix" value="0.25"/>
+        <PARAM id="on_off" value="0.0"/>
+        <PARAM id="rate" value="0.25"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Chorus>
+    <Input>
+      <Parameters x_pos="0.0007974481559358537" y_pos="0.2722419798374176">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.880382776260376" y_pos="0.2704626321792603">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>

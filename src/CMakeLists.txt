@@ -24,6 +24,7 @@ target_sources(BYOD PRIVATE
     gui/utils/SettingsButton.cpp
 
     state/ParamForwardManager.cpp
+    state/presets/PresetInfoHelpers.cpp
     state/presets/PresetManager.cpp
     state/presets/PresetsServerSyncManager.cpp
     state/presets/PresetsServerUserManager.cpp

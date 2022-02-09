@@ -15,33 +15,8 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
     syncWindow.getViewComponent().runUpdateCallback = [&]
     { updatePresetsToUpdate(); };
 
-    saveWindow.getViewComponent().presetSaveCallback = [&] (const String& name, const String& category, bool isPublic)
-    {
-        auto savePresetLambda = [this, name, category, isPublic]
-        {
-            if (presetManager.getPresetFile (presetManager.getUserPresetName(), category, name).existsAsFile())
-            {
-                const String warningBoxTitle = "Preset Save Warning!";
-                const String warningBoxMessage = "You are about to overwrite an existing preset! Are you sure you want to continue?";
-                if (NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, warningBoxTitle, warningBoxMessage) == 0)
-                    return;
-            }
-
-            presetManager.saveUserPreset (name, category, isPublic);
-        };
-
-        auto presetPath = manager.getUserPresetPath();
-        if (presetPath == juce::File() || ! presetPath.isDirectory())
-        {
-            presetPath.deleteRecursively();
-            chooseUserPresetFolder ([&]
-                                    { savePresetLambda(); });
-        }
-        else
-        {
-            savePresetLambda();
-        }
-    };
+    saveWindow.getViewComponent().presetSaveCallback = [&] (const PresetSaveInfo& saveInfo)
+    { savePreset (saveInfo); };
 }
 
 void PresetsComp::presetListUpdated()
@@ -56,6 +31,14 @@ void PresetsComp::presetListUpdated()
 
 void PresetsComp::syncServerPresetsToLocal()
 {
+    // user must have selected a preset path before trying to sync server presets
+    if (presetManager.getUserPresetPath() == File())
+    {
+        chooseUserPresetFolder ([&]
+                                { syncServerPresetsToLocal(); });
+        return;
+    }
+
     presetsToUpdate.clear();
     presetManager.syncServerPresetsToLocal (presetsToUpdate);
 
@@ -63,11 +46,45 @@ void PresetsComp::syncServerPresetsToLocal()
     syncWindow.show();
 }
 
+void PresetsComp::savePreset (const PresetSaveInfo& saveInfo)
+{
+    auto savePresetLambda = [] (PresetManager& presetMgr, const PresetSaveInfo& sInfo)
+    {
+        if (presetMgr.getPresetFile (presetMgr.getUserPresetName(), sInfo.category, sInfo.name).existsAsFile())
+        {
+            const String warningBoxTitle = "Preset Save Warning!";
+            const String warningBoxMessage = "You are about to overwrite an existing preset! Are you sure you want to continue?";
+            if (NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, warningBoxTitle, warningBoxMessage) == 0)
+                return;
+        }
+
+        presetMgr.saveUserPreset (sInfo.name, sInfo.category, sInfo.isPublic, sInfo.presetID);
+    };
+
+    auto presetPath = manager.getUserPresetPath();
+    if (presetPath == juce::File() || ! presetPath.isDirectory())
+    {
+        presetPath.deleteRecursively();
+        chooseUserPresetFolder ([&, saveInfo = saveInfo]
+                                { savePresetLambda (presetManager, saveInfo); });
+    }
+    else
+    {
+        savePresetLambda (presetManager, saveInfo);
+    }
+}
+
 void PresetsComp::updatePresetsToUpdate()
 {
     const auto& userPresetPath = presetManager.getUserPresetPath();
+    if (userPresetPath == File())
+    {
+        jassertfalse;
+        return;
+    }
+
     for (auto& [preset, _] : presetsToUpdate)
-        preset.toFile (userPresetPath.getChildFile (preset.getName() + ".chowpreset"));
+        preset.toFile (userPresetPath.getChildFile (preset.getName() + PresetConstants::presetExt));
 
     presetManager.loadUserPresetsFromFolder (userPresetPath);
 }

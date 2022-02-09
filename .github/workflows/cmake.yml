@@ -52,5 +52,9 @@ jobs:
       run: build/BYOD --unit-tests --all
 
     - name: Validate
-      if: runner.os == 'Windows' || runner.os == 'MacOS'
+      if: runner.os == 'MacOS'
       run: bash scripts/validate.sh
+
+#    - name: Setup debug session
+#      if: always()
+#      uses: mxschmitt/action-tmate@v3

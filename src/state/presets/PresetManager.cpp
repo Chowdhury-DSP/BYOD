@@ -1,4 +1,5 @@
 #include "PresetManager.h"
+#include "PresetInfoHelpers.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
 
 namespace
@@ -15,15 +16,40 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
 
     userManager->addListener (this);
 
-    setUserPresetConfigFile (userPresetPath);
     setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
 
     std::vector<chowdsp::Preset> factoryPresets;
-    factoryPresets.emplace_back (BinaryData::ZenDrive_chowpreset, BinaryData::ZenDrive_chowpresetSize);
+    // pedals
+    factoryPresets.emplace_back (BinaryData::Big_Muff_chowpreset, BinaryData::Big_Muff_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Centaur_chowpreset, BinaryData::Centaur_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::ZenDrive_chowpreset, BinaryData::ZenDrive_chowpresetSize);
+
+    // players
+    factoryPresets.emplace_back (BinaryData::J_Mascis_chowpreset, BinaryData::J_Mascis_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::John_Mayer_chowpreset, BinaryData::John_Mayer_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Neil_Young_chowpreset, BinaryData::Neil_Young_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Nirvana_chowpreset, BinaryData::Nirvana_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::The_Strokes_chowpreset, BinaryData::The_Strokes_chowpresetSize);
+
     addPresets (factoryPresets);
 
     loadDefaultPreset();
+
+    setUserPresetConfigFile (userPresetPath);
+
+#if JUCE_IOS
+    File appDataDir = File::getSpecialLocation (File::userApplicationDataDirectory);
+    auto userPresetFolder = appDataDir.getChildFile (userPresetPath).getSiblingFile ("Presets");
+    if (! userPresetFolder.isDirectory())
+    {
+        userPresetFolder.deleteFile();
+        userPresetFolder.createDirectory();
+    }
+
+    setUserPresetPath (userPresetFolder);
+#endif // JUCE_IOS
 }
 
 PresetManager::~PresetManager()
@@ -36,9 +62,34 @@ void PresetManager::presetLoginStatusChanged()
     setUserPresetName (userManager->getUsername());
 }
 
-void PresetManager::syncLocalPresetsToServer() const
+void PresetManager::syncLocalPresetsToServer()
 {
-    syncManager->syncLocalPresetsToServer (getUserPresets());
+    std::vector<PresetsServerSyncManager::AddedPresetInfo> addedPresetInfo;
+    syncManager->syncLocalPresetsToServer (getUserPresets(), addedPresetInfo);
+
+    if (addedPresetInfo.empty()) // no presets need new presetIDs!
+        return;
+
+    // update preset IDs of newly added presets
+    std::vector<const chowdsp::Preset*> presetsNeedingPrsetIDUpdate;
+    for (const auto& [constPreset, newPresetID] : addedPresetInfo)
+    {
+        for (auto& [_, preset] : presetMap)
+        {
+            if (preset == *constPreset)
+            {
+                PresetInfoHelpers::setPresetID (preset, newPresetID);
+                presetsNeedingPrsetIDUpdate.push_back (&preset);
+                preset.toFile (getPresetFile (preset));
+                break;
+            }
+        }
+    }
+
+    // sync new preset IDs to server
+    addedPresetInfo.clear();
+    syncManager->syncLocalPresetsToServer (presetsNeedingPrsetIDUpdate, addedPresetInfo);
+    jassert (addedPresetInfo.empty());
 }
 
 void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)
@@ -87,7 +138,7 @@ File PresetManager::getPresetFile (const String& vendor, const String& category,
     return getUserPresetPath()
         .getChildFile (vendor)
         .getChildFile (category)
-        .getChildFile (name + ".chowpreset");
+        .getChildFile (name + PresetConstants::presetExt);
 }
 
 void PresetManager::setUserPresetName (const String& newName)
@@ -114,6 +165,10 @@ void PresetManager::setUserPresetName (const String& newName)
         }
     }
 
+    // delete existing presets with this username from the preset map
+    sst::cpputils::nodal_erase_if (presetMap, [actualNewName] (const auto& presetPair)
+                                   { return presetPair.second.getVendor() == actualNewName; });
+
     userIDMap[actualNewName] = userUserIDStart;
     userIDMap.erase (userPresetsName);
 
@@ -123,15 +178,18 @@ void PresetManager::setUserPresetName (const String& newName)
     loadUserPresetsFromFolder (getUserPresetPath());
 }
 
-void PresetManager::saveUserPreset (const String& name, const String& category, bool isPublic)
+void PresetManager::saveUserPreset (const String& name, const String& category, bool isPublic, const String& presetID)
 {
     Logger::writeToLog ("Saving user preset, name: \"" + name + "\", category: \"" + category + "\"");
 
     auto stateXml = savePresetState();
     keepAlivePreset = std::make_unique<chowdsp::Preset> (name, getUserPresetName(), *stateXml, category);
-    keepAlivePreset->extraInfo.setAttribute (isPublicTag, isPublic);
     if (keepAlivePreset != nullptr)
     {
+        PresetInfoHelpers::setIsPublic (*keepAlivePreset, isPublic);
+        if (presetID.isNotEmpty())
+            PresetInfoHelpers::setPresetID (*keepAlivePreset, presetID);
+
         keepAlivePreset->toFile (getPresetFile (*keepAlivePreset));
         loadPreset (*keepAlivePreset);
 
@@ -139,4 +197,19 @@ void PresetManager::saveUserPreset (const String& name, const String& category, 
     }
 }
 
-const Identifier PresetManager::isPublicTag { "is_public" };
+void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
+{
+    std::vector<chowdsp::Preset> presets;
+    for (const auto& f : file.findChildFiles (juce::File::findFiles, true, "*" + PresetConstants::presetExt))
+        presets.push_back (loadUserPresetFromFile (f));
+
+    // delete old user presets
+    sst::cpputils::nodal_erase_if (presetMap, [] (const auto& presetPair)
+                                   { return presetPair.second.getVendor() != PresetConstants::factoryPresetVendor; });
+
+    int presetID = userIDMap[userPresetsName];
+    while (presetMap.find (presetID) != presetMap.end())
+        presetMap.erase (presetID++);
+
+    addPresets (presets);
+}

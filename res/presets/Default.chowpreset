@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Default" plugin="BYOD" vendor="CHOW" category="" version="0.2.0">
+<Preset name="Default" plugin="BYOD" vendor="CHOW" category="" version="0.3.0">
   <proc_chain>
     <Input>
       <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">

@@ -106,17 +106,27 @@ std::unique_ptr<XmlElement> BaseProcessor::toXML()
 
 void BaseProcessor::fromXML (XmlElement* xml)
 {
-    if (xml != nullptr)
-    {
-        if (xml->hasTagName (vts.state.getType()))
-        {
-            vts.state = ValueTree::fromXml (*xml); // don't use `replaceState()` otherwise UndoManager will clear
+    if (xml == nullptr)
+        return;
 
-            auto xPos = (float) xml->getDoubleAttribute ("x_pos");
-            auto yPos = (float) xml->getDoubleAttribute ("y_pos");
-            editorPosition = Point { xPos, yPos };
-        }
-    }
+    if (! xml->hasTagName (vts.state.getType()))
+        return;
+
+    vts.state = ValueTree::fromXml (*xml); // don't use `replaceState()` otherwise UndoManager will clear
+    loadPositionInfoFromXML (xml);
+}
+
+void BaseProcessor::loadPositionInfoFromXML (XmlElement* xml)
+{
+    if (xml == nullptr)
+        return;
+
+    if (! xml->hasTagName (vts.state.getType()))
+        return;
+
+    auto xPos = (float) xml->getDoubleAttribute ("x_pos");
+    auto yPos = (float) xml->getDoubleAttribute ("y_pos");
+    editorPosition = Point { xPos, yPos };
 }
 
 void BaseProcessor::addConnection (ConnectionInfo&& info)

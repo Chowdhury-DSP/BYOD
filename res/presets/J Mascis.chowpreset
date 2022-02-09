@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="J Mascis" plugin="BYOD" vendor="CHOW" category="Players"
+        version="0.3.0">
+  <proc_chain>
+    <Range_Booster>
+      <Parameters x_pos="0.1380126178264618" y_pos="0.01605839468538761">
+        <PARAM id="boost" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="range" value="2600.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Range_Booster>
+    <Big_Muff_Drive>
+      <Parameters x_pos="0.03943217545747757" y_pos="0.3722627758979797">
+        <PARAM id="harmonics" value="0.6499999761581421"/>
+        <PARAM id="level" value="0.6499999761581421"/>
+        <PARAM id="n_stages" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="sustain" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Big_Muff_Drive>
+    <Big_Muff_Tone>
+      <Parameters x_pos="0.3004731833934784" y_pos="0.3664233684539795">
+        <PARAM id="mids" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.6000000238418579"/>
+        <PARAM id="type" value="2.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Big_Muff_Tone>
+    <Tube_Screamer>
+      <Parameters x_pos="0.4408517479896545" y_pos="0.01751824840903282">
+        <PARAM id="diode" value="2.0"/>
+        <PARAM id="gain" value="0.8500000238418579"/>
+        <PARAM id="num_diodes" value="2.25"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Tube_Screamer>
+    <TS-Tone>
+      <Parameters x_pos="0.7003154754638672" y_pos="0.01605839468538761">
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.6499999761581421"/>
+      </Parameters>
+      <port_0 connection_0="5" connection_end_0="0"/>
+    </TS-Tone>
+    <Delay>
+      <Parameters x_pos="0.5993691086769104" y_pos="0.4145985543727875">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="feedback" value="0.6499999761581421"/>
+        <PARAM id="freq" value="7000.0"/>
+        <PARAM id="mix" value="0.383456289768219"/>
+        <PARAM id="on_off" value="0.0"/>
+        <PARAM id="ping_pong" value="0.0"/>
+        <PARAM id="time_ms" value="330.0000305175781"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Delay>
+    <Input>
+      <Parameters x_pos="0.003154574194923043" y_pos="0.01605839468538761">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.874605655670166" y_pos="0.6802919507026672">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>
