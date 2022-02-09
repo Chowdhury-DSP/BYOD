@@ -45,7 +45,7 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --parallel 4
+      run: cmake --build build --config Release --parallel 4
 
     - name: Unit Tests
       if: runner.os == 'Linux'
@@ -55,6 +55,6 @@ jobs:
       if: runner.os == 'Windows' || runner.os == 'MacOS'
       run: bash scripts/validate.sh
 
-    - name: Setup debug session
-      if: always()
-      uses: mxschmitt/action-tmate@v3
+#    - name: Setup debug session
+#      if: always()
+#      uses: mxschmitt/action-tmate@v3
