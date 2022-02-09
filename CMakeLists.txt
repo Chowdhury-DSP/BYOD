@@ -32,10 +32,9 @@ if(TARGET juce_vst2_sdk)
 endif()
 
 option(BYOD_USE_LOCAL_PRESET_SERVER "Set build flag to use local preset server" OFF)
-if (IOS OR BYOD_USE_LOCAL_PRESET_SERVER)
+if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)
     message(STATUS "Configuring for testing with local preset server")
     include (modules/cmake/AppleLocalNetworkPlist.cmake)
-    target_compile_definitions(BYOD PRIVATE BYOD_USE_LOCAL_PRESET_SERVER=1)
 endif()
 
 juce_add_plugin(BYOD
@@ -74,6 +73,10 @@ target_compile_definitions(BYOD PUBLIC
     BYOD_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
     BYOD_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
 )
+
+if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)
+    target_compile_definitions(BYOD PRIVATE BYOD_USE_LOCAL_PRESET_SERVER=1)
+endif()
 
 target_link_libraries(BYOD PRIVATE juce_plugin_modules)
 
