@@ -2,8 +2,11 @@
 
 namespace PresetsServerCommunication
 {
-//const juce::URL presetServerURL = juce::URL ("https://preset-sharing-server-f4gzy6tzkq-uc.a.run.app");
+#if BYOD_USE_LOCAL_PRESET_SERVER
 const juce::URL presetServerURL = juce::URL ("http://localhost:8080");
+#else
+const juce::URL presetServerURL = juce::URL ("https://preset-sharing-server-f4gzy6tzkq-uc.a.run.app");
+#endif
 
 String makeMessageString (const String& message)
 {
