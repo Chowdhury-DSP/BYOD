@@ -67,19 +67,29 @@ void PresetManager::syncLocalPresetsToServer()
     std::vector<PresetsServerSyncManager::AddedPresetInfo> addedPresetInfo;
     syncManager->syncLocalPresetsToServer (getUserPresets(), addedPresetInfo);
 
-    // update preset ID's of newly added presets
-    for (auto [constPreset, newPresetID] : addedPresetInfo)
+    if (addedPresetInfo.empty()) // no presets need new presetIDs!
+        return;
+
+    // update preset IDs of newly added presets
+    std::vector<const chowdsp::Preset*> presetsNeedingPrsetIDUpdate;
+    for (const auto& [constPreset, newPresetID] : addedPresetInfo)
     {
         for (auto& [_, preset] : presetMap)
         {
             if (preset == *constPreset)
             {
                 PresetInfoHelpers::setPresetID (preset, newPresetID);
+                presetsNeedingPrsetIDUpdate.push_back (&preset);
                 preset.toFile (getPresetFile (preset));
                 break;
             }
         }
     }
+
+    // sync new preset IDs to server
+    addedPresetInfo.clear();
+    syncManager->syncLocalPresetsToServer (presetsNeedingPrsetIDUpdate, addedPresetInfo);
+    jassert (addedPresetInfo.empty());
 }
 
 void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)

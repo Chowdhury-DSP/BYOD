@@ -51,6 +51,13 @@ void PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Pr
     auto response = sendServerRequest (CommType::get_presets, username, userManager->getPassword());
 
     auto presetsReturned = parseMessageResponse (response);
+    if (presetsReturned == "null")
+    {
+        NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Presets sync failed!", "No presets for this user exist on the server!");
+        serverPresets.clear();
+        return;
+    }
+
     if (! (presetsReturned.containsChar ('{') && presetsReturned.containsChar ('}')))
     {
         NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Presets sync failed!", "Unable to fetch presets from server!");
