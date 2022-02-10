@@ -22,7 +22,7 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
     pluginSettings->initialise (settingsFilePath);
 
     procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager, [&] (int l)
-                                              { setLatencySamples (l); });
+                                              { updateSampleLatency (l); });
     paramForwarder = std::make_unique<ParamForwardManager> (vts, *procs);
 
     presetManager = std::make_unique<PresetManager> (procs.get(), vts);
@@ -39,6 +39,9 @@ void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
 
     procs->prepare (sampleRate, samplesPerBlock);
     loadMeasurer.reset (sampleRate, samplesPerBlock);
+
+    bypassDelay.prepare ({ sampleRate, (uint32) samplesPerBlock, 2 });
+    bypassScratchBuffer.setSize (2, samplesPerBlock);
 }
 
 void BYOD::releaseResources()
@@ -49,7 +52,31 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
     AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
+    // push samples into bypass delay
+    bypassScratchBuffer.makeCopyOf (buffer);
+    processBypassDelay (bypassScratchBuffer);
+
+    // real processing here!
     procs->processAudio (buffer);
+}
+
+void BYOD::processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer&)
+{
+    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
+
+    processBypassDelay (buffer);
+}
+
+void BYOD::processBypassDelay (AudioBuffer<float>& buffer)
+{
+    auto&& block = dsp::AudioBlock<float> { buffer };
+    bypassDelay.process (dsp::ProcessContextReplacing<float> { block });
+}
+
+void BYOD::updateSampleLatency (int latencySamples)
+{
+    setLatencySamples (latencySamples);
+    bypassDelay.setDelay ((float) latencySamples);
 }
 
 AudioProcessorEditor* BYOD::createEditor()
