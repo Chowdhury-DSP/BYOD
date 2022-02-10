@@ -13,6 +13,7 @@ public:
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
     void processAudioBlock (AudioBuffer<float>& buffer) override;
+    void processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 
     AudioProcessorEditor* createEditor() override;
 
@@ -26,6 +27,9 @@ public:
     auto& getOpenGLHelper() { return openGLHelper; }
 
 private:
+    void processBypassDelay (AudioBuffer<float>& buffer);
+    void updateSampleLatency (int latencySamples);
+
     chowdsp::PluginLogger logger;
     chowdsp::SharedPluginSettings pluginSettings;
     [[maybe_unused]] chowdsp::SharedLNFAllocator lnfAllocator; // keep alive!
@@ -33,6 +37,9 @@ private:
     ProcessorStore procStore;
     std::unique_ptr<ProcessorChain> procs;
     [[maybe_unused]] std::unique_ptr<ParamForwardManager> paramForwarder;
+
+    AudioBuffer<float> bypassScratchBuffer;
+    chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::None> bypassDelay;
 
     UndoManager undoManager { 500000 };
 
