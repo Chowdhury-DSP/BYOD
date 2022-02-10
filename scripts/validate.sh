@@ -49,7 +49,14 @@ for plugin in "${plugins[@]}"; do
       echo "PLUGINVAL SUCCESS"
     else
       echo "PLUGINVAL FAILURE"
-      cat pluginval-logs/*
+
+      elif [[ "$OSTYPE" == "darwin"* ]]; then
+          cat pluginval-logs/*
+      else
+          powershell -Command "get-content pluginval-logs/*"
+      fi
+
+      exit 1
     fi
 done
 
