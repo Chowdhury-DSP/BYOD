@@ -19,14 +19,18 @@ PresetsServerUserManager::PresetsServerUserManager()
     pluginSettings->addProperties ({ { userNameSettingID, String() },
                                      { userTokenSettingID, String() } });
 
-    auto initialUsername = pluginSettings->getProperty<String> (userNameSettingID);
+    jobPool->addJob (
+        [&]
+        {
+            auto initialUsername = pluginSettings->getProperty<String> (userNameSettingID);
 
-    auto passwordEncoded = pluginSettings->getProperty<String> (userTokenSettingID);
-    MemoryOutputStream passwordStream;
-    Base64::convertFromBase64 (passwordStream, passwordEncoded);
-    auto initialPassword = passwordStream.toString();
+            auto passwordEncoded = pluginSettings->getProperty<String> (userTokenSettingID);
+            MemoryOutputStream passwordStream;
+            Base64::convertFromBase64 (passwordStream, passwordEncoded);
+            auto initialPassword = passwordStream.toString();
 
-    attemptToLogIn (initialUsername, initialPassword, true);
+            attemptToLogIn (initialUsername, initialPassword, true);
+        });
 }
 
 PresetsServerUserManager::~PresetsServerUserManager()
@@ -39,6 +43,9 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
 {
     if (! isUsernamePasswordPairValid (newUsername, newPassword))
     {
+        if (! failSilently)
+            MessageManager::callAsync ([]
+                                       { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attempt failed!", "Invalid username/password combo"); });
         isLoggedIn = false;
         return;
     }
@@ -57,13 +64,18 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
     }
 
     if (! failSilently)
-        NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attmempt failed!", parseMessageResponse (response));
+        MessageManager::callAsync ([responseText = parseMessageResponse (response)]
+                                   { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attempt failed!", responseText); });
 }
 
 void PresetsServerUserManager::createNewUser (const String& newUsername, const String& newPassword)
 {
     if (! isUsernamePasswordPairValid (newUsername, newPassword))
+    {
+        MessageManager::callAsync ([]
+                                   { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attempt failed!", "Invalid username/password combo"); });
         return;
+    }
 
     using namespace PresetsServerCommunication;
     auto response = sendServerRequest (CommType::register_user, newUsername, newPassword);
@@ -74,7 +86,8 @@ void PresetsServerUserManager::createNewUser (const String& newUsername, const S
         return;
     }
 
-    NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Registration attempt failed!", parseMessageResponse (response));
+    MessageManager::callAsync ([responseText = parseMessageResponse (response)]
+                               { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attempt failed!", responseText); });
 }
 
 void PresetsServerUserManager::logOut()

@@ -32,29 +32,46 @@ PresetsLoginDialog::PresetsLoginDialog()
     setupButton (registerButton);
 
     loginButton.onClick = [&]
-    {
-        userManager->attemptToLogIn (username.getText(), password.getText());
-        if (userManager->getIsLoggedIn())
-        {
-            getParentComponent()->setVisible (false);
-            loginChangeCallback();
-        }
-    };
+    { doRegisterLoginAction(); };
 
     cancelButton.onClick = [&]
     { getParentComponent()->setVisible (false); };
 
     registerButton.onClick = [&]
-    {
-        userManager->createNewUser (username.getText(), password.getText());
-        if (userManager->getIsLoggedIn())
-        {
-            getParentComponent()->setVisible (false);
-            loginChangeCallback();
-        }
-    };
+    { doRegisterLoginAction (true); };
+
+    addChildComponent (spinner);
 
     setSize (300, 120);
+}
+
+void PresetsLoginDialog::doRegisterLoginAction (bool registerAction)
+{
+    spinner.setVisible (true);
+    jobPool->addJob (
+        [registerAction, safeComp = Component::SafePointer (this), usernameText = username.getText(), passwordText = password.getText()]
+        {
+            if (registerAction)
+                safeComp->userManager->createNewUser (usernameText, passwordText);
+            else
+                safeComp->userManager->attemptToLogIn (usernameText, passwordText);
+
+            if (safeComp == nullptr) // component was deleted while waiting for job to run...
+                return;
+
+            if (safeComp->userManager->getIsLoggedIn())
+            {
+                safeComp->loginChangeCallback();
+                PresetsServerJobPool::callSafeOnMessageThread (safeComp, [] (auto& c)
+                                                               { c.getParentComponent()->setVisible (false); });
+            }
+
+            PresetsServerJobPool::callSafeOnMessageThread (safeComp,
+                                                           [] (auto& c)
+                                                           {
+                                                               c.spinner.setVisible (false);
+                                                           });
+        });
 }
 
 void PresetsLoginDialog::visibilityChanged()
@@ -66,6 +83,7 @@ void PresetsLoginDialog::visibilityChanged()
 void PresetsLoginDialog::resized()
 {
     auto bounds = getLocalBounds();
+    spinner.setBounds (bounds);
 
     username.setBounds (bounds.removeFromTop (proportionOfHeight (0.33f)).reduced (proportionOfWidth (0.1f), 5));
     password.setBounds (bounds.removeFromTop (proportionOfHeight (0.33f)).reduced (proportionOfWidth (0.1f), 5));

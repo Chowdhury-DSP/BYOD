@@ -12,8 +12,8 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
     loginWindow.getViewComponent().loginChangeCallback = [&]
     { presetListUpdated(); };
 
-    syncWindow.getViewComponent().runUpdateCallback = [&]
-    { updatePresetsToUpdate(); };
+    syncWindow.getViewComponent().runUpdateCallback = [&] (PresetManager::PresetUpdateList& presetUpdateList)
+    { updatePresetsToUpdate (presetUpdateList); };
 
     saveWindow.getViewComponent().presetSaveCallback = [&] (const PresetSaveInfo& saveInfo)
     { savePreset (saveInfo); };
@@ -39,11 +39,18 @@ void PresetsComp::syncServerPresetsToLocal()
         return;
     }
 
-    presetsToUpdate.clear();
-    presetManager.syncServerPresetsToLocal (presetsToUpdate);
+    jobPool->addJob (
+        [safeComp = Component::SafePointer (this)]
+        {
+            safeComp->presetManager.syncServerPresetsToLocal();
 
-    syncWindow.getViewComponent().updatePresetsList (presetsToUpdate);
-    syncWindow.show();
+            PresetsServerJobPool::callSafeOnMessageThread (safeComp,
+                                                           [] (auto& c)
+                                                           {
+                                                               c.syncWindow.getViewComponent().updatePresetsList (c.presetManager.getServerPresetUpdateList());
+                                                               c.syncWindow.show();
+                                                           });
+        });
 }
 
 void PresetsComp::savePreset (const PresetSaveInfo& saveInfo)
@@ -74,7 +81,7 @@ void PresetsComp::savePreset (const PresetSaveInfo& saveInfo)
     }
 }
 
-void PresetsComp::updatePresetsToUpdate()
+void PresetsComp::updatePresetsToUpdate (PresetManager::PresetUpdateList& presetUpdateList)
 {
     const auto& userPresetPath = presetManager.getUserPresetPath();
     if (userPresetPath == File())
@@ -83,8 +90,8 @@ void PresetsComp::updatePresetsToUpdate()
         return;
     }
 
-    for (auto& [preset, _] : presetsToUpdate)
-        preset.toFile (userPresetPath.getChildFile (preset.getName() + PresetConstants::presetExt));
+    for (auto& [preset, _] : presetUpdateList)
+        preset.toFile (presetManager.getPresetFile (preset));
 
     presetManager.loadUserPresetsFromFolder (userPresetPath);
 }

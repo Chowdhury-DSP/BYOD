@@ -9,11 +9,13 @@ public:
 
     using AddedPresetInfo = std::pair<const chowdsp::Preset*, String>;
 
-    void syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*>& presets, std::vector<AddedPresetInfo>& addedPresetInfo);
+    void syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*>& presets,
+                                   std::vector<AddedPresetInfo>& addedPresetInfo,
+                                   const std::function<void (int, int)>& updateProgressCallback);
     void syncServerPresetsToLocal (std::vector<chowdsp::Preset>& serverPresets);
 
 private:
-    SharedResourcePointer<PresetsServerUserManager> userManager;
+    SharedPresetsServerUserManager userManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsServerSyncManager)
 };

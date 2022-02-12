@@ -39,7 +39,7 @@ private:
     [[maybe_unused]] std::unique_ptr<ParamForwardManager> paramForwarder;
 
     AudioBuffer<float> bypassScratchBuffer;
-    chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::None> bypassDelay;
+    chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::None> bypassDelay { 1 << 10 };
 
     UndoManager undoManager { 500000 };
 
