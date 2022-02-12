@@ -1,5 +1,6 @@
 #pragma once
 
+#include "PresetsServerJobPool.h"
 #include "PresetsServerSyncManager.h"
 #include "PresetsServerUserManager.h"
 
@@ -44,6 +45,10 @@ private:
 
     SharedPresetsServerUserManager userManager;
     SharedResourcePointer<PresetsServerSyncManager> syncManager;
+
+    SharedPresetsServerJobPool jobPool;
+    double jobProgress = 0.0;
+    std::unique_ptr<AlertWindow> alertWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };

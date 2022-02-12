@@ -2,12 +2,22 @@
 #include "PresetInfoHelpers.h"
 #include "PresetsServerCommunication.h"
 
-void PresetsServerSyncManager::syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*>& presets, std::vector<AddedPresetInfo>& addedPresetInfo)
+namespace
+{
+const String presetAddedStr = "Added successfully: ";
+const String notConnectedStr = "Unable to connect!";
+} // namespace
+
+void PresetsServerSyncManager::syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*>& presets,
+                                                         std::vector<AddedPresetInfo>& addedPresetInfo,
+                                                         const std::function<void (int, int)>& updateProgressCallback)
 {
     Logger::writeToLog ("Syncing local user presets to server");
 
     using namespace PresetsServerCommunication;
-    for (auto* preset : presets)
+
+    const auto numPresets = (int) presets.size();
+    for (auto [index, preset] : sst::cpputils::enumerate (presets))
     {
         if (preset == nullptr)
         {
@@ -24,21 +34,31 @@ void PresetsServerSyncManager::syncLocalPresetsToServer (const std::vector<const
             PresetInfoHelpers::getPresetID (*preset),
         };
 
+        String response {};
         if (PresetInfoHelpers::getPresetID (*preset).isEmpty())
         {
             // preset doesn't have an ID yet, so we need to add it:
-            auto response = sendAddPresetRequest (presetRequestInfo);
+            response = sendAddPresetRequest (presetRequestInfo);
 
-            const String addedStr = "Added successfully: ";
             response = parseMessageResponse (response);
-            if (response.contains (addedStr))
-                addedPresetInfo.emplace_back (preset, response.fromLastOccurrenceOf (addedStr, false, false));
+            if (response.contains (presetAddedStr))
+                addedPresetInfo.emplace_back (preset, response.fromLastOccurrenceOf (presetAddedStr, false, false));
         }
         else
         {
             // preset has an ID, so we should update it:
-            sendUpdatePresetRequest (presetRequestInfo);
+            response = sendUpdatePresetRequest (presetRequestInfo);
+            response = parseMessageResponse (response);
         }
+
+        if (response.contains (notConnectedStr))
+        {
+            MessageManager::callAsync ([]
+                                       { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Preset Syncing failed!", notConnectedStr); });
+            break;
+        }
+
+        updateProgressCallback ((int) index, numPresets);
     }
 }
 

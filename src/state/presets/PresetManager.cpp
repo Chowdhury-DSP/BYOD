@@ -64,32 +64,64 @@ void PresetManager::presetLoginStatusChanged()
 
 void PresetManager::syncLocalPresetsToServer()
 {
-    std::vector<PresetsServerSyncManager::AddedPresetInfo> addedPresetInfo;
-    syncManager->syncLocalPresetsToServer (getUserPresets(), addedPresetInfo);
+    alertWindow.reset (LookAndFeel::getDefaultLookAndFeel().createAlertWindow ("Syncing Local Presets:", {}, {}, {}, {}, MessageBoxIconType::NoIcon, 0, nullptr));
+    alertWindow->setEscapeKeyCancels (false);
+    alertWindow->addProgressBarComponent (jobProgress);
+    alertWindow->enterModalState();
 
-    if (addedPresetInfo.empty()) // no presets need new presetIDs!
-        return;
-
-    // update preset IDs of newly added presets
-    std::vector<const chowdsp::Preset*> presetsNeedingPrsetIDUpdate;
-    for (const auto& [constPreset, newPresetID] : addedPresetInfo)
-    {
-        for (auto& [_, preset] : presetMap)
+    jobPool->addJob (
+        [&]
         {
-            if (preset == *constPreset)
-            {
-                PresetInfoHelpers::setPresetID (preset, newPresetID);
-                presetsNeedingPrsetIDUpdate.push_back (&preset);
-                preset.toFile (getPresetFile (preset));
-                break;
-            }
-        }
-    }
+            auto updateJobProgress = [&] (int index, int numPresets)
+            { jobProgress = double (index + 1) / (double) numPresets; };
 
-    // sync new preset IDs to server
-    addedPresetInfo.clear();
-    syncManager->syncLocalPresetsToServer (presetsNeedingPrsetIDUpdate, addedPresetInfo);
-    jassert (addedPresetInfo.empty());
+            auto startNewJobSection = [&] (const String& message)
+            {
+                MessageManager::callAsync ([&, message]
+                                           { alertWindow->setMessage (message); });
+                jobProgress = 0.0;
+            };
+
+            startNewJobSection ("Syncing user presets...");
+            std::vector<PresetsServerSyncManager::AddedPresetInfo> addedPresetInfo;
+            syncManager->syncLocalPresetsToServer (getUserPresets(), addedPresetInfo, updateJobProgress);
+
+            if (! addedPresetInfo.empty()) // no presets need new presetIDs!
+            {
+                startNewJobSection ("Updating preset IDs...");
+
+                // update preset IDs of newly added presets
+                std::vector<const chowdsp::Preset*> presetsNeedingPrsetIDUpdate;
+                int index = 0;
+                for (const auto& [constPreset, newPresetID] : addedPresetInfo)
+                {
+                    for (auto& [_, preset] : presetMap)
+                    {
+                        if (preset == *constPreset)
+                        {
+                            PresetInfoHelpers::setPresetID (preset, newPresetID);
+                            presetsNeedingPrsetIDUpdate.push_back (&preset);
+                            preset.toFile (getPresetFile (preset));
+                            updateJobProgress (index++, (int) addedPresetInfo.size());
+                            break;
+                        }
+                    }
+                }
+
+                // sync new preset IDs to server
+                startNewJobSection ("Syncing new preset IDs...");
+                addedPresetInfo.clear();
+                syncManager->syncLocalPresetsToServer (presetsNeedingPrsetIDUpdate, addedPresetInfo, updateJobProgress);
+                jassert (addedPresetInfo.empty());
+            }
+
+            MessageManager::callAsync (
+                [&]
+                {
+                    alertWindow->exitModalState (1);
+                    alertWindow.reset();
+                });
+        });
 }
 
 void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)

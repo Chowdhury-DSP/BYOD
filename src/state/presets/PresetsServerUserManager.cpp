@@ -19,16 +19,18 @@ PresetsServerUserManager::PresetsServerUserManager()
     pluginSettings->addProperties ({ { userNameSettingID, String() },
                                      { userTokenSettingID, String() } });
 
-    jobPool->addJob ([&]
-                     {
-                         auto initialUsername = pluginSettings->getProperty<String> (userNameSettingID);
+    jobPool->addJob (
+        [&]
+        {
+            auto initialUsername = pluginSettings->getProperty<String> (userNameSettingID);
 
-                         auto passwordEncoded = pluginSettings->getProperty<String> (userTokenSettingID);
-                         MemoryOutputStream passwordStream;
-                         Base64::convertFromBase64 (passwordStream, passwordEncoded);
-                         auto initialPassword = passwordStream.toString();
+            auto passwordEncoded = pluginSettings->getProperty<String> (userTokenSettingID);
+            MemoryOutputStream passwordStream;
+            Base64::convertFromBase64 (passwordStream, passwordEncoded);
+            auto initialPassword = passwordStream.toString();
 
-                         attemptToLogIn (initialUsername, initialPassword, true); });
+            attemptToLogIn (initialUsername, initialPassword, true);
+        });
 }
 
 PresetsServerUserManager::~PresetsServerUserManager()
