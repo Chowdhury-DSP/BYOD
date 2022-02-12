@@ -16,9 +16,8 @@ public:
     int addPresetOptions (int optionID) override;
     int addPresetServerMenuOptions (int optionID);
 
-    void updatePresetsToUpdate();
-
 private:
+    void updatePresetsToUpdate (PresetManager::PresetUpdateList&);
     void selectedPresetChanged() override;
     void syncServerPresetsToLocal();
     void savePreset (const PresetSaveInfo& saveInfo);
@@ -30,9 +29,8 @@ private:
     chowdsp::WindowInPlugin<PresetSearchWindow> searchWindow;
     chowdsp::WindowInPlugin<PresetsSyncDialog> syncWindow;
 
-    PresetManager::PresetUpdateList presetsToUpdate;
-
     SharedPresetsServerUserManager userManager;
+    SharedPresetsServerJobPool jobPool;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComp)
 };

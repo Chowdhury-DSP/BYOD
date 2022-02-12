@@ -80,7 +80,12 @@ PresetsSyncDialog::PresetsSyncDialog()
     setSize (noUpdateWidth, noUpdateHeight);
 }
 
-void PresetsSyncDialog::updatePresetsList (const PresetManager::PresetUpdateList& presetsToUpdate)
+PresetsSyncDialog::~PresetsSyncDialog()
+{
+    presetUpdateList = nullptr;
+}
+
+void PresetsSyncDialog::updatePresetsList (PresetManager::PresetUpdateList& presetsToUpdate)
 {
     if (presetsToUpdate.empty())
     {
@@ -100,10 +105,15 @@ void PresetsSyncDialog::updatePresetsList (const PresetManager::PresetUpdateList
     presetsList.setModel (listBoxModel.get());
     setSize (updatingWidth, updatingHeight);
 
+    presetUpdateList = &presetsToUpdate;
     okButton.onClick = [&]
     {
-        runUpdateCallback();
-        getParentComponent()->setVisible (false);
+        if (presetUpdateList != nullptr)
+        {
+            runUpdateCallback (*presetUpdateList);
+            getParentComponent()->setVisible (false);
+            presetUpdateList = nullptr;
+        }
     };
 }
 

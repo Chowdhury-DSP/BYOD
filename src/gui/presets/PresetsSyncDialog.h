@@ -6,13 +6,14 @@ class PresetsSyncDialog : public Component
 {
 public:
     PresetsSyncDialog();
+    ~PresetsSyncDialog() override;
 
     void paint (Graphics& g) override;
     void resized() override;
 
-    void updatePresetsList (const PresetManager::PresetUpdateList& presetsToUpdate);
+    void updatePresetsList (PresetManager::PresetUpdateList& presetsToUpdate);
 
-    std::function<void()> runUpdateCallback = [] {};
+    std::function<void (PresetManager::PresetUpdateList&)> runUpdateCallback = [] (PresetManager::PresetUpdateList&) {};
 
 private:
     String presetUpdateText;
@@ -20,6 +21,8 @@ private:
 
     ListBox presetsList;
     std::unique_ptr<ListBoxModel> listBoxModel;
+
+    PresetManager::PresetUpdateList* presetUpdateList = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsSyncDialog)
 };

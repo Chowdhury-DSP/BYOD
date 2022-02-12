@@ -124,8 +124,9 @@ void PresetManager::syncLocalPresetsToServer()
         });
 }
 
-void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)
+void PresetManager::syncServerPresetsToLocal()
 {
+    serverSyncUpdatePresetsList.clear();
     std::vector<chowdsp::Preset> serverPresets;
     syncManager->syncServerPresetsToLocal (serverPresets);
 
@@ -137,14 +138,14 @@ void PresetManager::syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate)
                          serverPresets.end());
 
     // mark if presets are being added or overwritten
-    presetsToUpdate.reserve (serverPresets.size());
+    serverSyncUpdatePresetsList.reserve (serverPresets.size());
     for (auto& preset : serverPresets)
     {
         auto updateType = sst::cpputils::contains_if (userPresets, [&preset] (const auto* userPreset)
                                                       { return userPreset->getName() == preset.getName(); })
                               ? PresetUpdate::Overwriting
                               : PresetUpdate::Adding;
-        presetsToUpdate.emplace_back (std::move (preset), updateType);
+        serverSyncUpdatePresetsList.emplace_back (std::move (preset), updateType);
     }
 }
 

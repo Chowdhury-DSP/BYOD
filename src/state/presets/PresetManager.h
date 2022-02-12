@@ -38,7 +38,8 @@ public:
     void presetLoginStatusChanged() override;
 
     void syncLocalPresetsToServer();
-    void syncServerPresetsToLocal (PresetUpdateList& presetsToUpdate);
+    void syncServerPresetsToLocal();
+    PresetUpdateList& getServerPresetUpdateList() { return serverSyncUpdatePresetsList; };
 
 private:
     ProcessorChain* procChain;
@@ -49,6 +50,8 @@ private:
     SharedPresetsServerJobPool jobPool;
     double jobProgress = 0.0;
     std::unique_ptr<AlertWindow> alertWindow;
+
+    PresetUpdateList serverSyncUpdatePresetsList;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };
