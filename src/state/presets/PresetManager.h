@@ -42,7 +42,7 @@ public:
 private:
     ProcessorChain* procChain;
 
-    SharedResourcePointer<PresetsServerUserManager> userManager;
+    SharedPresetsServerUserManager userManager;
     SharedResourcePointer<PresetsServerSyncManager> syncManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)

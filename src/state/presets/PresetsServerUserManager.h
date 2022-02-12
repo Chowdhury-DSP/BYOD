@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pch.h>
+#include "PresetsServerJobPool.h"
 
 class PresetsServerUserManager
 {
@@ -32,6 +32,9 @@ private:
     static constexpr SettingID userTokenSettingID = "user_token";
 
     chowdsp::SharedPluginSettings pluginSettings;
+    SharedPresetsServerJobPool jobPool;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsServerUserManager)
 };
+
+using SharedPresetsServerUserManager = SharedResourcePointer<PresetsServerUserManager>;

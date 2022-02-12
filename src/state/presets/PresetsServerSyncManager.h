@@ -13,7 +13,7 @@ public:
     void syncServerPresetsToLocal (std::vector<chowdsp::Preset>& serverPresets);
 
 private:
-    SharedResourcePointer<PresetsServerUserManager> userManager;
+    SharedPresetsServerUserManager userManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsServerSyncManager)
 };

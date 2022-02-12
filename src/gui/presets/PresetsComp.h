@@ -32,7 +32,7 @@ private:
 
     PresetManager::PresetUpdateList presetsToUpdate;
 
-    SharedResourcePointer<PresetsServerUserManager> userManager;
+    SharedPresetsServerUserManager userManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsComp)
 };
