@@ -23,8 +23,8 @@ private:
 
     BoardComponent comp;
 
-    TextButton plusButton { "+" };
-    TextButton minusButton { "-" };
+    DrawableButton plusButton { "", DrawableButton::ImageOnButtonBackground };
+    DrawableButton minusButton { "", DrawableButton::ImageOnButtonBackground };
 
     Label scaleLabel;
 

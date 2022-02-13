@@ -11,6 +11,8 @@ set(binary_data_files
     ui_assets/RightArrow.svg
     ui_assets/x-solid.svg
     ui_assets/cog-solid.svg
+    ui_assets/magnifying-glass-minus-solid.svg
+    ui_assets/magnifying-glass-plus-solid.svg
 
     guitar_ml_models/BluesJR_FullD.json
     guitar_ml_models/TS9_FullD.json
