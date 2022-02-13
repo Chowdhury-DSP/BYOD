@@ -50,7 +50,8 @@ void BYOD::releaseResources()
 
 void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
-    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
+    // @TODO: use the constructor with numSamples when we upgrade JUCE
+    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer };
 
     // push samples into bypass delay
     bypassScratchBuffer.makeCopyOf (buffer);
@@ -62,7 +63,7 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 
 void BYOD::processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer&)
 {
-    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
+    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer };
 
     processBypassDelay (buffer);
 }
