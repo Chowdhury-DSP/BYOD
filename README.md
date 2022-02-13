@@ -58,6 +58,6 @@ have contributed!
 
 ## License
 
-BYOD is open source, and is dual-licensed  under the 
+BYOD is open source, and is dual-licensed under the 
 General Public License Version 3. For more details, 
 please see the [licensing documentation](./docs/Licensing.md). Enjoy!

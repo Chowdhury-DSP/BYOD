@@ -12,6 +12,8 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     setScrollBarsShown (true, true);
 
     const auto buttonColour = Colours::azure.darker (0.8f).withAlpha (0.75f);
+    auto plusImage = Drawable::createFromImageData (BinaryData::magnifyingglassplussolid_svg, BinaryData::magnifyingglassplussolid_svgSize);
+    plusButton.setImages (plusImage.get());
     plusButton.setColour (TextButton::buttonColourId, buttonColour);
     addAndMakeVisible (plusButton);
     plusButton.onClick = [=]
@@ -20,6 +22,8 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
         resized();
     };
 
+    auto minusImage = Drawable::createFromImageData (BinaryData::magnifyingglassminussolid_svg, BinaryData::magnifyingglassminussolid_svgSize);
+    minusButton.setImages (minusImage.get());
     minusButton.setColour (TextButton::buttonColourId, buttonColour);
     addAndMakeVisible (minusButton);
     minusButton.onClick = [=]
