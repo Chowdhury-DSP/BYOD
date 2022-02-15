@@ -53,8 +53,7 @@ void PresetsServerSyncManager::syncLocalPresetsToServer (const std::vector<const
 
         if (response.contains (notConnectedStr))
         {
-            MessageManager::callAsync ([]
-                                       { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Preset Syncing failed!", notConnectedStr); });
+            PresetsServerCommunication::showFailureMessage ("Presets sync failed", notConnectedStr);
             break;
         }
 
@@ -62,7 +61,7 @@ void PresetsServerSyncManager::syncLocalPresetsToServer (const std::vector<const
     }
 }
 
-void PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Preset>& serverPresets)
+bool PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Preset>& serverPresets)
 {
     Logger::writeToLog ("Syncing user presets from server");
     using namespace PresetsServerCommunication;
@@ -73,16 +72,16 @@ void PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Pr
     auto presetsReturned = parseMessageResponse (response);
     if (presetsReturned == "null")
     {
-        NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Presets sync failed!", "No presets for this user exist on the server!");
+        PresetsServerCommunication::showFailureMessage ("Presets sync failed", "No presets for this user exist on the server!");
         serverPresets.clear();
-        return;
+        return false;
     }
 
     if (! (presetsReturned.containsChar ('{') && presetsReturned.containsChar ('}')))
     {
-        NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Presets sync failed!", "Unable to fetch presets from server!");
+        PresetsServerCommunication::showFailureMessage ("Presets sync failed", "Unable to fetch presets from server!");
         serverPresets.clear();
-        return;
+        return false;
     }
 
     try
@@ -110,9 +109,11 @@ void PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Pr
     catch (...)
     {
         Logger::writeToLog ("Exception happened while trying to sync server presets!");
-        NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Presets sync failed!", {});
+        PresetsServerCommunication::showFailureMessage ("Presets sync failed", {});
 
         serverPresets.clear();
-        return;
+        return false;
     }
+
+    return true;
 }

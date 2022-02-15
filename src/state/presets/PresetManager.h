@@ -38,7 +38,7 @@ public:
     void presetLoginStatusChanged() override;
 
     void syncLocalPresetsToServer();
-    void syncServerPresetsToLocal();
+    bool syncServerPresetsToLocal();
     PresetUpdateList& getServerPresetUpdateList() { return serverSyncUpdatePresetsList; };
 
 private:

@@ -44,8 +44,8 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
     if (! isUsernamePasswordPairValid (newUsername, newPassword))
     {
         if (! failSilently)
-            MessageManager::callAsync ([]
-                                       { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attempt failed!", "Invalid username/password combo"); });
+            PresetsServerCommunication::showFailureMessage ("Login attempt failed!", "Invalid username/password combo");
+
         isLoggedIn = false;
         return;
     }
@@ -64,16 +64,14 @@ void PresetsServerUserManager::attemptToLogIn (const String& newUsername, const 
     }
 
     if (! failSilently)
-        MessageManager::callAsync ([responseText = parseMessageResponse (response)]
-                                   { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attempt failed!", responseText); });
+        PresetsServerCommunication::showFailureMessage ("Login attempt failed!", parseMessageResponse (response));
 }
 
 void PresetsServerUserManager::createNewUser (const String& newUsername, const String& newPassword)
 {
     if (! isUsernamePasswordPairValid (newUsername, newPassword))
     {
-        MessageManager::callAsync ([]
-                                   { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attempt failed!", "Invalid username/password combo"); });
+        PresetsServerCommunication::showFailureMessage ("Registration attempt failed!", "Invalid username/password combo");
         return;
     }
 
@@ -86,8 +84,7 @@ void PresetsServerUserManager::createNewUser (const String& newUsername, const S
         return;
     }
 
-    MessageManager::callAsync ([responseText = parseMessageResponse (response)]
-                               { NativeMessageBox::showOkCancelBox (MessageBoxIconType::WarningIcon, "Login attempt failed!", responseText); });
+    PresetsServerCommunication::showFailureMessage ("Registration attempt failed!", parseMessageResponse (response));
 }
 
 void PresetsServerUserManager::logOut()

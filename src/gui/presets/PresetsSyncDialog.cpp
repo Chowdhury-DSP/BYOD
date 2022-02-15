@@ -95,7 +95,10 @@ void PresetsSyncDialog::updatePresetsList (PresetManager::PresetUpdateList& pres
         setSize (noUpdateWidth, noUpdateHeight);
 
         okButton.onClick = [&]
-        { getParentComponent()->setVisible (false); };
+        {
+            std::cout << "OK CLICKED" << std::endl;
+            getParentComponent()->setVisible (false);
+        };
 
         return;
     }

@@ -12,7 +12,7 @@ public:
     void syncLocalPresetsToServer (const std::vector<const chowdsp::Preset*>& presets,
                                    std::vector<AddedPresetInfo>& addedPresetInfo,
                                    const std::function<void (int, int)>& updateProgressCallback);
-    void syncServerPresetsToLocal (std::vector<chowdsp::Preset>& serverPresets);
+    bool syncServerPresetsToLocal (std::vector<chowdsp::Preset>& serverPresets);
 
 private:
     SharedPresetsServerUserManager userManager;
