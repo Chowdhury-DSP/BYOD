@@ -30,4 +30,6 @@ juce::String sendUpdatePresetRequest (const PresetRequestInfo& info);
 
 juce::String parseMessageResponse (const String& messageResponse);
 
+void showFailureMessage (const String& title, const String& message);
+
 } // namespace PresetsServerCommunication

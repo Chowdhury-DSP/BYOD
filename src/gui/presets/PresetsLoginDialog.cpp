@@ -18,7 +18,6 @@ PresetsLoginDialog::PresetsLoginDialog()
 
     setupEditor (username, "Username...");
     setupEditor (password, "Password...");
-    password.setPasswordCharacter (juce_wchar (L'●'));
 
     auto setupButton = [=] (TextButton& button)
     {

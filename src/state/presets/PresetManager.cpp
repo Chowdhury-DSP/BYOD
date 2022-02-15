@@ -124,11 +124,12 @@ void PresetManager::syncLocalPresetsToServer()
         });
 }
 
-void PresetManager::syncServerPresetsToLocal()
+bool PresetManager::syncServerPresetsToLocal()
 {
     serverSyncUpdatePresetsList.clear();
     std::vector<chowdsp::Preset> serverPresets;
-    syncManager->syncServerPresetsToLocal (serverPresets);
+    if (! syncManager->syncServerPresetsToLocal (serverPresets))
+        return false;
 
     // if an equivalent preset already exists, then we don't need to update it!
     const auto& userPresets = getUserPresets();
@@ -147,6 +148,8 @@ void PresetManager::syncServerPresetsToLocal()
                               : PresetUpdate::Adding;
         serverSyncUpdatePresetsList.emplace_back (std::move (preset), updateType);
     }
+
+    return true;
 }
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()

@@ -103,4 +103,17 @@ juce::String parseMessageResponse (const String& messageResponse)
     return messageResponse.fromLastOccurrenceOf ("Message: ", false, false).upToLastOccurrenceOf ("\n", false, false);
 }
 
+void showFailureMessage (const String& title, const String& message)
+{
+    MessageManager::callAsync (
+        [title, message]
+        {
+            NativeMessageBox::show (MessageBoxOptions()
+                                        .withIconType (MessageBoxIconType::WarningIcon)
+                                        .withTitle (title)
+                                        .withMessage (message)
+                                        .withButton ("OK"));
+        });
+}
+
 } // namespace PresetsServerCommunication

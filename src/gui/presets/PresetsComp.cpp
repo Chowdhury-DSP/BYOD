@@ -34,22 +34,27 @@ void PresetsComp::syncServerPresetsToLocal()
     // user must have selected a preset path before trying to sync server presets
     if (presetManager.getUserPresetPath() == File())
     {
-        chooseUserPresetFolder ([&]
-                                { syncServerPresetsToLocal(); });
+        chooseUserPresetFolder (
+            [&]
+            {
+                if (presetManager.getUserPresetPath() != File())
+                    syncServerPresetsToLocal();
+            });
         return;
     }
 
     jobPool->addJob (
         [safeComp = Component::SafePointer (this)]
         {
-            safeComp->presetManager.syncServerPresetsToLocal();
-
-            PresetsServerJobPool::callSafeOnMessageThread (safeComp,
-                                                           [] (auto& c)
-                                                           {
-                                                               c.syncWindow.getViewComponent().updatePresetsList (c.presetManager.getServerPresetUpdateList());
-                                                               c.syncWindow.show();
-                                                           });
+            if (safeComp->presetManager.syncServerPresetsToLocal())
+            {
+                PresetsServerJobPool::callSafeOnMessageThread (safeComp,
+                                                               [] (auto& c)
+                                                               {
+                                                                   c.syncWindow.getViewComponent().updatePresetsList (c.presetManager.getServerPresetUpdateList());
+                                                                   c.syncWindow.show();
+                                                               });
+            }
         });
 }
 
