@@ -26,6 +26,10 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
     paramForwarder = std::make_unique<ParamForwardManager> (vts, *procs);
 
     presetManager = std::make_unique<PresetManager> (procs.get(), vts);
+
+#if JUCE_IOS
+    LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
+#endif
 }
 
 void BYOD::addParameters (Parameters& params)
@@ -50,8 +54,7 @@ void BYOD::releaseResources()
 
 void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 {
-    // @TODO: use the constructor with numSamples when we upgrade JUCE
-    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer };
+    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
     // push samples into bypass delay
     bypassScratchBuffer.makeCopyOf (buffer);
@@ -63,7 +66,7 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 
 void BYOD::processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer&)
 {
-    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer };
+    AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
     processBypassDelay (buffer);
 }

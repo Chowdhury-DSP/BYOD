@@ -12,8 +12,6 @@ bool isUsernamePasswordPairValid (const String& username, const String& password
 }
 } // namespace
 
-// @TODO: use actual encryption for user token
-
 PresetsServerUserManager::PresetsServerUserManager()
 {
     pluginSettings->addProperties ({ { userNameSettingID, String() },

@@ -98,7 +98,6 @@ bool PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Pr
                 continue;
 
             // make sure we don't have duplicates
-            // @TODO: figure out why there are duplicates on the server
             if (sst::cpputils::contains_if (serverPresets, [&serverPreset] (const auto& preset)
                                             { return serverPreset.getName() == preset.getName(); }))
                 continue;

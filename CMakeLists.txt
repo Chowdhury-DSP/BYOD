@@ -1,11 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment target")
-project(BYOD VERSION 0.5.0)
+project(BYOD VERSION 0.5.1)
 
-# @TODO: we can probably switch clang back to C++20 when we upgrade JUCE
-if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-           OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-           OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(CMAKE_CXX_STANDARD 17)
 else()
     set(CMAKE_CXX_STANDARD 20)
