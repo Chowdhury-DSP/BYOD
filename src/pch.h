@@ -11,8 +11,9 @@
 
 // JUCE modules
 #include <JuceHeader.h>
-
+#if HAS_CLAP_JUCE_EXTENSIONS
 #include "clap-juce-extensions/clap-juce-extensions.h"
+#endif
 
 // Any other widely used headers that don't change...
 #include <Eigen/Dense>

@@ -4,8 +4,11 @@
 #include "processors/chain/ProcessorChain.h"
 #include "state/ParamForwardManager.h"
 
-class BYOD : public chowdsp::PluginBase<BYOD>,
+class BYOD : public chowdsp::PluginBase<BYOD>
+#if HAS_CLAP_JUCE_EXTENSIONS
+    ,
              private clap_juce_extensions::clap_properties
+#endif
 {
 public:
     BYOD();
