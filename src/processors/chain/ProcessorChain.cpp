@@ -95,7 +95,7 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
 
     proc->processAudioBlock (buffer);
 
-    auto processBuffer = [&] (BaseProcessor* nextProc, AudioBuffer<float>& nextBuffer)
+    auto processBuffer = [&] (BaseProcessor* nextProc, int inputIndex, AudioBuffer<float>& nextBuffer)
     {
         int nextNumInputs = nextProc->getNumInputs();
         if (nextNumProcs == 1 && nextNumInputs == 1)
@@ -110,15 +110,15 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
         }
         else
         {
-            int inputIdx = nextProc->getNextInputIdx();
-            auto& copyNextBuffer = nextProc->getInputBuffer (inputIdx);
+            auto& copyNextBuffer = nextProc->getInputBuffer (inputIndex);
             copyNextBuffer.makeCopyOf (nextBuffer, true);
 
+            nextProc->incrementNumInputsReady();
             if (nextProc->getNumInputsReady() < nextProc->getNumInputConnections())
                 return; // not all the inputs are ready yet...
 
             runProcessor (nextProc, copyNextBuffer, outProcessed);
-            nextProc->clearInputIdx();
+            nextProc->clearNumInputsReady();
         }
     };
 
@@ -131,8 +131,8 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
         const int numOutProcs = proc->getNumOutputConnections (i);
         for (int j = numOutProcs - 1; j >= 0; --j)
         {
-            auto* nextProc = proc->getOutputProcessor (i, j);
-            processBuffer (nextProc, *outBuffer);
+            const auto& connectionInfo = proc->getOutputConnection (i, j);
+            processBuffer (connectionInfo.endProc, connectionInfo.endPort, *outBuffer);
 
             nextNumProcs -= 1;
         }

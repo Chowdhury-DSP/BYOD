@@ -80,16 +80,14 @@ public:
 
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
-
-    BaseProcessor* getOutputProcessor (int portIdx, int connectionIdx) { return outputConnections[portIdx][connectionIdx].endProc; }
     const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[portIdx].getReference (connectionIdx); }
 
     int getNumOutputConnections (int portIdx) const { return outputConnections[portIdx].size(); }
     int getNumInputConnections() const { return inputsConnected.size(); };
 
-    int getNextInputIdx() { return inputsConnected[inputIdx++]; }
-    int getNumInputsReady() const { return inputIdx; }
-    void clearInputIdx() { inputIdx = 0; }
+    int incrementNumInputsReady() { return numInputsReady++; }
+    int getNumInputsReady() const { return numInputsReady; }
+    void clearNumInputsReady() { numInputsReady = 0; }
 
     void addConnection (ConnectionInfo&& info);
     void removeConnection (const ConnectionInfo& info);
@@ -131,7 +129,7 @@ private:
 
     std::vector<Array<ConnectionInfo>> outputConnections;
     Array<AudioBuffer<float>> inputBuffers;
-    int inputIdx = 0;
+    int numInputsReady = 0;
 
     Point<float> editorPosition;
 
