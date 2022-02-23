@@ -43,7 +43,7 @@ void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
     auto updateBufferMag = [&] (const AudioBuffer<float>& inBuffer, int inputIndex)
     {
         const auto inBufferNumChannels = inBuffer.getNumChannels();
-        const auto inBufferNumSamples = inBuffer.getNumChannels();
+        const auto inBufferNumSamples = inBuffer.getNumSamples();
 
         auto rmsAvg = 0.0f;
         for (int ch = 0; ch < inBufferNumChannels; ++ch)
@@ -57,7 +57,7 @@ void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
             curMag = portMag.smoother.processSample (rmsAvg);
         portMag.currentMagnitudeDB.set (curMag);
     };
-    
+
     if (portMagnitudesOn) // track input levels
     {
         if (numInputs == 1)

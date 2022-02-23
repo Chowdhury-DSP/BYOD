@@ -2,14 +2,14 @@
 
 <Preset name="ZenDrive" plugin="BYOD" vendor="CHOW" category="Pedals" version="0.3.0">
   <proc_chain>
-    <Zen_Drive>
+    <Yen_Drive>
       <Parameters x_pos="0.1978022009134293" y_pos="0.2385542094707489">
         <PARAM id="gain" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
         <PARAM id="voice" value="0.5"/>
       </Parameters>
       <port_0 connection_0="1" connection_end_0="0"/>
-    </Zen_Drive>
+    </Yen_Drive>
     <High_Cut>
       <Parameters x_pos="0.5404595136642456" y_pos="0.2337349355220795">
         <PARAM id="cutoff" value="5000.0009765625"/>

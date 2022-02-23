@@ -10,7 +10,7 @@ public:
     {
         gainDBParam = vts.getRawParameterValue ("gain");
 
-        uiOptions.backgroundColour = Colours::black;
+        uiOptions.backgroundColour = Colours::darkgrey.brighter (0.35f).withRotatedHue (0.25f);
         uiOptions.powerColour = Colours::yellow;
         uiOptions.info.description = "Simple linear gain boost.";
         uiOptions.info.authors = StringArray { "Jatin Chowdhury" };

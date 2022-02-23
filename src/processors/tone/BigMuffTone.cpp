@@ -17,7 +17,7 @@ const std::array<BigMuffTone::Components, 10> componentSets {
 };
 }
 
-BigMuffTone::BigMuffTone (UndoManager* um) : BaseProcessor ("Big Muff Tone", createParameterLayout(), um),
+BigMuffTone::BigMuffTone (UndoManager* um) : BaseProcessor ("Muff Tone", createParameterLayout(), um),
                                              comps (&componentSets[2])
 {
     toneParam = vts.getRawParameterValue ("tone");

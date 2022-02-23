@@ -2,15 +2,15 @@
 
 <Preset name="Nirvana" plugin="BYOD" vendor="CHOW" category="Players" version="0.3.0">
   <proc_chain>
-    <MXR_Distortion>
+    <Distortion_Plus>
       <Parameters x_pos="0.2272727340459824" y_pos="0.02846975065767765">
         <PARAM id="dist" value="0.300000011920929"/>
         <PARAM id="level" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="1" connection_end_0="0"/>
-    </MXR_Distortion>
-    <Big_Muff_Drive>
+    </Distortion_Plus>
+    <Muff_Drive>
       <Parameters x_pos="0.2153110057115555" y_pos="0.4644128084182739">
         <PARAM id="harmonics" value="0.449999988079071"/>
         <PARAM id="level" value="0.6499999761581421"/>
@@ -19,8 +19,8 @@
         <PARAM id="sustain" value="0.6000000238418579"/>
       </Parameters>
       <port_0 connection_0="2" connection_end_0="0"/>
-    </Big_Muff_Drive>
-    <Big_Muff_Tone>
+    </Muff_Drive>
+    <Muff_Tone>
       <Parameters x_pos="0.5063796043395996" y_pos="0.4661921560764313">
         <PARAM id="mids" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
@@ -28,7 +28,7 @@
         <PARAM id="type" value="6.0"/>
       </Parameters>
       <port_0 connection_0="3" connection_end_0="0"/>
-    </Big_Muff_Tone>
+    </Muff_Tone>
     <Chorus>
       <Parameters x_pos="0.5861244201660156" y_pos="0.05338078364729881">
         <PARAM id="delay_type" value="1.0"/>

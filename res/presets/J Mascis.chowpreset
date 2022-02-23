@@ -11,7 +11,7 @@
       </Parameters>
       <port_0 connection_0="1" connection_end_0="0"/>
     </Range_Booster>
-    <Big_Muff_Drive>
+    <Muff_Drive>
       <Parameters x_pos="0.03943217545747757" y_pos="0.3722627758979797">
         <PARAM id="harmonics" value="0.6499999761581421"/>
         <PARAM id="level" value="0.6499999761581421"/>
@@ -20,8 +20,8 @@
         <PARAM id="sustain" value="1.0"/>
       </Parameters>
       <port_0 connection_0="2" connection_end_0="0"/>
-    </Big_Muff_Drive>
-    <Big_Muff_Tone>
+    </Muff_Drive>
+    <Muff_Tone>
       <Parameters x_pos="0.3004731833934784" y_pos="0.3664233684539795">
         <PARAM id="mids" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
@@ -29,7 +29,7 @@
         <PARAM id="type" value="2.0"/>
       </Parameters>
       <port_0 connection_0="3" connection_end_0="0"/>
-    </Big_Muff_Tone>
+    </Muff_Tone>
     <Tube_Screamer>
       <Parameters x_pos="0.4408517479896545" y_pos="0.01751824840903282">
         <PARAM id="diode" value="2.0"/>

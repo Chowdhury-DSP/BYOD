@@ -12,7 +12,7 @@ float paramSkew (float paramVal)
 const auto levelSkew = ParameterHelpers::createNormalisableRange (-60.0f, 0.0f, -12.0f);
 } // namespace
 
-MXRDistortion::MXRDistortion (UndoManager* um) : BaseProcessor ("MXR Distortion", createParameterLayout(), um)
+MXRDistortion::MXRDistortion (UndoManager* um) : BaseProcessor ("Distortion Plus", createParameterLayout(), um)
 {
     distParam = vts.getRawParameterValue ("dist");
     levelParam = vts.getRawParameterValue ("level");
