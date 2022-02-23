@@ -48,12 +48,12 @@ void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
     constexpr auto LPF = chowdsp::StateVariableFilterType::Lowpass;
     constexpr auto HPF = chowdsp::StateVariableFilterType::Highpass;
 
-    // low band
+    // high band
     {
         dsp::AudioBlock<float> block { buffers[0] };
         dsp::ProcessContextReplacing<float> ctx { block };
-        lowCrossLPF1.process<decltype (ctx), LPF> (ctx);
-        lowCrossLPF2.process<decltype (ctx), LPF> (ctx);
+        highCrossHPF1.process<decltype (ctx), HPF> (ctx);
+        highCrossHPF2.process<decltype (ctx), HPF> (ctx);
     }
 
     // mid band
@@ -66,12 +66,12 @@ void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
         highCrossLPF2.process<decltype (ctx), LPF> (ctx);
     }
 
-    // high band
+    // low band
     {
         dsp::AudioBlock<float> block { buffers[2] };
         dsp::ProcessContextReplacing<float> ctx { block };
-        highCrossHPF1.process<decltype (ctx), HPF> (ctx);
-        highCrossHPF2.process<decltype (ctx), HPF> (ctx);
+        lowCrossLPF1.process<decltype (ctx), LPF> (ctx);
+        lowCrossLPF2.process<decltype (ctx), LPF> (ctx);
     }
 
     for (int i = 0; i < numOuts; ++i)

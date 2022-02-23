@@ -83,7 +83,7 @@ void Mixer::processAudio (AudioBuffer<float>& buffer)
 
         for (int ch = 0; ch < outBuffer->getNumChannels(); ++ch)
         {
-            int sourceCh = numChannels == 0 ? 0 : ch;
+            int sourceCh = numChannels == 1 ? 0 : ch;
             outBuffer->addFrom (ch, 0, inBuffer, sourceCh, 0, numSamples);
         }
     }
