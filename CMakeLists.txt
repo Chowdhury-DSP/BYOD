@@ -57,6 +57,16 @@ juce_add_plugin(BYOD
     PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST}
 )
 
+option(BYOD_BUILD_CLAP "Build a CLAP plugin target (experimental)" OFF)
+if(BYOD_BUILD_CLAP AND NOT IOS)
+    message(STATUS "Configuring CLAP build...")
+    clap_juce_extensions_plugin(
+        TARGET BYOD
+        CLAP_ID "org.chowdsp.byod"
+        CLAP_FEATURES distortion audio_effect
+    )
+endif()
+
 juce_generate_juce_header(BYOD)
 add_subdirectory(src)
 include_directories(src)
