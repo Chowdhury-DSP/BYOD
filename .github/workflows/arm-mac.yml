@@ -33,4 +33,4 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --config Debug --parallel 4 | xcpretty
+      run: cmake --build build --config Debug --parallel | xcpretty
