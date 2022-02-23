@@ -85,6 +85,11 @@ void BYOD::updateSampleLatency (int latencySamples)
 
 AudioProcessorEditor* BYOD::createEditor()
 {
+    struct BYODInfoProvider : public chowdsp::StandardInfoProvider
+    {
+        static juce::String getWrapperTypeString (const BYOD& proc) { return proc.getWrapperTypeString(); }
+    };
+
     auto builder = chowdsp::createGUIBuilder (magicState);
     builder->registerFactory ("Board", &BoardItem::factory);
     builder->registerFactory ("PresetsItem", &PresetsItem<BYOD>::factory);
@@ -92,6 +97,7 @@ AudioProcessorEditor* BYOD::createEditor()
     builder->registerFactory ("SettingsButton", &SettingsButtonItem::factory);
     builder->registerFactory ("CPUMeter", &CPUMeterItem<BYOD>::factory);
     builder->registerFactory ("OSMenu", &chowdsp::OversamplingMenuItem<BYOD>::factory);
+    builder->registerFactory ("BYODInfoComp", &chowdsp::InfoItem<BYODInfoProvider, BYOD>::factory);
     builder->registerLookAndFeel ("ByodLNF", std::make_unique<ByodLNF>());
     builder->registerLookAndFeel ("CPUMeterLNF", std::make_unique<CPUMeterLNF>());
 
@@ -113,6 +119,15 @@ AudioProcessorEditor* BYOD::createEditor()
     openGLHelper.setComponent (editor);
 
     return editor;
+}
+
+String BYOD::getWrapperTypeString() const
+{
+    // Since we are using 'external clap' this is the one JUCE API we can't override
+    if (wrapperType == wrapperType_Undefined && is_clap)
+        return "Clap";
+
+    return AudioProcessor::getWrapperTypeDescription (wrapperType);
 }
 
 void BYOD::getStateInformation (MemoryBlock& destData)

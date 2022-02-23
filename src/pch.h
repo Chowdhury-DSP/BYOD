@@ -12,6 +12,8 @@
 // JUCE modules
 #include <JuceHeader.h>
 
+#include "clap-juce-extensions/clap-juce-extensions.h"
+
 // Any other widely used headers that don't change...
 #include <Eigen/Dense>
 #include <RTNeural/RTNeural.h>
