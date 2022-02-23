@@ -30,7 +30,7 @@ public:
 private:
     void timerCallback() override { repaint(); }
 
-    std::pair<ProcessorEditor*, int> getNearestInputPort (const Point<int>& pos) const;
+    std::pair<ProcessorEditor*, int> getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const;
 
     const BoardComponent* board = nullptr;
 

@@ -83,7 +83,7 @@ void CableView::paint (Graphics& g)
         else if (cableMouse != nullptr)
         {
             auto mousePos = cableMouse->getPosition();
-            auto [editor, portIdx] = getNearestInputPort (mousePos);
+            auto [editor, portIdx] = getNearestInputPort (mousePos, cable->startProc);
             if (editor != nullptr)
             {
                 auto endPortLocation = getPortLocation (editor, portIdx, true);
@@ -123,10 +123,10 @@ void CableView::releaseCable (const MouseEvent& e)
     auto relMouse = e.getEventRelativeTo (this);
     auto mousePos = relMouse.getPosition();
 
-    auto [editor, portIdx] = getNearestInputPort (mousePos);
+    auto* cable = cables.getLast();
+    auto [editor, portIdx] = getNearestInputPort (mousePos, cable->startProc);
     if (editor != nullptr)
     {
-        auto* cable = cables.getLast();
         cable->endProc = editor->getProcPtr();
         cable->endIdx = portIdx;
 
@@ -162,7 +162,25 @@ void CableView::destroyCable (ProcessorEditor* origin, int portIndex)
     repaint();
 }
 
-std::pair<ProcessorEditor*, int> CableView::getNearestInputPort (const Point<int>& pos) const
+bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const BaseProcessor* destProc, const OwnedArray<Cable>& cables)
+{
+    if (sourceProc->getNumInputs() == 0)
+        return false;
+
+    if (sourceProc == destProc)
+        return true;
+
+    bool result = false;
+    for (auto* cable : cables)
+    {
+        if (cable->endProc == sourceProc)
+            result |= wouldConnectingCreateFeedbackLoop (cable->startProc, destProc, cables);
+    }
+
+    return result;
+}
+
+std::pair<ProcessorEditor*, int> CableView::getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const
 {
     auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
     int minDistance = -1;
@@ -185,7 +203,12 @@ std::pair<ProcessorEditor*, int> CableView::getNearestInputPort (const Point<int
     };
 
     for (auto* editor : board->processorEditors)
+    {
+        if (wouldConnectingCreateFeedbackLoop (sourceProc, editor->getProcPtr(), cables))
+            continue; // no feedback loops allowed
+
         checkPorts (editor);
+    }
 
     checkPorts (board->outputEditor.get());
 
