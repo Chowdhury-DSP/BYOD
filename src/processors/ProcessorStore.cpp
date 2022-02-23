@@ -51,28 +51,28 @@ static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 }
 
 ProcessorStore::StoreMap ProcessorStore::store = {
-    { "Big Muff Drive", &processorFactory<BigMuffDrive> },
     { "Centaur", &processorFactory<Centaur> },
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
     { "Dirty Tube", &processorFactory<TubeAmp> },
+    { "Distortion Plus", &processorFactory<MXRDistortion> },
     { "GuitarML", &processorFactory<GuitarMLAmp> },
     { "Hysteresis", &processorFactory<Hysteresis> },
-    { "MXR Distortion", &processorFactory<MXRDistortion> },
+    { "Muff Drive", &processorFactory<BigMuffDrive> },
     { "Range Booster", &processorFactory<RangeBooster> },
     { "RONN", &processorFactory<RONN> },
     { "Tube Screamer", &processorFactory<TubeScreamer> },
     { "Waveshaper", &processorFactory<Waveshaper> },
-    { "Zen Drive", &processorFactory<ZenDrive> },
+    { "Yen Drive", &processorFactory<ZenDrive> },
 
+    { "Amp IRs", &processorFactory<AmpIRs> },
     { "Bass Cleaner", &processorFactory<BassCleaner> },
     { "Bassman Tone", &processorFactory<BassmanTone> },
     { "Baxandall EQ", &processorFactory<BaxandallEQ> },
-    { "Big Muff Tone", &processorFactory<BigMuffTone> },
     { "Graphic EQ", &processorFactory<GraphicEQ> },
     { "High Cut", &processorFactory<HighCut> },
-    { "Amp IRs", &processorFactory<AmpIRs> },
     { "LoFi IRs", &processorFactory<LofiIrs> },
+    { "Muff Tone", &processorFactory<BigMuffTone> },
     { "SVF", &processorFactory<StateVariableFilter> },
     { "Treble Booster", &processorFactory<TrebleBooster> },
     { "TS-Tone", &processorFactory<TubeScreamerTone> },
@@ -109,8 +109,7 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());
 
-                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
-                                               }));
+                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() }); }));
     }
 
     for (auto& f : futureProcInfos)

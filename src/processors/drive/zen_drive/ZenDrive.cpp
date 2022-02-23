@@ -1,6 +1,6 @@
 #include "ZenDrive.h"
 
-ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Zen Drive", createParameterLayout(), um)
+ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Yen Drive", createParameterLayout(), um)
 {
     voiceParam = vts.getRawParameterValue ("voice");
     gainParam = vts.getRawParameterValue ("gain");

@@ -3,14 +3,14 @@
 <Preset name="MXR Distortion" plugin="BYOD" vendor="CHOW" category="Pedals"
         version="0.3.0">
   <proc_chain>
-    <MXR_Distortion>
+    <Distortion_Plus>
       <Parameters x_pos="0.3880126178264618" y_pos="0.2715328335762024">
         <PARAM id="dist" value="0.5"/>
         <PARAM id="level" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="-1" connection_end_0="0"/>
-    </MXR_Distortion>
+    </Distortion_Plus>
     <Input>
       <Parameters x_pos="0.005020080134272575" y_pos="0.2845849692821503">
         <PARAM id="mono_stereo" value="3.0"/>

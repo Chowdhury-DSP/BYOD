@@ -6,7 +6,7 @@ Mixer::Mixer (UndoManager* um) : BaseProcessor ("Mixer", createParameterLayout()
     for (int i = 0; i < numIns; ++i)
         gainDBParams[i] = vts.getRawParameterValue ("gain" + String (i));
 
-    uiOptions.backgroundColour = Colours::black;
+    uiOptions.backgroundColour = Colours::darkgrey.brighter (0.2f);
     uiOptions.powerColour = Colours::yellow;
     uiOptions.info.description = "Mixes together four input channels.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
