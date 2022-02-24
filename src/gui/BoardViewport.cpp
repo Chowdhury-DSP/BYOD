@@ -54,6 +54,9 @@ void BoardViewport::globalSettingChanged (SettingID settingID)
 
 void BoardViewport::setScaleFactor (float newScaleFactor)
 {
+    if (newScaleFactor < 0.45f || newScaleFactor > 1.8f)
+        return; // limits for zoom level
+
     scaleFactor = newScaleFactor;
     scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
 }
