@@ -264,9 +264,15 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
             customItem.action = [=]
             {
                 constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
-                fileChooser = std::make_shared<FileChooser> ("Custom IR", File(), "*.wav");
-                fileChooser->launchAsync (flags, [=] (const FileChooser& fc)
-                                          { ampIRs.loadIRFromFile (fc.getResult()); });
+                fileChooser = std::make_shared<FileChooser> ("Custom IR", File(), "*.wav", true, false, getTopLevelComponent());
+                fileChooser->launchAsync (flags,
+                                          [=] (const FileChooser& fc)
+                                          {
+                                              if (fc.getResults().isEmpty())
+                                                  return;
+
+                                              ampIRs.loadIRFromFile (fc.getResult());
+                                          });
             };
             menu->addItem (customItem);
 
