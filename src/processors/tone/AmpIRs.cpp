@@ -270,7 +270,7 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
                                           {
                                               if (fc.getResults().isEmpty())
                                                   return;
-                                              
+
                                               ampIRs.loadIRFromFile (fc.getResult());
                                           });
             };
