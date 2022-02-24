@@ -46,7 +46,7 @@ public:
 
                 testBuffer (buffer.getReadPointer (0));
             },
-            StringArray { "Big Muff Drive" });
+            StringArray { "Muff Drive" });
     }
 };
 
