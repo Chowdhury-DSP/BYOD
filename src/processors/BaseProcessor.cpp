@@ -40,19 +40,20 @@ void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
 
 void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
 {
-    const auto numChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
     auto updateBufferMag = [&] (const AudioBuffer<float>& inBuffer, int inputIndex)
     {
-        auto rmsAvg = 0.0f;
-        for (int ch = 0; ch < numChannels; ++ch)
-            rmsAvg += Decibels::gainToDecibels (inBuffer.getRMSLevel (ch, 0, numSamples)); // @TODO: not sure if getRMSLevel is optimized enough...
+        const auto inBufferNumChannels = inBuffer.getNumChannels();
+        const auto inBufferNumSamples = inBuffer.getNumSamples();
 
-        rmsAvg /= (float) numChannels;
+        auto rmsAvg = 0.0f;
+        for (int ch = 0; ch < inBufferNumChannels; ++ch)
+            rmsAvg += Decibels::gainToDecibels (inBuffer.getRMSLevel (ch, 0, inBufferNumSamples)); // @TODO: not sure if getRMSLevel is optimized enough...
+
+        rmsAvg /= (float) inBufferNumChannels;
 
         auto& portMag = portMagnitudes[(size_t) inputIndex];
         float curMag = 0.0f;
-        for (int n = 0; n < numSamples; ++n)
+        for (int n = 0; n < inBufferNumSamples; ++n)
             curMag = portMag.smoother.processSample (rmsAvg);
         portMag.currentMagnitudeDB.set (curMag);
     };

@@ -37,7 +37,7 @@ LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterL
     mixParam = vts.getRawParameterValue (mixTag);
     gainParam = vts.getRawParameterValue (gainTag);
 
-    uiOptions.backgroundColour = Colours::black.brighter (0.15f);
+    uiOptions.backgroundColour = Colours::darkgrey.brighter (0.15f);
     uiOptions.powerColour = Colours::red.darker (0.1f);
     uiOptions.info.description = "A collection of impulse responses from vintage toys and keyboards.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };

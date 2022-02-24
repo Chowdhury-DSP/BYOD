@@ -13,7 +13,7 @@ const auto sustainRange = ParameterHelpers::createNormalisableRange (0.4f, 2.0f,
 const auto levelRange = ParameterHelpers::createNormalisableRange (-60.0f, 0.0f, -9.0f);
 } // namespace
 
-BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Big Muff Drive", createParameterLayout(), um)
+BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Muff Drive", createParameterLayout(), um)
 {
     sustainParam = vts.getRawParameterValue ("sustain");
     harmParam = vts.getRawParameterValue ("harmonics");

@@ -45,14 +45,14 @@
       </Parameters>
       <port_0 connection_0="1" connection_end_0="0"/>
     </Baxandall_EQ>
-    <Zen_Drive>
+    <Yen_Drive>
       <Parameters x_pos="0.1618819832801819" y_pos="0.04092526808381081">
         <PARAM id="gain" value="0.300000011920929"/>
         <PARAM id="on_off" value="1.0"/>
         <PARAM id="voice" value="0.2000000029802322"/>
       </Parameters>
       <port_0 connection_0="3" connection_end_0="0"/>
-    </Zen_Drive>
+    </Yen_Drive>
     <Input>
       <Parameters x_pos="0.001594896311871707" y_pos="0.2277580052614212">
         <PARAM id="mono_stereo" value="3.0"/>
