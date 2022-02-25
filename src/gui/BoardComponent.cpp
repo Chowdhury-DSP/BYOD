@@ -16,13 +16,6 @@ constexpr int getScaleDim (int dim, float scaleFactor)
 
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cableView (this)
 {
-    newProcButton.setButtonText ("+");
-    newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
-    newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
-    addAndMakeVisible (newProcButton);
-    newProcButton.onClick = [=]
-    { showNewProcMenu(); };
-
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
     addAndMakeVisible (inputEditor.get());
     inputEditor->addPortListener (&cableView);
@@ -42,6 +35,10 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
     procChain.addListener (&cableView);
 
     cableView.refreshConnections();
+
+    popupMenu.setAssociatedComponent (this);
+    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
+    { showNewProcMenu (menu, options); };
 }
 
 BoardComponent::~BoardComponent()
@@ -77,7 +74,6 @@ void BoardComponent::resized()
     for (auto* editor : processorEditors)
         setEditorPosition (editor);
 
-    newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
 
     repaint();
@@ -122,12 +118,12 @@ void BoardComponent::showInfoComp (const BaseProcessor& proc)
     infoComp.toFront (true);
 }
 
-void BoardComponent::showNewProcMenu()
+void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options)
 {
-    auto& procStore = procChain.getProcStore();
+    nextEditorPosition = options.getTargetScreenArea().getPosition() - getScreenPosition();
 
     int menuID = 0;
-    PopupMenu menu;
+    auto& procStore = procChain.getProcStore();
     for (auto type : { Drive, Tone, Utility, Other })
     {
         PopupMenu subMenu;
@@ -137,14 +133,13 @@ void BoardComponent::showNewProcMenu()
         menu.addSubMenu (String (typeName), subMenu);
     }
 
-    auto options = PopupMenu::Options()
-                       .withParentComponent (this)
-                       .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-                       .withMinimumWidth (125)
-                       .withStandardItemHeight (27);
+    options = options
+                  .withParentComponent (this)
+                  .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
+                  .withMinimumWidth (125)
+                  .withStandardItemHeight (27);
 
     menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
-    menu.showMenuAsync (options);
 }
 
 ProcessorEditor* BoardComponent::findEditorForProcessor (const BaseProcessor* proc) const
@@ -171,19 +166,8 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> 
     auto position = proc->getPosition (getBounds());
     if (position == Point (0, 0) && getWidth() > 0 && getHeight() > 0) // no position set yet
     {
-        if (bounds == Rectangle<int> {}) // set initial bounds sort-of randomly
-        {
-            auto b = getLocalBounds()
-                         .withWidth (getWidth() * 2 / 3)
-                         .withHeight (getHeight() * 2 / 3);
-
-            auto randX = jmax (proportionOfWidth (0.1f), 1);
-            auto randY = jmax (proportionOfHeight (0.1f), 1);
-            auto& rand = Random::getSystemRandom();
-            auto centre = b.getCentre() + Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
-
-            bounds = Rectangle (thisEditorWidth, thisEditorHeight).withCentre (centre);
-        }
+        if (bounds == Rectangle<int> {})
+            bounds = Rectangle (thisEditorWidth, thisEditorHeight).withCentre (nextEditorPosition);
 
         editor->setBounds (bounds);
         proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
