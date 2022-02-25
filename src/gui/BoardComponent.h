@@ -25,12 +25,11 @@ public:
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
 
 private:
-    void showNewProcMenu();
+    void showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options);
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
 
     ProcessorChain& procChain;
-
-    TextButton newProcButton;
+    
     OwnedArray<ProcessorEditor> processorEditors;
     InfoComponent infoComp;
 
@@ -41,6 +40,9 @@ private:
     CableView cableView;
 
     float scaleFactor = 1.0f;
+
+    chowdsp::PopupMenuHelper popupMenu;
+    Point<int> nextEditorPosition {};
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 
