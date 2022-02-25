@@ -29,7 +29,7 @@ private:
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
 
     ProcessorChain& procChain;
-    
+
     OwnedArray<ProcessorEditor> processorEditors;
     InfoComponent infoComp;
 
