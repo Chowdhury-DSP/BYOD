@@ -5,19 +5,8 @@
 #include "Port.h"
 #include "processors/chain/ProcessorChain.h"
 
-class ProcessorEditor : public Component,
-                        private Port::PortListener
+class ProcessorEditor : public Component
 {
-    // clang-format off
-    CREATE_LISTENER (
-        PortListener,
-        portListeners,
-        virtual void createCable (ProcessorEditor* /*origin*/, int /*portIndex*/, const MouseEvent&) {}\
-        virtual void refreshCable (const MouseEvent&) {}\
-        virtual void releaseCable (const MouseEvent&) {}\
-        virtual void destroyCable (ProcessorEditor* /*origin*/, int /*portIndex*/) {}\
-    )
-    // clang-format on
 public:
     ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs);
     ~ProcessorEditor() override;
@@ -30,16 +19,14 @@ public:
     BaseProcessor* getProcPtr() const { return &proc; }
     const ProcessorUIOptions& getUIOptions() const { return procUI; }
 
-    void createCable (Port* origin, const MouseEvent& e) override;
-    void refreshCable (const MouseEvent& e) override;
-    void releaseCable (const MouseEvent& e) override;
-    void destroyCable (Port* origin) override;
-
+    Port* getPort (int portIndex, bool isInput);
     Point<int> getPortLocation (int portIndex, bool isInput) const;
     void setConnectionStatus (bool isConnected, int portIndex, bool isInput);
     Colour getColour() const noexcept { return procUI.backgroundColour; }
 
 private:
+    Port* getPortPrivate (int portIndex, bool isInput) const;
+
     void resetProcParameters();
     void createReplaceProcMenu (PopupMenu& menu);
 

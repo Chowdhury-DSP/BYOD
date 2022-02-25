@@ -1,5 +1,6 @@
 #include "CableViewConnectionHelper.h"
 #include "../BoardComponent.h"
+#include "CableViewPortLocationHelper.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
 
 namespace
@@ -133,7 +134,7 @@ void CableViewConnectionHelper::releaseCable (const MouseEvent& e)
     auto mousePos = relMouse.getPosition();
 
     auto* cable = cables.getLast();
-    auto [editor, portIdx] = cableView.getNearestInputPort (mousePos, cable->startProc);
+    auto [editor, portIdx, _] = cableView.getPortLocationHelper()->getNearestInputPort (mousePos, cable->startProc);
     if (editor != nullptr)
     {
         cable->endProc = editor->getProcPtr();

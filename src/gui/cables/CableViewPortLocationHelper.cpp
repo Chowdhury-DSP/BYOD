@@ -22,19 +22,20 @@ bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const B
     return result;
 }
 
-void getClosestPort (const Point<int>& pos, ProcessorEditor* editor, int& minDistance, CableView::EditorPortPair& closestPort, bool wantsInputPort)
+void getClosestPort (const Point<int>& pos, ProcessorEditor* editor, int& minDistance, CableView::EditorPort& closestPort, bool wantsInputPort, float scaleFactor)
 {
     int numPorts = wantsInputPort ? editor->getProcPtr()->getNumInputs() : editor->getProcPtr()->getNumOutputs();
+    const auto portDistanceLimit = CableConstants::getPortDistanceLimit (scaleFactor);
     for (int i = 0; i < numPorts; ++i)
     {
-        auto portLocation = CableViewPortLocationHelper::getPortLocation (editor, i, wantsInputPort);
+        auto portLocation = CableViewPortLocationHelper::getPortLocation ({ editor, i, wantsInputPort });
         auto distanceFromPort = pos.getDistanceFrom (portLocation);
 
-        bool isClosest = (distanceFromPort < CableConstants::portDistanceLimit && minDistance < 0) || distanceFromPort < minDistance;
+        bool isClosest = (distanceFromPort < portDistanceLimit && minDistance < 0) || distanceFromPort < minDistance;
         if (isClosest)
         {
             minDistance = distanceFromPort;
-            closestPort = std::make_pair (editor, i);
+            closestPort = CableView::EditorPort { editor, i, wantsInputPort };
         }
     }
 }
@@ -46,15 +47,21 @@ CableViewPortLocationHelper::CableViewPortLocationHelper (CableView& cv) : cable
 {
 }
 
-Point<int> CableViewPortLocationHelper::getPortLocation (ProcessorEditor* editor, int portIdx, bool isInput)
+Point<int> CableViewPortLocationHelper::getPortLocation (const CableView::EditorPort& editorPort)
 {
-    auto portLocation = editor->getPortLocation (portIdx, isInput);
-    return portLocation + editor->getBounds().getTopLeft();
+    auto portLocation = editorPort.editor->getPortLocation (editorPort.portIndex, editorPort.isInput);
+    return portLocation + editorPort.editor->getBounds().getTopLeft();
 }
 
-CableView::EditorPortPair CableViewPortLocationHelper::getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const
+bool CableViewPortLocationHelper::isInputPortConnected (const CableView::EditorPort& editorPort) const
 {
-    auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
+    return sst::cpputils::contains_if (cables, [&editorPort] (auto* cable)
+                                       { return cable->endProc == editorPort.editor->getProcPtr() && cable->endIdx == editorPort.portIndex; });
+}
+
+CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const
+{
+    auto result = CableView::EditorPort {};
     int minDistance = -1;
 
     for (auto* editor : board->processorEditors)
@@ -62,36 +69,33 @@ CableView::EditorPortPair CableViewPortLocationHelper::getNearestInputPort (cons
         if (wouldConnectingCreateFeedbackLoop (sourceProc, editor->getProcPtr(), cables))
             continue; // no feedback loops allowed
 
-        getClosestPort (pos, editor, minDistance, result, true);
+        getClosestPort (pos, editor, minDistance, result, true, cableView.scaleFactor);
     }
 
-    getClosestPort (pos, board->outputEditor.get(), minDistance, result, true);
+    getClosestPort (pos, board->outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
 
-    if (result.first == nullptr)
-        return result;
-
-    for (auto* cable : cables)
-    {
-        // the closest port is already connected!
-        if (cable->endProc == result.first->getProcPtr() && cable->endIdx == result.second)
-            return std::make_pair<ProcessorEditor*, int> (nullptr, 0);
-    }
+    if (result.editor == nullptr || isInputPortConnected (result))
+        return {};
 
     return result;
 }
 
-CableView::EditorPortPair CableViewPortLocationHelper::getNearestOutputPort (const Point<int>& pos) const
+CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const Point<int>& pos) const
 {
-    auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
+    auto result = CableView::EditorPort {};
     int minDistance = -1;
 
     for (auto* editor : board->processorEditors)
-        getClosestPort (pos, editor, minDistance, result, false);
+    {
+        getClosestPort (pos, editor, minDistance, result, false, cableView.scaleFactor);
+        getClosestPort (pos, editor, minDistance, result, true, cableView.scaleFactor);
+    }
 
-    getClosestPort (pos, board->inputEditor.get(), minDistance, result, false);
+    getClosestPort (pos, board->inputEditor.get(), minDistance, result, false, cableView.scaleFactor);
+    getClosestPort (pos, board->outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
 
-    if (result.first == nullptr)
-        return result;
+    if (result.editor == nullptr)
+        return {};
 
     return result;
 }

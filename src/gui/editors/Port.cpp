@@ -36,26 +36,6 @@ void Port::paint (Graphics& g)
     g.drawEllipse (portBounds.reduced (1.0f), 1.0f);
 }
 
-void Port::mouseDown (const MouseEvent& e)
-{
-    if (isInput)
-        portListeners.call (&PortListener::destroyCable, this);
-    else
-        portListeners.call (&PortListener::createCable, this, e);
-}
-
-void Port::mouseDrag (const MouseEvent& e)
-{
-    if (! isInput)
-        portListeners.call (&PortListener::refreshCable, e);
-}
-
-void Port::mouseUp (const MouseEvent& e)
-{
-    if (! isInput)
-        portListeners.call (&PortListener::releaseCable, e);
-}
-
 void Port::setConnectionStatus (bool connectionStatus)
 {
     isConnected = connectionStatus;

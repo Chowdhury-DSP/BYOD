@@ -20,10 +20,13 @@ void CableView::paint (Graphics& g)
     using namespace CableConstants;
     using namespace CableDrawingHelpers;
 
-    if (outputPortToHighlight.first != nullptr)
+    if (nearestPort.editor != nullptr)
     {
-        auto startPortLocation = CableViewPortLocationHelper::getPortLocation (outputPortToHighlight.first, outputPortToHighlight.second, false);
-        drawCablePortGlow (g, startPortLocation);
+        if (! nearestPort.isInput || portLocationHelper->isInputPortConnected (nearestPort))
+        {
+            auto startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
+            drawCablePortGlow (g, startPortLocation, scaleFactor);
+        }
     }
 
     g.setColour (cableColour.brighter (0.1f));
@@ -32,14 +35,14 @@ void CableView::paint (Graphics& g)
         auto* startEditor = board->findEditorForProcessor (cable->startProc);
         jassert (startEditor != nullptr);
 
-        auto startPortLocation = CableViewPortLocationHelper::getPortLocation (startEditor, cable->startIdx, false);
+        auto startPortLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, cable->startIdx, false });
 
         if (cable->endProc != nullptr)
         {
             auto* endEditor = board->findEditorForProcessor (cable->endProc);
             jassert (endEditor != nullptr);
 
-            auto endPortLocation = CableViewPortLocationHelper::getPortLocation (endEditor, cable->endIdx, true);
+            auto endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, cable->endIdx, true });
 
             auto startColour = startEditor->getColour();
             auto endColour = endEditor->getColour();
@@ -49,11 +52,10 @@ void CableView::paint (Graphics& g)
         else if (connectionHelper->cableMouse != nullptr)
         {
             auto mousePos = connectionHelper->cableMouse->getPosition();
-            auto [editor, portIdx] = portLocationHelper->getNearestInputPort (mousePos, cable->startProc);
-            if (editor != nullptr)
+            if (nearestPort.editor != nullptr && nearestPort.isInput)
             {
-                auto endPortLocation = CableViewPortLocationHelper::getPortLocation (editor, portIdx, true);
-                drawCablePortGlow (g, endPortLocation);
+                auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
+                drawCablePortGlow (g, endPortLocation, scaleFactor);
             }
 
             auto colour = startEditor->getColour();
@@ -62,10 +64,42 @@ void CableView::paint (Graphics& g)
     }
 }
 
+void CableView::mouseDown (const MouseEvent& e)
+{
+    nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition());
+    if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || nearestPort.editor == nullptr)
+        return;
+
+    if (nearestPort.isInput)
+    {
+        connectionHelper->destroyCable (nearestPort.editor, nearestPort.portIndex);
+    }
+    else
+    {
+        connectionHelper->createCable (nearestPort.editor, nearestPort.portIndex, e);
+        isDraggingCable = true;
+    }
+}
+
+void CableView::mouseDrag (const MouseEvent& e)
+{
+    if (isDraggingCable)
+        connectionHelper->refreshCable (e);
+}
+
+void CableView::mouseUp (const MouseEvent& e)
+{
+    if (isDraggingCable)
+    {
+        connectionHelper->releaseCable (e);
+        isDraggingCable = false;
+    }
+}
+
 void CableView::timerCallback()
 {
     const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
-    outputPortToHighlight = portLocationHelper->getNearestOutputPort (mousePos);
+    nearestPort = portLocationHelper->getNearestPort (mousePos);
     repaint();
 }
 

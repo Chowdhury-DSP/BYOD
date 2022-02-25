@@ -79,7 +79,7 @@ void drawCableShadow (Graphics& g, const Path& cablePath, float thickness)
 
 void drawCableEndCircle (Graphics& g, Point<float> centre, Colour colour, float scaleFactor)
 {
-    auto circle = (Rectangle { cableThickness * 2.0f, cableThickness * 2.0f } * scaleFactor).withCentre (centre);
+    auto circle = (Rectangle { cableThickness, cableThickness } * 2.4f * scaleFactor).withCentre (centre);
     g.setColour (colour);
     g.fillEllipse (circle);
 
@@ -100,13 +100,20 @@ void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float
     drawCableEndCircle (g, end, endColour, scaleFactor);
 }
 
-void drawCablePortGlow (Graphics& g, Point<int> location)
+void drawCablePortGlow (Graphics& g, Point<int> location, float scaleFactor)
 {
     Graphics::ScopedSaveState graphicsState (g);
     g.setColour (cableColour.darker (0.1f));
     g.setOpacity (0.65f);
 
-    auto glowBounds = (Rectangle (portDistanceLimit, portDistanceLimit).toFloat() * 2.5f).withCentre (location.toFloat());
+#if JUCE_IOS
+    constexpr float glowSizeFactor = 5.0f;
+#else
+    constexpr float glowSizeFactor = 2.5f;
+#endif
+
+    const auto glowDim = (float) getPortDistanceLimit (scaleFactor) * glowSizeFactor;
+    auto glowBounds = (Rectangle (glowDim, glowDim)).withCentre (location.toFloat());
     g.fillEllipse (glowBounds);
 }
 } // namespace CableDrawingHelpers

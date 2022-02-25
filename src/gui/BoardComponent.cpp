@@ -18,15 +18,14 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 {
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
     addAndMakeVisible (inputEditor.get());
-    inputEditor->addPortListener (cableView.getConnectionHelper());
 
     outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain);
     addAndMakeVisible (outputEditor.get());
-    outputEditor->addPortListener (cableView.getConnectionHelper());
 
     addChildComponent (infoComp);
     addAndMakeVisible (cableView);
     cableView.toBack();
+    addMouseListener (&cableView, true);
 
     for (auto* p : procs.getProcessors())
         processorAdded (p);
@@ -43,8 +42,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 
 BoardComponent::~BoardComponent()
 {
-    inputEditor->removePortListener (cableView.getConnectionHelper());
-    outputEditor->removePortListener (cableView.getConnectionHelper());
+    removeMouseListener (&cableView);
     procChain.removeListener (this);
     procChain.removeListener (cableView.getConnectionHelper());
 }
@@ -93,8 +91,6 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     cableView.processorBeingAdded (newProc);
     setEditorPosition (newEditor);
 
-    newEditor->addPortListener (cableView.getConnectionHelper());
-
     repaint();
 }
 
@@ -103,10 +99,7 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
     cableView.processorBeingRemoved (proc);
 
     if (auto* editor = findEditorForProcessor (proc))
-    {
-        editor->removePortListener (cableView.getConnectionHelper());
         processorEditors.removeObject (editor);
-    }
 
     repaint();
 }

@@ -14,14 +14,23 @@ public:
     ~CableView() override;
 
     void paint (Graphics& g) override;
+    void mouseDown (const MouseEvent& e) override;
+    void mouseDrag (const MouseEvent& e) override;
+    void mouseUp (const MouseEvent& e) override;
 
     auto* getConnectionHelper() { return connectionHelper.get(); }
+    auto* getPortLocationHelper() { return portLocationHelper.get(); }
     void processorBeingAdded (BaseProcessor* newProc);
     void processorBeingRemoved (const BaseProcessor* proc);
 
     void setScaleFactor (float newScaleFactor);
 
-    using EditorPortPair = std::pair<ProcessorEditor*, int>;
+    struct EditorPort
+    {
+        ProcessorEditor* editor = nullptr;
+        int portIndex = 0;
+        bool isInput = false;
+    };
 
 private:
     void timerCallback() override;
@@ -30,13 +39,15 @@ private:
     OwnedArray<Cable> cables;
 
     float scaleFactor = 1.0f;
+    bool isDraggingCable = false;
 
     friend class CableViewConnectionHelper;
     std::unique_ptr<CableViewConnectionHelper> connectionHelper;
 
     friend class CableViewPortLocationHelper;
     std::unique_ptr<CableViewPortLocationHelper> portLocationHelper;
-    CableView::EditorPortPair outputPortToHighlight { nullptr, 0 };
+
+    EditorPort nearestPort {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CableView)
 };

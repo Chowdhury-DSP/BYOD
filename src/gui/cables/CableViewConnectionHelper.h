@@ -2,8 +2,7 @@
 
 #include "CableView.h"
 
-class CableViewConnectionHelper : public ProcessorEditor::PortListener,
-                                  public ProcessorChain::Listener
+class CableViewConnectionHelper : public ProcessorChain::Listener
 {
 public:
     explicit CableViewConnectionHelper (CableView& cableView);
@@ -15,10 +14,10 @@ public:
     void connectionAdded (const ConnectionInfo& info) override;
     void connectionRemoved (const ConnectionInfo& info) override;
 
-    void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e) override;
-    void refreshCable (const MouseEvent& e) override;
-    void releaseCable (const MouseEvent& e) override;
-    void destroyCable (ProcessorEditor* origin, int portIndex) override;
+    void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e);
+    void refreshCable (const MouseEvent& e);
+    void releaseCable (const MouseEvent& e);
+    void destroyCable (ProcessorEditor* origin, int portIndex);
 
     std::unique_ptr<MouseEvent> cableMouse;
 
