@@ -3,6 +3,7 @@
 #include "drive/GuitarMLAmp.h"
 #include "drive/RONN.h"
 #include "drive/RangeBooster.h"
+#include "drive/Warp.h"
 #include "drive/big_muff/BigMuffDrive.h"
 #include "drive/centaur/Centaur.h"
 #include "drive/diode_circuits/DiodeClipper.h"
@@ -63,6 +64,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "RONN", &processorFactory<RONN> },
     { "Tube Screamer", &processorFactory<TubeScreamer> },
     { "Waveshaper", &processorFactory<Waveshaper> },
+    { "Warp", &processorFactory<Warp> },
     { "Yen Drive", &processorFactory<ZenDrive> },
 
     { "Amp IRs", &processorFactory<AmpIRs> },

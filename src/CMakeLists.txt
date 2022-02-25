@@ -44,6 +44,7 @@ target_sources(BYOD PRIVATE
     processors/drive/GuitarMLAmp.cpp
     processors/drive/RangeBooster.cpp
     processors/drive/RONN.cpp
+    processors/drive/Warp.cpp
     processors/drive/big_muff/BigMuffDrive.cpp
     processors/drive/big_muff/BigMuffClippingStage.cpp
     processors/drive/centaur/Centaur.cpp
