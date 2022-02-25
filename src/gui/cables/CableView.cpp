@@ -66,9 +66,12 @@ void CableView::paint (Graphics& g)
 
 void CableView::mouseDown (const MouseEvent& e)
 {
-    nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition());
-    if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || nearestPort.editor == nullptr)
-        return;
+    if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || e.eventComponent == nullptr)
+        return; // not a valid mouse event
+
+    nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition(), e.source.getComponentUnderMouse());
+    if (nearestPort.editor == nullptr)
+        return; // no nearest port
 
     if (nearestPort.isInput)
     {
@@ -99,7 +102,7 @@ void CableView::mouseUp (const MouseEvent& e)
 void CableView::timerCallback()
 {
     const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
-    nearestPort = portLocationHelper->getNearestPort (mousePos);
+    nearestPort = portLocationHelper->getNearestPort (mousePos, Desktop::getInstance().getMainMouseSource().getComponentUnderMouse());
     repaint();
 }
 

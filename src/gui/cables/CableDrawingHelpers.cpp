@@ -107,7 +107,7 @@ void drawCablePortGlow (Graphics& g, Point<int> location, float scaleFactor)
     g.setOpacity (0.65f);
 
 #if JUCE_IOS
-    constexpr float glowSizeFactor = 5.0f;
+    constexpr float glowSizeFactor = 4.5f;
 #else
     constexpr float glowSizeFactor = 2.5f;
 #endif

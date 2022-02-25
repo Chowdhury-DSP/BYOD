@@ -80,7 +80,7 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const Po
     return result;
 }
 
-CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const Point<int>& pos) const
+CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const Point<int>& pos, const Component* compUnderMouse) const
 {
     auto result = CableView::EditorPort {};
     int minDistance = -1;
@@ -96,6 +96,13 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const Point<i
 
     if (result.editor == nullptr)
         return {};
+
+    if (compUnderMouse != nullptr)
+    {
+        const auto* port = result.editor->getPort (result.portIndex, result.isInput);
+        if (! sst::cpputils::contains (std::array<const Component*, 3> { board, result.editor, port }, compUnderMouse))
+            return {}; // wrong component under the mouse!
+    }
 
     return result;
 }

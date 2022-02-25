@@ -11,7 +11,7 @@ public:
     bool isInputPortConnected (const CableView::EditorPort& editorPort) const;
 
     CableView::EditorPort getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const;
-    CableView::EditorPort getNearestPort (const Point<int>& pos) const;
+    CableView::EditorPort getNearestPort (const Point<int>& pos, const Component* compUnderMouse = nullptr) const;
 
 private:
     CableView& cableView;
