@@ -37,6 +37,8 @@ private:
     std::unique_ptr<ProcessorEditor> outputEditor;
 
     friend class CableView;
+    friend class CableViewConnectionHelper;
+    friend class CableViewPortLocationHelper;
     CableView cableView;
 
     float scaleFactor = 1.0f;

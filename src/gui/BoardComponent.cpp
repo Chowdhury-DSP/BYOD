@@ -1,4 +1,5 @@
 #include "BoardComponent.h"
+#include "cables/CableViewConnectionHelper.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
 
 namespace
@@ -6,7 +7,6 @@ namespace
 constexpr int editorWidth = 270;
 constexpr int editorHeight = 180;
 constexpr int editorPad = 5;
-constexpr int newButtonWidth = 40;
 
 constexpr int getScaleDim (int dim, float scaleFactor)
 {
@@ -18,11 +18,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 {
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
     addAndMakeVisible (inputEditor.get());
-    inputEditor->addPortListener (&cableView);
+    inputEditor->addPortListener (cableView.getConnectionHelper());
 
     outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain);
     addAndMakeVisible (outputEditor.get());
-    outputEditor->addPortListener (&cableView);
+    outputEditor->addPortListener (cableView.getConnectionHelper());
 
     addChildComponent (infoComp);
     addAndMakeVisible (cableView);
@@ -32,9 +32,9 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
         processorAdded (p);
 
     procChain.addListener (this);
-    procChain.addListener (&cableView);
+    procChain.addListener (cableView.getConnectionHelper());
 
-    cableView.refreshConnections();
+    cableView.getConnectionHelper()->refreshConnections();
 
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
@@ -43,10 +43,10 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 
 BoardComponent::~BoardComponent()
 {
-    inputEditor->removePortListener (&cableView);
-    outputEditor->removePortListener (&cableView);
+    inputEditor->removePortListener (cableView.getConnectionHelper());
+    outputEditor->removePortListener (cableView.getConnectionHelper());
     procChain.removeListener (this);
-    procChain.removeListener (&cableView);
+    procChain.removeListener (cableView.getConnectionHelper());
 }
 
 void BoardComponent::setScaleFactor (float newScaleFactor)
@@ -93,7 +93,7 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     cableView.processorBeingAdded (newProc);
     setEditorPosition (newEditor);
 
-    newEditor->addPortListener (&cableView);
+    newEditor->addPortListener (cableView.getConnectionHelper());
 
     repaint();
 }
@@ -104,7 +104,7 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
 
     if (auto* editor = findEditorForProcessor (proc))
     {
-        editor->removePortListener (&cableView);
+        editor->removePortListener (cableView.getConnectionHelper());
         processorEditors.removeObject (editor);
     }
 

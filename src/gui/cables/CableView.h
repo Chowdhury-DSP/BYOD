@@ -4,41 +4,39 @@
 #include "Cable.h"
 
 class BoardComponent;
+class CableViewConnectionHelper;
+class CableViewPortLocationHelper;
 class CableView : public Component,
-                  public ProcessorEditor::PortListener,
-                  public ProcessorChain::Listener,
                   private Timer
 {
 public:
     explicit CableView (const BoardComponent* comp);
+    ~CableView() override;
 
     void paint (Graphics& g) override;
 
+    auto* getConnectionHelper() { return connectionHelper.get(); }
     void processorBeingAdded (BaseProcessor* newProc);
     void processorBeingRemoved (const BaseProcessor* proc);
-    void refreshConnections() override;
-    void connectionAdded (const ConnectionInfo& info) override;
-    void connectionRemoved (const ConnectionInfo& info) override;
-
-    void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e) override;
-    void refreshCable (const MouseEvent& e) override;
-    void releaseCable (const MouseEvent& e) override;
-    void destroyCable (ProcessorEditor* origin, int portIndex) override;
 
     void setScaleFactor (float newScaleFactor);
 
-private:
-    void timerCallback() override { repaint(); }
+    using EditorPortPair = std::pair<ProcessorEditor*, int>;
 
-    std::pair<ProcessorEditor*, int> getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const;
+private:
+    void timerCallback() override;
 
     const BoardComponent* board = nullptr;
-
     OwnedArray<Cable> cables;
-    std::unique_ptr<MouseEvent> cableMouse;
-    bool ignoreConnectionCallbacks = false;
 
     float scaleFactor = 1.0f;
+
+    friend class CableViewConnectionHelper;
+    std::unique_ptr<CableViewConnectionHelper> connectionHelper;
+
+    friend class CableViewPortLocationHelper;
+    std::unique_ptr<CableViewPortLocationHelper> portLocationHelper;
+    CableView::EditorPortPair outputPortToHighlight { nullptr, 0 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CableView)
 };

@@ -165,7 +165,7 @@ void ProcessorEditor::resized()
         xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
     }
 
-    const int portDim = proportionOfHeight (0.15f);
+    const int portDim = proportionOfHeight (0.175f);
     auto placePorts = [=] (int x, auto& ports)
     {
         const auto nPorts = ports.size();

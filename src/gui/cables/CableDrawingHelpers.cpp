@@ -104,9 +104,9 @@ void drawCablePortGlow (Graphics& g, Point<int> location)
 {
     Graphics::ScopedSaveState graphicsState (g);
     g.setColour (cableColour.darker (0.1f));
-    g.setOpacity (0.5f);
+    g.setOpacity (0.65f);
 
-    auto glowBounds = (Rectangle (portDistanceLimit, portDistanceLimit) * 2).withCentre (location);
-    g.fillEllipse (glowBounds.toFloat());
+    auto glowBounds = (Rectangle (portDistanceLimit, portDistanceLimit).toFloat() * 2.5f).withCentre (location.toFloat());
+    g.fillEllipse (glowBounds);
 }
 } // namespace CableDrawingHelpers
