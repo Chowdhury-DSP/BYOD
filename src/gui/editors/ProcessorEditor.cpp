@@ -38,7 +38,6 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         auto newPort = inputPorts.add (std::make_unique<Port>());
         newPort->setInputOutput (true);
         addAndMakeVisible (newPort);
-        newPort->addPortListener (this);
     }
 
     for (int i = 0; i < baseProc.getNumOutputs(); ++i)
@@ -46,7 +45,6 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         auto newPort = outputPorts.add (std::make_unique<Port>());
         newPort->setInputOutput (false);
         addAndMakeVisible (newPort);
-        newPort->addPortListener (this);
     }
 
     popupMenu.setAssociatedComponent (this);
@@ -78,14 +76,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     };
 }
 
-ProcessorEditor::~ProcessorEditor()
-{
-    for (auto* port : inputPorts)
-        port->removePortListener (this);
-
-    for (auto* port : outputPorts)
-        port->removePortListener (this);
-}
+ProcessorEditor::~ProcessorEditor() = default;
 
 void ProcessorEditor::resetProcParameters()
 {
@@ -165,7 +156,7 @@ void ProcessorEditor::resized()
         xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
     }
 
-    const int portDim = proportionOfHeight (0.15f);
+    const int portDim = proportionOfHeight (0.17f);
     auto placePorts = [=] (int x, auto& ports)
     {
         const auto nPorts = ports.size();
@@ -207,36 +198,26 @@ void ProcessorEditor::mouseDrag (const MouseEvent& e)
     }
 }
 
-void ProcessorEditor::createCable (Port* origin, const MouseEvent& e)
-{
-    portListeners.call (&PortListener::createCable, this, outputPorts.indexOf (origin), e);
-}
-
-void ProcessorEditor::refreshCable (const MouseEvent& e)
-{
-    portListeners.call (&PortListener::refreshCable, e);
-}
-
-void ProcessorEditor::releaseCable (const MouseEvent& e)
-{
-    portListeners.call (&PortListener::releaseCable, e);
-}
-
-void ProcessorEditor::destroyCable (Port* origin)
-{
-    portListeners.call (&PortListener::destroyCable, this, inputPorts.indexOf (origin));
-}
-
-Point<int> ProcessorEditor::getPortLocation (int portIndex, bool isInput) const
+Port* ProcessorEditor::getPortPrivate (int portIndex, bool isInput) const
 {
     if (isInput)
     {
         jassert (portIndex < inputPorts.size());
-        return inputPorts[portIndex]->getBounds().getCentre();
+        return inputPorts[portIndex];
     }
 
     jassert (portIndex < outputPorts.size());
-    return outputPorts[portIndex]->getBounds().getCentre();
+    return outputPorts[portIndex];
+}
+
+Port* ProcessorEditor::getPort (int portIndex, bool isInput)
+{
+    return getPortPrivate (portIndex, isInput);
+}
+
+Point<int> ProcessorEditor::getPortLocation (int portIndex, bool isInput) const
+{
+    return getPortPrivate (portIndex, isInput)->getBounds().getCentre();
 }
 
 void ProcessorEditor::setConnectionStatus (bool isConnected, int portIndex, bool isInput)

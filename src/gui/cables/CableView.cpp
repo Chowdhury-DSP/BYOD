@@ -1,64 +1,33 @@
 #include "CableView.h"
 #include "../BoardComponent.h"
 #include "CableDrawingHelpers.h"
-#include "processors/chain/ProcessorChainActionHelper.h"
-
-namespace
-{
-Point<int> getPortLocation (ProcessorEditor* editor, int portIdx, bool isInput)
-{
-    auto portLocation = editor->getPortLocation (portIdx, isInput);
-    return portLocation + editor->getBounds().getTopLeft();
-}
-
-std::unique_ptr<Cable> connectionToCable (const ConnectionInfo& connection)
-{
-    return std::make_unique<Cable> (connection.startProc, connection.startPort, connection.endProc, connection.endPort);
-}
-
-ConnectionInfo cableToConnection (const Cable& cable)
-{
-    return { cable.startProc, cable.startIdx, cable.endProc, cable.endIdx };
-}
-
-void updateConnectionStatuses (const BoardComponent* board, const ConnectionInfo& connection, bool isConnected)
-{
-    if (auto* editor = board->findEditorForProcessor (connection.startProc))
-    {
-        bool shouldBeConnected = isConnected || connection.startProc->getNumOutputConnections (connection.startPort) > 0;
-        editor->setConnectionStatus (shouldBeConnected, connection.startPort, false);
-    }
-
-    if (auto* editor = board->findEditorForProcessor (connection.endProc))
-        editor->setConnectionStatus (isConnected, connection.endPort, true);
-}
-
-void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent* board)
-{
-    for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
-    {
-        auto numConnections = proc->getNumOutputConnections (portIdx);
-        for (int cIdx = 0; cIdx < numConnections; ++cIdx)
-        {
-            const auto& connection = proc->getOutputConnection (portIdx, cIdx);
-            cables.add (connectionToCable (connection));
-
-            updateConnectionStatuses (board, connection, true);
-        }
-    }
-}
-} // namespace
+#include "CableViewConnectionHelper.h"
+#include "CableViewPortLocationHelper.h"
 
 CableView::CableView (const BoardComponent* comp) : board (comp)
 {
     setInterceptsMouseClicks (false, false);
     startTimerHz (36);
+
+    connectionHelper = std::make_unique<CableViewConnectionHelper> (*this);
+    portLocationHelper = std::make_unique<CableViewPortLocationHelper> (*this);
 }
+
+CableView::~CableView() = default;
 
 void CableView::paint (Graphics& g)
 {
     using namespace CableConstants;
     using namespace CableDrawingHelpers;
+
+    if (nearestPort.editor != nullptr)
+    {
+        if (! nearestPort.isInput || portLocationHelper->isInputPortConnected (nearestPort))
+        {
+            auto startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
+            drawCablePortGlow (g, startPortLocation, scaleFactor);
+        }
+    }
 
     g.setColour (cableColour.brighter (0.1f));
     for (auto* cable : cables)
@@ -66,28 +35,27 @@ void CableView::paint (Graphics& g)
         auto* startEditor = board->findEditorForProcessor (cable->startProc);
         jassert (startEditor != nullptr);
 
-        auto startPortLocation = getPortLocation (startEditor, cable->startIdx, false);
+        auto startPortLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, cable->startIdx, false });
 
         if (cable->endProc != nullptr)
         {
             auto* endEditor = board->findEditorForProcessor (cable->endProc);
             jassert (endEditor != nullptr);
 
-            auto endPortLocation = getPortLocation (endEditor, cable->endIdx, true);
+            auto endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, cable->endIdx, true });
 
             auto startColour = startEditor->getColour();
             auto endColour = endEditor->getColour();
             auto levelDB = cable->endProc->getInputLevelDB (cable->endIdx);
             drawCable (g, startPortLocation.toFloat(), startColour, endPortLocation.toFloat(), endColour, scaleFactor, levelDB);
         }
-        else if (cableMouse != nullptr)
+        else if (connectionHelper->cableMouse != nullptr)
         {
-            auto mousePos = cableMouse->getPosition();
-            auto [editor, portIdx] = getNearestInputPort (mousePos, cable->startProc);
-            if (editor != nullptr)
+            auto mousePos = connectionHelper->cableMouse->getPosition();
+            if (nearestPort.editor != nullptr && nearestPort.isInput)
             {
-                auto endPortLocation = getPortLocation (editor, portIdx, true);
-                drawCablePortGlow (g, endPortLocation);
+                auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
+                drawCablePortGlow (g, endPortLocation, scaleFactor);
             }
 
             auto colour = startEditor->getColour();
@@ -96,194 +64,60 @@ void CableView::paint (Graphics& g)
     }
 }
 
+void CableView::mouseDown (const MouseEvent& e)
+{
+    if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || e.eventComponent == nullptr)
+        return; // not a valid mouse event
+
+    nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition(), e.source.getComponentUnderMouse());
+    if (nearestPort.editor == nullptr)
+        return; // no nearest port
+
+    if (nearestPort.isInput)
+    {
+        connectionHelper->destroyCable (nearestPort.editor, nearestPort.portIndex);
+    }
+    else
+    {
+        connectionHelper->createCable (nearestPort.editor, nearestPort.portIndex, e);
+        isDraggingCable = true;
+    }
+}
+
+void CableView::mouseDrag (const MouseEvent& e)
+{
+    if (isDraggingCable)
+        connectionHelper->refreshCable (e);
+}
+
+void CableView::mouseUp (const MouseEvent& e)
+{
+    if (isDraggingCable)
+    {
+        connectionHelper->releaseCable (e);
+        isDraggingCable = false;
+    }
+}
+
+void CableView::timerCallback()
+{
+    const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
+    nearestPort = portLocationHelper->getNearestPort (mousePos, Desktop::getInstance().getMainMouseSource().getComponentUnderMouse());
+    repaint();
+}
+
 void CableView::setScaleFactor (float newScaleFactor)
 {
     scaleFactor = newScaleFactor;
     repaint();
 }
 
-void CableView::createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e)
-{
-    cables.add (std::make_unique<Cable> (origin->getProcPtr(), portIndex));
-    cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
-    repaint();
-}
-
-void CableView::refreshCable (const MouseEvent& e)
-{
-    cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
-    repaint();
-}
-
-void CableView::releaseCable (const MouseEvent& e)
-{
-    cableMouse.reset();
-
-    // check if we're releasing near an output port
-    auto relMouse = e.getEventRelativeTo (this);
-    auto mousePos = relMouse.getPosition();
-
-    auto* cable = cables.getLast();
-    auto [editor, portIdx] = getNearestInputPort (mousePos, cable->startProc);
-    if (editor != nullptr)
-    {
-        cable->endProc = editor->getProcPtr();
-        cable->endIdx = portIdx;
-
-        const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
-        auto connection = cableToConnection (*cable);
-        board->procChain.getActionHelper().addConnection (std::move (connection));
-
-        repaint();
-        return;
-    }
-
-    // not being connected... trash the latest cable
-    cables.removeObject (cables.getLast());
-
-    repaint();
-}
-
-void CableView::destroyCable (ProcessorEditor* origin, int portIndex)
-{
-    const auto* proc = origin->getProcPtr();
-    for (auto* cable : cables)
-    {
-        if (cable->endProc == proc && cable->endIdx == portIndex)
-        {
-            const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
-            board->procChain.getActionHelper().removeConnection (cableToConnection (*cable));
-            cables.removeObject (cable);
-
-            break;
-        }
-    }
-
-    repaint();
-}
-
-bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const BaseProcessor* destProc, const OwnedArray<Cable>& cables)
-{
-    if (sourceProc->getNumInputs() == 0)
-        return false;
-
-    if (sourceProc == destProc)
-        return true;
-
-    bool result = false;
-    for (auto* cable : cables)
-    {
-        if (cable->endProc == sourceProc)
-            result |= wouldConnectingCreateFeedbackLoop (cable->startProc, destProc, cables);
-    }
-
-    return result;
-}
-
-std::pair<ProcessorEditor*, int> CableView::getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const
-{
-    auto result = std::make_pair<ProcessorEditor*, int> (nullptr, 0);
-    int minDistance = -1;
-
-    auto checkPorts = [&] (ProcessorEditor* editor)
-    {
-        int numPorts = editor->getProcPtr()->getNumInputs();
-        for (int i = 0; i < numPorts; ++i)
-        {
-            auto portLocation = getPortLocation (editor, i, true);
-            auto distanceFromPort = pos.getDistanceFrom (portLocation);
-
-            bool isClosest = (distanceFromPort < CableConstants::portDistanceLimit && minDistance < 0) || distanceFromPort < minDistance;
-            if (isClosest)
-            {
-                minDistance = distanceFromPort;
-                result = std::make_pair (editor, i);
-            }
-        }
-    };
-
-    for (auto* editor : board->processorEditors)
-    {
-        if (wouldConnectingCreateFeedbackLoop (sourceProc, editor->getProcPtr(), cables))
-            continue; // no feedback loops allowed
-
-        checkPorts (editor);
-    }
-
-    checkPorts (board->outputEditor.get());
-
-    if (result.first == nullptr)
-        return result;
-
-    for (auto* cable : cables)
-    {
-        // the closest port is already connected!
-        if (cable->endProc == result.first->getProcPtr() && cable->endIdx == result.second)
-            return std::make_pair<ProcessorEditor*, int> (nullptr, 0);
-    }
-
-    return result;
-}
-
 void CableView::processorBeingAdded (BaseProcessor* newProc)
 {
-    addConnectionsForProcessor (cables, newProc, board);
+    connectionHelper->processorBeingAdded (newProc);
 }
 
 void CableView::processorBeingRemoved (const BaseProcessor* proc)
 {
-    for (int i = cables.size() - 1; i >= 0; --i)
-    {
-        if (cables[i]->startProc == proc || cables[i]->endProc == proc)
-        {
-            updateConnectionStatuses (board, cableToConnection (*cables[i]), false);
-            cables.remove (i);
-        }
-    }
-}
-
-void CableView::refreshConnections()
-{
-    cables.clear();
-
-    for (auto* proc : board->procChain.getProcessors())
-        addConnectionsForProcessor (cables, proc, board);
-
-    addConnectionsForProcessor (cables, &board->procChain.getInputProcessor(), board);
-
-    repaint();
-}
-
-void CableView::connectionAdded (const ConnectionInfo& info)
-{
-    updateConnectionStatuses (board, info, true);
-
-    if (ignoreConnectionCallbacks)
-        return;
-
-    cables.add (connectionToCable (info));
-
-    repaint();
-}
-
-void CableView::connectionRemoved (const ConnectionInfo& info)
-{
-    updateConnectionStatuses (board, info, false);
-
-    if (ignoreConnectionCallbacks)
-        return;
-
-    for (auto* cable : cables)
-    {
-        if (cable->startProc == info.startProc
-            && cable->startIdx == info.startPort
-            && cable->endProc == info.endProc
-            && cable->endIdx == info.endPort)
-        {
-            cables.removeObject (cable);
-            break;
-        }
-    }
-
-    repaint();
+    connectionHelper->processorBeingRemoved (proc);
 }

@@ -1,4 +1,5 @@
 #include "BoardComponent.h"
+#include "cables/CableViewConnectionHelper.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
 
 namespace
@@ -6,7 +7,6 @@ namespace
 constexpr int editorWidth = 270;
 constexpr int editorHeight = 180;
 constexpr int editorPad = 5;
-constexpr int newButtonWidth = 40;
 
 constexpr int getScaleDim (int dim, float scaleFactor)
 {
@@ -18,23 +18,22 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 {
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
     addAndMakeVisible (inputEditor.get());
-    inputEditor->addPortListener (&cableView);
 
     outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain);
     addAndMakeVisible (outputEditor.get());
-    outputEditor->addPortListener (&cableView);
 
     addChildComponent (infoComp);
     addAndMakeVisible (cableView);
     cableView.toBack();
+    addMouseListener (&cableView, true);
 
     for (auto* p : procs.getProcessors())
         processorAdded (p);
 
     procChain.addListener (this);
-    procChain.addListener (&cableView);
+    procChain.addListener (cableView.getConnectionHelper());
 
-    cableView.refreshConnections();
+    cableView.getConnectionHelper()->refreshConnections();
 
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
@@ -43,10 +42,9 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 
 BoardComponent::~BoardComponent()
 {
-    inputEditor->removePortListener (&cableView);
-    outputEditor->removePortListener (&cableView);
+    removeMouseListener (&cableView);
     procChain.removeListener (this);
-    procChain.removeListener (&cableView);
+    procChain.removeListener (cableView.getConnectionHelper());
 }
 
 void BoardComponent::setScaleFactor (float newScaleFactor)
@@ -93,8 +91,6 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     cableView.processorBeingAdded (newProc);
     setEditorPosition (newEditor);
 
-    newEditor->addPortListener (&cableView);
-
     repaint();
 }
 
@@ -103,10 +99,7 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
     cableView.processorBeingRemoved (proc);
 
     if (auto* editor = findEditorForProcessor (proc))
-    {
-        editor->removePortListener (&cableView);
         processorEditors.removeObject (editor);
-    }
 
     repaint();
 }
