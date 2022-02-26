@@ -24,6 +24,7 @@
 
 // global definitions
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
+using ParamLayout = AudioProcessorValueTreeState::ParameterLayout;
 namespace wdft = chowdsp::WDFT;
 
 // Useful for creating Listener patterns

@@ -9,7 +9,7 @@ public:
     ~Compressor() override;
 
     ProcessorType getProcessorType() const override { return Other; }
-    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;

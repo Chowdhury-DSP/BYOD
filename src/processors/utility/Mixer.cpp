@@ -12,7 +12,7 @@ Mixer::Mixer (UndoManager* um) : BaseProcessor ("Mixer", createParameterLayout()
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout Mixer::createParameterLayout()
+ParamLayout Mixer::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

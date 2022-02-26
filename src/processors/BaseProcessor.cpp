@@ -1,7 +1,7 @@
 #include "BaseProcessor.h"
 
 BaseProcessor::BaseProcessor (const String& name,
-                              AudioProcessorValueTreeState::ParameterLayout params,
+                              ParamLayout params,
                               UndoManager* um,
                               int nInputs,
                               int nOutputs) : JuceProcWrapper (name),

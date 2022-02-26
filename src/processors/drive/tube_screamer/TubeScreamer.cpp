@@ -13,7 +13,7 @@ TubeScreamer::TubeScreamer (UndoManager* um) : BaseProcessor ("Tube Screamer", c
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout TubeScreamer::createParameterLayout()
+ParamLayout TubeScreamer::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

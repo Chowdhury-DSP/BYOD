@@ -8,7 +8,7 @@ public:
     explicit Tuner (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Utility; }
-    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    static ParamLayout createParameterLayout();
 
     void getCustomComponents (OwnedArray<Component>& customComps) override;
 

@@ -6,7 +6,7 @@ OutputProcessor::OutputProcessor (UndoManager* um) : BaseProcessor ("Output", cr
     uiOptions.backgroundColour = Colours::lightskyblue;
 }
 
-AudioProcessorValueTreeState::ParameterLayout OutputProcessor::createParameterLayout()
+ParamLayout OutputProcessor::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

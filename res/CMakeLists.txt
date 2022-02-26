@@ -16,6 +16,7 @@ set(binary_data_files
 
     guitar_ml_models/BluesJR_FullD.json
     guitar_ml_models/TS9_FullD.json
+    guitar_ml_models/metal_face_model.json
 
     "amp_irs/Fender.wav"
     "amp_irs/Marshall.wav"

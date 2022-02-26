@@ -80,7 +80,7 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
     uiOptions.info.infoLink = "https://guitarml.com";
 }
 
-AudioProcessorValueTreeState::ParameterLayout GuitarMLAmp::createParameterLayout()
+ParamLayout GuitarMLAmp::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

@@ -11,7 +11,7 @@ TubeScreamerTone::TubeScreamerTone (UndoManager* um) : BaseProcessor ("TS-Tone",
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout TubeScreamerTone::createParameterLayout()
+ParamLayout TubeScreamerTone::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

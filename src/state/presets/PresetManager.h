@@ -42,6 +42,8 @@ public:
     PresetUpdateList& getServerPresetUpdateList() { return serverSyncUpdatePresetsList; };
 
 private:
+    void loadFactoryPresets();
+
     ProcessorChain* procChain;
 
     SharedPresetsServerUserManager userManager;

@@ -22,7 +22,7 @@ MXRDistortion::MXRDistortion (UndoManager* um) : BaseProcessor ("Distortion Plus
     uiOptions.info.authors = StringArray { "Sam Schachter", "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout MXRDistortion::createParameterLayout()
+ParamLayout MXRDistortion::createParameterLayout()
 {
     auto params = createBaseParams();
     createPercentParameter (params, "dist", "Distortion", 0.5f);

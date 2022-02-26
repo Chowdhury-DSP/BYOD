@@ -112,7 +112,7 @@ Gate::Gate (UndoManager* um) : BaseProcessor ("Gate", createParameterLayout(), u
 
 Gate::~Gate() = default;
 
-AudioProcessorValueTreeState::ParameterLayout Gate::createParameterLayout()
+ParamLayout Gate::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

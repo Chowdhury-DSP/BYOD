@@ -12,7 +12,7 @@ FreqBandSplitter::FreqBandSplitter (UndoManager* um) : BaseProcessor ("Frequency
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout FreqBandSplitter::createParameterLayout()
+ParamLayout FreqBandSplitter::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

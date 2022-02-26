@@ -13,7 +13,7 @@ StateVariableFilter::StateVariableFilter (UndoManager* um) : BaseProcessor ("SVF
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout StateVariableFilter::createParameterLayout()
+ParamLayout StateVariableFilter::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

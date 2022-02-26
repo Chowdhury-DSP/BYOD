@@ -14,7 +14,7 @@ BassmanTone::BassmanTone (UndoManager* um) : BaseProcessor ("Bassman Tone", crea
     uiOptions.info.infoLink = "https://github.com/schachtersam32/WaveDigitalFilters_Sharc";
 }
 
-AudioProcessorValueTreeState::ParameterLayout BassmanTone::createParameterLayout()
+ParamLayout BassmanTone::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

@@ -10,7 +10,11 @@ juce_add_modules(chowdsp_juce_dsp)
 add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
 
 # add RTNeural
-set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
+if(APPLE)
+    set(RTNEURAL_EIGEN ON CACHE BOOL "Use RTNeural with Eigen backend" FORCE)
+else()
+    set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
+endif()
 add_subdirectory(RTNeural)
 
 # add sst-cpputils

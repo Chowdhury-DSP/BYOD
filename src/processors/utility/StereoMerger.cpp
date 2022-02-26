@@ -11,7 +11,7 @@ StereoMerger::StereoMerger (UndoManager* um) : BaseProcessor ("Stereo Merger", c
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout StereoMerger::createParameterLayout()
+ParamLayout StereoMerger::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

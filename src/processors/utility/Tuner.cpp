@@ -14,7 +14,7 @@ Tuner::Tuner (UndoManager* um) : BaseProcessor ("Tuner", createParameterLayout()
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout Tuner::createParameterLayout()
+ParamLayout Tuner::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

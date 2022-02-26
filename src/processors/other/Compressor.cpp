@@ -89,7 +89,7 @@ Compressor::Compressor (UndoManager* um) : BaseProcessor ("Compressor", createPa
 
 Compressor::~Compressor() = default;
 
-AudioProcessorValueTreeState::ParameterLayout Compressor::createParameterLayout()
+ParamLayout Compressor::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

@@ -24,7 +24,7 @@ Waveshaper::Waveshaper (UndoManager* um) : BaseProcessor ("Waveshaper", createPa
     uiOptions.info.infoLink = "https://surge-synthesizer.github.io";
 }
 
-AudioProcessorValueTreeState::ParameterLayout Waveshaper::createParameterLayout()
+ParamLayout Waveshaper::createParameterLayout()
 {
     using namespace ParameterHelpers;
 
