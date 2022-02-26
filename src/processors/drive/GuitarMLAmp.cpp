@@ -103,7 +103,7 @@ void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
     inGain.prepare (spec);
-    inGain.setRampDurationSeconds (0.01);
+    inGain.setRampDurationSeconds (0.1);
 
     for (auto& chModels : models)
     {

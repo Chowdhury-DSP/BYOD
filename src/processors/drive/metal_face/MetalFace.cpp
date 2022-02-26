@@ -27,10 +27,18 @@ ParamLayout MetalFace::createParameterLayout()
 void MetalFace::prepare (double sampleRate, int samplesPerBlock)
 {
     gain.prepare ({ sampleRate, (uint32) samplesPerBlock, 2 });
-    gain.setRampDurationSeconds (0.02);
+    gain.setRampDurationSeconds (0.1);
 
     for (auto& model : rnn)
         model.prepare (sampleRate, samplesPerBlock);
+
+    // pre-buffering
+    AudioBuffer<float> buffer (2, samplesPerBlock);
+    for (int i = 0; i < 5000; i += samplesPerBlock)
+    {
+        buffer.clear();
+        processAudio (buffer);
+    }
 }
 
 void MetalFace::processAudio (AudioBuffer<float>& buffer)
