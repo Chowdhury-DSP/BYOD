@@ -107,7 +107,7 @@ RONN::RONN (UndoManager* um) : BaseProcessor ("RONN", createParameterLayout(), u
     uiOptions.info.infoLink = "https://github.com/csteinmetz1/ronn";
 }
 
-AudioProcessorValueTreeState::ParameterLayout RONN::createParameterLayout()
+ParamLayout RONN::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

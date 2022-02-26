@@ -8,7 +8,7 @@ InputProcessor::InputProcessor (UndoManager* um) : BaseProcessor ("Input", creat
     uiOptions.backgroundColour = Colours::orange;
 }
 
-AudioProcessorValueTreeState::ParameterLayout InputProcessor::createParameterLayout()
+ParamLayout InputProcessor::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

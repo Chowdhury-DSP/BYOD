@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Instant Metal" plugin="BYOD" vendor="CHOW" category="Pedals"
+        version="0.5.1">
+  <proc_chain>
+    <Metal_Face>
+      <Parameters x_pos="0.1997991949319839" y_pos="0.3162055313587189">
+        <PARAM id="gain" value="-12.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Metal_Face>
+    <Amp_IRs>
+      <Parameters x_pos="0.5190762877464294" y_pos="0.3181818127632141" ir_file="">
+        <PARAM id="gain" value="14.0"/>
+        <PARAM id="ir" value="0.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Amp_IRs>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>

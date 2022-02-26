@@ -30,7 +30,7 @@ BigMuffTone::BigMuffTone (UndoManager* um) : BaseProcessor ("Muff Tone", createP
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout BigMuffTone::createParameterLayout()
+ParamLayout BigMuffTone::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

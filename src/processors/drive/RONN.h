@@ -11,7 +11,7 @@ public:
     explicit RONN (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
-    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    static ParamLayout createParameterLayout();
     void parameterChanged (const String& parameterID, float newValue) final;
 
     void prepare (double sampleRate, int samplesPerBlock) override;

@@ -57,7 +57,7 @@ RangeBooster::RangeBooster (UndoManager* um) : BaseProcessor ("Range Booster", c
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout RangeBooster::createParameterLayout()
+ParamLayout RangeBooster::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

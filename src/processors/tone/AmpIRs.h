@@ -13,7 +13,7 @@ public:
     ~AmpIRs() override;
 
     ProcessorType getProcessorType() const override { return Tone; }
-    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    static ParamLayout createParameterLayout();
 
     void parameterChanged (const String& parameterID, float newValue) final;
     void loadIRFromFile (const File& file);

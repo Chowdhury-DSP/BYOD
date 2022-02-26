@@ -9,7 +9,7 @@ public:
     explicit Warp (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
-    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
@@ -17,7 +17,6 @@ public:
 private:
     std::atomic<float>* freqHzParam = nullptr;
     std::atomic<float>* gainDBParam = nullptr;
-    std::atomic<float>* driveParam = nullptr;
     std::atomic<float>* fbParam = nullptr;
 
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> freqHzSmooth[2];

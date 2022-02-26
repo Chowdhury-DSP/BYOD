@@ -14,7 +14,7 @@ Oscilloscope::Oscilloscope (UndoManager* um) : BaseProcessor ("Oscilloscope", cr
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout Oscilloscope::createParameterLayout()
+ParamLayout Oscilloscope::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

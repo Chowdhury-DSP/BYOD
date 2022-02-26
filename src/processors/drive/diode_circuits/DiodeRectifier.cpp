@@ -13,7 +13,7 @@ DiodeRectifier::DiodeRectifier (UndoManager* um) : BaseProcessor ("Diode Rectifi
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout DiodeRectifier::createParameterLayout()
+ParamLayout DiodeRectifier::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

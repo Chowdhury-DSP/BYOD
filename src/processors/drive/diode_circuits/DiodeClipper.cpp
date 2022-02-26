@@ -14,7 +14,7 @@ DiodeClipper::DiodeClipper (UndoManager* um) : BaseProcessor ("Diode Clipper", c
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout DiodeClipper::createParameterLayout()
+ParamLayout DiodeClipper::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

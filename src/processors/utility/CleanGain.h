@@ -17,7 +17,7 @@ public:
     }
 
     ProcessorType getProcessorType() const override { return Utility; }
-    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout()
+    static ParamLayout createParameterLayout()
     {
         using namespace ParameterHelpers;
         auto params = createBaseParams();

@@ -1,13 +1,13 @@
 #pragma once
 
+#include "../../BaseProcessor.h"
 #include "../../utility/DCBlocker.h"
-#include "ZenDriveWDF.h"
-#include "processors/BaseProcessor.h"
+#include "MetalFaceRNN.h"
 
-class ZenDrive : public BaseProcessor
+class MetalFace : public BaseProcessor
 {
 public:
-    explicit ZenDrive (UndoManager* um = nullptr);
+    explicit MetalFace (UndoManager* um);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static ParamLayout createParameterLayout();
@@ -16,11 +16,12 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* voiceParam = nullptr;
-    std::atomic<float>* gainParam = nullptr;
+    std::atomic<float>* gainDBParam = nullptr;
 
-    ZenDriveWDF wdf[2];
+    dsp::Gain<float> gain;
+    MetalFaceRNN<28> rnn[2];
+
     DCBlocker dcBlocker;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZenDrive)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetalFace)
 };

@@ -41,7 +41,7 @@ public:
     using Ptr = std::unique_ptr<BaseProcessor>;
 
     BaseProcessor (const String& name,
-                   AudioProcessorValueTreeState::ParameterLayout params,
+                   ParamLayout params,
                    UndoManager* um = nullptr,
                    int nInputs = 1,
                    int nOutputs = 1);

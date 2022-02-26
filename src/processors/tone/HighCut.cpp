@@ -19,7 +19,7 @@ HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterL
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout HighCut::createParameterLayout()
+ParamLayout HighCut::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

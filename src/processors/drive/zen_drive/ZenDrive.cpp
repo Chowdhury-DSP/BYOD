@@ -10,7 +10,7 @@ ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Yen Drive", createParamet
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout ZenDrive::createParameterLayout()
+ParamLayout ZenDrive::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

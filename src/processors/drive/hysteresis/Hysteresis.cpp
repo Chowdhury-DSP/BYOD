@@ -13,7 +13,7 @@ Hysteresis::Hysteresis (UndoManager* um) : BaseProcessor ("Hysteresis", createPa
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout Hysteresis::createParameterLayout()
+ParamLayout Hysteresis::createParameterLayout()
 {
     using namespace ParameterHelpers;
 
