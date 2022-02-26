@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../BaseProcessor.h"
+#include "../../utility/DCBlocker.h"
 #include "MetalFaceRNN.h"
 
 class MetalFace : public BaseProcessor
@@ -19,6 +20,8 @@ private:
 
     dsp::Gain<float> gain;
     MetalFaceRNN<28> rnn[2];
+
+    DCBlocker dcBlocker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MetalFace)
 };

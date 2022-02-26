@@ -32,9 +32,11 @@ void MetalFace::prepare (double sampleRate, int samplesPerBlock)
     for (auto& model : rnn)
         model.prepare (sampleRate, samplesPerBlock);
 
+    dcBlocker.prepare (sampleRate, samplesPerBlock);
+
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 5000; i += samplesPerBlock)
+    for (int i = 0; i < 10000; i += samplesPerBlock)
     {
         buffer.clear();
         processAudio (buffer);
@@ -57,4 +59,6 @@ void MetalFace::processAudio (AudioBuffer<float>& buffer)
 
     const auto makeupDB = (-48.0f - gainDB) / 10.0f;
     block *= Decibels::decibelsToGain (makeupDB);
+
+    dcBlocker.processAudio (buffer);
 }
