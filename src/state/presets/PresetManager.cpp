@@ -16,7 +16,7 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
 
     userManager->addListener (this);
 
-    loadFactoryPresets();
+    loadBYODFactoryPresets();
     setUserPresetConfigFile (userPresetPath);
 
 #if JUCE_IOS
@@ -37,7 +37,7 @@ PresetManager::~PresetManager()
     userManager->removeListener (this);
 }
 
-void PresetManager::loadFactoryPresets()
+void PresetManager::loadBYODFactoryPresets()
 {
     setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
 

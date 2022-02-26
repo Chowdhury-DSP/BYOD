@@ -42,7 +42,7 @@ public:
     PresetUpdateList& getServerPresetUpdateList() { return serverSyncUpdatePresetsList; };
 
 private:
-    void loadFactoryPresets();
+    void loadBYODFactoryPresets();
 
     ProcessorChain* procChain;
 
