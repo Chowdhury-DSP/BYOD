@@ -11,7 +11,7 @@ Centaur::Centaur (UndoManager* um) : BaseProcessor ("Centaur", createParameterLa
     uiOptions.info.infoLink = "https://github.com/jatinchowdhury18/KlonCentaur";
 }
 
-AudioProcessorValueTreeState::ParameterLayout Centaur::createParameterLayout()
+ParamLayout Centaur::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

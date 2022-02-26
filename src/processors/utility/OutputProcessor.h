@@ -9,7 +9,7 @@ public:
     explicit OutputProcessor (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Utility; }
-    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;

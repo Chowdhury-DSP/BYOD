@@ -27,7 +27,7 @@ GraphicEQ::GraphicEQ (UndoManager* um) : BaseProcessor ("Graphic EQ", createPara
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout GraphicEQ::createParameterLayout()
+ParamLayout GraphicEQ::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

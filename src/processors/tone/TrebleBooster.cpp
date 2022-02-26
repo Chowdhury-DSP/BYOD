@@ -11,7 +11,7 @@ TrebleBooster::TrebleBooster (UndoManager* um) : BaseProcessor ("Treble Booster"
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout TrebleBooster::createParameterLayout()
+ParamLayout TrebleBooster::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

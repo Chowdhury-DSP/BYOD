@@ -42,6 +42,8 @@ public:
     PresetUpdateList& getServerPresetUpdateList() { return serverSyncUpdatePresetsList; };
 
 private:
+    void loadBYODFactoryPresets();
+
     ProcessorChain* procChain;
 
     SharedPresetsServerUserManager userManager;

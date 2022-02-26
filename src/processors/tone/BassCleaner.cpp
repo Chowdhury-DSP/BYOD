@@ -11,7 +11,7 @@ BassCleaner::BassCleaner (UndoManager* um) : BaseProcessor ("Bass Cleaner", crea
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout BassCleaner::createParameterLayout()
+ParamLayout BassCleaner::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

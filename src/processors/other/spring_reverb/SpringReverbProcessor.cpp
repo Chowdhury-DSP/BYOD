@@ -18,7 +18,7 @@ SpringReverbProcessor::SpringReverbProcessor (UndoManager* um) : BaseProcessor (
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout SpringReverbProcessor::createParameterLayout()
+ParamLayout SpringReverbProcessor::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

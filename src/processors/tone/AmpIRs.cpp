@@ -44,7 +44,7 @@ AmpIRs::~AmpIRs()
     vts.removeParameterListener (irTag, this);
 }
 
-AudioProcessorValueTreeState::ParameterLayout AmpIRs::createParameterLayout()
+ParamLayout AmpIRs::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

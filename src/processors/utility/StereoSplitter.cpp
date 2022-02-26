@@ -11,7 +11,7 @@ StereoSplitter::StereoSplitter (UndoManager* um) : BaseProcessor ("Stereo Splitt
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout StereoSplitter::createParameterLayout()
+ParamLayout StereoSplitter::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

@@ -26,7 +26,7 @@ BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Muff Drive", crea
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout BigMuffDrive::createParameterLayout()
+ParamLayout BigMuffDrive::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

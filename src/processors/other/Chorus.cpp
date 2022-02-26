@@ -28,7 +28,7 @@ Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus", createParameterLayou
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout Chorus::createParameterLayout()
+ParamLayout Chorus::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

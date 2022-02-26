@@ -48,7 +48,7 @@ LofiIrs::~LofiIrs()
     vts.removeParameterListener (irTag, this);
 }
 
-AudioProcessorValueTreeState::ParameterLayout LofiIrs::createParameterLayout()
+ParamLayout LofiIrs::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

@@ -10,7 +10,7 @@ TubeAmp::TubeAmp (UndoManager* um) : BaseProcessor ("Dirty Tube", createParamete
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout TubeAmp::createParameterLayout()
+ParamLayout TubeAmp::createParameterLayout()
 {
     using namespace ParameterHelpers;
 

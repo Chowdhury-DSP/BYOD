@@ -23,7 +23,7 @@ Delay::Delay (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout()
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout Delay::createParameterLayout()
+ParamLayout Delay::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

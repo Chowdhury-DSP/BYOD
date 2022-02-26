@@ -31,7 +31,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout Tremolo::createParameterLayout()
+ParamLayout Tremolo::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

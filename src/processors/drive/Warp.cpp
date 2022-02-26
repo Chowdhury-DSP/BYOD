@@ -61,9 +61,10 @@ Warp::Warp (UndoManager* um) : BaseProcessor ("Warp", createParameterLayout(), u
     uiOptions.powerColour = Colours::cyan;
     uiOptions.info.description = "Drive effect based on nonlinear feedback filters.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+    uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout Warp::createParameterLayout()
+ParamLayout Warp::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();

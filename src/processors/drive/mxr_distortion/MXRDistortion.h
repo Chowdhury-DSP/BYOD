@@ -9,7 +9,7 @@ public:
     explicit MXRDistortion (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Drive; }
-    static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;

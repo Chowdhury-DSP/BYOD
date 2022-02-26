@@ -21,7 +21,7 @@ BaxandallEQ::BaxandallEQ (UndoManager* um) : BaseProcessor ("Baxandall EQ", crea
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-AudioProcessorValueTreeState::ParameterLayout BaxandallEQ::createParameterLayout()
+ParamLayout BaxandallEQ::createParameterLayout()
 {
     using namespace ParameterHelpers;
 
