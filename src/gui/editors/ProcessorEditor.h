@@ -7,6 +7,15 @@
 
 class ProcessorEditor : public Component
 {
+    // clang-format off
+    CREATE_LISTENER (
+        Listener,
+        listeners,
+        virtual void showInfoComp (const BaseProcessor&) {}\
+        virtual void editorDragged (ProcessorEditor&, const MouseEvent&, const Point<int>&) {}\
+        virtual void duplicateProcessor (const ProcessorEditor&) {}\
+    )
+    // clang-format on
 public:
     ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs);
     ~ProcessorEditor() override;
@@ -25,6 +34,7 @@ public:
     Colour getColour() const noexcept { return procUI.backgroundColour; }
 
 private:
+    void processorSettingsCallback (PopupMenu& menu, PopupMenu::Options& options);
     Port* getPortPrivate (int portIndex, bool isInput) const;
 
     void resetProcParameters();
@@ -45,7 +55,8 @@ private:
 
     Point<int> mouseDownOffset;
 
-    chowdsp::PopupMenuHelper popupMenu;
+    DrawableButton settingsButton { "Settings", DrawableButton::ImageFitted };
+
     chowdsp::SharedLNFAllocator lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)

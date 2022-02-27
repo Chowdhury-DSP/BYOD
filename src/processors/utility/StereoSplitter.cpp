@@ -6,7 +6,7 @@ StereoSplitter::StereoSplitter (UndoManager* um) : BaseProcessor ("Stereo Splitt
     modeParam = vts.getRawParameterValue ("mode");
 
     uiOptions.backgroundColour = Colours::lightgrey;
-    uiOptions.powerColour = Colours::darkred.brighter (0.2f);
+    uiOptions.powerColour = Colours::red.darker (0.05f);
     uiOptions.info.description = "Splits a stereo signal into two mono signals.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
