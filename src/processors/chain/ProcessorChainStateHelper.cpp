@@ -175,7 +175,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bo
         auto newProc = chain.procStore.createProcByName (procName);
         if (newProc == nullptr)
         {
-            jassertfalse; // unable to crete this processor
+            jassertfalse; // unable to create this processor
             continue;
         }
 
