@@ -137,15 +137,7 @@ void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& optio
     nextEditorPosition = options.getTargetScreenArea().getPosition() - getScreenPosition();
 
     int menuID = 0;
-    auto& procStore = procChain.getProcStore();
-    for (auto type : { Drive, Tone, Utility, Other })
-    {
-        PopupMenu subMenu;
-        procStore.createProcList (subMenu, menuID, type);
-
-        auto typeName = std::string (magic_enum::enum_name (type));
-        menu.addSubMenu (String (typeName), subMenu);
-    }
+    procChain.getProcStore().createProcList (menu, menuID);
 
     options = options
                   .withParentComponent (this)

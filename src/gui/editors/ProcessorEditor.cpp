@@ -75,7 +75,10 @@ void ProcessorEditor::processorSettingsCallback (PopupMenu& menu, PopupMenu::Opt
 
     PopupMenu replaceProcMenu;
     createReplaceProcMenu (replaceProcMenu);
-    menu.addSubMenu ("Replace", replaceProcMenu);
+    if (replaceProcMenu.containsAnyActiveItems())
+        menu.addSubMenu ("Replace", replaceProcMenu);
+
+    menu.addItem ("Duplicate", [&] {});
 
     menu.addItem ("Info", [&]
                   { listeners.call (&Listener::showInfoComp, proc); });
@@ -106,17 +109,8 @@ void ProcessorEditor::resetProcParameters()
 
 void ProcessorEditor::createReplaceProcMenu (PopupMenu& menu)
 {
-    auto& procStore = procChain.getProcStore();
-
     int menuID = 100;
-    for (auto type : { Drive, Tone, Utility, Other })
-    {
-        PopupMenu subMenu;
-        procStore.createProcReplaceList (subMenu, menuID, type, &proc);
-
-        auto typeName = std::string (magic_enum::enum_name (type));
-        menu.addSubMenu (String (typeName), subMenu);
-    }
+    procChain.getProcStore().createProcReplaceList (menu, menuID, &proc);
 }
 
 void ProcessorEditor::paint (Graphics& g)
@@ -160,8 +154,8 @@ void ProcessorEditor::resized()
     {
         const auto xButtonSize = proportionOfWidth (0.1f);
         const auto xButtonPad = proportionOfWidth (0.015f);
-        powerButton.setBounds (width - 3 * xButtonSize, 0, xButtonSize, xButtonSize);
-        settingsButton.setBounds (Rectangle { width - 2 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad / 2));
+        settingsButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad / 2));
+        powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
         xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
     }
 
