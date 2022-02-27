@@ -6,7 +6,8 @@
 #include "utils/LookAndFeels.h"
 
 class BoardComponent final : public Component,
-                             private ProcessorChain::Listener
+                             private ProcessorChain::Listener,
+                             private ProcessorEditor::Listener
 {
 public:
     explicit BoardComponent (ProcessorChain& procs);
@@ -15,7 +16,9 @@ public:
     void resized() override;
     void setScaleFactor (float newScaleFactor);
 
-    void showInfoComp (const BaseProcessor& proc);
+    void showInfoComp (const BaseProcessor& proc) override;
+    void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const Point<int>& mouseOffset) override;
+    void duplicateProcessor (const ProcessorEditor& editor) override;
 
     void processorAdded (BaseProcessor* newProc) override;
     void processorRemoved (const BaseProcessor* proc) override;

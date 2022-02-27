@@ -132,44 +132,73 @@ BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
     return store[name](undoManager);
 }
 
-void ProcessorStore::createProcList (PopupMenu& menu, int& menuID, ProcessorType type)
+void ProcessorStore::duplicateProcessor (const BaseProcessor& procToDuplicate)
 {
-    for (auto& procDesc : store)
+    addProcessorCallback (createProcByName (procToDuplicate.getName()));
+}
+
+template <typename FilterType>
+void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, FilterType&& filter, BaseProcessor* procToReplace)
+{
+    for (auto type : { Drive, Tone, Utility, Other })
     {
-        const auto& procInfo = procTypeStore[procDesc.first];
-        if (procInfo.type != type)
-            continue;
+        PopupMenu subMenu;
+        for (auto& procDesc : store.store)
+        {
+            const auto& procInfo = store.procTypeStore.at (procDesc.first);
 
-        PopupMenu::Item item;
-        item.itemID = ++menuID;
-        item.text = procDesc.first;
-        item.action = [=]
-        { addProcessorCallback (procDesc.second (undoManager)); };
+            if (procInfo.type != type)
+                continue;
 
-        menu.addItem (item);
+            if (! filter (procDesc.first, procInfo))
+                continue;
+
+            PopupMenu::Item item;
+            item.itemID = ++menuID;
+            item.text = procDesc.first;
+            item.action = [&store, &procDesc, procToReplace]
+            {
+                if (procToReplace == nullptr)
+                    store.addProcessorCallback (procDesc.second (store.undoManager));
+                else
+                    store.replaceProcessorCallback (procDesc.second (store.undoManager), procToReplace);
+            };
+
+            subMenu.addItem (item);
+        }
+
+        if (subMenu.containsAnyActiveItems())
+        {
+            auto typeName = std::string (magic_enum::enum_name (type));
+            menu.addSubMenu (String (typeName), subMenu);
+        }
     }
 }
 
-void ProcessorStore::createProcReplaceList (PopupMenu& menu, int& menuID, ProcessorType type, BaseProcessor* procToReplace)
+void createProcListUnfiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, BaseProcessor* procToReplace = nullptr)
 {
-    for (auto& procDesc : store)
-    {
-        const auto& procInfo = procTypeStore[procDesc.first];
-        if (procInfo.type != type)
-            continue;
+    createProcListFiltered (
+        store, menu, menuID, [] (auto...)
+        { return true; },
+        procToReplace);
+}
 
-        if (procInfo.numInputs != procToReplace->getNumInputs())
-            continue;
+void ProcessorStore::createProcList (PopupMenu& menu, int& menuID) const
+{
+    createProcListUnfiltered (*this, menu, menuID);
+}
 
-        if (procInfo.numOutputs != procToReplace->getNumOutputs())
-            continue;
-
-        PopupMenu::Item item;
-        item.itemID = ++menuID;
-        item.text = procDesc.first;
-        item.action = [=]
-        { replaceProcessorCallback (procDesc.second (undoManager), procToReplace); };
-
-        menu.addItem (item);
-    }
+void ProcessorStore::createProcReplaceList (PopupMenu& menu, int& menuID, BaseProcessor* procToReplace) const
+{
+    createProcListFiltered (
+        *this,
+        menu,
+        menuID,
+        [procToReplace] (const String& name, const ProcInfo& procInfo)
+        {
+            return procInfo.numInputs == procToReplace->getNumInputs()
+                   && procInfo.numOutputs == procToReplace->getNumOutputs()
+                   && name != procToReplace->getName();
+        },
+        procToReplace);
 }

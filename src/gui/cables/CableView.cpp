@@ -22,7 +22,9 @@ void CableView::paint (Graphics& g)
 
     if (nearestPort.editor != nullptr)
     {
-        if (! nearestPort.isInput || portLocationHelper->isInputPortConnected (nearestPort))
+        const bool isDraggingNearInputPort = nearestPort.isInput && isDraggingCable;
+        const bool isNearConnectedInput = nearestPort.isInput && ! portLocationHelper->isInputPortConnected (nearestPort);
+        if (! (isDraggingNearInputPort || isNearConnectedInput))
         {
             auto startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
             drawCablePortGlow (g, startPortLocation, scaleFactor);
@@ -53,7 +55,7 @@ void CableView::paint (Graphics& g)
         {
             auto mousePos = connectionHelper->cableMouse->getPosition();
             const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cable->startProc);
-            if (nearestInputPort.editor != nullptr && nearestInputPort.isInput)
+            if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
             {
                 auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
                 drawCablePortGlow (g, endPortLocation, scaleFactor);

@@ -28,6 +28,22 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.onClick = [=]
     { procChain.getActionHelper().removeProcessor (&proc); };
 
+    if (proc.getNumInputs() != 0 && proc.getNumOutputs() != 0)
+    {
+        auto cog = Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize);
+        cog->replaceColour (Colours::white, contrastColour);
+        settingsButton.setImages (cog.get());
+        addAndMakeVisible (settingsButton);
+
+        settingsButton.onClick = [&]
+        {
+            PopupMenu menu;
+            PopupMenu::Options options;
+            processorSettingsCallback (menu, options);
+            menu.showMenuAsync (options);
+        };
+    }
+
     if (auto* lnf = proc.getCustomLookAndFeel())
         setLookAndFeel (lnf);
     else
@@ -46,37 +62,33 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         newPort->setInputOutput (false);
         addAndMakeVisible (newPort);
     }
-
-    popupMenu.setAssociatedComponent (this);
-    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
-    {
-        if (proc.getNumInputs() == 0 || proc.getNumOutputs() == 0)
-            return; // no menu for I/O processors
-
-        proc.addToPopupMenu (menu);
-
-        menu.addItem ("Reset", [&]
-                      { resetProcParameters(); });
-
-        PopupMenu replaceProcMenu;
-        createReplaceProcMenu (replaceProcMenu);
-        menu.addSubMenu ("Replace", replaceProcMenu);
-
-        if (auto* p = getParentComponent())
-        {
-            menu.addItem ("Info", [&, boardComp = dynamic_cast<BoardComponent*> (p)]
-                          { boardComp->showInfoComp (proc); });
-
-            options = options.withParentComponent (p);
-        }
-
-        menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
-
-        options = options.withStandardItemHeight (27);
-    };
 }
 
 ProcessorEditor::~ProcessorEditor() = default;
+
+void ProcessorEditor::processorSettingsCallback (PopupMenu& menu, PopupMenu::Options& options)
+{
+    proc.addToPopupMenu (menu);
+
+    menu.addItem ("Reset", [&]
+                  { resetProcParameters(); });
+
+    PopupMenu replaceProcMenu;
+    createReplaceProcMenu (replaceProcMenu);
+    if (replaceProcMenu.containsAnyActiveItems())
+        menu.addSubMenu ("Replace", replaceProcMenu);
+
+    menu.addItem ("Duplicate", [&]
+                  { listeners.call (&Listener::duplicateProcessor, *this); });
+
+    menu.addItem ("Info", [&]
+                  { listeners.call (&Listener::showInfoComp, proc); });
+
+    menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
+    options = options
+                  .withParentComponent (getParentComponent())
+                  .withStandardItemHeight (27);
+}
 
 void ProcessorEditor::resetProcParameters()
 {
@@ -98,17 +110,8 @@ void ProcessorEditor::resetProcParameters()
 
 void ProcessorEditor::createReplaceProcMenu (PopupMenu& menu)
 {
-    auto& procStore = procChain.getProcStore();
-
     int menuID = 100;
-    for (auto type : { Drive, Tone, Utility, Other })
-    {
-        PopupMenu subMenu;
-        procStore.createProcReplaceList (subMenu, menuID, type, &proc);
-
-        auto typeName = std::string (magic_enum::enum_name (type));
-        menu.addSubMenu (String (typeName), subMenu);
-    }
+    procChain.getProcStore().createProcReplaceList (menu, menuID, &proc);
 }
 
 void ProcessorEditor::paint (Graphics& g)
@@ -151,9 +154,9 @@ void ProcessorEditor::resized()
     if (! isIOProcessor)
     {
         const auto xButtonSize = proportionOfWidth (0.1f);
-        const auto xButtonPad = proportionOfWidth (0.015f);
+        settingsButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (proportionOfWidth (0.01f)));
         powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
-        xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
+        xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (proportionOfWidth (0.015f)));
     }
 
     const int portDim = proportionOfHeight (0.17f);
@@ -183,19 +186,7 @@ void ProcessorEditor::mouseDown (const MouseEvent& e)
 
 void ProcessorEditor::mouseDrag (const MouseEvent& e)
 {
-    const auto relE = e.getEventRelativeTo (getParentComponent());
-
-    if (auto* parent = getParentComponent())
-    {
-        auto parentBounds = parent->getBounds();
-        proc.setPosition (relE.getPosition() - mouseDownOffset, parentBounds);
-        setTopLeftPosition (proc.getPosition (parentBounds));
-        parent->repaint();
-    }
-    else
-    {
-        jassertfalse;
-    }
+    listeners.call (&Listener::editorDragged, *this, e, mouseDownOffset);
 }
 
 Port* ProcessorEditor::getPortPrivate (int portIndex, bool isInput) const

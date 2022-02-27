@@ -12,6 +12,12 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
 
 void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)
 {
+    if (newProc == nullptr)
+    {
+        jassertfalse; // unable to create this processor!
+        return;
+    }
+
     um->beginNewTransaction();
     um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
 }
@@ -49,6 +55,12 @@ void ProcessorChainActionHelper::removeProcessor (BaseProcessor* procToRemove)
 
 void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, BaseProcessor* procToReplace)
 {
+    if (newProc == nullptr)
+    {
+        jassertfalse; // unable to create this processor!
+        return;
+    }
+
     // 1-to-1 replacement requires the same I/O channels!
     jassert (newProc->getNumInputs() == procToReplace->getNumInputs());
     jassert (newProc->getNumOutputs() == procToReplace->getNumOutputs());
