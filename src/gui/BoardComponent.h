@@ -18,6 +18,7 @@ public:
 
     void showInfoComp (const BaseProcessor& proc) override;
     void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const Point<int>& mouseOffset) override;
+    void duplicateProcessor (const ProcessorEditor& editor) override;
 
     void processorAdded (BaseProcessor* newProc) override;
     void processorRemoved (const BaseProcessor* proc) override;

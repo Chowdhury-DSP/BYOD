@@ -131,13 +131,18 @@ BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
     return store[name](undoManager);
 }
 
+void ProcessorStore::duplicateProcessor (const BaseProcessor& procToDuplicate)
+{
+    addProcessorCallback (createProcByName (procToDuplicate.getName()));
+}
+
 template <typename FilterType>
 void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, FilterType&& filter, BaseProcessor* procToReplace)
 {
     for (auto type : { Drive, Tone, Utility, Other })
     {
         PopupMenu subMenu;
-        for (auto& procDesc : store.getStoreMap())
+        for (auto& procDesc : store.store)
         {
             const auto& procInfo = store.procTypeStore.at (procDesc.first);
 

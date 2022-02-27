@@ -78,7 +78,8 @@ void ProcessorEditor::processorSettingsCallback (PopupMenu& menu, PopupMenu::Opt
     if (replaceProcMenu.containsAnyActiveItems())
         menu.addSubMenu ("Replace", replaceProcMenu);
 
-    menu.addItem ("Duplicate", [&] {});
+    menu.addItem ("Duplicate", [&]
+                  { listeners.call (&Listener::duplicateProcessor, *this); });
 
     menu.addItem ("Info", [&]
                   { listeners.call (&Listener::showInfoComp, proc); });
@@ -153,10 +154,9 @@ void ProcessorEditor::resized()
     if (! isIOProcessor)
     {
         const auto xButtonSize = proportionOfWidth (0.1f);
-        const auto xButtonPad = proportionOfWidth (0.015f);
-        settingsButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad / 2));
+        settingsButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (proportionOfWidth (0.01f)));
         powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
-        xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
+        xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (proportionOfWidth (0.015f)));
     }
 
     const int portDim = proportionOfHeight (0.17f);

@@ -13,6 +13,7 @@ class ProcessorEditor : public Component
         listeners,
         virtual void showInfoComp (const BaseProcessor&) {}\
         virtual void editorDragged (ProcessorEditor&, const MouseEvent&, const Point<int>&) {}\
+        virtual void duplicateProcessor (const ProcessorEditor&) {}\
     )
     // clang-format on
 public:

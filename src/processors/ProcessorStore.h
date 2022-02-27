@@ -10,16 +10,20 @@ public:
     explicit ProcessorStore (UndoManager* um = nullptr);
 
     BaseProcessor::Ptr createProcByName (const String& name);
+    void duplicateProcessor (const BaseProcessor& procToDuplicate);
+
     void createProcList (PopupMenu& menu, int& menuID) const;
     void createProcReplaceList (PopupMenu& menu, int& menuID, BaseProcessor* procToReplace) const;
 
     static StoreMap& getStoreMap() { return store; }
 
+private:
+    friend class ProcessorChainActionHelper;
+
+    static StoreMap store;
+
     std::function<void (BaseProcessor::Ptr)> addProcessorCallback = nullptr;
     std::function<void (BaseProcessor::Ptr, BaseProcessor*)> replaceProcessorCallback = nullptr;
-
-private:
-    static StoreMap store;
 
     struct ProcInfo
     {

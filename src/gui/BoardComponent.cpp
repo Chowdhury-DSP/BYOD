@@ -132,6 +132,15 @@ void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e
     repaint();
 }
 
+void BoardComponent::duplicateProcessor (const ProcessorEditor& editor)
+{
+    const auto xOff = proportionOfWidth (0.075f);
+    const auto yOff = proportionOfHeight (0.075f);
+    nextEditorPosition = editor.getBoundsInParent().getCentre().translated (xOff, yOff);
+
+    procChain.getProcStore().duplicateProcessor (*editor.getProcPtr());
+}
+
 void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options)
 {
     nextEditorPosition = options.getTargetScreenArea().getPosition() - getScreenPosition();
