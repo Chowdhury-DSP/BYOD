@@ -77,17 +77,13 @@ void ProcessorEditor::processorSettingsCallback (PopupMenu& menu, PopupMenu::Opt
     createReplaceProcMenu (replaceProcMenu);
     menu.addSubMenu ("Replace", replaceProcMenu);
 
-    if (auto* p = getParentComponent())
-    {
-        menu.addItem ("Info", [&, boardComp = dynamic_cast<BoardComponent*> (p)]
-                      { boardComp->showInfoComp (proc); });
-
-        options = options.withParentComponent (p);
-    }
+    menu.addItem ("Info", [&]
+                  { listeners.call (&Listener::showInfoComp, proc); });
 
     menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
-
-    options = options.withStandardItemHeight (27);
+    options = options
+                  .withParentComponent (getParentComponent())
+                  .withStandardItemHeight (27);
 }
 
 void ProcessorEditor::resetProcParameters()
@@ -196,19 +192,7 @@ void ProcessorEditor::mouseDown (const MouseEvent& e)
 
 void ProcessorEditor::mouseDrag (const MouseEvent& e)
 {
-    const auto relE = e.getEventRelativeTo (getParentComponent());
-
-    if (auto* parent = getParentComponent())
-    {
-        auto parentBounds = parent->getBounds();
-        proc.setPosition (relE.getPosition() - mouseDownOffset, parentBounds);
-        setTopLeftPosition (proc.getPosition (parentBounds));
-        parent->repaint();
-    }
-    else
-    {
-        jassertfalse;
-    }
+    listeners.call (&Listener::editorDragged, *this, e, mouseDownOffset);
 }
 
 Port* ProcessorEditor::getPortPrivate (int portIndex, bool isInput) const

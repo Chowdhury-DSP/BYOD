@@ -18,9 +18,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 {
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
     addAndMakeVisible (inputEditor.get());
+    inputEditor->addListener (this);
 
     outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain);
     addAndMakeVisible (outputEditor.get());
+    outputEditor->addListener (this);
 
     addChildComponent (infoComp);
     addAndMakeVisible (cableView);
@@ -42,6 +44,9 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 
 BoardComponent::~BoardComponent()
 {
+    inputEditor->removeListener (this);
+    outputEditor->removeListener (this);
+
     removeMouseListener (&cableView);
     procChain.removeListener (this);
     procChain.removeListener (cableView.getConnectionHelper());
@@ -91,6 +96,8 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     cableView.processorBeingAdded (newProc);
     setEditorPosition (newEditor);
 
+    newEditor->addListener (this);
+
     repaint();
 }
 
@@ -99,7 +106,10 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
     cableView.processorBeingRemoved (proc);
 
     if (auto* editor = findEditorForProcessor (proc))
+    {
+        editor->removeListener (this);
         processorEditors.removeObject (editor);
+    }
 
     repaint();
 }
@@ -109,6 +119,17 @@ void BoardComponent::showInfoComp (const BaseProcessor& proc)
     infoComp.setInfoForProc (proc.getName(), proc.getUIOptions().info);
     infoComp.setVisible (true);
     infoComp.toFront (true);
+}
+
+void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e, const Point<int>& mouseOffset)
+{
+    const auto relE = e.getEventRelativeTo (this);
+    const auto bounds = getBounds();
+
+    auto* proc = editor.getProcPtr();
+    proc->setPosition (relE.getPosition() - mouseOffset, bounds);
+    editor.setTopLeftPosition (proc->getPosition (bounds));
+    repaint();
 }
 
 void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options)

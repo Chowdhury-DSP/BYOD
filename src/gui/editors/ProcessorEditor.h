@@ -7,6 +7,14 @@
 
 class ProcessorEditor : public Component
 {
+    // clang-format off
+    CREATE_LISTENER (
+        Listener,
+        listeners,
+        virtual void showInfoComp (const BaseProcessor&) {}\
+        virtual void editorDragged (ProcessorEditor&, const MouseEvent&, const Point<int>&) {}\
+    )
+    // clang-format on
 public:
     ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs);
     ~ProcessorEditor() override;
@@ -47,7 +55,7 @@ private:
     Point<int> mouseDownOffset;
 
     DrawableButton settingsButton { "Settings", DrawableButton::ImageFitted };
-    
+
     chowdsp::SharedLNFAllocator lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)
