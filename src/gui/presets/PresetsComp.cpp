@@ -154,7 +154,17 @@ int PresetsComp::addPresetOptions (int optionID)
     auto menu = presetBox.getRootMenu();
     menu->addSeparator();
 
-    juce::PopupMenu::Item saveItem { "Save Preset" };
+    juce::PopupMenu::Item resetItem { "Reset" };
+    resetItem.itemID = ++optionID;
+    resetItem.action = [=]
+    {
+        updatePresetBoxText();
+        if (auto* currentPreset = manager.getCurrentPreset())
+            manager.loadPreset (*currentPreset);
+    };
+    menu->addItem (resetItem);
+
+    juce::PopupMenu::Item saveItem { "Save Preset As" };
     saveItem.itemID = ++optionID;
     saveItem.action = [=]
     {
