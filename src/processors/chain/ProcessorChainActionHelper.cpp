@@ -60,7 +60,7 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
         jassertfalse; // unable to create this processor!
         return;
     }
-    
+
     // 1-to-1 replacement requires the same I/O channels!
     jassert (newProc->getNumInputs() == procToReplace->getNumInputs());
     jassert (newProc->getNumOutputs() == procToReplace->getNumOutputs());
