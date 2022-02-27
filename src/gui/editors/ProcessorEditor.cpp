@@ -28,6 +28,22 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
     xButton.onClick = [=]
     { procChain.getActionHelper().removeProcessor (&proc); };
 
+    if (proc.getNumInputs() != 0 && proc.getNumOutputs() != 0)
+    {
+        auto cog = Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize);
+        cog->replaceColour (Colours::white, contrastColour);
+        settingsButton.setImages (cog.get());
+        addAndMakeVisible (settingsButton);
+
+        settingsButton.onClick = [&]
+        {
+            PopupMenu menu;
+            PopupMenu::Options options;
+            processorSettingsCallback (menu, options);
+            menu.showMenuAsync (options);
+        };
+    }
+
     if (auto* lnf = proc.getCustomLookAndFeel())
         setLookAndFeel (lnf);
     else
@@ -46,37 +62,33 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         newPort->setInputOutput (false);
         addAndMakeVisible (newPort);
     }
-
-    popupMenu.setAssociatedComponent (this);
-    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
-    {
-        if (proc.getNumInputs() == 0 || proc.getNumOutputs() == 0)
-            return; // no menu for I/O processors
-
-        proc.addToPopupMenu (menu);
-
-        menu.addItem ("Reset", [&]
-                      { resetProcParameters(); });
-
-        PopupMenu replaceProcMenu;
-        createReplaceProcMenu (replaceProcMenu);
-        menu.addSubMenu ("Replace", replaceProcMenu);
-
-        if (auto* p = getParentComponent())
-        {
-            menu.addItem ("Info", [&, boardComp = dynamic_cast<BoardComponent*> (p)]
-                          { boardComp->showInfoComp (proc); });
-
-            options = options.withParentComponent (p);
-        }
-
-        menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
-
-        options = options.withStandardItemHeight (27);
-    };
 }
 
 ProcessorEditor::~ProcessorEditor() = default;
+
+void ProcessorEditor::processorSettingsCallback (PopupMenu& menu, PopupMenu::Options& options)
+{
+    proc.addToPopupMenu (menu);
+
+    menu.addItem ("Reset", [&]
+                  { resetProcParameters(); });
+
+    PopupMenu replaceProcMenu;
+    createReplaceProcMenu (replaceProcMenu);
+    menu.addSubMenu ("Replace", replaceProcMenu);
+
+    if (auto* p = getParentComponent())
+    {
+        menu.addItem ("Info", [&, boardComp = dynamic_cast<BoardComponent*> (p)]
+                      { boardComp->showInfoComp (proc); });
+
+        options = options.withParentComponent (p);
+    }
+
+    menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
+
+    options = options.withStandardItemHeight (27);
+}
 
 void ProcessorEditor::resetProcParameters()
 {
@@ -152,7 +164,8 @@ void ProcessorEditor::resized()
     {
         const auto xButtonSize = proportionOfWidth (0.1f);
         const auto xButtonPad = proportionOfWidth (0.015f);
-        powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
+        powerButton.setBounds (width - 3 * xButtonSize, 0, xButtonSize, xButtonSize);
+        settingsButton.setBounds (Rectangle { width - 2 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad / 2));
         xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (xButtonPad));
     }
 

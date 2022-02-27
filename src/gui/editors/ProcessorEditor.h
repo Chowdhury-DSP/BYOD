@@ -25,6 +25,7 @@ public:
     Colour getColour() const noexcept { return procUI.backgroundColour; }
 
 private:
+    void processorSettingsCallback (PopupMenu& menu, PopupMenu::Options& options);
     Port* getPortPrivate (int portIndex, bool isInput) const;
 
     void resetProcParameters();
@@ -45,7 +46,8 @@ private:
 
     Point<int> mouseDownOffset;
 
-    chowdsp::PopupMenuHelper popupMenu;
+    DrawableButton settingsButton { "Settings", DrawableButton::ImageFitted };
+    
     chowdsp::SharedLNFAllocator lnfAllocator;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorEditor)
