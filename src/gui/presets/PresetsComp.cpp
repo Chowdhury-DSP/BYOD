@@ -154,7 +154,17 @@ int PresetsComp::addPresetOptions (int optionID)
     auto menu = presetBox.getRootMenu();
     menu->addSeparator();
 
-    juce::PopupMenu::Item saveItem { "Save Preset" };
+    juce::PopupMenu::Item resetItem { "Reset" };
+    resetItem.itemID = ++optionID;
+    resetItem.action = [=]
+    {
+        updatePresetBoxText();
+        if (auto* currentPreset = manager.getCurrentPreset())
+            manager.loadPreset (*currentPreset);
+    };
+    menu->addItem (resetItem);
+
+    juce::PopupMenu::Item saveItem { "Save Preset As" };
     saveItem.itemID = ++optionID;
     saveItem.action = [=]
     {
@@ -167,17 +177,17 @@ int PresetsComp::addPresetOptions (int optionID)
     // editing should only be allowed for user presets!
     if (presetManager.getCurrentPreset()->getVendor() == presetManager.getUserPresetName())
     {
-        juce::PopupMenu::Item editItem { "Edit Preset" };
+        juce::PopupMenu::Item editItem { "Resave Preset" };
         editItem.itemID = ++optionID;
         editItem.action = [&]
         {
+            updatePresetBoxText();
             if (auto* currentPreset = manager.getCurrentPreset())
             {
                 auto presetFile = currentPreset->getPresetFile();
                 if (presetFile == File())
                     presetFile = presetManager.getPresetFile (*currentPreset);
 
-                updatePresetBoxText();
                 saveWindow.getViewComponent().prepareToShow (currentPreset, presetFile);
                 saveWindow.show();
             }
@@ -185,12 +195,37 @@ int PresetsComp::addPresetOptions (int optionID)
         menu->addItem (editItem);
     }
 
+    if (presetManager.getCurrentPreset()->getVendor() != PresetConstants::factoryPresetVendor)
+    {
+        juce::PopupMenu::Item deleteItem { "Delete Preset" };
+        deleteItem.itemID = ++optionID;
+        deleteItem.action = [&]
+        {
+            updatePresetBoxText();
+            if (auto* currentPreset = manager.getCurrentPreset())
+            {
+                auto presetFile = currentPreset->getPresetFile();
+                if (! (presetFile.existsAsFile() && presetFile.hasFileExtension (PresetConstants::presetExt)))
+                {
+                    NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Preset Deletion", "Unable to find preset file!");
+                    return;
+                }
+
+                if (NativeMessageBox::showOkCancelBox (MessageBoxIconType::QuestionIcon, "Preset Deletion", "Are you sure you want to delete this preset? This operation cannot be undone."))
+                {
+                    presetFile.deleteFile();
+                    manager.loadDefaultPreset();
+                    manager.loadUserPresetsFromFolder (manager.getUserPresetPath());
+                }
+            }
+        };
+        menu->addItem (deleteItem);
+    }
+
     juce::PopupMenu::Item searchItem { "Search" };
     searchItem.itemID = ++optionID;
     searchItem.action = [&]
-    {
-        searchWindow.show();
-    };
+    { searchWindow.show(); };
     menu->addItem (searchItem);
 
 #if ! JUCE_IOS

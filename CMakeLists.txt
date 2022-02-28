@@ -45,6 +45,10 @@ juce_add_plugin(BYOD
     ProductName "BYOD"
     ICON_BIG res/logo.png
 
+    VST2_CATEGORY kPlugCategEffect
+    VST3_CATEGORIES Fx Distortion
+    AU_MAIN_TYPE kAudioUnitType_Effect
+    AAX_CATEGORY AAX_ePlugInCategory_Harmonic
     LV2_URI https://github.com/Chowdhury-DSP/BYOD
 
     MICROPHONE_PERMISSION_ENABLED TRUE
@@ -52,9 +56,9 @@ juce_add_plugin(BYOD
     REQUIRES_FULL_SCREEN TRUE
     IPHONE_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
     IPAD_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
-
-    # Apple won't let you use local network unless...
-    PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST}
+    PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST} # Apple won't let you use local network unless we add this
+    ICLOUD_PERMISSIONS_ENABLED TRUE
+    HARDENED_RUNTIME_ENABLED ${BUILD_RELEASE}
 )
 
 option(BYOD_BUILD_CLAP "Build a CLAP plugin target (experimental)" OFF)
@@ -88,13 +92,6 @@ if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)
 endif()
 
 target_link_libraries(BYOD PRIVATE juce_plugin_modules)
-
-# we need these flags for notarization on MacOS
-if(BUILD_RELEASE AND APPLE)
-    message(STATUS "Setting MacOS release flags...")
-    set_target_properties(BYOD_Standalone PROPERTIES
-        XCODE_ATTRIBUTE_ENABLE_HARDENED_RUNTIME YES)
-endif()
 
 if(IOS)
     message(STATUS "Setting iOS-specific properties...")
