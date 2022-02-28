@@ -1,58 +1,58 @@
-name: CI-iOS
-
-on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
-  workflow_dispatch:
-
-jobs:
-  build_and_test:
-    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
-    name: Build AUv3 plugin for iOS
-    runs-on: macos-latest
-
-    steps:
-      - name: Get latest CMake
-        uses: lukka/get-cmake@latest
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-        with:
-          submodules: recursive
-
-      - uses: Apple-Actions/import-codesign-certs@v1
-        with:
-          p12-file-base64: ${{ secrets.IOS_CERTIFICATES_BASE64 }}
-          p12-password: ${{ secrets.IOS_CERTIFICATES_PASS }}
-
-      - uses: Apple-Actions/download-provisioning-profiles@v1
-        with:
-          bundle-id: com.chowdsp.BYOD
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
-
-      - uses: Apple-Actions/download-provisioning-profiles@v1
-        with:
-          bundle-id: com.chowdsp.BYOD.BYODAUv3
-          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
-          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
-          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
-
-      - name: Setup debug session
-        if: always()
-        uses: mxschmitt/action-tmate@v3
-
-      - name: Configure
-        shell: bash
-        run: cmake -Bbuild-ios -GXcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=11.4 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" -DCMAKE_XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY="1,2" -DCMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE="NO"
-
-      - name: Build
-        shell: bash
-        run: xcodebuild -project build-ios/BYOD.xcodeproj -scheme BYOD_Standalone archive -configuration Debug -sdk iphoneos -jobs 4 -archivePath BYOD.xcarchive | xcpretty
+#name: CI-iOS
+#
+#on:
+#  push:
+#    branches:
+#      - main
+#      - develop
+#  pull_request:
+#    branches:
+#      - main
+#      - develop
+#  workflow_dispatch:
+#
+#jobs:
+#  build_and_test:
+#    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
+#    name: Build AUv3 plugin for iOS
+#    runs-on: macos-latest
+#
+#    steps:
+#      - name: Get latest CMake
+#        uses: lukka/get-cmake@latest
+#
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#        with:
+#          submodules: recursive
+#
+#      - uses: Apple-Actions/import-codesign-certs@v1
+#        with:
+#          p12-file-base64: ${{ secrets.IOS_CERTIFICATES_BASE64 }}
+#          p12-password: ${{ secrets.IOS_CERTIFICATES_PASS }}
+#
+#      - uses: Apple-Actions/download-provisioning-profiles@v1
+#        with:
+#          bundle-id: com.chowdsp.BYOD
+#          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+#          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+#          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+#
+#      - uses: Apple-Actions/download-provisioning-profiles@v1
+#        with:
+#          bundle-id: com.chowdsp.BYOD.BYODAUv3
+#          issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+#          api-key-id: ${{ secrets.APPSTORE_KEY_ID }}
+#          api-private-key: ${{ secrets.APPSTORE_PRIVATE_KEY }}
+#
+#      - name: Setup debug session
+#        if: always()
+#        uses: mxschmitt/action-tmate@v3
+#
+#      - name: Configure
+#        shell: bash
+#        run: cmake -Bbuild-ios -GXcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_OSX_DEPLOYMENT_TARGET=11.4 -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM="${{ secrets.APPLE_TEAM_ID }}" -DCMAKE_XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY="1,2" -DCMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE="NO"
+#
+#      - name: Build
+#        shell: bash
+#        run: xcodebuild -project build-ios/BYOD.xcodeproj -scheme BYOD_Standalone archive -configuration Debug -sdk iphoneos -jobs 4 -archivePath BYOD.xcarchive | xcpretty
