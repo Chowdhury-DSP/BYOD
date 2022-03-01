@@ -27,7 +27,6 @@ private:
     SpringReverb reverb;
 
     AudioBuffer<float> dryBuffer;
-    dsp::Gain<float> dryGain;
     dsp::Gain<float> wetGain;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpringReverbProcessor)

@@ -77,6 +77,7 @@ void Chorus::prepare (double sampleRate, int samplesPerBlock)
     aaFilter.setCutoffFrequency (12000.0f);
 
     dryWetMixer.prepare (spec);
+    dryWetMixer.setMixingRule (dsp::DryWetMixingRule::sin3dB);
 
     dcBlocker.prepare (spec);
     dcBlocker.setCutoffFrequency (60.0f);

@@ -59,7 +59,9 @@ void Delay::prepare (double sampleRate, int samplesPerBlock)
     lofiDelayLine.prepare (stereoSpec);
 
     dryWetMixer.prepare (stereoSpec);
+    dryWetMixer.setMixingRule (dsp::DryWetMixingRule::balanced);
     dryWetMixerMono.prepare (monoSpec);
+    dryWetMixerMono.setMixingRule (dsp::DryWetMixingRule::balanced);
 
     delaySmooth.reset (sampleRate, 0.1);
     freqSmooth.reset (sampleRate, 0.1);
@@ -77,7 +79,7 @@ void Delay::processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType& delay
     dsp::AudioBlock<float> block { buffer };
 
     auto& dryWet = numChannels == 1 ? dryWetMixerMono : dryWetMixer;
-    dryWet.setWetMixProportion (*mixParam);
+    dryWet.setWetMixProportion (*mixParam * 0.5f);
     dryWet.pushDrySamples (block);
 
     const auto* fbData = feedbackSmoothBuffer.getSmoothedBuffer();
@@ -155,7 +157,7 @@ void Delay::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLi
     auto& bufferToProcess = numChannels == 2 ? buffer : stereoBuffer;
 
     dsp::AudioBlock<float> block { bufferToProcess };
-    dryWetMixer.setWetMixProportion (*mixParam);
+    dryWetMixer.setWetMixProportion (*mixParam * 0.5f);
     dryWetMixer.pushDrySamples (block);
 
     // if we have a stereo input collapse to mono
