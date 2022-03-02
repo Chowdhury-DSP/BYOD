@@ -52,9 +52,12 @@ void PresetManager::loadBYODFactoryPresets()
 
     // players
     factoryPresets.emplace_back (BinaryData::J_Mascis_chowpreset, BinaryData::J_Mascis_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Jimi_Hendrix_chowpreset, BinaryData::Jimi_Hendrix_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::John_Mayer_chowpreset, BinaryData::John_Mayer_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Johnny_Greenwood_chowpreset, BinaryData::Johnny_Greenwood_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Neil_Young_chowpreset, BinaryData::Neil_Young_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Nirvana_chowpreset, BinaryData::Nirvana_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Pete_Townshend_chowpreset, BinaryData::Pete_Townshend_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::The_Strokes_chowpreset, BinaryData::The_Strokes_chowpresetSize);
 
     addPresets (factoryPresets);

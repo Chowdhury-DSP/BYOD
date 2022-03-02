@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Jimi Hendrix" plugin="BYOD" vendor="CHOW" category="Players"
+        version="0.5.2">
+  <proc_chain>
+    <Distortion_Plus>
+      <Parameters x_pos="0.05863956362009048" y_pos="0.4584774971008301">
+        <PARAM id="dist" value="0.800000011920929"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Distortion_Plus>
+    <Muff_Tone>
+      <Parameters x_pos="0.321344792842865" y_pos="0.4826989471912384">
+        <PARAM id="mids" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.6499999761581421"/>
+        <PARAM id="type" value="6.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Muff_Tone>
+    <SVF>
+      <Parameters x_pos="0.7222715020179749" y_pos="0.0313725508749485">
+        <PARAM id="freq" value="8000.0009765625"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="q_value" value="0.707099974155426"/>
+      </Parameters>
+      <port_0 connection_0="5" connection_end_0="0"/>
+    </SVF>
+    <Tube_Screamer>
+      <Parameters x_pos="0.1668145507574081" y_pos="0.0117647061124444">
+        <PARAM id="diode" value="1.0"/>
+        <PARAM id="gain" value="0.2530753314495087"/>
+        <PARAM id="num_diodes" value="2.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Tube_Screamer>
+    <TS-Tone>
+      <Parameters x_pos="0.4365572333335876" y_pos="0.0">
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </TS-Tone>
+    <Envelope_Filter>
+      <Parameters x_pos="0.5676309466362" y_pos="0.5934256315231323">
+        <PARAM id="direct_control" value="0.0"/>
+        <PARAM id="filter_type" value="0.0"/>
+        <PARAM id="freq" value="800.0"/>
+        <PARAM id="freq_mod" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="res" value="0.800000011920929"/>
+        <PARAM id="sense" value="0.800000011920929"/>
+        <PARAM id="speed" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Envelope_Filter>
+    <Input>
+      <Parameters x_pos="0.002661934355273843" y_pos="0.0117647061124444">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8775510191917419" y_pos="0.570588231086731">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>

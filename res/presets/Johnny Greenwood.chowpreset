@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Johnny Greenwood" plugin="BYOD" vendor="CHOW" category="Players"
+        version="0.5.2">
+  <proc_chain>
+    <Tremolo>
+      <Parameters x_pos="0.5618305802345276" y_pos="0.3459119498729706">
+        <PARAM id="depth" value="0.1000000014901161"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="7.999999046325684"/>
+        <PARAM id="wave" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="5" connection_end_0="0"/>
+    </Tremolo>
+    <Spring_Reverb>
+      <Parameters x_pos="0.4995131492614746" y_pos="0.6729559898376465">
+        <PARAM id="chaos" value="0.1500000059604645"/>
+        <PARAM id="damping" value="0.5"/>
+        <PARAM id="decay" value="0.699999988079071"/>
+        <PARAM id="mix" value="0.1500000059604645"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="reflect" value="0.5"/>
+        <PARAM id="shake" value="0.0"/>
+        <PARAM id="size" value="0.2953952252864838"/>
+        <PARAM id="spin" value="0.75"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Spring_Reverb>
+    <Compressor>
+      <Parameters x_pos="0.3203505277633667" y_pos="0.02201257832348347">
+        <PARAM id="attack" value="1.99999988079071"/>
+        <PARAM id="knee" value="6.0"/>
+        <PARAM id="makeup" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ratio" value="3.0"/>
+        <PARAM id="release" value="49.99999618530273"/>
+        <PARAM id="thresh" value="-12.0"/>
+      </Parameters>
+      <port_0 connection_0="6" connection_end_0="0"/>
+    </Compressor>
+    <TS-Tone>
+      <Parameters x_pos="0.2015579342842102" y_pos="0.347484290599823">
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </TS-Tone>
+    <Range_Booster>
+      <Parameters x_pos="0.02629016526043415" y_pos="0.009433962404727936">
+        <PARAM id="boost" value="6.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="range" value="4000.000244140625"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Range_Booster>
+    <Delay>
+      <Parameters x_pos="0.1197663098573685" y_pos="0.6713836193084717">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="feedback" value="0.1500000059604645"/>
+        <PARAM id="freq" value="8000.00048828125"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="0.0"/>
+        <PARAM id="ping_pong" value="0.0"/>
+        <PARAM id="time_ms" value="89.99998474121094"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Delay>
+    <Tube_Screamer>
+      <Parameters x_pos="0.6144108772277832" y_pos="0.03144654259085655">
+        <PARAM id="diode" value="0.0"/>
+        <PARAM id="gain" value="0.800000011920929"/>
+        <PARAM id="num_diodes" value="3.0"/>
+        <PARAM id="on_off" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Tube_Screamer>
+    <Input>
+      <Parameters x_pos="0.0" y_pos="0.3207547068595886">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8909444808959961" y_pos="0.6367924809455872">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>

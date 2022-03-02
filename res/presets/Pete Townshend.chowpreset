@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Pete Townshend" plugin="BYOD" vendor="CHOW" category="Players"
+        version="0.5.2">
+  <proc_chain>
+    <Bass_Cleaner>
+      <Parameters x_pos="0.2159008085727692" y_pos="0.07956318557262421">
+        <PARAM id="clean" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Bass_Cleaner>
+    <Tube_Screamer>
+      <Parameters x_pos="0.5404813885688782" y_pos="0.08736349642276764">
+        <PARAM id="diode" value="2.0"/>
+        <PARAM id="gain" value="0.800000011920929"/>
+        <PARAM id="num_diodes" value="1.200000047683716"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Tube_Screamer>
+    <High_Cut>
+      <Parameters x_pos="0.1932895630598068" y_pos="0.5085803270339966">
+        <PARAM id="cutoff" value="15999.998046875"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </High_Cut>
+    <Amp_IRs>
+      <Parameters x_pos="0.5981035828590393" y_pos="0.5179407000541687" ir_file="">
+        <PARAM id="gain" value="12.0"/>
+        <PARAM id="ir" value="0.0"/>
+        <PARAM id="mix" value="0.800000011920929"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Amp_IRs>
+    <Input>
+      <Parameters x_pos="0.00709849176928401" y_pos="0.2588235437870026">
+        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8731144666671753" y_pos="0.2862745225429535">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+</Preset>
