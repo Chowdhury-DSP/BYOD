@@ -5,7 +5,7 @@ TubeAmp::TubeAmp (UndoManager* um) : BaseProcessor ("Dirty Tube", createParamete
 {
     driveParam = vts.getRawParameterValue ("drive");
 
-    uiOptions.backgroundColour = Colours::darkcyan;
+    uiOptions.backgroundColour = Colours::cyan.interpolatedWith (Colours::navy, 0.5f);
     uiOptions.info.description = "Virtual analog model of an old tube amplifier.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
