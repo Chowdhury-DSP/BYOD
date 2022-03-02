@@ -24,7 +24,7 @@ public:
     void getCustomComponents (OwnedArray<Component>& customComps) override;
 
     std::unique_ptr<XmlElement> toXML() override;
-    void fromXML (XmlElement* xml) override;
+    void fromXML (XmlElement* xml, bool loadPosition) override;
 
 private:
     std::atomic<float>* mixParam = nullptr;

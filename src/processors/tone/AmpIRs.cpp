@@ -134,9 +134,9 @@ std::unique_ptr<XmlElement> AmpIRs::toXML()
     return std::move (xml);
 }
 
-void AmpIRs::fromXML (XmlElement* xml)
+void AmpIRs::fromXML (XmlElement* xml, bool loadPosition)
 {
-    BaseProcessor::fromXML (xml);
+    BaseProcessor::fromXML (xml, loadPosition);
 
     auto irFile = File (xml->getStringAttribute ("ir_file"));
     if (irFile.getFullPathName().isNotEmpty())

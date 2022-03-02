@@ -10,7 +10,7 @@ public:
     explicit ProcessorStore (UndoManager* um = nullptr);
 
     BaseProcessor::Ptr createProcByName (const String& name);
-    void duplicateProcessor (const BaseProcessor& procToDuplicate);
+    void duplicateProcessor (BaseProcessor& procToDuplicate);
 
     void createProcList (PopupMenu& menu, int& menuID) const;
     void createProcReplaceList (PopupMenu& menu, int& menuID, BaseProcessor* procToReplace) const;

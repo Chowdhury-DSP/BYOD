@@ -105,7 +105,7 @@ std::unique_ptr<XmlElement> BaseProcessor::toXML()
     return std::move (xml);
 }
 
-void BaseProcessor::fromXML (XmlElement* xml)
+void BaseProcessor::fromXML (XmlElement* xml, bool loadPosition)
 {
     if (xml == nullptr)
         return;
@@ -114,7 +114,9 @@ void BaseProcessor::fromXML (XmlElement* xml)
         return;
 
     vts.state = ValueTree::fromXml (*xml); // don't use `replaceState()` otherwise UndoManager will clear
-    loadPositionInfoFromXML (xml);
+
+    if (loadPosition)
+        loadPositionInfoFromXML (xml);
 }
 
 void BaseProcessor::loadPositionInfoFromXML (XmlElement* xml)

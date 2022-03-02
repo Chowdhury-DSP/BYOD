@@ -113,8 +113,7 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());
 
-                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
-                                               }));
+                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() }); }));
     }
 
     for (auto& f : futureProcInfos)
@@ -132,9 +131,13 @@ BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
     return store[name](undoManager);
 }
 
-void ProcessorStore::duplicateProcessor (const BaseProcessor& procToDuplicate)
+void ProcessorStore::duplicateProcessor (BaseProcessor& procToDuplicate)
 {
-    addProcessorCallback (createProcByName (procToDuplicate.getName()));
+    auto newProc = createProcByName (procToDuplicate.getName());
+    if (newProc != nullptr)
+        newProc->fromXML (procToDuplicate.toXML().get(), false);
+
+    addProcessorCallback (std::move (newProc));
 }
 
 template <typename FilterType>
