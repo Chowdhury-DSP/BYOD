@@ -12,7 +12,6 @@ add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
 # set default plugin formats to build
-option(BUILD_RELEASE "Set build flags for release builds" OFF)
 if(IOS)
     set(JUCE_FORMATS Standalone AUv3)
 else()
@@ -37,6 +36,13 @@ if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)
     include (modules/cmake/AppleLocalNetworkPlist.cmake)
 endif()
 
+option(BUILD_RELEASE "Set build flags for release builds" OFF)
+if(BUILD_RELEASE)
+    set(HARDENED_RUNTIME_ENABLED YES)
+else()
+    set(HARDENED_RUNTIME_ENABLED NO)
+endif()
+
 juce_add_plugin(BYOD
     COMPANY_NAME chowdsp
     PLUGIN_MANUFACTURER_CODE Chow
@@ -58,7 +64,7 @@ juce_add_plugin(BYOD
     IPAD_SCREEN_ORIENTATIONS UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight
     PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST} # Apple won't let you use local network unless we add this
     ICLOUD_PERMISSIONS_ENABLED TRUE
-    HARDENED_RUNTIME_ENABLED ${BUILD_RELEASE}
+    HARDENED_RUNTIME_ENABLED ${HARDENED_RUNTIME_ENABLED}
 )
 
 option(BYOD_BUILD_CLAP "Build a CLAP plugin target (experimental)" OFF)
