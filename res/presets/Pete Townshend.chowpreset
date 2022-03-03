@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="Pete Townshend" plugin="BYOD" vendor="CHOW" category="Players"
-        version="0.5.2">
+        version="0.5.3">
   <proc_chain>
     <Bass_Cleaner>
       <Parameters x_pos="0.2159008085727692" y_pos="0.07956318557262421">
@@ -37,7 +37,6 @@
     </Amp_IRs>
     <Input>
       <Parameters x_pos="0.00709849176928401" y_pos="0.2588235437870026">
-        <PARAM id="mono_stereo" value="3.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="0" connection_end_0="0"/>

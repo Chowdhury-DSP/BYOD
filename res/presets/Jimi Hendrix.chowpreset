@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="Jimi Hendrix" plugin="BYOD" vendor="CHOW" category="Players"
-        version="0.5.2">
+        version="0.5.3">
   <proc_chain>
     <Distortion_Plus>
       <Parameters x_pos="0.05863956362009048" y_pos="0.4584774971008301">
@@ -60,7 +60,6 @@
     </Envelope_Filter>
     <Input>
       <Parameters x_pos="0.002661934355273843" y_pos="0.0117647061124444">
-        <PARAM id="mono_stereo" value="3.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="3" connection_end_0="0"/>
