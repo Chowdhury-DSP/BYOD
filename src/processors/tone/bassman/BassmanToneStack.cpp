@@ -39,6 +39,7 @@ void BassmanToneStack::process (float* buffer, const int numSamples) noexcept
         return;
     }
 
+    setSMatrixData();
     for (int n = 0; n < numSamples; ++n)
         buffer[n] = processSample (buffer[n]);
 }

@@ -79,6 +79,7 @@ void processFilter (AudioBuffer<float>& buffer, chowdsp::StateVariableFilter<flo
     {
         auto block = dsp::AudioBlock<float> { buffer };
         auto context = dsp::ProcessContextReplacing<float> { block };
+        svf.setCutoffFrequency (freqSmooth.getNextValue());
         svf.process<decltype (context), type> (context);
     }
 }

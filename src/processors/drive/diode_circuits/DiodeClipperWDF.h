@@ -78,6 +78,8 @@ public:
             return;
         }
 
+        Vs.setResistanceValue (1.0f / (MathConstants<float>::twoPi * cutoffSmooth.getNextValue() * capVal));
+        dp.setDiodeParameters (curDiodeIs, Vt, nDiodesSmooth.getNextValue());
         for (int n = 0; n < numSamples; ++n)
             buffer[n] = processSample (buffer[n]);
     }

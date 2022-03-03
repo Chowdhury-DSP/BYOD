@@ -17,10 +17,8 @@ else()
 endif()
 add_subdirectory(RTNeural)
 
-# add sst-cpputils
+ # add other C++ libraries
 add_subdirectory(sst-cpputils)
-
-# add rapidfuzz
 add_subdirectory(rapidfuzz-cpp)
 
 include(cmake/WarningFlags.cmake)
