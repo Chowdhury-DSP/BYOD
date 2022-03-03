@@ -7,15 +7,38 @@ namespace
 constexpr int editorWidth = 270;
 constexpr int editorHeight = 180;
 constexpr int editorPad = 5;
+constexpr int newButtonWidth = 40;
 
 constexpr int getScaleDim (int dim, float scaleFactor)
 {
     return int ((float) dim * scaleFactor);
 }
+
+Point<int> getRandomPosition (const Component& comp)
+{
+    auto b = comp.getLocalBounds()
+                 .withWidth (comp.getWidth() * 2 / 3)
+                 .withHeight (comp.getHeight() * 2 / 3);
+
+    auto randX = jmax (comp.proportionOfWidth (0.1f), 1);
+    auto randY = jmax (comp.proportionOfHeight (0.1f), 1);
+    auto& rand = Random::getSystemRandom();
+    return b.getCentre() + Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
+}
 } // namespace
 
 BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cableView (this)
 {
+    newProcButton.setButtonText ("+");
+    newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
+    newProcButton.setColour (ComboBox::outlineColourId, Colours::white);
+    addAndMakeVisible (newProcButton);
+    newProcButton.onClick = [&]
+    {
+        addingFromNewProcButton = true;
+        popupMenu.showPopupMenu();
+    };
+
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
     addAndMakeVisible (inputEditor.get());
     inputEditor->addListener (this);
@@ -77,6 +100,7 @@ void BoardComponent::resized()
     for (auto* editor : processorEditors)
         setEditorPosition (editor);
 
+    newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
 
     repaint();
@@ -143,7 +167,20 @@ void BoardComponent::duplicateProcessor (const ProcessorEditor& editor)
 
 void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options)
 {
-    nextEditorPosition = options.getTargetScreenArea().getPosition() - getScreenPosition();
+    if (addingFromNewProcButton)
+    {
+        nextEditorPosition = getRandomPosition (*this);
+        addingFromNewProcButton = false;
+    }
+    else
+    {
+        nextEditorPosition = options.getTargetScreenArea().getPosition() - getScreenPosition();
+
+        const auto halfEditorWidth = getScaleDim (editorWidth, scaleFactor) / 2;
+        const auto halfEditorHeight = getScaleDim (editorHeight, scaleFactor) / 2;
+        nextEditorPosition.x = jlimit (halfEditorWidth, getWidth() - halfEditorWidth, nextEditorPosition.x);
+        nextEditorPosition.y = jlimit (halfEditorHeight, getHeight() - halfEditorHeight, nextEditorPosition.y);
+    }
 
     int menuID = 0;
     procChain.getProcStore().createProcList (menu, menuID);
@@ -186,6 +223,7 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> 
 
         editor->setBounds (bounds);
         proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
+        editor->setTopLeftPosition (proc->getPosition (getLocalBounds()));
     }
     else
     {
