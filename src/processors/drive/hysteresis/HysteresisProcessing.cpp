@@ -88,6 +88,7 @@ void HysteresisProcessing::processBlock (double* bufferLeft, double* bufferRight
     }
     else
     {
+        cook (driveSmooth.getNextValue(), widthSmooth.getNextValue(), satSmooth.getNextValue());
         for (int n = 0; n < numSamples; ++n)
         {
             stereoVec[0] = bufferLeft[n];
