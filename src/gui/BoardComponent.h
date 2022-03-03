@@ -46,8 +46,11 @@ private:
 
     float scaleFactor = 1.0f;
 
+    TextButton newProcButton;
     chowdsp::PopupMenuHelper popupMenu;
     Point<int> nextEditorPosition {};
+    bool addingFromNewProcButton = false;
+    bool addingFromRightClick = false;
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 
