@@ -71,6 +71,7 @@ void HighCut::processAudio (AudioBuffer<float>& buffer)
     }
     else
     {
+        calcCoefs (Rv2.getNextValue());
         for (int ch = 0; ch < numChannels; ++ch)
         {
             for (int n = 0; n < buffer.getNumSamples(); ++n)

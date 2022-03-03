@@ -41,6 +41,7 @@ void OutputStageProc::processBlock (float* block, const int numSamples) noexcept
     }
     else
     {
+        calcCoefs (levelSmooth.getNextValue());
         chowdsp::IIRFilter<1>::processBlock (block, numSamples);
     }
 }

@@ -58,8 +58,7 @@ public:
         {
             for (int n = 0; n < numSamples; ++n)
             {
-                auto curR10b = r10bSmooth.getNextValue();
-                calcCoefs (curR10b);
+                calcCoefs (r10bSmooth.getNextValue());
                 block[n] = processSample (block[n]);
 
                 // block[n] += 4.5f * R12 / (R12 + R11 + curR10b); // bias
@@ -67,6 +66,7 @@ public:
         }
         else
         {
+            calcCoefs (r10bSmooth.getNextValue());
             chowdsp::IIRFilter<2>::processBlock (block, numSamples);
             // FloatVectorOperations::add (block, 4.5f * R12 / (R12 + R11 + r10bSmooth.getCurrentValue()), numSamples); // bias
         }

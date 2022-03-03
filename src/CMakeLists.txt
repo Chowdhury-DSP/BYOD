@@ -59,6 +59,7 @@ target_sources(BYOD PRIVATE
     processors/drive/diode_circuits/DiodeRectifier.cpp
     processors/drive/hysteresis/Hysteresis.cpp
     processors/drive/hysteresis/HysteresisProcessing.cpp
+    processors/drive/king_of_tone/KingOfToneDrive.cpp
     processors/drive/metal_face/MetalFace.cpp
     processors/drive/metal_face/MetalFaceRNN.cpp
     processors/drive/mxr_distortion/MXRDistortion.cpp
