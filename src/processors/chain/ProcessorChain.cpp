@@ -155,14 +155,14 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     portMagsHelper->preparePortMagnitudes();
 
     const auto osNumSamples = (int) osBlock.getNumSamples();
-    const auto numChannels = buffer.getNumChannels();
+    const auto inputNumChannels = (int) osBlock.getNumChannels();
 
     // process mono or stereo buffer?
     {
-        inputBuffer.setSize (2, osNumSamples, false, false, true);
+        inputBuffer.setSize (inputNumChannels, osNumSamples, false, false, true);
         inputBuffer.clear();
 
-        for (int ch = 0; ch < numChannels; ++ch)
+        for (int ch = 0; ch < inputNumChannels; ++ch)
             inputBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
     }
 
@@ -170,23 +170,8 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     bool outProcessed = false;
     runProcessor (&inputProcessor, inputBuffer, outProcessed);
 
-    if (outProcessed)
-    {
-        // get last block from output processor
-        auto& outBuffer = *outputProcessor.getOutputBuffer();
-        for (int ch = 0; ch < numChannels; ++ch)
-            FloatVectorOperations::copy (osBlock.getChannelPointer ((size_t) ch),
-                                         outBuffer.getReadPointer (ch),
-                                         osNumSamples);
-    }
-    else
-    {
-        // output processor is not connected!
-        osBlock.clear();
-    }
-
     // do output processing (downsampling, output gain)
-    ioProcessor.processAudioOutput (buffer);
+    ioProcessor.processAudioOutput (*outputProcessor.getOutputBuffer(), buffer, outProcessed);
 }
 
 void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, float /*newValue*/)

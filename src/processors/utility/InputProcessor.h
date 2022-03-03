@@ -17,10 +17,6 @@ public:
     void getCustomComponents (OwnedArray<Component>& customComps) override;
 
 private:
-    std::atomic<float>* monoModeParam = nullptr;
-
-    AudioBuffer<float> monoBuffer;
-
     LevelMeterComponent::LevelDataType rmsLevels {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputProcessor)
