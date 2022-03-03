@@ -6,7 +6,7 @@
     <Distortion_Plus>
       <Parameters x_pos="0.05863956362009048" y_pos="0.4584774971008301">
         <PARAM id="dist" value="0.800000011920929"/>
-        <PARAM id="level" value="0.5"/>
+        <PARAM id="level" value="0.55"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="1" connection_end_0="0"/>
@@ -51,7 +51,7 @@
         <PARAM id="filter_type" value="0.0"/>
         <PARAM id="freq" value="800.0"/>
         <PARAM id="freq_mod" value="0.0"/>
-        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="on_off" value="0.0"/>
         <PARAM id="res" value="0.800000011920929"/>
         <PARAM id="sense" value="0.800000011920929"/>
         <PARAM id="speed" value="0.5"/>

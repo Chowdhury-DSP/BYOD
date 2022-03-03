@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="Instant Metal" plugin="BYOD" vendor="CHOW" category="Pedals"
-        version="0.5.1">
+        version="0.5.2">
   <proc_chain>
     <Metal_Face>
       <Parameters x_pos="0.1997991949319839" y_pos="0.3162055313587189">
@@ -12,7 +12,7 @@
     </Metal_Face>
     <Amp_IRs>
       <Parameters x_pos="0.5190762877464294" y_pos="0.3181818127632141" ir_file="">
-        <PARAM id="gain" value="12.0"/>
+        <PARAM id="gain" value="11.0"/>
         <PARAM id="ir" value="0.0"/>
         <PARAM id="mix" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>

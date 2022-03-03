@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="John Mayer" plugin="BYOD" vendor="CHOW" category="Players" version="0.3.0">
+<Preset name="John Mayer" plugin="BYOD" vendor="CHOW" category="Players" version="0.5.2">
   <proc_chain>
     <Compressor>
       <Parameters x_pos="0.1845559775829315" y_pos="0.02547770738601685">
@@ -26,7 +26,7 @@
     <Centaur>
       <Parameters x_pos="0.00231660227291286" y_pos="0.3885350227355957">
         <PARAM id="gain" value="0.2000000029802322"/>
-        <PARAM id="level" value="1.0"/>
+        <PARAM id="level" value="0.8"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="5" connection_end_0="0"/>

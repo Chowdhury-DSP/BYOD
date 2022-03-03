@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="Big Muff" plugin="BYOD" vendor="CHOW" category="Pedals"
-        version="0.3.0">
+        version="0.5.2">
   <proc_chain>
     <Muff_Drive>
       <Parameters x_pos="0.287066251039505" y_pos="0.2189781069755554">

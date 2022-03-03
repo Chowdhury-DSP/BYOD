@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="MXR Distortion" plugin="BYOD" vendor="CHOW" category="Pedals"
-        version="0.3.0">
+        version="0.5.2">
   <proc_chain>
     <Distortion_Plus>
       <Parameters x_pos="0.3880126178264618" y_pos="0.2715328335762024">
         <PARAM id="dist" value="0.5"/>
-        <PARAM id="level" value="0.5"/>
+        <PARAM id="level" value="0.6"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="-1" connection_end_0="0"/>

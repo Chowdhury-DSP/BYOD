@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="The Strokes" plugin="BYOD" vendor="CHOW" category="Players" version="0.3.0">
+<Preset name="The Strokes" plugin="BYOD" vendor="CHOW" category="Players" version="0.5.2">
   <proc_chain>
     <Tube_Screamer>
       <Parameters x_pos="0.02232854813337326" y_pos="0.4786476790904999">

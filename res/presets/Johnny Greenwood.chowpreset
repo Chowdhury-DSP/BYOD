@@ -68,9 +68,9 @@
     <Tube_Screamer>
       <Parameters x_pos="0.6144108772277832" y_pos="0.03144654259085655">
         <PARAM id="diode" value="0.0"/>
-        <PARAM id="gain" value="0.800000011920929"/>
+        <PARAM id="gain" value="0.5"/>
         <PARAM id="num_diodes" value="3.0"/>
-        <PARAM id="on_off" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="3" connection_end_0="0"/>
     </Tube_Screamer>

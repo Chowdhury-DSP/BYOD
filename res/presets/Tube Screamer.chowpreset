@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="Tube Screamer" plugin="BYOD" vendor="CHOW" category="Pedals"
-        version="0.3.0">
+        version="0.5.2">
   <proc_chain>
     <Tube_Screamer>
-      <Parameters x_pos="0.2334384918212891" y_pos="0.2788321077823639">
+      <Parameters x_pos="0.1596989929676056" y_pos="0.1570121943950653">
         <PARAM id="diode" value="0.0"/>
         <PARAM id="gain" value="0.5"/>
         <PARAM id="num_diodes" value="1.0"/>
@@ -13,15 +13,22 @@
       <port_0 connection_0="1" connection_end_0="0"/>
     </Tube_Screamer>
     <TS-Tone>
-      <Parameters x_pos="0.5544164180755615" y_pos="0.2759124040603638">
+      <Parameters x_pos="0.4423076808452606" y_pos="0.1615853607654572">
         <PARAM id="on_off" value="1.0"/>
         <PARAM id="tone" value="0.5"/>
       </Parameters>
-      <port_0 connection_0="-1" connection_end_0="0"/>
+      <port_0 connection_0="2" connection_end_0="0"/>
     </TS-Tone>
+    <Clean_Gain>
+      <Parameters x_pos="0.5693979859352112" y_pos="0.478658527135849">
+        <PARAM id="gain" value="6.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Clean_Gain>
     <Input>
       <Parameters x_pos="0.005020080134272575" y_pos="0.2845849692821503">
-        <PARAM id="mono_stereo" value="3.0"/>
+        <PARAM id="mono_stereo" value="0.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="0" connection_end_0="0"/>

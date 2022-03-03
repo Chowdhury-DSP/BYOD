@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Nirvana" plugin="BYOD" vendor="CHOW" category="Players" version="0.3.0">
+<Preset name="Nirvana" plugin="BYOD" vendor="CHOW" category="Players" version="0.5.2">
   <proc_chain>
     <Distortion_Plus>
       <Parameters x_pos="0.2272727340459824" y_pos="0.02846975065767765">
@@ -13,7 +13,7 @@
     <Muff_Drive>
       <Parameters x_pos="0.2153110057115555" y_pos="0.4644128084182739">
         <PARAM id="harmonics" value="0.449999988079071"/>
-        <PARAM id="level" value="0.6499999761581421"/>
+        <PARAM id="level" value="0.5"/>
         <PARAM id="n_stages" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>
         <PARAM id="sustain" value="0.6000000238418579"/>
