@@ -34,13 +34,17 @@ Name: "VST3_64"; Description: "VST3 Plugin 64-bit"; Types: full
 Name: "VST_64"; Description: "VST Plugin 64-bit"; Types: full
 Name: "VST3_32"; Description: "VST3 Plugin 32-bit"; Types: full
 Name: "VST_32"; Description: "VST Plugin 32-bit"; Types: full
-; Name: "AAX"; Description: "AAX Plugin"; Types: full
+Name: "Standalone"; Description: "Standalone Plugin"; Types: full
+Name: "AAX"; Description: "AAX Plugin"; Types: full
 
 [Files]
-Source: "../../bin/Win64/BYOD.vst3"; DestDir: "{code:GetDir|VST3_64}"; Components: VST3_64; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../bin/Win64/BYOD.dll"; DestDir: "{code:GetDir|VST_64}"; Components: VST_64; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../bin/Win32/BYOD.vst3"; DestDir: "{code:GetDir|VST3_32}"; Components: VST3_32; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../bin/Win32/BYOD.dll"; DestDir: "{code:GetDir|VST_32}"; Components: VST_32; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win64/BYOD.vst3"; Excludes: "*.aaxplugin"; DestDir: "{code:GetDir|VST3_64}"; Components: VST3_64; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win64/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|VST_64}"; Components: VST_64; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win32/BYOD.vst3"; Excludes: "*.aaxplugin"; DestDir: "{code:GetDir|VST3_32}"; Components: VST3_32; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win32/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|VST_32}"; Components: VST_32; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win64/BYOD.exe"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|Standalone}"; Components: Standalone; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win64/BYOD.aaxplugin"; Excludes: "*.vst3"; DestDir: "{code:GetDir|AAX}"; Components: AAX; Flags: ignoreversion recursesubdirs createallsubdirs
+
 
 [Icons]
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"

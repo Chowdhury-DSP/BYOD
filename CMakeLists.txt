@@ -11,6 +11,8 @@ endif()
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
+# juce_set_aax_sdk_path(NONE)
+
 # set default plugin formats to build
 if(IOS)
     set(JUCE_FORMATS Standalone AUv3)
@@ -28,6 +30,12 @@ endif()
 if(TARGET juce_vst2_sdk)
     message(STATUS "Building VST2 plugin format")
     list(APPEND JUCE_FORMATS VST)
+endif()
+
+# Build AAX if SDK target exists
+if(TARGET juce_aax_sdk)
+    message(STATUS "Building AAX plugin format")
+    list(APPEND JUCE_FORMATS AAX)
 endif()
 
 option(BYOD_USE_LOCAL_PRESET_SERVER "Set build flag to use local preset server" OFF)
