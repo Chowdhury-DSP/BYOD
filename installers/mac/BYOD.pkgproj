@@ -2477,7 +2477,7 @@
 																	<key>GID</key>
 																	<integer>80</integer>
 																	<key>PATH</key>
-																	<string>../../build/BYOD</string>
+																	<string>../../bin/Mac/BYOD.aaxplugin</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -3305,7 +3305,7 @@
 			<key>BUILD_PATH</key>
 			<dict>
 				<key>PATH</key>
-				<string>../../bin/Mac/BYOD.aaxplugin</string>
+				<string>../../build</string>
 				<key>PATH_TYPE</key>
 				<integer>1</integer>
 			</dict>
