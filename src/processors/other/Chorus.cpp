@@ -83,6 +83,8 @@ void Chorus::prepare (double sampleRate, int samplesPerBlock)
     dcBlocker.setCutoffFrequency (60.0f);
 
     stereoBuffer.setSize (2, samplesPerBlock);
+
+    bypassNeedsReset = false;
 }
 
 template <typename DelayArrType>
@@ -180,17 +182,24 @@ void Chorus::processAudio (AudioBuffer<float>& buffer)
     dryWetMixer.mixWetSamples (block);
 
     outputBuffers.getReference (0) = &processBuffer;
+
+    bypassNeedsReset = true;
 }
 
 void Chorus::processAudioBypassed (AudioBuffer<float>& buffer)
 {
-    for (auto& delaySet : cleanDelay)
-        for (auto& delay : delaySet)
-            delay.reset();
+    if (bypassNeedsReset)
+    {
+        for (auto& delaySet : cleanDelay)
+            for (auto& delay : delaySet)
+                delay.reset();
 
-    for (auto& delaySet : lofiDelay)
-        for (auto& delay : delaySet)
-            delay.reset();
+        for (auto& delaySet : lofiDelay)
+            for (auto& delay : delaySet)
+                delay.reset();
+
+        bypassNeedsReset = false;
+    }
 
     outputBuffers.getReference (0) = &buffer;
 }

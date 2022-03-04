@@ -2,39 +2,51 @@
 
 namespace
 {
+constexpr int downsampleFactor = 2;
+constexpr double preDelayMs = 2.0;
+
 constexpr float smallShakeSeconds = 0.0005f;
 constexpr float largeShakeSeconds = 0.001f;
 } // namespace
 
-void SpringReverb::prepare (double sampleRate, int samplesPerBlock)
+int SpringReverb::prepareRebuffering (const dsp::ProcessSpec& spec)
 {
-    fs = (float) sampleRate;
-    maxBlockSize = samplesPerBlock;
+    const auto blockSizeDouble = (preDelayMs * 0.001) * spec.sampleRate;
+    const auto upsampledBlockSize = int (std::round (blockSizeDouble * 0.5) * 2.0);
 
-    dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
-    delay.prepare (spec);
+    dsp::ProcessSpec smallBufferSpec { spec.sampleRate, (uint32) upsampledBlockSize, spec.numChannels };
+    downsample.prepare(smallBufferSpec, downsampleFactor);
+    upsample.prepare(smallBufferSpec, downsampleFactor);
 
-    dcBlocker.prepare (spec);
+    fs = (float) spec.sampleRate / (float) downsampleFactor;
+    blockSize = upsampledBlockSize / downsampleFactor;
+    downsampledBuffer.setSize (2, blockSize);
+    dsp::ProcessSpec dsSpec { (double) fs, (uint32) blockSize, 2 };
+    delay.prepare (dsSpec);
+
+    dcBlocker.prepare (dsSpec);
     dcBlocker.setCutoffFrequency (40.0f);
 
     for (auto& apf : vecAPFs)
-        apf.prepare (sampleRate);
+        apf.prepare ((double) fs);
 
-    lpf.prepare (spec);
+    lpf.prepare (dsSpec);
 
-    reflectionNetwork.prepare (spec);
+    reflectionNetwork.prepare (dsSpec);
 
-    chaosSmooth.reset (sampleRate, 0.05);
+    chaosSmooth.reset ((double) fs, 0.05);
 
     z[0] = 0.0f;
     z[1] = 0.0f;
 
     shakeCounter = -1;
-    shakeBuffer.setSize (1, int (fs * largeShakeSeconds * 3.0f) + maxBlockSize);
-    shortShakeBuffer.setSize (1, (int) spec.maximumBlockSize);
+    shakeBuffer.setSize (1, int (fs * largeShakeSeconds * 3.0f) + blockSize);
+    shortShakeBuffer.setSize (1, blockSize);
+
+    return upsampledBlockSize;
 }
 
-void SpringReverb::setParams (const Params& params, int numSamples)
+void SpringReverb::setParams (const Params& params)
 {
     auto msToSamples = [=] (float ms)
     {
@@ -48,7 +60,7 @@ void SpringReverb::setParams (const Params& params, int numSamples)
         shakeSeconds *= 1.0f + 0.5f * params.size;
         shakeCounter = int (fs * shakeSeconds);
 
-        shakeBuffer.setSize (1, shakeCounter + maxBlockSize, false, false, true);
+        shakeBuffer.setSize (1, shakeCounter + blockSize, false, false, true);
         shakeBuffer.clear();
         auto* shakeBufferPtr = shakeBuffer.getWritePointer (0);
         for (int i = 0; i < shakeCounter; ++i)
@@ -68,7 +80,7 @@ void SpringReverb::setParams (const Params& params, int numSamples)
 
     float delaySamples = 1000.0f + std::pow (params.size * 0.099f, 1.0f) * fs;
     chaosSmooth.setTargetValue (rand.nextFloat() * delaySamples * 0.07f);
-    delaySamples += std::pow (params.chaos, 3.0f) * chaosSmooth.skip (numSamples);
+    delaySamples += std::pow (params.chaos, 3.0f) * chaosSmooth.skip (blockSize);
     delay.setDelay (delaySamples);
 
     feedbackGain = std::pow (0.001f, delaySamples / (t60Seconds * fs));
@@ -79,7 +91,7 @@ void SpringReverb::setParams (const Params& params, int numSamples)
         apf.setParams (msToSamples (0.35f + 3.0f * params.size), Vec::fromRawArray (apfGVec));
 
     constexpr float dampFreqLow = 4000.0f;
-    constexpr float dampFreqHigh = 18000.0f;
+    const float dampFreqHigh = jmin (18000.0f, fs * 0.48f);
     auto dampFreq = dampFreqLow * std::pow (dampFreqHigh / dampFreqLow, 1.0f - params.damping);
     lpf.setCutoffFrequency (dampFreq);
 
@@ -87,7 +99,23 @@ void SpringReverb::setParams (const Params& params, int numSamples)
     reflectionNetwork.setParams (params.size, t60Seconds, reflSkew, params.damping);
 }
 
-void SpringReverb::processBlock (AudioBuffer<float>& buffer)
+void SpringReverb::processRebufferedBlock (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+    const auto numChannels = buffer.getNumChannels();
+
+    const auto dsNumSamples = numSamples / downsampleFactor;
+    downsampledBuffer.setSize (numChannels, dsNumSamples, false, false, true);
+    for (int ch = 0; ch < numChannels; ++ch)
+        downsample.process (buffer.getReadPointer (ch), downsampledBuffer.getWritePointer (ch), ch, numSamples);
+
+    processDownsampledBuffer (downsampledBuffer);
+
+    for (int ch = 0; ch < numChannels; ++ch)
+        upsample.process (downsampledBuffer.getReadPointer (ch), buffer.getWritePointer (ch), ch, dsNumSamples);
+}
+
+void SpringReverb::processDownsampledBuffer (AudioBuffer<float>& buffer)
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
@@ -98,7 +126,7 @@ void SpringReverb::processBlock (AudioBuffer<float>& buffer)
     // add shakeBuffer
     if (shakeCounter > 0)
     {
-        int startSample = shakeBuffer.getNumSamples() - shakeCounter - maxBlockSize;
+        int startSample = shakeBuffer.getNumSamples() - shakeCounter - blockSize;
         shortShakeBuffer.copyFrom (0, 0, shakeBuffer, 0, startSample, numSamples);
         shakeCounter = jmax (shakeCounter - numSamples, 0);
     }
