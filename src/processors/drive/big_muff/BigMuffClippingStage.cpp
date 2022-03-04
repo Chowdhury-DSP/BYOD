@@ -17,7 +17,7 @@ constexpr float twoIs_over_Vt = twoIs / Vt;
 constexpr float A = -10000.0f / 150.0f; // BJT Common-Emitter amp gain
 constexpr float VbiasA = 0.7f; // bias point after input filter
 
-constexpr int numIters = 5; // max number of Newton-Raphson iterations
+constexpr int numIters = 4; // max number of Newton-Raphson iterations
 
 // compute sinh and cosh at the same time so it's faster...
 inline auto sinh_cosh (float x) noexcept

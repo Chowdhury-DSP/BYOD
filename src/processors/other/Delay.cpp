@@ -68,6 +68,8 @@ void Delay::prepare (double sampleRate, int samplesPerBlock)
 
     feedbackSmoothBuffer.prepare (sampleRate, samplesPerBlock);
     feedbackSmoothBuffer.setRampLength (0.01);
+
+    bypassNeedsReset = false;
 }
 
 template <typename DelayType>
@@ -239,13 +241,20 @@ void Delay::processAudio (AudioBuffer<float>& buffer)
         else if (delayTypeIndex == 1)
             processPingPongDelay (buffer, lofiDelayLine);
     }
+
+    bypassNeedsReset = true;
 }
 
 void Delay::processAudioBypassed (AudioBuffer<float>& buffer)
 {
-    cleanDelayLine.reset();
-    lofiDelayLine.reset();
-    stereoBuffer.clear();
+    if (bypassNeedsReset)
+    {
+        cleanDelayLine.reset();
+        lofiDelayLine.reset();
+        stereoBuffer.clear();
+
+        bypassNeedsReset = false;
+    }
 
     outputBuffers.getReference (0) = &buffer;
 }

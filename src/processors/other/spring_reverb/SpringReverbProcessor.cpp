@@ -37,11 +37,11 @@ ParamLayout SpringReverbProcessor::createParameterLayout()
 
 void SpringReverbProcessor::prepare (double sampleRate, int samplesPerBlock)
 {
-    reverb.prepare (sampleRate, samplesPerBlock);
+    dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
+    reverb.prepare (spec);
 
     dryBuffer.setSize (2, samplesPerBlock);
 
-    dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
     wetGain.prepare (spec);
     wetGain.setRampDurationSeconds (0.1);
 }
@@ -49,15 +49,14 @@ void SpringReverbProcessor::prepare (double sampleRate, int samplesPerBlock)
 void SpringReverbProcessor::processAudio (AudioBuffer<float>& buffer)
 {
     reverb.setParams ({
-                          sizeParam->load(),
-                          decayParam->load(),
-                          reflectParam->load(),
-                          spinParam->load(),
-                          dampParam->load(),
-                          chaosParam->load(),
-                          shakeParam->load() > 0.5f,
-                      },
-                      buffer.getNumSamples());
+        sizeParam->load(),
+        decayParam->load(),
+        reflectParam->load(),
+        spinParam->load(),
+        dampParam->load(),
+        chaosParam->load(),
+        shakeParam->load() > 0.5f,
+    });
 
     dryBuffer.makeCopyOf (buffer);
 
