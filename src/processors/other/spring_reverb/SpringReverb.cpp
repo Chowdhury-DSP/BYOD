@@ -15,8 +15,8 @@ int SpringReverb::prepareRebuffering (const dsp::ProcessSpec& spec)
     const auto upsampledBlockSize = int (std::round (blockSizeDouble * 0.5) * 2.0);
 
     dsp::ProcessSpec smallBufferSpec { spec.sampleRate, (uint32) upsampledBlockSize, spec.numChannels };
-    downsample.prepare(smallBufferSpec, downsampleFactor);
-    upsample.prepare(smallBufferSpec, downsampleFactor);
+    downsample.prepare (smallBufferSpec, downsampleFactor);
+    upsample.prepare (smallBufferSpec, downsampleFactor);
 
     fs = (float) spec.sampleRate / (float) downsampleFactor;
     blockSize = upsampledBlockSize / downsampleFactor;
