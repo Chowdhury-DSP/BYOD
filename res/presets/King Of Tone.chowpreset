@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="King Of Tone" plugin="BYOD" vendor="CHOW" category="Pedals"
-        version="0.5.2">
+        version="0.5.3">
   <proc_chain>
     <Tone_King>
       <Parameters x_pos="0.2118730843067169" y_pos="0.3381037712097168">
@@ -22,7 +22,6 @@
     </SVF>
     <Input>
       <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
-        <PARAM id="mono_stereo" value="0.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="0" connection_end_0="0"/>

@@ -11,15 +11,22 @@ public:
     void prepare (double sampleRate, int samplesPerBlock);
 
     int getOversamplingFactor() const;
-    dsp::AudioBlock<float> processAudioInput (AudioBuffer<float>& buffer, bool& sampleRateChanged);
-    void processAudioOutput (AudioBuffer<float>& buffer);
+    dsp::AudioBlock<float> processAudioInput (const AudioBuffer<float>& buffer, bool& sampleRateChanged);
+    void processAudioOutput (const AudioBuffer<float>& processedBuffer, AudioBuffer<float>& outputBuffer, bool processingCompleted);
 
     auto& getOversampling() { return oversampling; }
 
 private:
+    bool processChannelInputs (const AudioBuffer<float>& buffer);
+    void processChannelOutputs (AudioBuffer<float>& buffer, int numChannelsProcessed) const;
+
     const std::function<void (int)> latencyChangedCallbackFunc;
 
     chowdsp::VariableOversampling<float> oversampling;
+
+    std::atomic<float>* monoModeParam = nullptr;
+    AudioBuffer<float> ioBuffer;
+    dsp::AudioBlock<float> processBlock;
 
     std::atomic<float>* inGainParam = nullptr;
     std::atomic<float>* outGainParam = nullptr;

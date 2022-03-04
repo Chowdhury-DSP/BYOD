@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="John Mayer" plugin="BYOD" vendor="CHOW" category="Players" version="0.5.2">
+<Preset name="John Mayer" plugin="BYOD" vendor="CHOW" category="Players" version="0.5.3">
   <proc_chain>
     <Compressor>
       <Parameters x_pos="0.1845559775829315" y_pos="0.02547770738601685">
@@ -69,7 +69,6 @@
     </Bassman_Tone>
     <Input>
       <Parameters x_pos="0.003154574194923043" y_pos="0.01605839468538761">
-        <PARAM id="mono_stereo" value="3.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="0" connection_end_0="0"/>

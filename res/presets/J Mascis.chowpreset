@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <Preset name="J Mascis" plugin="BYOD" vendor="CHOW" category="Players"
-        version="0.5.2">
+        version="0.5.3">
   <proc_chain>
     <Range_Booster>
       <Parameters x_pos="0.1380126178264618" y_pos="0.01605839468538761">
@@ -60,7 +60,6 @@
     </Delay>
     <Input>
       <Parameters x_pos="0.003154574194923043" y_pos="0.01605839468538761">
-        <PARAM id="mono_stereo" value="3.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="0" connection_end_0="0"/>

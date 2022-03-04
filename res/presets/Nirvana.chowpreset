@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Nirvana" plugin="BYOD" vendor="CHOW" category="Players" version="0.5.2">
+<Preset name="Nirvana" plugin="BYOD" vendor="CHOW" category="Players" version="0.5.3">
   <proc_chain>
     <Distortion_Plus>
       <Parameters x_pos="0.2272727340459824" y_pos="0.02846975065767765">
@@ -42,7 +42,6 @@
     </Chorus>
     <Input>
       <Parameters x_pos="0.0007974481559358537" y_pos="0.2722419798374176">
-        <PARAM id="mono_stereo" value="3.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="0" connection_end_0="0"/>
