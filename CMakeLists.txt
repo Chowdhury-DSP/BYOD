@@ -8,6 +8,8 @@ else()
     set(CMAKE_CXX_STANDARD 20)
 endif()
 
+option(BYOD_BUILD_CLAP "Build a CLAP plugin target (experimental)" OFF)
+
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
@@ -75,7 +77,6 @@ juce_add_plugin(BYOD
     HARDENED_RUNTIME_ENABLED ${HARDENED_RUNTIME_ENABLED}
 )
 
-option(BYOD_BUILD_CLAP "Build a CLAP plugin target (experimental)" OFF)
 if(BYOD_BUILD_CLAP AND NOT IOS)
     clap_juce_extensions_plugin(
         TARGET BYOD

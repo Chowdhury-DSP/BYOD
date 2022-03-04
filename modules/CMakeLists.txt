@@ -7,7 +7,10 @@ message(STATUS "VERSION for JUCE: ${juce_version}")
 juce_add_modules(foleys_gui_magic)
 add_subdirectory(chowdsp_utils)
 juce_add_modules(chowdsp_juce_dsp)
-add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
+
+if(BYOD_BUILD_CLAP AND NOT IOS)
+    add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
+endif()
 
 # add RTNeural
 if(APPLE)
