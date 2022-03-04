@@ -80,5 +80,7 @@ private:
 
     std::unique_ptr<ParameterAttachment> delayTypeAttach;
 
+    bool bypassNeedsReset = false;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Chorus)
 };

@@ -3,7 +3,7 @@
 #include "ReflectionNetwork.h"
 #include "SchroederAllpass.h"
 
-class SpringReverb
+class SpringReverb : public chowdsp::RebufferedProcessor<float>
 {
 public:
     SpringReverb() = default;
@@ -19,11 +19,18 @@ public:
         bool shake = false;
     };
 
-    void prepare (double sampleRate, int samplesPerBlock);
-    void setParams (const Params& params, int numSamples);
-    void processBlock (AudioBuffer<float>& buffer);
+    void setParams (const Params& params);
+
+    int prepareRebuffering (const dsp::ProcessSpec& spec) override;
+    void processRebufferedBlock (AudioBuffer<float>& buffer) override;
 
 private:
+    void processDownsampledBuffer (AudioBuffer<float>& buffer);
+
+    chowdsp::Downsampler<float, 8> downsample;
+    chowdsp::Upsampler<float, 8> upsample;
+    AudioBuffer<float> downsampledBuffer;
+
     chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange3rd> delay { 1 << 18 };
     float feedbackGain = 0.0f;
 
@@ -38,8 +45,8 @@ private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> chaosSmooth;
 
     float z[2] { 0.0f, 0.0f };
-    float fs = 48000.0f;
-    int maxBlockSize = 256;
+    float fs = 48000.0f; // downsampled sample rate
+    int blockSize = 256; // downsampled block size
 
     chowdsp::StateVariableFilter<float> lpf;
 

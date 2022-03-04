@@ -71,5 +71,7 @@ private:
     std::unique_ptr<ParameterAttachment> delayTypeAttach;
     std::unique_ptr<ParameterAttachment> pingPongAttach;
 
+    bool bypassNeedsReset = false;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Delay)
 };
