@@ -5,7 +5,8 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
                                                       saveWindow (*this),
                                                       searchWindow (*this, presetMgr)
 #if BYOD_BUILD_PRESET_SERVER
-                                                      , loginWindow (*this),
+                                                      ,
+                                                      loginWindow (*this),
                                                       syncWindow (*this)
 #endif
 {
@@ -130,107 +131,158 @@ int PresetsComp::createPresetsMenu (int optionID)
     return optionID;
 }
 
+template <typename ActionType>
+int PresetsComp::addPresetMenuItem (PopupMenu* menu, int optionID, const String& itemText, ActionType&& action)
+{
+    juce::PopupMenu::Item item { itemText };
+    item.itemID = ++optionID;
+    item.action = [&, forwardedAction = std::forward<ActionType> (action)]
+    {
+        updatePresetBoxText();
+        forwardedAction();
+    };
+    menu->addItem (item);
+
+    return optionID;
+}
+
+int PresetsComp::addBasicPresetOptions (PopupMenu* menu, int optionID)
+{
+    optionID = addPresetMenuItem (menu,
+                                  optionID,
+                                  "Reset",
+                                  [&]
+                                  {
+                                      if (auto* currentPreset = manager.getCurrentPreset())
+                                          manager.loadPreset (*currentPreset);
+                                  });
+
+    optionID = addPresetMenuItem (menu,
+                                  optionID,
+                                  "Save Preset As",
+                                  [&]
+                                  {
+                                      saveWindow.getViewComponent().prepareToShow();
+                                      saveWindow.show();
+                                  });
+
+    // editing should only be allowed for user presets!
+    if (presetManager.getCurrentPreset()->getVendor() == presetManager.getUserPresetName())
+    {
+        optionID = addPresetMenuItem (menu,
+                                      optionID,
+                                      "Resave Preset",
+                                      [&]
+                                      {
+                                          if (auto* currentPreset = manager.getCurrentPreset())
+                                          {
+                                              auto presetFile = currentPreset->getPresetFile();
+                                              if (presetFile == File())
+                                                  presetFile = presetManager.getPresetFile (*currentPreset);
+
+                                              saveWindow.getViewComponent().prepareToShow (currentPreset, presetFile);
+                                              saveWindow.show();
+                                          }
+                                      });
+    }
+
+    if (presetManager.getCurrentPreset()->getVendor() != PresetConstants::factoryPresetVendor)
+    {
+        optionID = addPresetMenuItem (menu,
+                                      optionID,
+                                      "Delete Preset",
+                                      [&]
+                                      {
+                                          if (auto* currentPreset = manager.getCurrentPreset())
+                                          {
+                                              auto presetFile = currentPreset->getPresetFile();
+                                              if (! (presetFile.existsAsFile() && presetFile.hasFileExtension (PresetConstants::presetExt)))
+                                              {
+                                                  NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Preset Deletion", "Unable to find preset file!");
+                                                  return;
+                                              }
+
+                                              if (NativeMessageBox::showOkCancelBox (MessageBoxIconType::QuestionIcon, "Preset Deletion", "Are you sure you want to delete this preset? This operation cannot be undone."))
+                                              {
+                                                  presetFile.deleteFile();
+                                                  manager.loadDefaultPreset();
+                                                  manager.loadUserPresetsFromFolder (manager.getUserPresetPath());
+                                              }
+                                          }
+                                      });
+    }
+
+    return addPresetMenuItem (menu, optionID, "Search", [&]
+                              { searchWindow.show(); });
+}
+
+int PresetsComp::addPresetShareOptions (PopupMenu* menu, int optionID)
+{
+    optionID = addPresetMenuItem (menu,
+                                  optionID,
+                                  "Copy Current Preset",
+                                  [&]
+                                  {
+                                      if (auto* currentPreset = manager.getCurrentPreset())
+                                          SystemClipboard::copyTextToClipboard (currentPreset->toXml()->toString());
+                                  });
+
+    optionID = addPresetMenuItem (menu,
+                                  optionID,
+                                  "Paste Preset",
+                                  [&]
+                                  {
+                                      const auto presetText = SystemClipboard::getTextFromClipboard();
+                                      if (presetText.isEmpty())
+                                          return;
+
+                                      if (auto presetXml = XmlDocument::parse (presetText))
+                                          presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (presetXml.get()));
+                                  });
+
+    return addPresetMenuItem (menu,
+                              optionID,
+                              "Load Preset From File",
+                              [&]
+                              {
+                                  constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
+                                  fileChooser = std::make_shared<FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + PresetConstants::presetExt, true, false, getTopLevelComponent());
+                                  fileChooser->launchAsync (flags,
+                                                            [&] (const FileChooser& fc)
+                                                            {
+                                                                if (fc.getResults().isEmpty())
+                                                                    return;
+
+                                                                presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (fc.getResult()));
+                                                            });
+                              });
+}
+
+int PresetsComp::addPresetFolderOptions (PopupMenu* menu, int optionID)
+{
+    if (manager.getUserPresetPath().isDirectory())
+    {
+        optionID = addPresetMenuItem (menu, optionID, "Go to Preset Folder...", [&]
+                                      { manager.getUserPresetPath().startAsProcess(); });
+    }
+
+    return addPresetMenuItem (menu, optionID, "Choose Preset Folder...", [&]
+                              { chooseUserPresetFolder ({}); });
+}
+
 int PresetsComp::addPresetOptions (int optionID)
 {
     auto menu = presetBox.getRootMenu();
     menu->addSeparator();
 
-    juce::PopupMenu::Item resetItem { "Reset" };
-    resetItem.itemID = ++optionID;
-    resetItem.action = [=]
-    {
-        updatePresetBoxText();
-        if (auto* currentPreset = manager.getCurrentPreset())
-            manager.loadPreset (*currentPreset);
-    };
-    menu->addItem (resetItem);
+    optionID = addBasicPresetOptions (menu, optionID);
+    menu->addSeparator();
 
-    juce::PopupMenu::Item saveItem { "Save Preset As" };
-    saveItem.itemID = ++optionID;
-    saveItem.action = [=]
-    {
-        updatePresetBoxText();
-        saveWindow.getViewComponent().prepareToShow();
-        saveWindow.show();
-    };
-    menu->addItem (saveItem);
-
-    // editing should only be allowed for user presets!
-    if (presetManager.getCurrentPreset()->getVendor() == presetManager.getUserPresetName())
-    {
-        juce::PopupMenu::Item editItem { "Resave Preset" };
-        editItem.itemID = ++optionID;
-        editItem.action = [&]
-        {
-            updatePresetBoxText();
-            if (auto* currentPreset = manager.getCurrentPreset())
-            {
-                auto presetFile = currentPreset->getPresetFile();
-                if (presetFile == File())
-                    presetFile = presetManager.getPresetFile (*currentPreset);
-
-                saveWindow.getViewComponent().prepareToShow (currentPreset, presetFile);
-                saveWindow.show();
-            }
-        };
-        menu->addItem (editItem);
-    }
-
-    if (presetManager.getCurrentPreset()->getVendor() != PresetConstants::factoryPresetVendor)
-    {
-        juce::PopupMenu::Item deleteItem { "Delete Preset" };
-        deleteItem.itemID = ++optionID;
-        deleteItem.action = [&]
-        {
-            updatePresetBoxText();
-            if (auto* currentPreset = manager.getCurrentPreset())
-            {
-                auto presetFile = currentPreset->getPresetFile();
-                if (! (presetFile.existsAsFile() && presetFile.hasFileExtension (PresetConstants::presetExt)))
-                {
-                    NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Preset Deletion", "Unable to find preset file!");
-                    return;
-                }
-
-                if (NativeMessageBox::showOkCancelBox (MessageBoxIconType::QuestionIcon, "Preset Deletion", "Are you sure you want to delete this preset? This operation cannot be undone."))
-                {
-                    presetFile.deleteFile();
-                    manager.loadDefaultPreset();
-                    manager.loadUserPresetsFromFolder (manager.getUserPresetPath());
-                }
-            }
-        };
-        menu->addItem (deleteItem);
-    }
-
-    juce::PopupMenu::Item searchItem { "Search" };
-    searchItem.itemID = ++optionID;
-    searchItem.action = [&]
-    { searchWindow.show(); };
-    menu->addItem (searchItem);
+    optionID = addPresetShareOptions (menu, optionID);
+    menu->addSeparator();
 
 #if ! JUCE_IOS
-    juce::PopupMenu::Item goToFolderItem { "Go to Preset folder..." };
-    goToFolderItem.itemID = ++optionID;
-    goToFolderItem.action = [=]
-    {
-        updatePresetBoxText();
-        auto folder = manager.getUserPresetPath();
-        if (folder.isDirectory())
-            folder.startAsProcess();
-        else
-            chooseUserPresetFolder ({});
-    };
-    menu->addItem (goToFolderItem);
-
-    juce::PopupMenu::Item chooseFolderItem { "Choose Preset folder..." };
-    chooseFolderItem.itemID = ++optionID;
-    chooseFolderItem.action = [=]
-    {
-        updatePresetBoxText();
-        chooseUserPresetFolder ({});
-    };
-    menu->addItem (chooseFolderItem);
+    optionID = addPresetFolderOptions (menu, optionID);
 #endif
 
     return optionID;

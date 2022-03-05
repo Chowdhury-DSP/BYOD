@@ -88,6 +88,8 @@ struct PresetSearchWindow::SearchLabel : LabelWithCentredEditor
 
 PresetSearchWindow::PresetSearchWindow (chowdsp::PresetManager& presetMgr) : presetManager (presetMgr)
 {
+    setName ("Presets Search");
+
     auto setupLabel = [&] (auto& label)
     {
         label = std::make_unique<SearchLabel>();

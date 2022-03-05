@@ -20,6 +20,13 @@ public:
 #endif
 
 private:
+    template <typename ActionType>
+    int addPresetMenuItem (PopupMenu* menu, int optionID, const String& itemText, ActionType&& action);
+
+    int addBasicPresetOptions (PopupMenu* menu, int optionID);
+    int addPresetShareOptions (PopupMenu* menu, int optionID);
+    int addPresetFolderOptions (PopupMenu* menu, int optionID);
+
     void selectedPresetChanged() override;
     void savePreset (const PresetSaveInfo& saveInfo);
 
@@ -32,6 +39,8 @@ private:
 
     chowdsp::WindowInPlugin<PresetsSaveDialog> saveWindow;
     chowdsp::WindowInPlugin<PresetSearchWindow> searchWindow;
+
+    std::shared_ptr<FileChooser> fileChooser;
 
 #if BYOD_BUILD_PRESET_SERVER
     chowdsp::WindowInPlugin<PresetsLoginDialog> loginWindow;

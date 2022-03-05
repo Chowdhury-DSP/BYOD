@@ -37,6 +37,8 @@ public:
     void saveUserPreset (const String& name, const String& category, bool isPublic, const String& presetID = {});
     void loadUserPresetsFromFolder (const juce::File& file) final;
 
+    void loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad);
+
 #if BYOD_BUILD_PRESET_SERVER
     void presetLoginStatusChanged() override;
 

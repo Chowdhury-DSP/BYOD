@@ -6,6 +6,19 @@ namespace
 {
 const String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
 const String presetTag = "preset";
+
+void showFailureMessage (const String& title, const String& message)
+{
+    MessageManager::callAsync (
+        [title, message]
+        {
+            NativeMessageBox::show (MessageBoxOptions()
+                                        .withIconType (MessageBoxIconType::WarningIcon)
+                                        .withTitle (title)
+                                        .withMessage (message)
+                                        .withButton ("OK"));
+        });
+}
 } // namespace
 
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
@@ -267,4 +280,16 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         presetMap.erase (presetID++);
 
     addPresets (presets);
+}
+
+void PresetManager::loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad)
+{
+    if (presetToLoad == nullptr || ! presetToLoad->isValid())
+    {
+        showFailureMessage ("Preset Load Failure", "Unable to load preset!");
+        return;
+    }
+
+    keepAlivePreset = std::move (presetToLoad);
+    loadPreset (*keepAlivePreset);
 }
