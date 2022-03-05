@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #include "PresetsServerUserManager.h"
 #include "PresetsServerCommunication.h"
 
@@ -91,3 +93,5 @@ void PresetsServerUserManager::logOut()
     password = {};
     isLoggedIn = false;
 }
+
+#endif // BYOD_BUILD_PRESET_SERVER

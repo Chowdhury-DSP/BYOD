@@ -40,10 +40,18 @@ if(TARGET juce_aax_sdk)
     list(APPEND JUCE_FORMATS AAX)
 endif()
 
-option(BYOD_USE_LOCAL_PRESET_SERVER "Set build flag to use local preset server" OFF)
-if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)
-    message(STATUS "Configuring for testing with local preset server")
-    include (modules/cmake/AppleLocalNetworkPlist.cmake)
+option(BYOD_BUILD_PRESET_SERVER "Set build flag to build the preset server" OFF)
+if(BYOD_BUILD_PRESET_SERVER)
+    message(STATUS "Configuring BYOD to build presets server code")
+    set(BYOD_BUILD_PRESET_SERVER_FLAG 1)
+
+    option(BYOD_USE_LOCAL_PRESET_SERVER "Set build flag to use local preset server" OFF)
+    if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)
+        message(STATUS "Configuring for testing with local preset server")
+        include (modules/cmake/AppleLocalNetworkPlist.cmake)
+    endif()
+else()
+    set(BYOD_BUILD_PRESET_SERVER_FLAG 0)
 endif()
 
 option(BUILD_RELEASE "Set build flags for release builds" OFF)
@@ -100,6 +108,8 @@ target_compile_definitions(BYOD PUBLIC
     BYOD_BUILD_FQDN="${PLUGIN_BUILD_FQDN}"
     BYOD_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
     BYOD_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
+
+    BYOD_BUILD_PRESET_SERVER=${BYOD_BUILD_PRESET_SERVER_FLAG}
 )
 
 if ((NOT IOS) AND BYOD_USE_LOCAL_PRESET_SERVER)

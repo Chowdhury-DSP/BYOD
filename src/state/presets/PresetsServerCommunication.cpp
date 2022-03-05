@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #include "PresetsServerCommunication.h"
 
 namespace PresetsServerCommunication
@@ -117,3 +119,5 @@ void showFailureMessage (const String& title, const String& message)
 }
 
 } // namespace PresetsServerCommunication
+
+#endif // BYOD_BUILD_PRESET_SERVER

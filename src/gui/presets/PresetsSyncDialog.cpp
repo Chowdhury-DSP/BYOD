@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #include "PresetsSyncDialog.h"
 
 namespace
@@ -141,3 +143,5 @@ void PresetsSyncDialog::resized()
     okButton.setBounds (footerBounds.removeFromLeft (proportionOfWidth (0.5f)).reduced (5));
     cancelButton.setBounds (footerBounds.removeFromLeft (proportionOfWidth (0.5f)).reduced (5));
 }
+
+#endif // BYOD_BUILD_PRESET_SERVER

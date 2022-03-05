@@ -11,10 +11,12 @@ const String presetTag = "preset";
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
                                                                                               procChain (chain)
 {
+#if BYOD_BUILD_PRESET_SERVER
     if (userManager->getUsername().isNotEmpty())
         setUserPresetName (userManager->getUsername());
 
     userManager->addListener (this);
+#endif
 
     loadBYODFactoryPresets();
     setUserPresetConfigFile (userPresetPath);
@@ -34,7 +36,9 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
 
 PresetManager::~PresetManager()
 {
+#if BYOD_BUILD_PRESET_SERVER
     userManager->removeListener (this);
+#endif
 }
 
 void PresetManager::loadBYODFactoryPresets()
@@ -66,6 +70,7 @@ void PresetManager::loadBYODFactoryPresets()
     loadDefaultPreset();
 }
 
+#if BYOD_BUILD_PRESET_SERVER
 void PresetManager::presetLoginStatusChanged()
 {
     setUserPresetName (userManager->getUsername());
@@ -160,6 +165,7 @@ bool PresetManager::syncServerPresetsToLocal()
 
     return true;
 }
+#endif // BYOD_BUILD_PRESET_SERVER
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
 {
@@ -231,9 +237,13 @@ void PresetManager::saveUserPreset (const String& name, const String& category, 
     keepAlivePreset = std::make_unique<chowdsp::Preset> (name, getUserPresetName(), *stateXml, category);
     if (keepAlivePreset != nullptr)
     {
+#if BYOD_BUILD_PRESET_SERVER
         PresetInfoHelpers::setIsPublic (*keepAlivePreset, isPublic);
         if (presetID.isNotEmpty())
             PresetInfoHelpers::setPresetID (*keepAlivePreset, presetID);
+#else
+        ignoreUnused (isPublic, presetID);
+#endif
 
         keepAlivePreset->toFile (getPresetFile (*keepAlivePreset));
         loadPreset (*keepAlivePreset);

@@ -2,18 +2,22 @@
 
 PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (presetMgr),
                                                       presetManager (presetMgr),
-                                                      loginWindow (*this),
                                                       saveWindow (*this),
-                                                      searchWindow (*this, presetMgr),
+                                                      searchWindow (*this, presetMgr)
+#if BYOD_BUILD_PRESET_SERVER
+                                                      , loginWindow (*this),
                                                       syncWindow (*this)
+#endif
 {
     presetListUpdated();
 
+#if BYOD_BUILD_PRESET_SERVER
     loginWindow.getViewComponent().loginChangeCallback = [&]
     { presetListUpdated(); };
 
     syncWindow.getViewComponent().runUpdateCallback = [&] (PresetManager::PresetUpdateList& presetUpdateList)
     { updatePresetsToUpdate (presetUpdateList); };
+#endif
 
     saveWindow.getViewComponent().presetSaveCallback = [&] (const PresetSaveInfo& saveInfo)
     { savePreset (saveInfo); };
@@ -26,9 +30,13 @@ void PresetsComp::presetListUpdated()
     int optionID = 0;
     optionID = createPresetsMenu (optionID);
     optionID = addPresetOptions (optionID);
+
+#if BYOD_BUILD_PRESET_SERVER
     addPresetServerMenuOptions (optionID);
+#endif
 }
 
+#if BYOD_BUILD_PRESET_SERVER
 void PresetsComp::syncServerPresetsToLocal()
 {
     // user must have selected a preset path before trying to sync server presets
@@ -58,34 +66,6 @@ void PresetsComp::syncServerPresetsToLocal()
         });
 }
 
-void PresetsComp::savePreset (const PresetSaveInfo& saveInfo)
-{
-    auto savePresetLambda = [] (PresetManager& presetMgr, const PresetSaveInfo& sInfo)
-    {
-        if (presetMgr.getPresetFile (presetMgr.getUserPresetName(), sInfo.category, sInfo.name).existsAsFile())
-        {
-            const String warningBoxTitle = "Preset Save Warning!";
-            const String warningBoxMessage = "You are about to overwrite an existing preset! Are you sure you want to continue?";
-            if (NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, warningBoxTitle, warningBoxMessage) == 0)
-                return;
-        }
-
-        presetMgr.saveUserPreset (sInfo.name, sInfo.category, sInfo.isPublic, sInfo.presetID);
-    };
-
-    auto presetPath = manager.getUserPresetPath();
-    if (presetPath == juce::File() || ! presetPath.isDirectory())
-    {
-        presetPath.deleteRecursively();
-        chooseUserPresetFolder ([&, saveInfo = saveInfo]
-                                { savePresetLambda (presetManager, saveInfo); });
-    }
-    else
-    {
-        savePresetLambda (presetManager, saveInfo);
-    }
-}
-
 void PresetsComp::updatePresetsToUpdate (PresetManager::PresetUpdateList& presetUpdateList)
 {
     const auto& userPresetPath = presetManager.getUserPresetPath();
@@ -100,6 +80,7 @@ void PresetsComp::updatePresetsToUpdate (PresetManager::PresetUpdateList& preset
 
     presetManager.loadUserPresetsFromFolder (userPresetPath);
 }
+#endif // BYOD_BUILD_PRESET_SERVER
 
 int PresetsComp::createPresetsMenu (int optionID)
 {
@@ -255,6 +236,7 @@ int PresetsComp::addPresetOptions (int optionID)
     return optionID;
 }
 
+#if BYOD_BUILD_PRESET_SERVER
 int PresetsComp::addPresetServerMenuOptions (int optionID)
 {
     auto menu = presetBox.getRootMenu();
@@ -305,6 +287,35 @@ int PresetsComp::addPresetServerMenuOptions (int optionID)
     }
 
     return optionID;
+}
+#endif // BYOD_BUILD_PRESET_SERVER
+
+void PresetsComp::savePreset (const PresetSaveInfo& saveInfo)
+{
+    auto savePresetLambda = [] (PresetManager& presetMgr, const PresetSaveInfo& sInfo)
+    {
+        if (presetMgr.getPresetFile (presetMgr.getUserPresetName(), sInfo.category, sInfo.name).existsAsFile())
+        {
+            const String warningBoxTitle = "Preset Save Warning!";
+            const String warningBoxMessage = "You are about to overwrite an existing preset! Are you sure you want to continue?";
+            if (NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, warningBoxTitle, warningBoxMessage) == 0)
+                return;
+        }
+
+        presetMgr.saveUserPreset (sInfo.name, sInfo.category, sInfo.isPublic, sInfo.presetID);
+    };
+
+    auto presetPath = manager.getUserPresetPath();
+    if (presetPath == juce::File() || ! presetPath.isDirectory())
+    {
+        presetPath.deleteRecursively();
+        chooseUserPresetFolder ([&, saveInfo = saveInfo]
+                                { savePresetLambda (presetManager, saveInfo); });
+    }
+    else
+    {
+        savePresetLambda (presetManager, saveInfo);
+    }
 }
 
 void PresetsComp::selectedPresetChanged()
