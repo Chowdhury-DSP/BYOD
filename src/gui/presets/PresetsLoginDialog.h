@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #pragma once
 
 #include "ServerWaitingSpinner.h"
@@ -29,3 +31,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsLoginDialog)
 };
+
+#endif // BYOD_BUILD_PRESET_SERVER

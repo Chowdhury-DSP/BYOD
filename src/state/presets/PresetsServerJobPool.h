@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #pragma once
 
 #include <pch.h>
@@ -32,3 +34,5 @@ private:
 };
 
 using SharedPresetsServerJobPool = SharedResourcePointer<PresetsServerJobPool>;
+
+#endif // BYOD_BUILD_PRESET_SERVER

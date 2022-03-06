@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #include "PresetsServerSyncManager.h"
 #include "PresetInfoHelpers.h"
 #include "PresetsServerCommunication.h"
@@ -116,3 +118,5 @@ bool PresetsServerSyncManager::syncServerPresetsToLocal (std::vector<chowdsp::Pr
 
     return true;
 }
+
+#endif // BYOD_BUILD_PRESET_SERVER

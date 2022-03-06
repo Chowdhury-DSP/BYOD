@@ -11,8 +11,10 @@ const String factoryPresetVendor = "CHOW";
 } // namespace PresetConstants
 
 class ProcessorChain;
-class PresetManager : public chowdsp::PresetManager,
-                      private PresetsServerUserManager::Listener
+class PresetManager : public chowdsp::PresetManager
+#if BYOD_BUILD_PRESET_SERVER
+    , private PresetsServerUserManager::Listener
+#endif
 {
 public:
     enum PresetUpdate
@@ -35,17 +37,22 @@ public:
     void saveUserPreset (const String& name, const String& category, bool isPublic, const String& presetID = {});
     void loadUserPresetsFromFolder (const juce::File& file) final;
 
+    void loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad);
+
+#if BYOD_BUILD_PRESET_SERVER
     void presetLoginStatusChanged() override;
 
     void syncLocalPresetsToServer();
     bool syncServerPresetsToLocal();
     PresetUpdateList& getServerPresetUpdateList() { return serverSyncUpdatePresetsList; };
+#endif
 
 private:
     void loadBYODFactoryPresets();
 
     ProcessorChain* procChain;
 
+#if BYOD_BUILD_PRESET_SERVER
     SharedPresetsServerUserManager userManager;
     SharedResourcePointer<PresetsServerSyncManager> syncManager;
 
@@ -54,6 +61,7 @@ private:
     std::unique_ptr<AlertWindow> alertWindow;
 
     PresetUpdateList serverSyncUpdatePresetsList;
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };

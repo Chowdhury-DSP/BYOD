@@ -33,7 +33,11 @@ PresetsSaveDialog::PresetsSaveDialog()
     cancelButton.onClick = [&]
     { getParentComponent()->setVisible (false); };
 
+#if BYOD_BUILD_PRESET_SERVER
     setSize (400, 240);
+#else
+    setSize (400, 190);
+#endif
 }
 
 void PresetsSaveDialog::prepareToShow (const chowdsp::Preset* presetToEdit, const File& presetFile)
@@ -52,8 +56,14 @@ void PresetsSaveDialog::prepareToShow (const chowdsp::Preset* presetToEdit, cons
     {
         nameLabel.setText (presetToEdit->getName(), dontSendNotification);
         categoryLabel.setText (presetToEdit->getCategory(), dontSendNotification);
+
+#if BYOD_BUILD_PRESET_SERVER
         publicSwitch.setToggleState (PresetInfoHelpers::getIsPublic (*presetToEdit), dontSendNotification);
         presetID = PresetInfoHelpers::getPresetID (*presetToEdit);
+#else
+        publicSwitch.setToggleState (false, dontSendNotification);
+        presetID = {};
+#endif
     }
 
     okButton.onClick = [&, presetFileToDelete = presetFile]
@@ -103,7 +113,10 @@ void PresetsSaveDialog::resized()
     bounds.removeFromLeft (labelsWidth);
     nameLabel.setBounds (bounds.removeFromTop (itemHeight).reduced (10, 5));
     categoryLabel.setBounds (bounds.removeFromTop (itemHeight).reduced (10, 5));
+
+#if BYOD_BUILD_PRESET_SERVER
     publicSwitch.setBounds (bounds.removeFromTop (itemHeight).reduced (10, 5).withWidth (100));
+#endif
 
     okButton.setBounds (footerBounds.removeFromLeft (proportionOfWidth (0.5f)).reduced (5));
     cancelButton.setBounds (footerBounds.removeFromLeft (proportionOfWidth (0.5f)).reduced (5));

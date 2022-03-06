@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #pragma once
 
 #include <pch.h>
@@ -13,3 +15,5 @@ struct ServerWaitingSpinner : public Component,
         getLookAndFeel().drawSpinningWaitAnimation (g, Colours::white, 0, 0, getWidth(), getHeight());
     }
 };
+
+#endif // BYOD_BUILD_PRESET_SERVER

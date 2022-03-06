@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #include "PresetsLoginDialog.h"
 
 PresetsLoginDialog::PresetsLoginDialog()
@@ -91,3 +93,5 @@ void PresetsLoginDialog::resized()
     cancelButton.setBounds (bounds.removeFromLeft (proportionOfWidth (0.33f)).reduced (5));
     registerButton.setBounds (bounds.removeFromLeft (proportionOfWidth (0.33f)).reduced (5));
 }
+
+#endif // BYOD_BUILD_PRESET_SERVER

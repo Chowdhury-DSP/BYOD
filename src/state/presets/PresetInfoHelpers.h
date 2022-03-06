@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #pragma once
 
 #include <pch.h>
@@ -11,3 +13,5 @@ void setPresetID (chowdsp::Preset& preset, const String& presetID);
 String getPresetID (const chowdsp::Preset& preset);
 
 } // namespace PresetInfoHelpers
+
+#endif // BYOD_BUILD_PRESET_SERVER
