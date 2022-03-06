@@ -186,7 +186,7 @@ int PresetsComp::addBasicPresetOptions (PopupMenu* menu, int optionID)
                                       });
     }
 
-    if (presetManager.getCurrentPreset()->getVendor() != PresetConstants::factoryPresetVendor)
+    if (presetManager.getCurrentPreset()->getPresetFile() != File())
     {
         optionID = addPresetMenuItem (menu,
                                       optionID,
@@ -240,22 +240,10 @@ int PresetsComp::addPresetShareOptions (PopupMenu* menu, int optionID)
                                           presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (presetXml.get()));
                                   });
 
-    return addPresetMenuItem (menu,
-                              optionID,
-                              "Load Preset From File",
-                              [&]
-                              {
-                                  constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
-                                  fileChooser = std::make_shared<FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + PresetConstants::presetExt, true, false, getTopLevelComponent());
-                                  fileChooser->launchAsync (flags,
-                                                            [&] (const FileChooser& fc)
-                                                            {
-                                                                if (fc.getResults().isEmpty())
-                                                                    return;
-
-                                                                presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (fc.getResult()));
-                                                            });
-                              });
+#if ! JUCE_IOS
+    return addPresetMenuItem (menu, optionID, "Load Preset From File", [&]
+                              { loadFromFileBrowser(); });
+#endif
 }
 
 int PresetsComp::addPresetFolderOptions (PopupMenu* menu, int optionID)
@@ -286,6 +274,20 @@ int PresetsComp::addPresetOptions (int optionID)
 #endif
 
     return optionID;
+}
+
+void PresetsComp::loadFromFileBrowser()
+{
+    constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
+    fileChooser = std::make_shared<FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + PresetConstants::presetExt, true, false, getTopLevelComponent());
+    fileChooser->launchAsync (flags,
+                              [&] (const FileChooser& fc)
+                              {
+                                  if (fc.getResults().isEmpty())
+                                      return;
+
+                                  presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (fc.getResult()));
+                              });
 }
 
 #if BYOD_BUILD_PRESET_SERVER

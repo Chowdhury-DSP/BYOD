@@ -35,15 +35,18 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
     setUserPresetConfigFile (userPresetPath);
 
 #if JUCE_IOS
-    File appDataDir = File::getSpecialLocation (File::userApplicationDataDirectory);
-    auto userPresetFolder = appDataDir.getChildFile (userPresetPath).getSiblingFile ("Presets");
-    if (! userPresetFolder.isDirectory())
+    const auto groupDir = File::getContainerForSecurityApplicationGroupIdentifier ("group.com.chowdsp.BYOD");
+    if (groupDir != File())
     {
-        userPresetFolder.deleteFile();
-        userPresetFolder.createDirectory();
-    }
+        auto userPresetFolder = groupDir.getChildFile (userPresetPath).getSiblingFile ("Presets");
+        if (! userPresetFolder.isDirectory())
+        {
+            userPresetFolder.deleteFile();
+            userPresetFolder.createDirectory();
+        }
 
-    setUserPresetPath (userPresetFolder);
+        setUserPresetPath (userPresetFolder);
+    }
 #endif // JUCE_IOS
 }
 

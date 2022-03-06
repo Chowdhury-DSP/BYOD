@@ -83,6 +83,8 @@ juce_add_plugin(BYOD
     PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST} # Apple won't let you use local network unless we add this
     ICLOUD_PERMISSIONS_ENABLED TRUE
     HARDENED_RUNTIME_ENABLED ${HARDENED_RUNTIME_ENABLED}
+    APP_GROUPS_ENABLED TRUE
+    APP_GROUP_IDS "group.com.chowdsp.BYOD"
 )
 
 if(BYOD_BUILD_CLAP AND NOT IOS)

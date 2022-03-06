@@ -27,6 +27,7 @@ private:
     int addPresetShareOptions (PopupMenu* menu, int optionID);
     int addPresetFolderOptions (PopupMenu* menu, int optionID);
 
+    void loadFromFileBrowser();
     void selectedPresetChanged() override;
     void savePreset (const PresetSaveInfo& saveInfo);
 
