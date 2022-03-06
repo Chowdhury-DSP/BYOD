@@ -28,7 +28,7 @@ To create a new processor, either right-click on the plugin
 background, or click on the "plus" icon in the upper right corner.
 A menu will appear, offering a selection of processor to be created.
 
-@TODO: GIF of creating/removing a processor
+<img src="./screenshots/Create_Remove.gif" alt="Create/Remove Processor" height="400">
 
 ### Removing A Processor
 To remove an existing processor, click the "x" button on the top
@@ -41,7 +41,7 @@ port from the first processor, and drag to create a cable. Release
 the cable near an input port of the second processor to complete
 the connection.
 
-@TODO: GIF of connecting processors
+<img src="./screenshots/Connect_Disconnect.gif" alt="Connect/Disconnect Processor" height="400">
 
 ### Destroying A Cable
 To destroy a cable, click on the input port at the end of the
@@ -54,7 +54,7 @@ Each processor has an on/off switch, as well as a settings menu,
 containing options to reset the processor's parameters, duplicate
 the processor, or show the processor information.
 
-@TODO: GIF of processor controls
+<img src="./screenshots/Proc_Controls.gif" alt="Processor Controls" height="400">
 
 ## Global Controls
 
