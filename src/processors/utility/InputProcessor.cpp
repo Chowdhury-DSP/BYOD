@@ -15,6 +15,11 @@ ParamLayout InputProcessor::createParameterLayout()
 
 void InputProcessor::prepare (double /*sampleRate*/, int /*samplesPerBlock*/)
 {
+    resetLevels();
+}
+
+void InputProcessor::resetLevels()
+{
     std::fill (rmsLevels.begin(), rmsLevels.end(), 0.0f);
 }
 

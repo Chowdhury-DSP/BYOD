@@ -12,13 +12,12 @@ public:
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
+    void resetLevels();
     void processAudio (AudioBuffer<float>& buffer) override;
 
     void getCustomComponents (OwnedArray<Component>& customComps) override;
 
 private:
-    AudioBuffer<float> stereoBuffer;
-
     LevelMeterComponent::LevelDataType rmsLevels {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OutputProcessor)

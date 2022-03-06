@@ -134,19 +134,12 @@ void ChainIOProcessor::processChannelOutputs (AudioBuffer<float>& buffer, int nu
         buffer.copyFrom (ch, 0, ioBuffer, ch % numChannelsProcessed, 0, buffer.getNumSamples());
 }
 
-void ChainIOProcessor::processAudioOutput (const AudioBuffer<float>& processedBuffer, AudioBuffer<float>& outputBuffer, bool processingCompleted)
+void ChainIOProcessor::processAudioOutput (const AudioBuffer<float>& processedBuffer, AudioBuffer<float>& outputBuffer)
 {
     const auto numProcessedChannels = processedBuffer.getNumChannels();
-    if (! processingCompleted)
-    {
-        processBlock.clear();
-    }
-    else
-    {
-        auto&& processedBlock = dsp::AudioBlock<const float> { processedBuffer };
-        for (size_t ch = 0; ch < 2; ++ch)
-            processBlock.getSingleChannelBlock (ch).copyFrom (processedBlock.getSingleChannelBlock (ch % (size_t) numProcessedChannels));
-    }
+    auto&& processedBlock = dsp::AudioBlock<const float> { processedBuffer };
+    for (size_t ch = 0; ch < 2; ++ch)
+        processBlock.getSingleChannelBlock (ch).copyFrom (processedBlock.getSingleChannelBlock (ch % (size_t) numProcessedChannels));
 
     auto&& outputBlock = dsp::AudioBlock<float> { ioBuffer };
     oversampling.processSamplesDown (outputBlock);

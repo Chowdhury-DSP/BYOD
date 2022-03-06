@@ -5,7 +5,7 @@
 class Port : public Component
 {
 public:
-    Port() = default;
+    explicit Port (const Colour& processorColour);
 
     void setInputOutput (bool shouldBeInput) { isInput = shouldBeInput; }
     void setConnectionStatus (bool connectionStatus);
@@ -15,6 +15,8 @@ public:
 private:
     bool isInput = false;
     bool isConnected = false;
+
+    const Colour& procColour;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Port)
 };

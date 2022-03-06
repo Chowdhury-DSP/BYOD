@@ -12,6 +12,7 @@ public:
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
+    void resetLevels();
     void processAudio (AudioBuffer<float>& buffer) override;
 
     void getCustomComponents (OwnedArray<Component>& customComps) override;

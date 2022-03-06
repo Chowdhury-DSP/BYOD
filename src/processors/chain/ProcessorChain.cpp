@@ -91,7 +91,12 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     }
 
     if (nextNumProcs == 0) // the output of this processor is connected to nothing, so let's not waste our processing...
+    {
+        if (proc == &inputProcessor)
+            inputProcessor.resetLevels();
+
         return;
+    }
 
     proc->processAudioBlock (buffer);
 
@@ -170,8 +175,20 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     bool outProcessed = false;
     runProcessor (&inputProcessor, inputBuffer, outProcessed);
 
-    // do output processing (downsampling, output gain)
-    ioProcessor.processAudioOutput (*outputProcessor.getOutputBuffer(), buffer, outProcessed);
+    if (! outProcessed)
+    {
+        outputProcessor.resetLevels();
+        inputBuffer.clear();
+        ioProcessor.processAudioOutput (inputBuffer, buffer);
+    }
+    else
+    {
+        // do output processing (downsampling, output gain)
+        if (auto* outBuffer = outputProcessor.getOutputBuffer())
+            ioProcessor.processAudioOutput (*outBuffer, buffer);
+        else
+            jassertfalse; // output buffer is null after output was processed?
+    }
 }
 
 void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, float /*newValue*/)

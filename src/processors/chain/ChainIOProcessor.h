@@ -12,7 +12,7 @@ public:
 
     int getOversamplingFactor() const;
     dsp::AudioBlock<float> processAudioInput (const AudioBuffer<float>& buffer, bool& sampleRateChanged);
-    void processAudioOutput (const AudioBuffer<float>& processedBuffer, AudioBuffer<float>& outputBuffer, bool processingCompleted);
+    void processAudioOutput (const AudioBuffer<float>& processedBuffer, AudioBuffer<float>& outputBuffer);
 
     auto& getOversampling() { return oversampling; }
 
