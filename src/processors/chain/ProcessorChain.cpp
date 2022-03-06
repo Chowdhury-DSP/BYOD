@@ -91,7 +91,12 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     }
 
     if (nextNumProcs == 0) // the output of this processor is connected to nothing, so let's not waste our processing...
+    {
+        if (proc == &inputProcessor)
+            inputProcessor.resetLevels();
+
         return;
+    }
 
     proc->processAudioBlock (buffer);
 
@@ -169,6 +174,9 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     // run processing chain
     bool outProcessed = false;
     runProcessor (&inputProcessor, inputBuffer, outProcessed);
+
+    if (! outProcessed)
+        outputProcessor.resetLevels();
 
     // do output processing (downsampling, output gain)
     if (auto* outBuffer = outputProcessor.getOutputBuffer())

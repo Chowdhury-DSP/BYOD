@@ -13,9 +13,13 @@ ParamLayout OutputProcessor::createParameterLayout()
     return { params.begin(), params.end() };
 }
 
-void OutputProcessor::prepare (double /*sampleRate*/, int samplesPerBlock)
+void OutputProcessor::prepare (double /*sampleRate*/, int /*samplesPerBlock*/)
 {
-    stereoBuffer.setSize (2, samplesPerBlock);
+    resetLevels();
+}
+
+void OutputProcessor::resetLevels()
+{
     std::fill (rmsLevels.begin(), rmsLevels.end(), 0.0f);
 }
 
@@ -24,27 +28,10 @@ void OutputProcessor::processAudio (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    if (numChannels == 1)
-    {
-        auto processedData = buffer.getReadPointer (0);
-        for (int ch = 0; ch < stereoBuffer.getNumChannels(); ++ch)
-            FloatVectorOperations::copy (stereoBuffer.getWritePointer (ch),
-                                         processedData,
-                                         numSamples);
+    rmsLevels[0] = buffer.getMagnitude (0, 0, numSamples);
+    rmsLevels[1] = buffer.getMagnitude (1 % numChannels, 0, numSamples);
 
-        outputBuffers.getReference (0) = &stereoBuffer;
-    }
-    else
-    {
-        outputBuffers.getReference (0) = &buffer;
-    }
-
-    // update meter levels
-    {
-        const auto& outBuffer = outputBuffers.getReference (0);
-        rmsLevels[0] = outBuffer->getMagnitude (0, 0, numSamples);
-        rmsLevels[1] = outBuffer->getMagnitude (1, 0, numSamples);
-    }
+    outputBuffers.getReference (0) = &buffer;
 }
 
 void OutputProcessor::getCustomComponents (OwnedArray<Component>& customComps)
