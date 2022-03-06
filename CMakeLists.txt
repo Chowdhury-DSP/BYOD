@@ -61,6 +61,14 @@ else()
     set(HARDENED_RUNTIME_ENABLED NO)
 endif()
 
+if(IOS)
+    set(USE_APP_GROUPS TRUE)
+    set(APP_GROUP_IDS_TO_USE "group.com.chowdsp.BYOD")
+else()
+    set(USE_APP_GROUPS FALSE)
+    set(APP_GROUP_IDS_TO_USE "")
+endif()
+
 juce_add_plugin(BYOD
     COMPANY_NAME chowdsp
     PLUGIN_MANUFACTURER_CODE Chow
@@ -83,8 +91,8 @@ juce_add_plugin(BYOD
     PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST} # Apple won't let you use local network unless we add this
     ICLOUD_PERMISSIONS_ENABLED TRUE
     HARDENED_RUNTIME_ENABLED ${HARDENED_RUNTIME_ENABLED}
-    APP_GROUPS_ENABLED TRUE
-    APP_GROUP_IDS "group.com.chowdsp.BYOD"
+    APP_GROUPS_ENABLED ${USE_APP_GROUPS}
+    APP_GROUP_IDS ${APP_GROUP_IDS_TO_USE}
 )
 
 if(BYOD_BUILD_CLAP AND NOT IOS)
