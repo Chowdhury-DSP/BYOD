@@ -176,11 +176,19 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     runProcessor (&inputProcessor, inputBuffer, outProcessed);
 
     if (! outProcessed)
+    {
         outputProcessor.resetLevels();
-
-    // do output processing (downsampling, output gain)
-    if (auto* outBuffer = outputProcessor.getOutputBuffer())
-        ioProcessor.processAudioOutput (*outBuffer, buffer, outProcessed);
+        inputBuffer.clear();
+        ioProcessor.processAudioOutput (inputBuffer, buffer);
+    }
+    else
+    {
+        // do output processing (downsampling, output gain)
+        if (auto* outBuffer = outputProcessor.getOutputBuffer())
+            ioProcessor.processAudioOutput (*outBuffer, buffer);
+        else
+            jassertfalse; // output buffer is null after output was processed?
+    }
 }
 
 void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, float /*newValue*/)
