@@ -51,14 +51,14 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
 
     for (int i = 0; i < baseProc.getNumInputs(); ++i)
     {
-        auto newPort = inputPorts.add (std::make_unique<Port>());
+        auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour));
         newPort->setInputOutput (true);
         addAndMakeVisible (newPort);
     }
 
     for (int i = 0; i < baseProc.getNumOutputs(); ++i)
     {
-        auto newPort = outputPorts.add (std::make_unique<Port>());
+        auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour));
         newPort->setInputOutput (false);
         addAndMakeVisible (newPort);
     }

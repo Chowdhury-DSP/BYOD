@@ -1,13 +1,19 @@
 #include "Port.h"
 #include "../cables/CableDrawingHelpers.h"
 
+Port::Port (const Colour& processorColour) : procColour (processorColour)
+{
+}
+
 void Port::paint (Graphics& g)
 {
-    auto portBounds = getLocalBounds().toFloat();
-    g.setColour (isInput ? Colours::black : Colours::darkgrey);
+    const auto portBounds = getLocalBounds().toFloat();
 
     if (isConnected)
     {
+        g.setColour (procColour);
+        g.fillEllipse (portBounds);
+
         const auto width = (float) getWidth();
         const auto xOff = isInput ? -1.0f : 1.0f;
         const auto bigArcStart = 0.0f;
@@ -22,6 +28,8 @@ void Port::paint (Graphics& g)
         arcPath.lineTo (pb.getCentreX() + xOff, pb.getBottom());
         arcPath.addArc (pb.getX(), pb.getY(), pb.getWidth(), pb.getHeight(), smallArcStart, smallArcEnd);
         arcPath.closeSubPath();
+
+        g.setColour (isInput ? Colours::black : Colours::darkgrey);
         g.fillPath (arcPath);
 
         g.setColour (Colours::white);
@@ -29,6 +37,7 @@ void Port::paint (Graphics& g)
     }
     else
     {
+        g.setColour (isInput ? Colours::black : Colours::darkgrey);
         g.fillEllipse (portBounds);
     }
 
