@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #pragma once
 
 #include <pch.h>
@@ -33,3 +35,5 @@ juce::String parseMessageResponse (const String& messageResponse);
 void showFailureMessage (const String& title, const String& message);
 
 } // namespace PresetsServerCommunication
+
+#endif // BYOD_BUILD_PRESET_SERVER

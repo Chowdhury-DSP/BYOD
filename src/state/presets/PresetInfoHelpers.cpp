@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #include "PresetInfoHelpers.h"
 
 namespace PresetInfoHelpers
@@ -25,3 +27,5 @@ String getPresetID (const chowdsp::Preset& preset)
     return preset.extraInfo.getStringAttribute (presetIDTag);
 }
 } // namespace PresetInfoHelpers
+
+#endif // BYOD_BUILD_PRESET_SERVER

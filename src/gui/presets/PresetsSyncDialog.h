@@ -1,3 +1,5 @@
+#if BYOD_BUILD_PRESET_SERVER
+
 #pragma once
 
 #include "state/presets/PresetManager.h"
@@ -26,3 +28,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetsSyncDialog)
 };
+
+#endif // BYOD_BUILD_PRESET_SERVER
