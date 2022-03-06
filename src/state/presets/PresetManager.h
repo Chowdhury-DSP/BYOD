@@ -13,7 +13,8 @@ const String factoryPresetVendor = "CHOW";
 class ProcessorChain;
 class PresetManager : public chowdsp::PresetManager
 #if BYOD_BUILD_PRESET_SERVER
-    , private PresetsServerUserManager::Listener
+    ,
+                      private PresetsServerUserManager::Listener
 #endif
 {
 public:
