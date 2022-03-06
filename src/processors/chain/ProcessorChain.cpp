@@ -171,7 +171,8 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     runProcessor (&inputProcessor, inputBuffer, outProcessed);
 
     // do output processing (downsampling, output gain)
-    ioProcessor.processAudioOutput (*outputProcessor.getOutputBuffer(), buffer, outProcessed);
+    if (auto* outBuffer = outputProcessor.getOutputBuffer())
+        ioProcessor.processAudioOutput (*outBuffer, buffer, outProcessed);
 }
 
 void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, float /*newValue*/)
