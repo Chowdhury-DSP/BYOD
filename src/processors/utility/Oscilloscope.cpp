@@ -40,6 +40,11 @@ void Oscilloscope::processAudio (AudioBuffer<float>& buffer)
     scopeTask.pushSamples (0, buffer.getReadPointer (0), numSamples);
 }
 
+void Oscilloscope::inputConnectionChanged (int /*portIndex*/, bool /*wasConnected*/)
+{
+    scopeTask.reset();
+}
+
 //===================================================================
 void Oscilloscope::ScopeBackgroundTask::prepareTask (double sampleRate, int /*samplesPerBlock*/, int& requstedBlockSize, int& waitMs)
 {
@@ -50,6 +55,20 @@ void Oscilloscope::ScopeBackgroundTask::prepareTask (double sampleRate, int /*sa
     requstedBlockSize = samplesToDisplay + triggerBuffer;
 
     waitMs = int (1000.0 / (double) scopeFps);
+}
+
+void Oscilloscope::ScopeBackgroundTask::resetTask()
+{
+    ScopedLock sl (crit);
+    scopePath.clear();
+    scopePath.startNewSubPath (mapXY (0, 0.0f));
+    scopePath.lineTo (mapXY (samplesToDisplay, 0.0f));
+}
+
+Point<float> Oscilloscope::ScopeBackgroundTask::mapXY (int sampleIndex, float yVal) const
+{
+    return Point { jmap (float (sampleIndex), 0.0f, float (samplesToDisplay), bounds.getX(), bounds.getRight()),
+                   jmap (yVal, -1.0f, 1.0f, bounds.getBottom(), bounds.getY()) };
 }
 
 void Oscilloscope::ScopeBackgroundTask::runTask (const AudioBuffer<float>& buffer)
@@ -70,12 +89,6 @@ void Oscilloscope::ScopeBackgroundTask::runTask (const AudioBuffer<float>& buffe
     ScopedLock sl (crit);
     if (bounds == Rectangle<float> {})
         return;
-
-    auto mapXY = [=, &b = std::as_const (bounds)] (int sampleIndex, float yVal)
-    {
-        return Point { jmap (float (sampleIndex), 0.0f, float (samplesToDisplay), bounds.getX(), bounds.getRight()),
-                       jmap (yVal, -1.0f, 1.0f, bounds.getBottom(), bounds.getY()) };
-    };
 
     scopePath.clear();
     scopePath.startNewSubPath (mapXY (0, data[triggerOffset]));

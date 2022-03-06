@@ -10,6 +10,7 @@ public:
     ProcessorType getProcessorType() const override { return Utility; }
     static ParamLayout createParameterLayout();
 
+    void inputConnectionChanged (int portIndex, bool wasConnected) override;
     void getCustomComponents (OwnedArray<Component>& customComps) override;
 
     void prepare (double sampleRate, int samplesPerBlock) override;
@@ -21,8 +22,10 @@ private:
         ScopeBackgroundTask() : chowdsp::AudioUIBackgroundTask ("Oscilloscope Background Task") {}
 
         void prepareTask (double sampleRate, int samplesPerBlock, int& requstedBlockSize, int& waitMs) override;
+        void resetTask() override;
         void runTask (const AudioBuffer<float>& data) override;
 
+        Point<float> mapXY (int sampleIndex, float yVal) const;
         void setBounds (Rectangle<int> newBounds);
         Path getScopePath() const noexcept;
 

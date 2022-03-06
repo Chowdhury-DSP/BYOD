@@ -11,6 +11,7 @@ public:
     static ParamLayout createParameterLayout();
 
     void getCustomComponents (OwnedArray<Component>& customComps) override;
+    void inputConnectionChanged (int portIndex, bool wasConnected) override;
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
@@ -20,7 +21,8 @@ private:
     {
         TunerBackgroundTask() : chowdsp::AudioUIBackgroundTask ("Tuner Background Task") {}
 
-        void prepareTask (double sampleRate, int samplesPerBlock, int& requstedBlockSize, int& waitMs) override;
+        void prepareTask (double sampleRate, int samplesPerBlock, int& requestedBlockSize, int& waitMs) override;
+        void resetTask() override;
         void runTask (const AudioBuffer<float>& data) override;
 
         double getCurrentFreqHz() noexcept;

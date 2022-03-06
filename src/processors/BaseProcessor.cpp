@@ -138,6 +138,7 @@ void BaseProcessor::addConnection (ConnectionInfo&& info)
     outputConnections[info.startPort].add (info);
 
     info.endProc->inputsConnected.addUsingDefaultSort (info.endPort);
+    info.endProc->inputConnectionChanged (info.endPort, true);
 }
 
 void BaseProcessor::removeConnection (const ConnectionInfo& info)
@@ -152,6 +153,7 @@ void BaseProcessor::removeConnection (const ConnectionInfo& info)
             connections.remove (cIdx);
             info.endProc->inputsConnected.removeFirstMatchingValue (info.endPort);
             info.endProc->inputBuffers[info.endPort].clear();
+            info.endProc->inputConnectionChanged (info.endPort, false);
             break;
         }
     }

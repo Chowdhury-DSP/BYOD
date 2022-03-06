@@ -91,6 +91,7 @@ public:
 
     void addConnection (ConnectionInfo&& info);
     void removeConnection (const ConnectionInfo& info);
+    virtual void inputConnectionChanged (int /*portIndex*/, bool /*wasConnected*/) {}
 
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }

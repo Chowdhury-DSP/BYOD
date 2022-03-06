@@ -40,6 +40,11 @@ void Tuner::processAudio (AudioBuffer<float>& buffer)
     tunerTask.pushSamples (0, buffer.getReadPointer (0), numSamples);
 }
 
+void Tuner::inputConnectionChanged (int /*portIndex*/, bool /*wasConnected*/)
+{
+    tunerTask.reset();
+}
+
 //===================================================================
 void Tuner::TunerBackgroundTask::prepareTask (double sampleRate, int /*samplesPerBlock*/, int& requestedBlockSize, int& /*waitMs*/)
 {
@@ -48,6 +53,11 @@ void Tuner::TunerBackgroundTask::prepareTask (double sampleRate, int /*samplesPe
 
     freqValSmoother.reset ((double) tunerRefreshHz, 0.15);
     freqValSmoother.setCurrentAndTargetValue ((double) tuner.getCurrentFrequencyHz());
+}
+
+void Tuner::TunerBackgroundTask::resetTask()
+{
+    curFreqHz = 1.0;
 }
 
 void Tuner::TunerBackgroundTask::runTask (const AudioBuffer<float>& data)
