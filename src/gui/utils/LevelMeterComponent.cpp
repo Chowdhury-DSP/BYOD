@@ -40,8 +40,9 @@ void LevelMeterComponent::paint (Graphics& g)
     gradient.addColour (0.6f, Colour (0xffF6C80D));
     g.setGradientFill (gradient);
 
-    g.fillRect (leftChBounds.withTop (getYForDB (dbLevels[0])));
-    g.fillRect (rightChBounds.withTop (getYForDB (dbLevels[1])));
+    const auto yPad = meterBounds.getY() / 2;
+    g.fillRect (leftChBounds.withTop (getYForDB (dbLevels[0]) + yPad));
+    g.fillRect (rightChBounds.withTop (getYForDB (dbLevels[1]) + yPad));
 
     //    g.setFont (12.0f);
     //    g.setColour (Colours::black);
