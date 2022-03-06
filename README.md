@@ -19,6 +19,12 @@ add new guitar effect processors, please see
 the latest Nightly Builds (potentially unstable),
 they can be downloaded [here](https://chowdsp.com/nightly.html#byod).**
 
+## Quick Links
+- Latest Release (coming soon...)
+- BYOD for iOS (coming soon...)
+- [Nightly Builds](https://chowdsp.com/nightly.html#byod)
+- [User Manual](https://github.com/Chowdhury-DSP/BYOD/blob/main/manual/Manual.md)
+
 ## Building
 
 To build from scratch, you must have CMake installed.
