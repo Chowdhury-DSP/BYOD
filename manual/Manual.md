@@ -8,6 +8,8 @@ other useful effects. BYOD is currently available for Windows,
 Linux, Mac, and iOS in the following formats: VST/VST3, AU, LV2,
 AAX, AUv3, and Standalone.
 
+<img src="./screenshots/full_gui.png" alt="Plugin GUI" height="400">
+
 ## Installation
 
 To install BYOD for desktop, download the plugin installer

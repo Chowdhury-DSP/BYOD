@@ -116,6 +116,7 @@ AudioProcessorValueTreeState::ParameterLayout MyEffect::createParameterLayout()
                                                   "Param",
                                                   String(),
                                                   NormalisableRange<float> { 5.0f, 500.0f },
+                                                  100.0f,
                                                   &timeMsValToString,
                                                   &stringToTimeMsVal));
 

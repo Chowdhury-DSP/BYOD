@@ -1,7 +1,9 @@
 # BYOD (Build-Your-Own Distortion)
 
+[![Download Latest](https://img.shields.io/badge/download-latest-blue.svg)](https://github.com/Chowdhury-DSP/BYOD/releases/latest)
 ![CI](https://github.com/Chowdhury-DSP/BYOD/workflows/CI/badge.svg)
 [![License](https://img.shields.io/badge/License-GPL3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
+[![Downloads](https://img.shields.io/github/downloads/Chowdhury-DSP/BYOD/total)](https://somsubhra.github.io/github-release-stats/?username=Chowdhury-DSP&repository=BYOD&page=1&per_page=30)
 
 BYOD is a guitar distortion plugin with a customisable
 signal chain that allows users to create their own guitar
@@ -11,19 +13,17 @@ to purely digital creations, along with some musical
 tone-shaping filters, and a handful of other useful
 processing blocks.
 
+## Quick Links
+- [Latest Release](https://chowdsp.com/products.html#byod)
+- [BYOD for iOS](https://apps.apple.com/us/app/byod/id1595313287)
+- [Nightly Builds](https://chowdsp.com/nightly.html#byod)
+- [User Manual](https://github.com/Chowdhury-DSP/BYOD/blob/main/manual/Manual.md)
+
+<img src="./manual/screenshots/full_gui.png" alt="Plugin GUI" height="400">
+
 BYOD is open to contributions! If you would like to
 add new guitar effect processors, please see
 [the documentation](./docs).
-
-**BYOD is currently in pre-release. If you would like to try
-the latest Nightly Builds (potentially unstable),
-they can be downloaded [here](https://chowdsp.com/nightly.html#byod).**
-
-## Quick Links
-- Latest Release (coming soon...)
-- BYOD for iOS (coming soon...)
-- [Nightly Builds](https://chowdsp.com/nightly.html#byod)
-- [User Manual](https://github.com/Chowdhury-DSP/BYOD/blob/main/manual/Manual.md)
 
 ## Building
 
@@ -58,8 +58,8 @@ $ cmake --build build --config Release --parallel 4
   - [Magic Enum](https://github.com/Neargye/magic_enum)
   - [Surge Synth Team's cpputils](https://github.com/surge-synthesizer/sst-cpputils)
 
-Credits for the individual processing blocks are shown on
-the information page for each block. Big thanks to all who
+Credits for the individual processors are shown on
+the information page for each processor. Big thanks to all who
 have contributed!
 
 ## License

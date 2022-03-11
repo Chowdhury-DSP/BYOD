@@ -10,7 +10,7 @@ under the BSD 3-clause license.
 The original intention was to license BYOD
 under the GPLv3, however, the GPL is not
 compatible with the iOS App Store rules 
-more information [here](https://www.fsf.org/blogs/licensing/more-about-the-app-store-gpl-enforcement)).
+(more information [here](https://www.fsf.org/blogs/licensing/more-about-the-app-store-gpl-enforcement)).
 With that in mind, the CLA will allow the plugin
 to be distributed under a license which is compatible
 with the App Store rules (in this case BSD).
@@ -42,7 +42,7 @@ and when you add your name to the AUTHORS list, add
 "[no CLA]" after your name. Following these steps will
 alert us that you only want your code to be licensed
 under the GPLv3, so we can make sure such code is
-excluded from uture iOS builds.
+excluded from iOS builds.
 
 If your contribution is something else that cannot be
 trivialy excluded from iOS builds, then please create
