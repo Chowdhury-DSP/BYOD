@@ -12,7 +12,7 @@ SettingsButton::SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper& og
                                                                                            proc (processor),
                                                                                            openGLHelper (oglHelper)
 {
-    pluginSettings->addProperties ({ { openglID, false } }, this);
+    pluginSettings->addProperties ({ { openglID, openGLHelper.isOpenGLAvailable() } }, this);
     globalSettingChanged (openglID);
 
     auto cog = Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize);
@@ -118,7 +118,7 @@ void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
 
 void SettingsButton::openGLManu (PopupMenu& menu, int itemID)
 {
-    if (! chowdsp::OpenGLHelper::isOpenGLAvailable())
+    if (! openGLHelper.isOpenGLAvailable())
         return;
 
     const auto isCurrentlyOn = pluginSettings->getProperty<bool> (openglID);
