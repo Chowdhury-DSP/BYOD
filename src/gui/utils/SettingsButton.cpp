@@ -8,11 +8,12 @@ const Colour onColour = Colours::yellow;
 const Colour offColour = Colours::white;
 } // namespace
 
-SettingsButton::SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper& oglHelper) : DrawableButton ("Settings", DrawableButton::ImageFitted),
+SettingsButton::SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper* oglHelper) : DrawableButton ("Settings", DrawableButton::ImageFitted),
                                                                                            proc (processor),
                                                                                            openGLHelper (oglHelper)
 {
-    pluginSettings->addProperties ({ { openglID, openGLHelper.isOpenGLAvailable() } }, this);
+    const auto shouldUseOpenGLByDefault = openGLHelper != nullptr && openGLHelper->isOpenGLAvailable();
+    pluginSettings->addProperties ({ { openglID, shouldUseOpenGLByDefault } }, this);
     globalSettingChanged (openglID);
 
     auto cog = Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize);
@@ -32,12 +33,15 @@ void SettingsButton::globalSettingChanged (SettingID settingID)
     if (settingID != openglID)
         return;
 
-    const auto shouldUseOpenGL = pluginSettings->getProperty<bool> (openglID);
-    if (shouldUseOpenGL == openGLHelper.isAttached())
-        return; // no change
+    if (openGLHelper != nullptr)
+    {
+        const auto shouldUseOpenGL = pluginSettings->getProperty<bool> (openglID);
+        if (shouldUseOpenGL == openGLHelper->isAttached())
+            return; // no change
 
-    Logger::writeToLog ("Using OpenGL: " + String (shouldUseOpenGL ? "TRUE" : "FALSE"));
-    shouldUseOpenGL ? openGLHelper.attach() : openGLHelper.detach();
+        Logger::writeToLog ("Using OpenGL: " + String (shouldUseOpenGL ? "TRUE" : "FALSE"));
+        shouldUseOpenGL ? openGLHelper->attach() : openGLHelper->detach();
+    }
 }
 
 void SettingsButton::showSettingsMenu()
@@ -118,7 +122,7 @@ void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
 
 void SettingsButton::openGLManu (PopupMenu& menu, int itemID)
 {
-    if (! openGLHelper.isOpenGLAvailable())
+    if (openGLHelper == nullptr || ! openGLHelper->isOpenGLAvailable())
         return;
 
     const auto isCurrentlyOn = pluginSettings->getProperty<bool> (openglID);

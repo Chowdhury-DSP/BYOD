@@ -29,7 +29,7 @@ public:
     auto& getVTS() { return vts; }
     auto& getOversampling() { return procs->getOversampling(); }
     auto& getLoadMeasurer() { return loadMeasurer; }
-    auto& getOpenGLHelper() { return openGLHelper; }
+    auto* getOpenGLHelper() { return openGLHelper.get(); }
 
 private:
     void processBypassDelay (AudioBuffer<float>& buffer);
@@ -50,7 +50,7 @@ private:
 
     AudioProcessLoadMeasurer loadMeasurer;
 
-    chowdsp::OpenGLHelper openGLHelper;
+    std::unique_ptr<chowdsp::OpenGLHelper> openGLHelper = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BYOD)
 };

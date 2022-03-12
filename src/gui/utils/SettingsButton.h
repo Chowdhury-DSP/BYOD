@@ -8,7 +8,7 @@ class SettingsButton : public DrawableButton,
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
 public:
-    SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper& openGLHelper);
+    SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper* openGLHelper);
     ~SettingsButton() override;
 
     void globalSettingChanged (SettingID settingID) final;
@@ -21,7 +21,7 @@ private:
     void copyDiagnosticInfo();
 
     const BYOD& proc;
-    chowdsp::OpenGLHelper& openGLHelper;
+    chowdsp::OpenGLHelper* openGLHelper;
 
     chowdsp::SharedPluginSettings pluginSettings;
     chowdsp::SharedLNFAllocator lnfAllocator;
