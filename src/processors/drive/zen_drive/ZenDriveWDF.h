@@ -21,6 +21,7 @@ public:
 
     void setParameters (float voiceParam, float gainParam, bool force = false)
     {
+        gainParam = jmax (gainParam, 0.001f); // protect from R9 going to zero
         if (force)
         {
             voiceSmooth.setCurrentAndTargetValue (voiceParam);
