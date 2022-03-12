@@ -106,6 +106,27 @@ will be saved to this folder, and when the plugin opens, it will
 search this folder, as well as any subfolders, to load new user
 presets.
 
+## Troubleshooting
+
+### Resetting Global Settings
+If you run into any issues that require the global settings to
+be changed or reset, the global settings file can be found at
+the following location:
+- Windows: `C:\Users\<username>\AppData\Roaming\ChowdhuryDSP\BYOD\.plugin_settings.json`
+- Mac: `~/Library/ChowdhuryDSP/BYOD/.plugin_settings.json`
+- Linux: `~/.config/ChowdhuryDSP/BYOD/.plugin_settings.json`
+
+To reset the global settings, you may delete this file, and it will
+automatically be regenerated the next time the plugin is used.
+
+### OpenGL Rendering
+On Windows and Linux, BYOD will use OpenGL for rendering the UI by
+default, unless the host system does not support OpenGL version 2.0
+or greater. If OpenGL is available, it is possible to turn off rendering
+with OpenGL in the [global settings menu](#settings). If you need
+to override your chosen OpenGL setting, please visit the [global
+settings file](#resetting-global-settings).
+
 ## Open Source
 
 BYOD is open-source software that is free (as in “free beer”),

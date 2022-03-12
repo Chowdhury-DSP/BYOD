@@ -53,6 +53,7 @@ target_compile_definitions(juce_plugin_modules
         JUCE_USE_CURL=0
         JUCE_JACK=1
         JUCE_ALSA=1
+        JUCE_COREGRAPHICS_DRAW_ASYNC=1
         CHOWDSP_USE_XSIMD=1
         CHOWDSP_USE_CUSTOM_JUCE_DSP=1
         JucePlugin_Manufacturer="chowdsp"

@@ -85,6 +85,9 @@ void BYOD::updateSampleLatency (int latencySamples)
 
 AudioProcessorEditor* BYOD::createEditor()
 {
+    if (openGLHelper == nullptr)
+        openGLHelper = std::make_unique<chowdsp::OpenGLHelper>();
+
     struct BYODInfoProvider : public chowdsp::StandardInfoProvider
     {
         static juce::String getWrapperTypeString (const BYOD& proc) { return proc.getWrapperTypeString(); }
@@ -116,7 +119,7 @@ AudioProcessorEditor* BYOD::createEditor()
     // we need to set resize limits for StandalonePluginHolder
     editor->setResizeLimits (10, 10, 2000, 2000);
 
-    openGLHelper.setComponent (editor);
+    openGLHelper->setComponent (editor);
 
     return editor;
 }
