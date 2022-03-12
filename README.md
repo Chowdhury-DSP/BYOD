@@ -49,6 +49,12 @@ $ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build --config Release --parallel 4
 ```
 
+After a successful build, the resulting plugin binaries will be located in
+`build/BYOD_artefacts`.
+
+If building for Linux, please review the Linux dependencies used by
+the [BYOD CI pipeline](https://github.com/Chowdhury-DSP/BYOD/blob/main/.github/workflows/cmake.yml#L30).
+
 ## Credits:
 
 - GUI Framework - [Plugin GUI Magic](https://github.com/ffAudio/PluginGUIMagic)
