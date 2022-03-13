@@ -48,6 +48,12 @@ void SpringReverbProcessor::prepare (double sampleRate, int samplesPerBlock)
 
 void SpringReverbProcessor::processAudio (AudioBuffer<float>& buffer)
 {
+    if (numChannels != buffer.getNumChannels())
+    {
+        reverb.reset();
+        numChannels = buffer.getNumChannels();
+    }
+
     reverb.setParams ({
         sizeParam->load(),
         decayParam->load(),
