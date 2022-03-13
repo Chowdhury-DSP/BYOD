@@ -29,5 +29,7 @@ private:
     AudioBuffer<float> dryBuffer;
     dsp::Gain<float> wetGain;
 
+    int numChannels = 1;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpringReverbProcessor)
 };
