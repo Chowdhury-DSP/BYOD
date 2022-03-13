@@ -1,4 +1,5 @@
 #include "BYOD.h"
+#include "SystemInfo.h"
 #include "gui/BoardViewport.h"
 #include "gui/presets/PresetsItem.h"
 #include "gui/utils/CPUMeter.h"
@@ -19,6 +20,8 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                logger (logFileSubDir, logFileNameRoot),
                procStore (&undoManager)
 {
+    Logger::writeToLog (SystemInfo::getDiagnosticsString (*this));
+
     pluginSettings->initialise (settingsFilePath);
 
     procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager, [&] (int l)

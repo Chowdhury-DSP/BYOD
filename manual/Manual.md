@@ -108,6 +108,11 @@ presets.
 
 ## Troubleshooting
 
+If you run into issues when using BYOD, you may submit bug reports
+using [GitHub Issues](https://github.com/Chowdhury-DSP/BYOD/issues).
+However, it is recommended to read the following troubleshooting
+suggestions first.
+
 ### Resetting Global Settings
 If you run into any issues that require the global settings to
 be changed or reset, the global settings file can be found at
@@ -126,6 +131,19 @@ or greater. If OpenGL is available, it is possible to turn off rendering
 with OpenGL in the [global settings menu](#settings). If you need
 to override your chosen OpenGL setting, please visit the [global
 settings file](#resetting-global-settings).
+
+### Viewing Log Files
+Information about specific sessions of the plugin can be seen in
+the plugin log files. These files are can be found in the following
+location:
+- Windows: `C:\Users\<username>\AppData\Roaming\ChowdhuryDSP\BYOD\Logs`
+- Mac: `~/Library/ChowdhuryDSP/BYOD/Logs`
+- Linux: `~/.config/ChowdhuryDSP/BYOD/Logs`
+
+### Copying Plugin Diagnostics
+If you need to submit a bug report, it is very useful to include
+the plugin's diagnostic information in your bug report. The diagnostic
+info can be copied from the [global settings menu](#settings).
 
 ## Open Source
 
