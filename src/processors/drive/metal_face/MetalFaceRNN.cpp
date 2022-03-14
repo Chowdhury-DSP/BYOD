@@ -58,8 +58,18 @@ void MetalFaceRNN<hiddenSize, ResamplerType>::initialise (const void* modelData,
 template <int hiddenSize, typename ResamplerType>
 void MetalFaceRNN<hiddenSize, ResamplerType>::prepare (double sampleRate, int samplesPerBlock)
 {
-    needsResampling = sampleRate != targetSampleRate;
-    resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, targetSampleRate);
+    auto targetSampleRateToUse = targetSampleRate;
+    if (sampleRate > targetSampleRateToUse)
+    {
+        auto factor = std::log2 ((sampleRate / targetSampleRateToUse));
+        if (factor != (int) factor)
+            factor = (float) (int) factor + 1.0f;
+
+        targetSampleRateToUse = sampleRate / std::pow (2.0f, factor);
+    }
+
+    needsResampling = sampleRate != targetSampleRateToUse;
+    resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, targetSampleRateToUse);
 
     model.reset();
 }
