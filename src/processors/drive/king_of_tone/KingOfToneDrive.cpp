@@ -127,6 +127,7 @@ void KingOfToneDrive::prepare (double sampleRate, int samplesPerBlock)
     dcBlocker.prepare (sampleRate, samplesPerBlock);
 
     prevMode = (int) *modeParam;
+    prevNumChannels = 2;
 
     preBuffer.setSize (2, samplesPerBlock);
     doPreBuffering();
@@ -134,8 +135,9 @@ void KingOfToneDrive::prepare (double sampleRate, int samplesPerBlock)
 
 void KingOfToneDrive::doPreBuffering()
 {
+    preBuffer.setSize (prevNumChannels, preBuffer.getNumSamples(), false, false, true);
     const auto numSamples = preBuffer.getNumSamples();
-    for (int i = 0; i < int (fs * 0.5f); i += numSamples)
+    for (int i = 0; i < (int) fs; i += numSamples)
     {
         preBuffer.clear();
         processAudio (preBuffer);
@@ -144,15 +146,16 @@ void KingOfToneDrive::doPreBuffering()
 
 void KingOfToneDrive::processAudio (AudioBuffer<float>& buffer)
 {
-    const auto currentMode = (int) *modeParam;
-    if (currentMode != prevMode)
-    {
-        prevMode = currentMode;
-        doPreBuffering();
-    }
-
     const auto numSamples = (int) buffer.getNumSamples();
     const auto numChannels = (int) buffer.getNumChannels();
+
+    const auto currentMode = (int) *modeParam;
+    if (currentMode != prevMode || numChannels != prevNumChannels)
+    {
+        prevMode = currentMode;
+        prevNumChannels = numChannels;
+        doPreBuffering();
+    }
 
     buffer.applyGain (0.2f); // voltage scaling
 
@@ -197,7 +200,9 @@ void KingOfToneDrive::processAudio (AudioBuffer<float>& buffer)
             FloatVectorOperations::multiply (x, Decibels::decibelsToGain (makeupGainDB), numSamples);
         }
         else
+        {
             FloatVectorOperations::multiply (x, Decibels::decibelsToGain (-12.0f), numSamples);
+        }
     }
 
     dcBlocker.processAudio (buffer);

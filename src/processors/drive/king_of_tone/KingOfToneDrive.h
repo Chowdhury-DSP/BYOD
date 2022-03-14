@@ -24,6 +24,7 @@ private:
 
     SmoothedValue<float> driveParamSmooth[2];
     int prevMode = 0;
+    int prevNumChannels = 0;
 
     float fs = 48000.0f;
     chowdsp::FirstOrderHPF<float> inputFilter[2];

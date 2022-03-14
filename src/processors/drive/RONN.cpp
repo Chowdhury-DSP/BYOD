@@ -179,6 +179,8 @@ void RONN::reloadModel (int randomSeed)
 
     if (std::isnan (makeupGain) || std::isinf (makeupGain))
         reloadModel (randomSeed + 1);
+
+    makeupGain = jmax (makeupGain, 30.0f);
 }
 
 void RONN::prepare (double sampleRate, int samplesPerBlock)
