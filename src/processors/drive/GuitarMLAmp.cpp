@@ -139,7 +139,7 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
 
         for (int n = 0; n < buffer.getNumSamples(); ++n)
         {
-            float input alignas(16)[] = { x[n] };
+            float input alignas (16)[] = { x[n] };
             x[n] = model.forward (input) + x[n];
         }
     }

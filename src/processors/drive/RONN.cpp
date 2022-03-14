@@ -236,7 +236,7 @@ void RONN::processAudio (AudioBuffer<float>& buffer)
         auto* x = buffer.getWritePointer (ch);
         for (int n = 0; n < buffer.getNumSamples(); ++n)
         {
-            float input alignas(16)[] = { x[n] };
+            float input alignas (16)[] = { x[n] };
             x[n] = neuralNet[ch].forward (input);
         }
     }
