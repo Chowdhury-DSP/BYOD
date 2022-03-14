@@ -138,7 +138,10 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         auto& model = models[ch].at (modelType);
 
         for (int n = 0; n < buffer.getNumSamples(); ++n)
-            x[n] = model.forward (x + n) + x[n];
+        {
+            float input alignas(16)[] = { x[n] };
+            x[n] = model.forward (input) + x[n];
+        }
     }
 
     dcBlocker.processAudio (buffer);
