@@ -18,6 +18,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
+    void doPrebuffering();
+
     // model loading utils
     SpinLock modelLoadingLock;
     void reloadModel (int randomSeed);
@@ -25,10 +27,13 @@ private:
     // input gain
     std::atomic<float>* inGainDbParam = nullptr;
     dsp::Gain<float> inputGain;
+    dsp::Gain<float> outputGain;
     float makeupGain = 1.0f;
 
     RTNeural::ModelT<float, 1, 1, RTNeural::DenseT<float, 1, 8>, RTNeural::TanhActivationT<float, 8>, RTNeural::Conv1DT<float, 8, 4, 3, 2>, RTNeural::TanhActivationT<float, 4>, RTNeural::GRULayerT<float, 4, 8>, RTNeural::DenseT<float, 8, 1>> neuralNet[2];
 
+    std::atomic_bool needsPrebuffering { false };
+    int maxBlockSize = 0;
     DCBlocker dcBlocker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (RONN)
