@@ -70,9 +70,15 @@ void BigMuffDrive::prepare (double sampleRate, int samplesPerBlock)
         filt.reset();
     }
 
-    // pre-buffering
-    AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 10000; i += samplesPerBlock)
+    prevNumStages = (int) *nStagesParam + 1;
+    maxBlockSize = samplesPerBlock;
+    doPrebuffering();
+}
+
+void BigMuffDrive::doPrebuffering()
+{
+    AudioBuffer<float> buffer (2, maxBlockSize);
+    for (int i = 0; i < 10000; i += maxBlockSize)
     {
         buffer.clear();
         processAudio (buffer);
@@ -128,12 +134,18 @@ void BigMuffDrive::processInputStage (AudioBuffer<float>& buffer)
 
 void BigMuffDrive::processAudio (AudioBuffer<float>& buffer)
 {
+    const int numStages = (int) *nStagesParam + 1;
+    if (numStages != prevNumStages)
+    {
+        prevNumStages = numStages;
+        doPrebuffering();
+    }
+
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
     processInputStage (buffer);
 
-    const int numStages = (int) *nStagesParam + 1;
     for (int i = 0; i < numStages; ++i)
         stages[i].processBlock (buffer);
 

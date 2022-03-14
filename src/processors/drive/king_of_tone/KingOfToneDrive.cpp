@@ -128,7 +128,7 @@ void KingOfToneDrive::prepare (double sampleRate, int samplesPerBlock)
 
     prevMode = (int) *modeParam;
 
-    preBuffer.setSize (1, samplesPerBlock);
+    preBuffer.setSize (2, samplesPerBlock);
     doPreBuffering();
 }
 

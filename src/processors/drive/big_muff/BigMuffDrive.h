@@ -15,6 +15,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
+    void doPrebuffering();
     void processInputStage (AudioBuffer<float>& buffer);
 
     std::atomic<float>* sustainParam = nullptr;
@@ -27,11 +28,13 @@ private:
     dsp::Gain<float> sustainGain;
 
     BigMuffClippingStage stages[4];
+    int prevNumStages = 0;
 
     chowdsp::FirstOrderHPF<float> dcBlocker[2];
     dsp::Gain<float> outLevel;
 
     float fs = 48000.0f;
+    int maxBlockSize = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BigMuffDrive)
 };

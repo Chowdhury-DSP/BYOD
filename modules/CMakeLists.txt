@@ -13,11 +13,7 @@ if(BYOD_BUILD_CLAP AND NOT IOS)
 endif()
 
 # add RTNeural
-if(APPLE)
-    set(RTNEURAL_EIGEN ON CACHE BOOL "Use RTNeural with Eigen backend" FORCE)
-else()
-    set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
-endif()
+set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
 add_subdirectory(RTNeural)
 
  # add other C++ libraries

@@ -128,6 +128,7 @@ void RONN::parameterChanged (const String& parameterID, float newValue)
 
     auto seedIdx = int (newValue);
     reloadModel (randomSeeds[seedIdx]);
+    needsPrebuffering = true;
 }
 
 void RONN::reloadModel (int randomSeed)
@@ -151,28 +152,33 @@ void RONN::reloadModel (int randomSeed)
     auto denseOutWeights = createRandomVec2 (generator, ortho, 1, 8);
     auto denseOutBias = createRandomVec (generator, normal, 1);
 
-    SpinLock::ScopedLockType modelLoadingScopedLock (modelLoadingLock);
-    for (auto& nn : neuralNet)
     {
-        nn.get<0>().setWeights (denseInWeights);
-        nn.get<0>().setBias (denseInBias.data());
+        SpinLock::ScopedLockType modelLoadingScopedLock (modelLoadingLock);
+        for (auto& nn : neuralNet)
+        {
+            nn.get<0>().setWeights (denseInWeights);
+            nn.get<0>().setBias (denseInBias.data());
 
-        nn.get<2>().setWeights (convWeights);
-        nn.get<2>().setBias (convBias);
+            nn.get<2>().setWeights (convWeights);
+            nn.get<2>().setBias (convBias);
 
-        nn.get<4>().setWVals (gruKernel);
-        nn.get<4>().setUVals (gruRecurrent);
-        nn.get<4>().setBVals (gruBias);
+            nn.get<4>().setWVals (gruKernel);
+            nn.get<4>().setUVals (gruRecurrent);
+            nn.get<4>().setBVals (gruBias);
 
-        nn.get<5>().setWeights (denseOutWeights);
-        nn.get<5>().setBias (denseOutBias.data());
+            nn.get<5>().setWeights (denseOutWeights);
+            nn.get<5>().setBias (denseOutBias.data());
 
-        nn.reset();
+            nn.reset();
 
-        float input[] = { 1.0f };
-        makeupGain = 1.0f / std::abs (nn.forward (input));
-        nn.reset();
+            float input[] = { 1.0f };
+            makeupGain = 1.0f / std::abs (nn.forward (input));
+            nn.reset();
+        }
     }
+
+    if (std::isnan (makeupGain) || std::isinf (makeupGain))
+        reloadModel (randomSeed + 1);
 }
 
 void RONN::prepare (double sampleRate, int samplesPerBlock)
@@ -181,18 +187,33 @@ void RONN::prepare (double sampleRate, int samplesPerBlock)
     inputGain.prepare (spec);
     inputGain.setRampDurationSeconds (0.05);
 
+    outputGain.prepare (spec);
+
     neuralNet[0].reset();
     neuralNet[1].reset();
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
 
+    maxBlockSize = samplesPerBlock;
+    doPrebuffering();
+}
+
+void RONN::doPrebuffering()
+{
+    needsPrebuffering = false;
+
     // pre-buffering
-    AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 10000; i += samplesPerBlock)
+    AudioBuffer<float> buffer (2, maxBlockSize);
+    for (int i = 0; i < 100000; i += maxBlockSize)
     {
         buffer.clear();
         processAudio (buffer);
     }
+
+    outputGain.setRampDurationSeconds (0.0);
+    outputGain.setGainLinear (0.0f);
+    outputGain.setRampDurationSeconds (0.25);
+    outputGain.setGainLinear (makeupGain);
 }
 
 void RONN::processAudio (AudioBuffer<float>& buffer)
@@ -200,6 +221,9 @@ void RONN::processAudio (AudioBuffer<float>& buffer)
     SpinLock::ScopedTryLockType modelLoadingTryLock (modelLoadingLock);
     if (! modelLoadingTryLock.isLocked())
         return;
+
+    if (needsPrebuffering)
+        doPrebuffering();
 
     dsp::AudioBlock<float> block (buffer);
     dsp::ProcessContextReplacing<float> context (block);
@@ -212,14 +236,14 @@ void RONN::processAudio (AudioBuffer<float>& buffer)
         auto* x = buffer.getWritePointer (ch);
         for (int n = 0; n < buffer.getNumSamples(); ++n)
         {
-            float input[] = { x[n] };
+            float input alignas (16)[] = { x[n] };
             x[n] = neuralNet[ch].forward (input);
         }
     }
 
     dcBlocker.processAudio (buffer);
+    outputGain.process (context);
 
-    buffer.applyGain (makeupGain);
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
         const auto numSamples = buffer.getNumSamples();
