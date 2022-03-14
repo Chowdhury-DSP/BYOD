@@ -60,7 +60,7 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
     AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
     // push samples into bypass delay
-    bypassScratchBuffer.makeCopyOf (buffer);
+    bypassScratchBuffer.makeCopyOf (buffer, true);
     processBypassDelay (bypassScratchBuffer);
 
     // real processing here!
