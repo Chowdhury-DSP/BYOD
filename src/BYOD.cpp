@@ -88,8 +88,13 @@ void BYOD::updateSampleLatency (int latencySamples)
 
 AudioProcessorEditor* BYOD::createEditor()
 {
+    Logger::writeToLog ("Creating BYOD Editor!");
+
     if (openGLHelper == nullptr)
+    {
         openGLHelper = std::make_unique<chowdsp::OpenGLHelper>();
+        Logger::writeToLog ("Created OpenGL Helper.");
+    }
 
     struct BYODInfoProvider : public chowdsp::StandardInfoProvider
     {
