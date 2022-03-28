@@ -11,7 +11,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={commonpf64}\Chowdhury DSP\
+DefaultDirName={commonpf}\Chowdhury DSP\
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 DisableDirPage=yes
@@ -21,7 +21,7 @@ OutputBaseFilename="{#MyAppName}-Win-{#MyAppVersion}"
 OutputDir=.
 SetupIconFile=byod.ico
 UninstallDisplayIcon=byod.ico
-UninstallFilesDir={commonpf64}\Chowdhury DSP\{#MyAppName}
+UninstallFilesDir={commonpf}\Chowdhury DSP\{#MyAppName}
 Compression=lzma
 SolidCompression=yes
 
