@@ -17,9 +17,9 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    struct ScopeBackgroundTask : chowdsp::AudioUIBackgroundTask
+    struct ScopeBackgroundTask : chowdsp::TimeSliceAudioUIBackgroundTask
     {
-        ScopeBackgroundTask() : chowdsp::AudioUIBackgroundTask ("Oscilloscope Background Task") {}
+        ScopeBackgroundTask() : chowdsp::TimeSliceAudioUIBackgroundTask ("Oscilloscope Background Task") {}
 
         void prepareTask (double sampleRate, int samplesPerBlock, int& requstedBlockSize, int& waitMs) override;
         void resetTask() override;
