@@ -17,9 +17,9 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    struct TunerBackgroundTask : chowdsp::AudioUIBackgroundTask
+    struct TunerBackgroundTask : chowdsp::TimeSliceAudioUIBackgroundTask
     {
-        TunerBackgroundTask() : chowdsp::AudioUIBackgroundTask ("Tuner Background Task") {}
+        TunerBackgroundTask() : chowdsp::TimeSliceAudioUIBackgroundTask ("Tuner Background Task") {}
 
         void prepareTask (double sampleRate, int samplesPerBlock, int& requestedBlockSize, int& waitMs) override;
         void resetTask() override;
