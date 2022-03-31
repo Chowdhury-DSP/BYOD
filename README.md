@@ -55,6 +55,12 @@ After a successful build, the resulting plugin binaries will be located in
 If building for Linux, please review the Linux dependencies used by
 the [BYOD CI pipeline](https://github.com/Chowdhury-DSP/BYOD/blob/main/.github/workflows/cmake.yml#L30).
 
+### Compiling with OpenGL support
+
+By default, OpenGL support is enabled on Windows, and is disabled on all other
+platforms.  If you would like to override the default behaviour, you can pass the
+argument `-DCHOWDSP_ENABLE_OPENGL=<ON|OFF>` to the CMake configure step.
+
 ## Credits:
 
 - GUI Framework - [Plugin GUI Magic](https://github.com/ffAudio/PluginGUIMagic)
