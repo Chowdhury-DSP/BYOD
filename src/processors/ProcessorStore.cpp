@@ -1,6 +1,7 @@
 #include "ProcessorStore.h"
 
 #include "drive/GuitarMLAmp.h"
+#include "drive/MetalFace.h"
 #include "drive/RONN.h"
 #include "drive/RangeBooster.h"
 #include "drive/Warp.h"
@@ -10,7 +11,6 @@
 #include "drive/diode_circuits/DiodeRectifier.h"
 #include "drive/hysteresis/Hysteresis.h"
 #include "drive/king_of_tone/KingOfToneDrive.h"
-#include "drive/metal_face/MetalFace.h"
 #include "drive/mxr_distortion/MXRDistortion.h"
 #include "drive/tube_amp/TubeAmp.h"
 #include "drive/tube_screamer/TubeScreamer.h"

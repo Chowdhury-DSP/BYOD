@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../BaseProcessor.h"
-#include "../../utility/DCBlocker.h"
-#include "MetalFaceRNN.h"
+#include "../BaseProcessor.h"
+#include "../utility/DCBlocker.h"
+#include "neural_utils/ResampledRNN.h"
 
 class MetalFace : public BaseProcessor
 {
@@ -19,7 +19,7 @@ private:
     std::atomic<float>* gainDBParam = nullptr;
 
     dsp::Gain<float> gain;
-    MetalFaceRNN<28> rnn[2];
+    ResampledRNN<28> rnn[2];
 
     DCBlocker dcBlocker;
 
