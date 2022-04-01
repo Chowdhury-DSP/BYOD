@@ -6,56 +6,7 @@ const std::map<String, String> guitarMLModels {
     { "BluesJR_FullD_json", "Blues Jr." },
     { "TS9_FullD_json", "TS9" },
 };
-
-using Vec2d = std::vector<std::vector<float>>;
-
-Vec2d transpose (const Vec2d& x)
-{
-    auto outer_size = x.size();
-    auto inner_size = x[0].size();
-    Vec2d y (inner_size, std::vector<float> (outer_size, 0.0f));
-
-    for (size_t i = 0; i < outer_size; ++i)
-    {
-        for (size_t j = 0; j < inner_size; ++j)
-            y[j][i] = x[i][j];
-    }
-
-    return y;
 }
-
-void load_json (const String& filename, GuitarMLAmp::ModelType& model)
-{
-    auto& lstm = model.get<0>();
-    auto& dense = model.get<1>();
-
-    // read a JSON file
-    int modelDataSize;
-    auto modelData = BinaryData::getNamedResource (filename.getCharPointer(), modelDataSize);
-    jassert (modelData != nullptr);
-    MemoryInputStream jsonInputStream (modelData, (size_t) modelDataSize, false);
-    auto weights_json = nlohmann::json::parse (jsonInputStream.readEntireStreamAsString().toStdString());
-
-    Vec2d lstm_weights_ih = weights_json["/state_dict/rec.weight_ih_l0"_json_pointer];
-    lstm.setWVals (transpose (lstm_weights_ih));
-
-    Vec2d lstm_weights_hh = weights_json["/state_dict/rec.weight_hh_l0"_json_pointer];
-    lstm.setUVals (transpose (lstm_weights_hh));
-
-    std::vector<float> lstm_bias_ih = weights_json["/state_dict/rec.bias_ih_l0"_json_pointer];
-    std::vector<float> lstm_bias_hh = weights_json["/state_dict/rec.bias_hh_l0"_json_pointer];
-    for (int i = 0; i < 80; ++i)
-        lstm_bias_hh[i] += lstm_bias_ih[i];
-    lstm.setBVals (lstm_bias_hh);
-
-    Vec2d dense_weights = weights_json["/state_dict/lin.weight"_json_pointer];
-    dense.setWeights (dense_weights);
-
-    std::vector<float> dense_bias = weights_json["/state_dict/lin.bias"_json_pointer];
-    dense.setBias (dense_bias.data());
-}
-
-} // namespace
 
 GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createParameterLayout(), um)
 {
@@ -67,7 +18,11 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
         for (auto& model : models)
         {
             model.insert (std::make_pair (modelConfig.first, ModelType {}));
-            load_json (modelConfig.first, model.at (modelConfig.first));
+
+            int modelDataSize;
+            auto modelData = BinaryData::getNamedResource (modelConfig.first.getCharPointer(), modelDataSize);
+            jassert (modelData != nullptr);
+            model.at (modelConfig.first).initialise (modelData, modelDataSize, 48000.0);
         }
 
         modelTypes.push_back (modelConfig.first);
@@ -108,7 +63,7 @@ void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
     for (auto& chModels : models)
     {
         for (auto& model : chModels)
-            model.second.reset();
+            model.second.prepare (sampleRate, samplesPerBlock);
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
@@ -132,16 +87,11 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        auto* x = buffer.getWritePointer (ch);
-
         auto modelType = modelTypes[(int) modelParam->load()];
         auto& model = models[ch].at (modelType);
 
-        for (int n = 0; n < buffer.getNumSamples(); ++n)
-        {
-            float input alignas (16)[] = { x[n] };
-            x[n] = model.forward (input) + x[n];
-        }
+        auto&& channelBlock = block.getSingleChannelBlock ((size_t) ch);
+        model.process<true> (channelBlock);
     }
 
     dcBlocker.processAudio (buffer);
