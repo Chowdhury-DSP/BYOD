@@ -44,6 +44,7 @@ target_sources(BYOD PRIVATE
     processors/chain/ProcessorChainStateHelper.cpp
 
     processors/drive/GuitarMLAmp.cpp
+    processors/drive/MetalFace.cpp
     processors/drive/RangeBooster.cpp
     processors/drive/RONN.cpp
     processors/drive/Warp.cpp
@@ -60,9 +61,8 @@ target_sources(BYOD PRIVATE
     processors/drive/hysteresis/Hysteresis.cpp
     processors/drive/hysteresis/HysteresisProcessing.cpp
     processors/drive/king_of_tone/KingOfToneDrive.cpp
-    processors/drive/metal_face/MetalFace.cpp
-    processors/drive/metal_face/MetalFaceRNN.cpp
     processors/drive/mxr_distortion/MXRDistortion.cpp
+    processors/drive/neural_utils/ResampledRNN.cpp
     processors/drive/tube_amp/TubeAmp.cpp
     processors/drive/tube_screamer/TubeScreamer.cpp
     processors/drive/waveshaper/SurgeWaveshapers.cpp

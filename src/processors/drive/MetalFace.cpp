@@ -1,5 +1,5 @@
 #include "MetalFace.h"
-#include "../../ParameterHelpers.h"
+#include "../ParameterHelpers.h"
 
 MetalFace::MetalFace (UndoManager* um) : BaseProcessor ("Metal Face", createParameterLayout(), um)
 {

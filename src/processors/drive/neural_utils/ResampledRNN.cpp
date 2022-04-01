@@ -1,4 +1,4 @@
-#include "MetalFaceRNN.h"
+#include "ResampledRNN.h"
 
 namespace
 {
@@ -45,7 +45,7 @@ void loadModel (ModelType& model, int hiddenSize, const nlohmann::json& weights_
 } // namespace
 
 template <int hiddenSize, typename ResamplerType>
-void MetalFaceRNN<hiddenSize, ResamplerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
+void ResampledRNN<hiddenSize, ResamplerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
 {
     targetSampleRate = modelSampleRate;
 
@@ -56,46 +56,25 @@ void MetalFaceRNN<hiddenSize, ResamplerType>::initialise (const void* modelData,
 }
 
 template <int hiddenSize, typename ResamplerType>
-void MetalFaceRNN<hiddenSize, ResamplerType>::prepare (double sampleRate, int samplesPerBlock)
+void ResampledRNN<hiddenSize, ResamplerType>::prepare (double sampleRate, int samplesPerBlock)
 {
-    auto targetSampleRateToUse = targetSampleRate;
-    if (sampleRate > targetSampleRateToUse)
-    {
-        auto factor = std::log2 ((sampleRate / targetSampleRateToUse));
-        if (factor != (int) factor)
-            factor = (float) (int) factor + 1.0f;
-
-        targetSampleRateToUse = sampleRate / std::pow (2.0f, factor);
-    }
+    const auto lstmDelaySamples = (int) std::ceil (sampleRate / targetSampleRate);
+    auto targetSampleRateToUse = targetSampleRate * lstmDelaySamples;
 
     needsResampling = sampleRate != targetSampleRateToUse;
     resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, targetSampleRateToUse);
 
     model.reset();
+    model.template get<0>().reset (lstmDelaySamples);
 }
 
 template <int hiddenSize, typename ResamplerType>
-void MetalFaceRNN<hiddenSize, ResamplerType>::reset()
+void ResampledRNN<hiddenSize, ResamplerType>::reset()
 {
     resampler.reset();
     model.reset();
 }
 
-template <int hiddenSize, typename ResamplerType>
-void MetalFaceRNN<hiddenSize, ResamplerType>::process (dsp::AudioBlock<float>& block)
-{
-    auto&& processBlock = dsp::AudioBlock<float> { block };
-    if (needsResampling)
-        processBlock = resampler.processIn (block);
-
-    const auto numSamples = (int) processBlock.getNumSamples();
-    auto* x = processBlock.getChannelPointer (0);
-    for (int i = 0; i < numSamples; ++i)
-        x[i] = model.forward (&x[i]);
-
-    if (needsResampling)
-        resampler.processOut (processBlock, block);
-}
-
 //=======================================================
-template class MetalFaceRNN<28, chowdsp::ResamplingTypes::LanczosResampler<>>;
+template class ResampledRNN<20, chowdsp::ResamplingTypes::LanczosResampler<>>; // GuitarML
+template class ResampledRNN<28, chowdsp::ResamplingTypes::LanczosResampler<>>; // MetalFace
