@@ -26,8 +26,11 @@ public:
     /** Returns false since LSTM is not an activation. */
     constexpr bool isActivation() const noexcept { return false; }
 
+    /** Prepares the LSTM to process with a given delay length. */
+    void prepare (int delaySamples);
+
     /** Resets the state of the LSTM. */
-    void reset (int delaySamples = 1);
+    void reset();
 
     /** Performs forward propagation for this layer. */
     void forward (const v_type (&ins)[v_in_size])

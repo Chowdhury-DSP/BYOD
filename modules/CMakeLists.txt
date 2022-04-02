@@ -68,7 +68,6 @@ target_include_directories(juce_plugin_modules
         $<TARGET_PROPERTY:juce_plugin_modules,INCLUDE_DIRECTORIES>
     PUBLIC
         ${CMAKE_SOURCE_DIR}/modules/magic_enum/include
-        ${CMAKE_SOURCE_DIR}/modules/RTNeural
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/Eigen
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/xsimd/include
         $<TARGET_PROPERTY:sst-cpputils,INTERFACE_INCLUDE_DIRECTORIES>
@@ -78,7 +77,7 @@ target_include_directories(juce_plugin_modules
 set_target_properties(juce_plugin_modules PROPERTIES
     POSITION_INDEPENDENT_CODE TRUE
     VISIBILITY_INLINES_HIDDEN TRUE
-    C_VISBILITY_PRESET hidden
+    C_VISIBILITY_PRESET hidden
     CXX_VISIBILITY_PRESET hidden
 )
 
