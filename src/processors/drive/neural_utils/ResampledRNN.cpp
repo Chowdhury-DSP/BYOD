@@ -64,8 +64,10 @@ void ResampledRNN<hiddenSize, ResamplerType>::prepare (double sampleRate, int sa
     needsResampling = sampleRate != targetSampleRateToUse;
     resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, targetSampleRateToUse);
 
+    model.template get<0>().prepare (lstmDelaySamples);
     model.reset();
-    model.template get<0>().reset (lstmDelaySamples);
+
+    gainCorrection = Decibels::decibelsToGain (-3.0f * std::log2 (sampleRate / targetSampleRate));
 }
 
 template <int hiddenSize, typename ResamplerType>

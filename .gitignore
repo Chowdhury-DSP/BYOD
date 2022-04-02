@@ -20,3 +20,4 @@ bin/
 # audio files
 sim/**/*.wav
 *.asd
+*.mp4

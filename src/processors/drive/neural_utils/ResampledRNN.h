@@ -38,6 +38,8 @@ public:
 
         if (needsResampling)
             resampler.processOut (processBlock, block);
+
+        block *= gainCorrection;
     }
 
 private:
@@ -49,6 +51,7 @@ private:
 
     double targetSampleRate = 48000.0;
     bool needsResampling = true;
+    float gainCorrection = 1.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResampledRNN)
 };

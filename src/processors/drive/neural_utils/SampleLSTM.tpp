@@ -44,16 +44,26 @@ SampleLSTM<T, in_sizet, out_sizet>::SampleLSTM()
             Wc[i][k] = v_type ((T) 0);
         }
     }
+}
+
+template <typename T, int in_sizet, int out_sizet>
+void SampleLSTM<T, in_sizet, out_sizet>::prepare (int delaySamples)
+{
+    delayWriteIdx = delaySamples - 1;
+    ct_internal.resize (delayWriteIdx + 1, {});
+    outs_internal.resize (delayWriteIdx + 1, {});
 
     reset();
 }
 
 template <typename T, int in_sizet, int out_sizet>
-void SampleLSTM<T, in_sizet, out_sizet>::reset (int delaySamples)
+void SampleLSTM<T, in_sizet, out_sizet>::reset()
 {
-    delayWriteIdx = delaySamples - 1;
-    ct_internal.resize (delayWriteIdx + 1, {});
-    outs_internal.resize (delayWriteIdx + 1, {});
+    for (auto& vec : ct_internal)
+        std::fill (vec.begin(), vec.end(), v_type{});
+
+    for (auto& vec : outs_internal)
+        std::fill (vec.begin(), vec.end(), v_type{});
 
     // reset output state
     for (int i = 0; i < v_out_size; ++i)
