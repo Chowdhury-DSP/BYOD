@@ -29,7 +29,7 @@ public:
         if (start < 1.0e-10f)
             return;
 
-        expectLessThan (steadyState, 1.0e-6f, "Steady state level is too large!");
+        expectLessThan (steadyState, 1.0e-5f, "Steady state level is too large!");
         expectLessThan (start, steadyState * 20.0f, "DC offset present at beginning of signal!");
     }
 

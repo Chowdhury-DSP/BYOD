@@ -36,7 +36,7 @@ void MetalFace::prepare (double sampleRate, int samplesPerBlock)
 
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 10000; i += samplesPerBlock)
+    for (int i = 0; i < 5000; i += samplesPerBlock)
     {
         buffer.clear();
         processAudio (buffer);
