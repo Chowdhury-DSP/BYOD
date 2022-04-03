@@ -67,7 +67,7 @@ void ResampledRNN<hiddenSize, ResamplerType>::prepare (double sampleRate, int sa
     model.template get<0>().prepare (lstmDelaySamples);
     model.reset();
 
-    gainCorrection = Decibels::decibelsToGain (-3.0f * std::log2 (sampleRate / targetSampleRate));
+    gainCorrection = Decibels::decibelsToGain (-3.0f * (float) std::log2 (sampleRate / targetSampleRate));
 }
 
 template <int hiddenSize, typename ResamplerType>
