@@ -13,7 +13,6 @@ public:
 
     void presetListUpdated() final;
     int createPresetsMenu (int optionID) override;
-    int addPresetOptions (int optionID) override;
 
 #if BYOD_BUILD_PRESET_SERVER
     int addPresetServerMenuOptions (int optionID);

@@ -10,7 +10,7 @@ const String dryWetTag = "dry_wet";
 } // namespace
 
 ChainIOProcessor::ChainIOProcessor (AudioProcessorValueTreeState& vts, std::function<void (int)>&& latencyChangedCallback) : latencyChangedCallbackFunc (std::move (latencyChangedCallback)),
-                                                                                                                             oversampling (vts, 2, true)
+                                                                                                                             oversampling (vts, true)
 {
     monoModeParam = vts.getRawParameterValue (monoModeTag);
     inGainParam = vts.getRawParameterValue (inGainTag);
@@ -38,7 +38,7 @@ void ChainIOProcessor::createParameters (Parameters& params)
 
 void ChainIOProcessor::prepare (double sampleRate, int samplesPerBlock)
 {
-    oversampling.prepareToPlay (sampleRate, samplesPerBlock);
+    oversampling.prepareToPlay (sampleRate, samplesPerBlock, 2);
 
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
     for (auto* gain : { &inGain, &outGain })
@@ -50,10 +50,15 @@ void ChainIOProcessor::prepare (double sampleRate, int samplesPerBlock)
     ioBuffer.setSize (2, samplesPerBlock);
     dryWetMixer.prepare (spec);
     latencyChangedCallbackFunc ((int) oversampling.getLatencySamples());
+
+    isPrepared = true;
 }
 
 int ChainIOProcessor::getOversamplingFactor() const
 {
+    if (! isPrepared)
+        return 1;
+    
     return oversampling.getOSFactor();
 }
 
