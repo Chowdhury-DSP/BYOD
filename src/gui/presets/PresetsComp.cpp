@@ -46,7 +46,7 @@ void PresetsComp::presetListUpdated()
 #if BYOD_BUILD_PRESET_SERVER
     addPresetServerMenuOptions (optionID);
 #endif
-    
+
     updatePresetBoxText();
 }
 

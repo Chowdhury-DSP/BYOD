@@ -58,7 +58,7 @@ int ChainIOProcessor::getOversamplingFactor() const
 {
     if (! isPrepared)
         return 1;
-    
+
     return oversampling.getOSFactor();
 }
 

@@ -19,7 +19,6 @@ public:
 #endif
 
 private:
-
     int addBasicPresetOptions (PopupMenu* menu, int optionID);
     int addPresetShareOptions (PopupMenu* menu, int optionID);
     int addCustomPresetFolderOptions (PopupMenu* menu, int optionID);
