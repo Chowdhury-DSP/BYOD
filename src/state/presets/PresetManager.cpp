@@ -21,6 +21,41 @@ void showFailureMessage (const String& title, const String& message)
 }
 } // namespace
 
+class ChangePresetAction : public UndoableAction
+{
+public:
+    explicit ChangePresetAction (PresetManager& mgr) : manager (mgr) {}
+
+    bool perform() override
+    {
+        if (keepAlivePreset != nullptr)
+        {
+            std::swap (manager.currentPreset, keepAlivePreset);
+
+            const auto swapDirty = manager.getIsDirty();
+            manager.setIsDirty (presetWasDirty);
+            presetWasDirty = swapDirty;
+
+            manager.listeners.call (&chowdsp::PresetManager::Listener::selectedPresetChanged);
+            return true;
+        }
+
+        keepAlivePreset = manager.getCurrentPreset();
+        presetWasDirty = manager.getIsDirty();
+        return keepAlivePreset != nullptr;
+    }
+
+    bool undo() override { return perform(); }
+    int getSizeInUnits() override { return (int) sizeof (*this); }
+
+private:
+    PresetManager& manager;
+    const chowdsp::Preset* keepAlivePreset = nullptr;
+    bool presetWasDirty = false;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChangePresetAction)
+};
+
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
                                                                                               procChain (chain)
 {
@@ -190,7 +225,14 @@ std::unique_ptr<XmlElement> PresetManager::savePresetState()
 
 void PresetManager::loadPresetState (const XmlElement* xml)
 {
-    Logger::writeToLog ("Loading preset: " + getCurrentPreset()->getName());
+    if (auto* curPreset = getCurrentPreset())
+        Logger::writeToLog ("Loading preset: " + curPreset->getName());
+
+    if (auto* um = vts.undoManager)
+    {
+        um->beginNewTransaction();
+        um->perform (new ChangePresetAction (*this));
+    }
 
     procChain->getStateHelper().loadProcChain (xml, true);
 }

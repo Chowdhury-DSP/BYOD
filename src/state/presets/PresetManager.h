@@ -64,5 +64,7 @@ private:
     PresetUpdateList serverSyncUpdatePresetsList;
 #endif
 
+    friend class ChangePresetAction;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetManager)
 };

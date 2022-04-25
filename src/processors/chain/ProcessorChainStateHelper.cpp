@@ -106,7 +106,8 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
 
 void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bool loadingPreset)
 {
-    um->beginNewTransaction();
+    if (! loadingPreset)
+        um->beginNewTransaction();
 
     while (! chain.procs.isEmpty())
         um->perform (new AddOrRemoveProcessor (chain, chain.procs.getLast()));
