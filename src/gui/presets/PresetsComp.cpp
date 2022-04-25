@@ -40,7 +40,7 @@ void PresetsComp::presetListUpdated()
     menu->addSeparator();
 
 #if ! JUCE_IOS
-    optionID = addPresetFolderOptions (menu, optionID);
+    optionID = addCustomPresetFolderOptions (menu, optionID);
 #endif
 
 #if BYOD_BUILD_PRESET_SERVER
@@ -140,21 +140,6 @@ int PresetsComp::createPresetsMenu (int optionID)
 
         presetBox.getRootMenu()->addSubMenu (vendorName, vendorMenu);
     }
-
-    return optionID;
-}
-
-template <typename ActionType>
-int PresetsComp::addPresetMenuItem (PopupMenu* menu, int optionID, const String& itemText, ActionType&& action)
-{
-    juce::PopupMenu::Item item { itemText };
-    item.itemID = ++optionID;
-    item.action = [&, forwardedAction = std::forward<ActionType> (action)]
-    {
-        updatePresetBoxText();
-        forwardedAction();
-    };
-    menu->addItem (item);
 
     return optionID;
 }
@@ -259,7 +244,7 @@ int PresetsComp::addPresetShareOptions (PopupMenu* menu, int optionID)
 #endif
 }
 
-int PresetsComp::addPresetFolderOptions (PopupMenu* menu, int optionID)
+int PresetsComp::addCustomPresetFolderOptions (PopupMenu* menu, int optionID)
 {
     if (manager.getUserPresetPath().isDirectory())
     {
