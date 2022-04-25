@@ -26,15 +26,28 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
 
 void PresetsComp::presetListUpdated()
 {
-    presetBox.getRootMenu()->clear();
+    auto* menu = presetBox.getRootMenu();
+    menu->clear();
 
     int optionID = 0;
     optionID = createPresetsMenu (optionID);
-    optionID = addPresetOptions (optionID);
+    menu->addSeparator();
+
+    optionID = addBasicPresetOptions (menu, optionID);
+    menu->addSeparator();
+
+    optionID = addPresetShareOptions (menu, optionID);
+    menu->addSeparator();
+
+#if ! JUCE_IOS
+    optionID = addCustomPresetFolderOptions (menu, optionID);
+#endif
 
 #if BYOD_BUILD_PRESET_SERVER
     addPresetServerMenuOptions (optionID);
 #endif
+    
+    updatePresetBoxText();
 }
 
 #if BYOD_BUILD_PRESET_SERVER
@@ -127,21 +140,6 @@ int PresetsComp::createPresetsMenu (int optionID)
 
         presetBox.getRootMenu()->addSubMenu (vendorName, vendorMenu);
     }
-
-    return optionID;
-}
-
-template <typename ActionType>
-int PresetsComp::addPresetMenuItem (PopupMenu* menu, int optionID, const String& itemText, ActionType&& action)
-{
-    juce::PopupMenu::Item item { itemText };
-    item.itemID = ++optionID;
-    item.action = [&, forwardedAction = std::forward<ActionType> (action)]
-    {
-        updatePresetBoxText();
-        forwardedAction();
-    };
-    menu->addItem (item);
 
     return optionID;
 }
@@ -246,7 +244,7 @@ int PresetsComp::addPresetShareOptions (PopupMenu* menu, int optionID)
 #endif
 }
 
-int PresetsComp::addPresetFolderOptions (PopupMenu* menu, int optionID)
+int PresetsComp::addCustomPresetFolderOptions (PopupMenu* menu, int optionID)
 {
     if (manager.getUserPresetPath().isDirectory())
     {
@@ -256,24 +254,6 @@ int PresetsComp::addPresetFolderOptions (PopupMenu* menu, int optionID)
 
     return addPresetMenuItem (menu, optionID, "Choose Preset Folder...", [&]
                               { chooseUserPresetFolder ({}); });
-}
-
-int PresetsComp::addPresetOptions (int optionID)
-{
-    auto menu = presetBox.getRootMenu();
-    menu->addSeparator();
-
-    optionID = addBasicPresetOptions (menu, optionID);
-    menu->addSeparator();
-
-    optionID = addPresetShareOptions (menu, optionID);
-    menu->addSeparator();
-
-#if ! JUCE_IOS
-    optionID = addPresetFolderOptions (menu, optionID);
-#endif
-
-    return optionID;
 }
 
 void PresetsComp::loadFromFileBrowser()

@@ -35,5 +35,7 @@ private:
     std::atomic<float>* dryWetParam = nullptr;
     DryWetProcessor dryWetMixer;
 
+    bool isPrepared = false;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChainIOProcessor)
 };
