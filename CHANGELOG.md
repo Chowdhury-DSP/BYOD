@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Improved neural network-based modules sound quality at different sample rates.
+- Fixed undo/redo not restoring preset name.
+
 ## [1.0.1] 2022-03-15
 - Changed UI rendering to use OpenGL by default on Windows/Linux, unless OpenGL 2.0+ is not available on the host system.
 - Fixed YenDrive giving NaN output when Gain parameter set to zero.
