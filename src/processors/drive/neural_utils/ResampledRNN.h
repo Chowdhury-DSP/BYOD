@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SampleLSTM.h"
 #include "SampleGRU.h"
+#include "SampleLSTM.h"
 
 template <int hiddenSize, typename RecurrentLayerType = SampleLSTM<float, 1, hiddenSize>, typename ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<>>
 class ResampledRNN

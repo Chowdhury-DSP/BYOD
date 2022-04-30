@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../../utility/DCBlocker.h"
-#include "GainStageProc.h"
 #include "GainStageML.h"
+#include "GainStageProc.h"
 #include "InputBufferProcessor.h"
 #include "OutputStageProcessor.h"
 

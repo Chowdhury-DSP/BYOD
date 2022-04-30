@@ -105,16 +105,16 @@ private:
 
     static inline void recurrent_mat_mul (const v_type (&vec)[v_out_size], const v_type (&mat)[out_size][v_out_size], v_type (&out)[v_out_size]) noexcept
     {
-        for(int i = 0; i < v_out_size; ++i)
-            out[i] = v_type(0);
+        for (int i = 0; i < v_out_size; ++i)
+            out[i] = v_type (0);
 
-        T scalar_in alignas(RTNEURAL_DEFAULT_ALIGNMENT)[v_size] { (T)0 };
-        for(int k = 0; k < v_out_size; ++k)
+        T scalar_in alignas (RTNEURAL_DEFAULT_ALIGNMENT)[v_size] { (T) 0 };
+        for (int k = 0; k < v_out_size; ++k)
         {
-            vec[k].store_aligned(scalar_in);
-            for(int i = 0; i < v_out_size; ++i)
+            vec[k].store_aligned (scalar_in);
+            for (int i = 0; i < v_out_size; ++i)
             {
-                for(int j = 0; j < v_size; ++j)
+                for (int j = 0; j < v_size; ++j)
                     out[i] += scalar_in[j] * mat[k * v_size + j][i];
             }
         }
