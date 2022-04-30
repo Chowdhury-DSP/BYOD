@@ -34,15 +34,6 @@ SampleLSTM<T, in_sizet, out_sizet>::SampleLSTM()
             Uo[i][k] = v_type ((T) 0);
             Uc[i][k] = v_type ((T) 0);
         }
-
-        // kernel weights
-        for (int k = 0; k < v_in_size; ++k)
-        {
-            Wf[i][k] = v_type ((T) 0);
-            Wi[i][k] = v_type ((T) 0);
-            Wo[i][k] = v_type ((T) 0);
-            Wc[i][k] = v_type ((T) 0);
-        }
     }
 }
 
@@ -76,17 +67,6 @@ void SampleLSTM<T, in_sizet, out_sizet>::reset()
 template <typename T, int in_sizet, int out_sizet>
 void SampleLSTM<T, in_sizet, out_sizet>::setWVals (const std::vector<std::vector<T>>& wVals)
 {
-    for (int i = 0; i < in_size; ++i)
-    {
-        for (int j = 0; j < out_size; ++j)
-        {
-            Wi[j][i / v_size] = RTNeural::set_value (Wi[j][i / v_size], i % v_size, wVals[i][j]);
-            Wf[j][i / v_size] = RTNeural::set_value (Wf[j][i / v_size], i % v_size, wVals[i][j + out_size]);
-            Wc[j][i / v_size] = RTNeural::set_value (Wc[j][i / v_size], i % v_size, wVals[i][j + 2 * out_size]);
-            Wo[j][i / v_size] = RTNeural::set_value (Wo[j][i / v_size], i % v_size, wVals[i][j + 3 * out_size]);
-        }
-    }
-
     for (int j = 0; j < out_size; ++j)
     {
         Wi_1[j / v_size] = RTNeural::set_value (Wi_1[j / v_size], j % v_size, wVals[0][j]);
@@ -101,12 +81,12 @@ void SampleLSTM<T, in_sizet, out_sizet>::setUVals (const std::vector<std::vector
 {
     for (int i = 0; i < out_size; ++i)
     {
-        for (int j = 0; j < out_size; ++j)
+        for (int k = 0; k < out_size; ++k)
         {
-            Ui[j][i / v_size] = RTNeural::set_value (Ui[j][i / v_size], i % v_size, uVals[i][j]);
-            Uf[j][i / v_size] = RTNeural::set_value (Uf[j][i / v_size], i % v_size, uVals[i][j + out_size]);
-            Uc[j][i / v_size] = RTNeural::set_value (Uc[j][i / v_size], i % v_size, uVals[i][j + 2 * out_size]);
-            Uo[j][i / v_size] = RTNeural::set_value (Uo[j][i / v_size], i % v_size, uVals[i][j + 3 * out_size]);
+            Ui[k][i / v_size] = RTNeural::set_value (Ui[k][i / v_size], i % v_size, uVals[k][i]);
+            Uf[k][i / v_size] = RTNeural::set_value (Uf[k][i / v_size], i % v_size, uVals[k][i + out_size]);
+            Uc[k][i / v_size] = RTNeural::set_value (Uc[k][i / v_size], i % v_size, uVals[k][i + 2 * out_size]);
+            Uo[k][i / v_size] = RTNeural::set_value (Uo[k][i / v_size], i % v_size, uVals[k][i + 3 * out_size]);
         }
     }
 }

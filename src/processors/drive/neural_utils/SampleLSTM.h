@@ -5,6 +5,8 @@
 /**
  * Modification of RTNeural::LSTMLayerT to use a variable recurrent delay
  * instead of the standard 1-sample recurrent delay.
+ *
+ * N.B: Right now this class is specialized for in_sizet = 1.
  */
 template <typename T, int in_sizet, int out_sizet>
 class SampleLSTM
@@ -17,6 +19,8 @@ class SampleLSTM
 public:
     static constexpr auto in_size = in_sizet;
     static constexpr auto out_size = out_sizet;
+
+    static_assert (in_size == 1, "SampleLSTM is currently only implemented for 1-input case!");
 
     SampleLSTM();
 
@@ -101,31 +105,25 @@ private:
 
     static inline void recurrent_mat_mul (const v_type (&vec)[v_out_size], const v_type (&mat)[out_size][v_out_size], v_type (&out)[v_out_size]) noexcept
     {
-        T sums alignas (RTNEURAL_DEFAULT_ALIGNMENT)[out_size] { (T) 0 };
-        for (int i = 0; i < v_size; ++i)
+        for(int i = 0; i < v_out_size; ++i)
+            out[i] = v_type(0);
+
+        T scalar_in alignas(RTNEURAL_DEFAULT_ALIGNMENT)[v_size] { (T)0 };
+        for(int k = 0; k < v_out_size; ++k)
         {
-            for (int j = 0; j < v_out_size; ++j)
+            vec[k].store_aligned(scalar_in);
+            for(int i = 0; i < v_out_size; ++i)
             {
-                for (int k = 0; k < v_out_size; ++k)
-                    sums[i + j * v_size] += xsimd::hadd (mat[i + j * v_size][k] * vec[k]);
+                for(int j = 0; j < v_size; ++j)
+                    out[i] += scalar_in[j] * mat[k * v_size + j][i];
             }
         }
-
-        for (int i = 0; i < v_out_size; ++i)
-            out[i] = xsimd::load_aligned (sums + i * v_size);
     }
 
     static inline v_type sigmoid (v_type x) noexcept
     {
         return (T) 1.0 / ((T) 1.0 + xsimd::exp (-x));
     }
-
-    // kernel weights
-    v_type Wf[out_size][v_in_size];
-    v_type Wi[out_size][v_in_size];
-    v_type Wo[out_size][v_in_size];
-    v_type Wc[out_size][v_in_size];
-    v_type kernel_outs[v_out_size];
 
     // single-input kernel weights
     v_type Wf_1[v_out_size];

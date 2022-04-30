@@ -1,8 +1,9 @@
 #pragma once
 
 #include "SampleLSTM.h"
+#include "SampleGRU.h"
 
-template <int hiddenSize, typename ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<>>
+template <int hiddenSize, typename RecurrentLayerType = SampleLSTM<float, 1, hiddenSize>, typename ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<>>
 class ResampledRNN
 {
 public:
@@ -43,7 +44,6 @@ public:
     }
 
 private:
-    using RecurrentLayerType = SampleLSTM<float, 1, hiddenSize>;
     using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
     RTNeural::ModelT<float, 1, 1, RecurrentLayerType, DenseLayerType> model;
 
