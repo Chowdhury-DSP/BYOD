@@ -20,7 +20,13 @@ jobs:
     strategy:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
-        os: [ubuntu-latest, windows-2019, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            cmake_args: "-DBYOD_BUILD_CLAP=1"
+          - os: windows-2019
+            cmake_args: "-DBYOD_BUILD_CLAP=1"
+          - os: macos-latest
+            cmake_args: "-DCMAKE_BUILD_TYPE=Release -DBYOD_BUILD_CLAP=1"
     
     steps:
     - name: Install Linux Deps
@@ -41,7 +47,9 @@ jobs:
 
     - name: Configure
       shell: bash
-      run: cmake -Bbuild -DCMAKE_BUILD_TYPE=Release -DBYOD_BUILD_CLAP=1
+      env:
+        CMAKE_ARGS: ${{ matrix.cmake_args }}
+      run: cmake -Bbuild $CMAKE_ARGS
 
     - name: Build
       shell: bash
