@@ -30,7 +30,7 @@ public:
             return;
 
         expectLessThan (steadyState, 1.0e-5f, "Steady state level is too large!");
-        expectLessThan (start, steadyState * 20.0f, "DC offset present at beginning of signal!");
+        expectLessThan (start, steadyState * 100.0f, "DC offset present at beginning of signal!");
     }
 
     void runTest() override
