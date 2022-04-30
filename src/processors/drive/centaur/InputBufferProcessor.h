@@ -10,7 +10,7 @@ public:
 
     void prepare (float sampleRate);
     void calcCoefs();
-    void processBlock (float* buffer, const int numSamples) noexcept override;
+    void processBlock (float* buffer, const int numSamples) noexcept;
 
 private:
     float fs = 44100.0f;

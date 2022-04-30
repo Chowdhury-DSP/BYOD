@@ -19,7 +19,7 @@ auto transpose = [] (const Vec2d& x) -> Vec2d
 };
 
 template <typename ModelType>
-void loadModel (ModelType& model, int hiddenSize, const nlohmann::json& weights_json)
+void loadLSTMModel (ModelType& model, int hiddenSize, const nlohmann::json& weights_json)
 {
     auto& lstm = model.template get<0>();
     auto& dense = model.template get<1>();
@@ -42,41 +42,61 @@ void loadModel (ModelType& model, int hiddenSize, const nlohmann::json& weights_
     std::vector<float> dense_bias = weights_json["/state_dict/lin.bias"_json_pointer];
     dense.setBias (dense_bias.data());
 }
+
+template <typename ModelType>
+void loadGRUModel (ModelType& model, const nlohmann::json& weights_json)
+{
+    auto json_layers = weights_json["layers"];
+    const auto gru_layer_json = json_layers.at (0);
+    const auto dense_layer_json = json_layers.at (1);
+
+    auto& gru = model.template get<0>();
+    auto& dense = model.template get<1>();
+
+    int layer_idx = 0;
+    const auto& gru_weights = gru_layer_json["weights"];
+    RTNeural::json_parser::loadGRU<float> (gru, gru_weights);
+    RTNeural::modelt_detail::loadLayer<float> (dense, layer_idx, dense_layer_json, "dense", 1, false);
+}
 } // namespace
 
-template <int hiddenSize, typename ResamplerType>
-void ResampledRNN<hiddenSize, ResamplerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
+template <int hiddenSize, typename RecurrentLayerType, typename ResamplerType>
+void ResampledRNN<hiddenSize, RecurrentLayerType, ResamplerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
 {
     targetSampleRate = modelSampleRate;
 
     MemoryInputStream jsonInputStream (modelData, (size_t) modelDataSize, false);
     auto weightsJson = nlohmann::json::parse (jsonInputStream.readEntireStreamAsString().toStdString());
 
-    loadModel (model, hiddenSize, weightsJson);
+    if constexpr (std::is_same_v<RecurrentLayerType, SampleGRU<float, 1, 8>>) // Centaur model has keras-style weights
+        loadGRUModel (model, weightsJson);
+    else
+        loadLSTMModel (model, hiddenSize, weightsJson);
 }
 
-template <int hiddenSize, typename ResamplerType>
-void ResampledRNN<hiddenSize, ResamplerType>::prepare (double sampleRate, int samplesPerBlock)
+template <int hiddenSize, typename RecurrentLayerType, typename ResamplerType>
+void ResampledRNN<hiddenSize, RecurrentLayerType, ResamplerType>::prepare (double sampleRate, int samplesPerBlock)
 {
-    const auto lstmDelaySamples = (int) std::ceil (sampleRate / targetSampleRate);
-    auto targetSampleRateToUse = targetSampleRate * lstmDelaySamples;
+    const auto rnnDelaySamples = (int) std::ceil (sampleRate / targetSampleRate);
+    auto targetSampleRateToUse = targetSampleRate * rnnDelaySamples;
 
     needsResampling = sampleRate != targetSampleRateToUse;
     resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, targetSampleRateToUse);
 
-    model.template get<0>().prepare (lstmDelaySamples);
+    model.template get<0>().prepare (rnnDelaySamples);
     model.reset();
 
     gainCorrection = Decibels::decibelsToGain (-3.0f * (float) std::log2 (sampleRate / targetSampleRate));
 }
 
-template <int hiddenSize, typename ResamplerType>
-void ResampledRNN<hiddenSize, ResamplerType>::reset()
+template <int hiddenSize, typename RecurrentLayerType, typename ResamplerType>
+void ResampledRNN<hiddenSize, RecurrentLayerType, ResamplerType>::reset()
 {
     resampler.reset();
     model.reset();
 }
 
 //=======================================================
-template class ResampledRNN<20, chowdsp::ResamplingTypes::LanczosResampler<>>; // GuitarML
-template class ResampledRNN<28, chowdsp::ResamplingTypes::LanczosResampler<>>; // MetalFace
+template class ResampledRNN<20, SampleLSTM<float, 1, 20>, chowdsp::ResamplingTypes::LanczosResampler<>>; // GuitarML
+template class ResampledRNN<28, SampleLSTM<float, 1, 28>, chowdsp::ResamplingTypes::LanczosResampler<>>; // MetalFace
+template class ResampledRNN<8, SampleGRU<float, 1, 8>, chowdsp::ResamplingTypes::LanczosResampler<>>; // Centaur

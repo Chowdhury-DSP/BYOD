@@ -52,7 +52,7 @@ public:
         chowdsp::Bilinear::BilinearTransform<float, 3>::call (b, a, bs, as, K);
     }
 
-    void processBlock (float* block, const int numSamples) noexcept override
+    void processBlock (float* block, const int numSamples) noexcept
     {
         if (r10bSmooth.isSmoothing())
         {

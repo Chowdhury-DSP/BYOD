@@ -2,6 +2,7 @@
 
 #include "../../utility/DCBlocker.h"
 #include "GainStageProc.h"
+#include "GainStageML.h"
 #include "InputBufferProcessor.h"
 #include "OutputStageProcessor.h"
 
@@ -16,14 +17,23 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
+    void addToPopupMenu (PopupMenu& menu) override;
+
 private:
     std::atomic<float>* levelParam = nullptr;
+    std::atomic<float>* modeParam = nullptr;
 
     InputBufferProcessor inProc[2];
     OutputStageProc outProc[2];
     std::unique_ptr<GainStageProc> gainStageProc;
+    GainStageML gainStageML;
+
+    bool useMLPrev = false;
+    AudioBuffer<float> fadeBuffer;
 
     DCBlocker dcBlocker;
+
+    std::unique_ptr<ParameterAttachment> modeAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Centaur)
 };
