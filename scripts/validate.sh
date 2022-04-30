@@ -33,7 +33,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]; then
     # declare -a plugins=()
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     pluginval=$(install_pluginval_mac)
-    declare -a plugins=("build/BYOD_artefacts/VST3/BYOD.vst3")
+    declare -a plugins=("build/BYOD_artefacts/Release/VST3/BYOD.vst3")
 else
     pluginval=$(install_pluginval_win)
     declare -a plugins=("build/BYOD_artefacts/Release/VST3/BYOD.vst3")

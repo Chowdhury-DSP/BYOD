@@ -52,6 +52,7 @@ target_sources(BYOD PRIVATE
     processors/drive/big_muff/BigMuffClippingStage.cpp
     processors/drive/centaur/Centaur.cpp
     processors/drive/centaur/FeedForward2.cpp
+    processors/drive/centaur/GainStageML.cpp
     processors/drive/centaur/GainStageProc.cpp
     processors/drive/centaur/InputBufferProcessor.cpp
     processors/drive/centaur/OutputStageProcessor.cpp
