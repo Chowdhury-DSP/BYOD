@@ -120,18 +120,18 @@ void Centaur::addToPopupMenu (PopupMenu& menu)
     modeAttach = std::make_unique<ParameterAttachment> (
         *modeChoiceParam, [=] (float) {}, vts.undoManager);
 
-    for (const auto [index, delayTypeChoice] : sst::cpputils::enumerate (modeChoiceParam->choices))
+    for (const auto [index, modeChoice] : sst::cpputils::enumerate (modeChoiceParam->choices))
     {
-        PopupMenu::Item delayTypeItem;
-        delayTypeItem.itemID = ++itemID;
-        delayTypeItem.text = delayTypeChoice;
-        delayTypeItem.action = [&, newParamVal = modeChoiceParam->convertTo0to1 ((float) index)]
+        PopupMenu::Item modeItem;
+        modeItem.itemID = ++itemID;
+        modeItem.text = modeChoice;
+        modeItem.action = [&, newParamVal = modeChoiceParam->convertTo0to1 ((float) index)]
         {
             modeAttach->setValueAsCompleteGesture (newParamVal);
         };
-        delayTypeItem.colour = (modeChoiceParam->getIndex() == (int) index) ? uiOptions.powerColour : Colours::white;
+        modeItem.colour = (modeChoiceParam->getIndex() == (int) index) ? uiOptions.powerColour : Colours::white;
 
-        menu.addItem (delayTypeItem);
+        menu.addItem (modeItem);
     }
 
     menu.addSeparator();
