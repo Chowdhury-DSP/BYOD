@@ -3,7 +3,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
-- Improved neural network-based modules sound quality at different sample rates.
+- Added "Neural" mode to Centaur module
+- Improved neural network-based modules performance and sound quality at different sample rates.
 - Fixed undo/redo not restoring preset name.
 
 ## [1.0.1] 2022-03-15
