@@ -3,6 +3,7 @@
 
 namespace
 {
+// Component values taken from this blog post: https://www.coda-effects.com/p/big-muff-tonestack-dealing-with-mids.html
 const std::array<BigMuffTone::Components, 10> componentSets {
     BigMuffTone::Components { .name = "Triangle", .R8 = 22.0e3f, .C8 = 10.0e-9f, .C9 = 4.0e-9f, .R5 = 22.0e3f },
     BigMuffTone::Components { .name = "Ram's Head '73", .R8 = 33.0e3f, .C8 = 10.0e-9f, .C9 = 4.0e-9f, .R5 = 33.0e3f },
