@@ -16,9 +16,9 @@
 #endif
 
 // Any other widely used headers that don't change...
-#include <chowdsp_wdf/chowdsp_wdf.h>
 #include <Eigen/Dense>
 #include <RTNeural/RTNeural.h>
+#include <chowdsp_wdf/chowdsp_wdf.h>
 #include <magic_enum.hpp>
 #include <rapidfuzz/fuzz.hpp>
 #include <sst/cpputils.h>
