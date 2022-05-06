@@ -47,6 +47,15 @@ constexpr inline int sign (double x)
     return int (x > 0.0) - int (x < 0.0);
 }
 
+/** Signum function to determine the sign of the input. */
+template <typename T>
+inline juce::dsp::SIMDRegister<T> signumSIMD (juce::dsp::SIMDRegister<T> val)
+{
+    auto positive = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (juce::dsp::SIMDRegister<T> ((T) 0), val);
+    auto negative = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (val, juce::dsp::SIMDRegister<T> ((T) 0));
+    return positive - negative;
+}
+
 /** Langevin function */
 template <typename Float, typename Bool>
 static inline Float langevin (Float x, Float coth, Bool nearZero) noexcept
@@ -112,7 +121,7 @@ static inline Float hysteresisFunc (Float M, Float H, Float H_d, HysteresisState
 
 #if HYSTERESIS_USE_SIMD
     const auto delta = ((Float) 1.0 & Float::greaterThanOrEqual (H_d, (Float) 0.0)) - ((Float) 1.0 & Float::lessThan (H_d, (Float) 0.0));
-    const auto delta_M = Float::equal (chowdsp::signumSIMD (delta), chowdsp::signumSIMD (hp.M_diff));
+    const auto delta_M = Float::equal (signumSIMD (delta), signumSIMD (hp.M_diff));
     hp.kap1 = (Float) hp.nc & delta_M;
 #else
     const auto delta = (Float) ((H_d >= 0.0) - (H_d < 0.0));

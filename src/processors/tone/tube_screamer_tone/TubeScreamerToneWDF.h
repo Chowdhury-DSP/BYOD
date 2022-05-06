@@ -19,7 +19,7 @@ public:
     void setParams (float toneParam)
     {
         toneParam = toneParam * 2.0f - 1.0f;
-        auto toneSkew = (float) chowdsp::signum (toneParam) * std::pow (std::abs (toneParam), 0.35f);
+        auto toneSkew = (float) chowdsp::signum::signum (toneParam) * std::pow (std::abs (toneParam), 0.35f);
         toneSkew = jlimit (0.01f, 0.99f, (toneSkew + 1.0f) * 0.5f);
 
         P2_high.setResistanceValue ((1.0f - toneSkew) * P2val);
