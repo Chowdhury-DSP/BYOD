@@ -5,7 +5,7 @@
 
 namespace GainStageSpace
 {
-using namespace chowdsp::WDFT;
+using namespace chowdsp::wdft;
 
 class FeedForward2WDF
 {

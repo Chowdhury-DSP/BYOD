@@ -16,7 +16,7 @@ const std::array<BigMuffTone::Components, 10> componentSets {
     BigMuffTone::Components { .name = "Flat Mids", .R8 = 39.0e3f, .C8 = 10.0e-9f, .C9 = 10.0e-9f, .R5 = 22.0e3f },
     BigMuffTone::Components { .name = "Bump Mids", .R8 = 39.0e3f, .C8 = 5.6e-9f, .C9 = 10.0e-9f, .R5 = 22.0e3f },
 };
-}
+} // namespace
 
 BigMuffTone::BigMuffTone (UndoManager* um) : BaseProcessor ("Muff Tone", createParameterLayout(), um),
                                              comps (&componentSets[2])

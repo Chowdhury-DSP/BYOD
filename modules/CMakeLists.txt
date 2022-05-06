@@ -7,6 +7,7 @@ message(STATUS "VERSION for JUCE: ${juce_version}")
 juce_add_modules(foleys_gui_magic)
 add_subdirectory(chowdsp_utils)
 juce_add_modules(chowdsp_juce_dsp)
+add_subdirectory(chowdsp_wdf)
 
 if(BYOD_BUILD_CLAP AND NOT IOS)
     add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
@@ -32,6 +33,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp_dsp
         chowdsp_gui
         chowdsp_plugin_utils
+        chowdsp_wdf
         foleys_gui_magic
         RTNeural
         rapidfuzz::rapidfuzz
