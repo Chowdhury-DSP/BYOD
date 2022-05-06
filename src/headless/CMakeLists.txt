@@ -29,12 +29,13 @@ target_precompile_headers(BYOD_headless PRIVATE ../pch.h)
 get_target_property(juce_includes juce_plugin_modules INCLUDE_DIRECTORIES)
 target_include_directories(BYOD_headless
     PRIVATE
-    ../
-    ../../modules
-    ../../modules/RTNeural
-    ../../modules/chowdsp_utils/modules
-    ../../modules/JUCE/modules
-    ${juce_includes}
+        ../
+        ../../modules
+        ../../modules/RTNeural
+        ../../modules/chowdsp_utils/modules
+        ../../modules/JUCE/modules
+        ../../modules/chowdsp_wdf/include
+        ${juce_includes}
 )
 
 target_link_libraries(BYOD_headless PUBLIC
