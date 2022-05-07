@@ -39,7 +39,7 @@ private:
 
     struct CleanDelayType
     {
-        void prepare (dsp::ProcessSpec& spec)
+        void prepare (const dsp::ProcessSpec& spec)
         {
             lpf.prepare (spec);
             delay.prepare (spec);
