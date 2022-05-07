@@ -1,13 +1,7 @@
 #include "ChainIOProcessor.h"
 #include "../ParameterHelpers.h"
 
-namespace
-{
-const String monoModeTag = "mono_mode";
-const String inGainTag = "in_gain";
-const String outGainTag = "out_gain";
-const String dryWetTag = "dry_wet";
-} // namespace
+using namespace GlobalParamTags;
 
 ChainIOProcessor::ChainIOProcessor (AudioProcessorValueTreeState& vts, std::function<void (int)>&& latencyChangedCallback) : latencyChangedCallbackFunc (std::move (latencyChangedCallback)),
                                                                                                                              oversampling (vts, true)

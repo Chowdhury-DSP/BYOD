@@ -1,6 +1,7 @@
 #include "SettingsButton.h"
 #include "SystemInfo.h"
-#include "gui/BoardViewport.h"
+#include "BYOD.h"
+#include "gui/pedalboard/BoardViewport.h"
 #include "processors/chain/ProcessorChainPortMagnitudesHelper.h"
 
 namespace
@@ -19,9 +20,7 @@ SettingsButton::SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper* og
     pluginSettings->addProperties ({ { openglID, shouldUseOpenGLByDefault } }, this);
     globalSettingChanged (openglID);
 
-    auto cog = Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize);
-    setImages (cog.get());
-
+    setImages (Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize).get());
     onClick = [=]
     { showSettingsMenu(); };
 }

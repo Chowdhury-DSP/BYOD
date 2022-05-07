@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utils/PowerButton.h"
+#include "PowerButton.h"
 #include "KnobsComponent.h"
 #include "Port.h"
 #include "processors/chain/ProcessorChain.h"
