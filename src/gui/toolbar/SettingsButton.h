@@ -1,7 +1,8 @@
 #pragma once
 
-#include "BYOD.h"
+#include <pch.h>
 
+class BYOD;
 class SettingsButton : public DrawableButton,
                        private chowdsp::GlobalPluginSettings::Listener
 {
@@ -29,30 +30,4 @@ private:
     static constexpr SettingID openglID = "use_opengl";
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsButton)
-};
-
-class SettingsButtonItem : public foleys::GuiItem
-{
-public:
-    FOLEYS_DECLARE_GUI_FACTORY (SettingsButtonItem)
-
-    SettingsButtonItem (foleys::MagicGUIBuilder& builder, const ValueTree& node) : foleys::GuiItem (builder, node)
-    {
-        auto* plugin = dynamic_cast<BYOD*> (builder.getMagicState().getProcessor());
-        button = std::make_unique<SettingsButton> (*plugin, plugin->getOpenGLHelper());
-
-        addAndMakeVisible (button.get());
-    }
-
-    void update() override {}
-
-    Component* getWrappedComponent() override
-    {
-        return button.get();
-    }
-
-private:
-    std::unique_ptr<SettingsButton> button;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsButtonItem)
 };

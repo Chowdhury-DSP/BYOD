@@ -2,6 +2,14 @@
 
 #include "DryWetProcessor.h"
 
+namespace GlobalParamTags
+{
+const String monoModeTag = "mono_mode";
+const String inGainTag = "in_gain";
+const String outGainTag = "out_gain";
+const String dryWetTag = "dry_wet";
+} // namespace GlobalParamTags
+
 class ChainIOProcessor
 {
 public:

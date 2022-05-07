@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../utils/PowerButton.h"
 #include "KnobsComponent.h"
 #include "Port.h"
+#include "PowerButton.h"
 #include "processors/chain/ProcessorChain.h"
 
 class ProcessorEditor : public Component

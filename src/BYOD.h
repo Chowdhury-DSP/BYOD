@@ -3,6 +3,7 @@
 #include "processors/ProcessorStore.h"
 #include "processors/chain/ProcessorChain.h"
 #include "state/ParamForwardManager.h"
+#include "state/StateManager.h"
 
 class BYOD : public chowdsp::PluginBase<BYOD>
 #if HAS_CLAP_JUCE_EXTENSIONS
@@ -30,6 +31,8 @@ public:
     auto& getOversampling() { return procs->getOversampling(); }
     auto& getLoadMeasurer() { return loadMeasurer; }
     auto* getOpenGLHelper() { return openGLHelper.get(); }
+    auto& getUndoManager() { return undoManager; }
+    auto& getStateManager() { return *stateManager; }
 
 private:
     void processBypassDelay (AudioBuffer<float>& buffer);
@@ -49,6 +52,8 @@ private:
     UndoManager undoManager { 500000 };
 
     AudioProcessLoadMeasurer loadMeasurer;
+
+    std::unique_ptr<StateManager> stateManager;
 
     std::unique_ptr<chowdsp::OpenGLHelper> openGLHelper = nullptr;
 
