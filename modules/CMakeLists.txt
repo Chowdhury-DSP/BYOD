@@ -4,7 +4,6 @@ subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
 
 # add custom JUCE modules
-juce_add_modules(foleys_gui_magic)
 add_subdirectory(chowdsp_utils)
 juce_add_modules(chowdsp_juce_dsp)
 add_subdirectory(chowdsp_wdf)
@@ -34,7 +33,6 @@ target_link_libraries(juce_plugin_modules
         chowdsp_gui
         chowdsp_plugin_utils
         chowdsp_wdf
-        foleys_gui_magic
         RTNeural
         rapidfuzz::rapidfuzz
     PUBLIC
@@ -54,6 +52,7 @@ target_compile_definitions(juce_plugin_modules
         JUCE_COREGRAPHICS_DRAW_ASYNC=1
         CHOWDSP_USE_XSIMD=1
         CHOWDSP_USE_CUSTOM_JUCE_DSP=1
+        CHOWDSP_USE_FOLEYS_CLASSES=0
         JucePlugin_Manufacturer="chowdsp"
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"

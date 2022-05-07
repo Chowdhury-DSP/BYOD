@@ -1,7 +1,4 @@
 set(binary_data_files
-    gui.xml
-    gui_ios.xml
-
     ui_assets/PowerButton.svg
     ui_assets/info.svg
     ui_assets/swap.svg

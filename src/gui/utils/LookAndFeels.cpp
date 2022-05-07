@@ -176,14 +176,19 @@ void ProcessorLNF::drawLabel (Graphics& g, Label& label)
 //==================================================================
 int BottomBarLNF::getNameWidth (int height, const String& text)
 {
-    Font f = Font ((float) height * heightFrac);
+    Font f = getFontForSliderHeight (height);
     return f.getStringWidth (text);
+}
+
+Font BottomBarLNF::getFontForSliderHeight (int height)
+{
+    return { jmin ((float) height * 0.5f, 19.0f) };
 }
 
 void BottomBarLNF::drawRotarySlider (Graphics& g, int, int, int, int height, float, const float, const float, Slider& slider)
 {
     g.setColour (Colours::white); // @TODO: make colour selectable
-    g.setFont (Font ((float) height * heightFrac).boldened());
+    g.setFont (getFontForSliderHeight (height).boldened());
 
     String text = slider.getName() + ": ";
     int width = getNameWidth (height, text);
@@ -205,18 +210,18 @@ Label* BottomBarLNF::createSliderTextBox (Slider& slider)
     label->setInterceptsMouseClicks (false, false);
     label->setColour (Label::outlineColourId, Colours::transparentBlack);
     label->setColour (Label::outlineWhenEditingColourId, Colours::transparentBlack);
-    label->setJustificationType (Justification::centred);
-    label->setFont (Font (16.0f).boldened());
+    label->setJustificationType (Justification::left);
+    label->setFont (getFontForSliderHeight (slider.getHeight()).boldened());
 
     label->onEditorShow = [label]
     {
-        if (auto editor = label->getCurrentTextEditor())
+        if (auto* editor = label->getCurrentTextEditor())
         {
             editor->setBounds (label->getLocalBounds());
             editor->setColour (CaretComponent::caretColourId, Colour (0xFFC954D4));
             editor->setColour (TextEditor::backgroundColourId, Colours::transparentBlack);
             editor->setJustification (Justification::left);
-            editor->applyFontToAllText (Font (14.0f).boldened());
+            editor->applyFontToAllText (getFontForSliderHeight (editor->getHeight()).boldened());
         }
     };
 

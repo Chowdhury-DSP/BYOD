@@ -3,7 +3,7 @@
 #include "InfoComponent.h"
 #include "cables/CableView.h"
 #include "editors/ProcessorEditor.h"
-#include "utils/LookAndFeels.h"
+#include "gui/utils/LookAndFeels.h"
 
 class BoardComponent final : public Component,
                              private ProcessorChain::Listener,

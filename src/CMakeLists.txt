@@ -6,25 +6,36 @@ endif()
 target_sources(BYOD PRIVATE
     BYOD.cpp
 
-    gui/BoardComponent.cpp
-    gui/BoardViewport.cpp
-    gui/InfoComponent.cpp
-    gui/cables/CableDrawingHelpers.cpp
-    gui/cables/CableViewConnectionHelper.cpp
-    gui/cables/CableViewPortLocationHelper.cpp
-    gui/cables/CableView.cpp
-    gui/editors/KnobsComponent.cpp
-    gui/editors/Port.cpp
-    gui/editors/ProcessorEditor.cpp
-    gui/presets/PresetsComp.cpp
-    gui/presets/PresetsLoginDialog.cpp
-    gui/presets/PresetsSaveDialog.cpp
-    gui/presets/PresetSearchWindow.cpp
-    gui/presets/PresetsSyncDialog.cpp
+    gui/BYODPluginEditor.cpp
+    gui/TitleBar.cpp
+
+    gui/pedalboard/BoardComponent.cpp
+    gui/pedalboard/BoardViewport.cpp
+    gui/pedalboard/InfoComponent.cpp
+    gui/pedalboard/cables/CableDrawingHelpers.cpp
+    gui/pedalboard/cables/CableViewConnectionHelper.cpp
+    gui/pedalboard/cables/CableViewPortLocationHelper.cpp
+    gui/pedalboard/cables/CableView.cpp
+    gui/pedalboard/editors/KnobsComponent.cpp
+    gui/pedalboard/editors/Port.cpp
+    gui/pedalboard/editors/ProcessorEditor.cpp
+
+    gui/toolbar/ToolBar.cpp
+    gui/toolbar/UndoRedoComponent.cpp
+    gui/toolbar/SettingsButton.cpp
+    gui/toolbar/CPUMeter.cpp
+    gui/toolbar/GlobalParamControls.cpp
+    gui/toolbar/presets/PresetsComp.cpp
+    gui/toolbar/presets/PresetsLoginDialog.cpp
+    gui/toolbar/presets/PresetsSaveDialog.cpp
+    gui/toolbar/presets/PresetSearchWindow.cpp
+    gui/toolbar/presets/PresetsSyncDialog.cpp
+
     gui/utils/LevelMeterComponent.cpp
     gui/utils/LookAndFeels.cpp
-    gui/utils/SettingsButton.cpp
 
+    state/StateManager.cpp
+    state/UIState.cpp
     state/ParamForwardManager.cpp
     state/presets/PresetInfoHelpers.cpp
     state/presets/PresetManager.cpp

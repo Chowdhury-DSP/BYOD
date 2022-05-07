@@ -48,13 +48,13 @@ public:
     ~BottomBarLNF() override = default;
 
 protected:
-    static int getNameWidth (int height, const String& text);
     void drawRotarySlider (Graphics& g, int, int, int, int height, float, const float, const float, Slider& slider) override;
     Slider::SliderLayout getSliderLayout (Slider& slider) override;
     Label* createSliderTextBox (Slider& slider) override;
 
 private:
-    static constexpr float heightFrac = 0.5f;
+    static int getNameWidth (int height, const String& text);
+    static Font getFontForSliderHeight (int height);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BottomBarLNF)
 };
