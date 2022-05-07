@@ -5,31 +5,48 @@ namespace
 constexpr int buttonPad = 10;
 }
 
-UndoRedoComponent::UndoRedoComponent (UndoManager& undoManager)
+UndoRedoComponent::UndoRedoComponent (UndoManager& um) : undoManager (um)
 {
     undoButton.setImages (Drawable::createFromImageData (BinaryData::undosolid_png, BinaryData::undosolid_pngSize).get());
     addAndMakeVisible (undoButton);
-    undoButton.onClick = [this, &undoManager]
+    undoButton.onClick = [this]
     {
         undoManager.undo();
-        updateButtonEnablementStates (undoManager);
+        updateButtonEnablementStates();
     };
 
     redoButton.setImages (Drawable::createFromImageData (BinaryData::redosolid_png, BinaryData::redosolid_pngSize).get());
     addAndMakeVisible (redoButton);
-    redoButton.onClick = [this, &undoManager]
+    redoButton.onClick = [this]
     {
         undoManager.redo();
-        updateButtonEnablementStates (undoManager);
+        updateButtonEnablementStates();
     };
 
-    updateButtonEnablementStates (undoManager);
+    undoManager.addChangeListener (this);
+    updateButtonEnablementStates();
 }
 
-void UndoRedoComponent::updateButtonEnablementStates (const UndoManager& um)
+UndoRedoComponent::~UndoRedoComponent()
 {
-    undoButton.setEnabled (um.canUndo());
-    redoButton.setEnabled (um.canRedo());
+    undoManager.removeChangeListener (this);
+}
+
+void UndoRedoComponent::changeListenerCallback (ChangeBroadcaster* source)
+{
+    if (source != &undoManager)
+    {
+        jassertfalse; //unknown source!
+        return;
+    }
+
+    updateButtonEnablementStates();
+}
+
+void UndoRedoComponent::updateButtonEnablementStates()
+{
+    undoButton.setEnabled (undoManager.canUndo());
+    redoButton.setEnabled (undoManager.canRedo());
 }
 
 void UndoRedoComponent::resized()

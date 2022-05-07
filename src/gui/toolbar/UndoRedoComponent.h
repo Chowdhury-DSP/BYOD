@@ -2,15 +2,21 @@
 
 #include <pch.h>
 
-class UndoRedoComponent : public Component
+class UndoRedoComponent : public Component,
+                          private ChangeListener
+
 {
 public:
     explicit UndoRedoComponent (UndoManager& undoManager);
+    ~UndoRedoComponent() override;
 
     void resized() override;
 
 private:
-    void updateButtonEnablementStates (const UndoManager& um);
+    void changeListenerCallback (ChangeBroadcaster* source) override;
+    void updateButtonEnablementStates();
+
+    UndoManager& undoManager;
 
     DrawableButton undoButton { "Undo", DrawableButton::ImageStretched };
     DrawableButton redoButton { "Redo", DrawableButton::ImageStretched };

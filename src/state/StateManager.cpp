@@ -41,4 +41,7 @@ void StateManager::loadState (XmlElement* xmlState)
     procChain.getStateHelper().loadProcChain (procChainXml);
 
     presetManager.setIsDirty (presetWasDirty);
+
+    if (auto* um = vts.undoManager)
+        um->clearUndoHistory();
 }
