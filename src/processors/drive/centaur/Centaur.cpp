@@ -14,7 +14,7 @@ Centaur::Centaur (UndoManager* um) : BaseProcessor ("Centaur", createParameterLa
 
     uiOptions.backgroundColour = Colour (0xFFDAA520);
     uiOptions.powerColour = Colour (0xFF14CBF2).brighter (0.5f);
-    uiOptions.info.description = "Emulation of the Klon Centaur overdrive pedal.";
+    uiOptions.info.description = "Emulation of the Klon Centaur overdrive pedal. Use the right-click menu to enable neural mode.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
     uiOptions.info.infoLink = "https://github.com/jatinchowdhury18/KlonCentaur";
     uiOptions.paramIDsToSkip = { modeTag };
