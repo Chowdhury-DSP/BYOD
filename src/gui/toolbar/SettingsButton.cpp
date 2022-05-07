@@ -1,6 +1,6 @@
 #include "SettingsButton.h"
-#include "SystemInfo.h"
 #include "BYOD.h"
+#include "SystemInfo.h"
 #include "gui/pedalboard/BoardViewport.h"
 #include "processors/chain/ProcessorChainPortMagnitudesHelper.h"
 
