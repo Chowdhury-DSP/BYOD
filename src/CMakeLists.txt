@@ -23,7 +23,6 @@ target_sources(BYOD PRIVATE
     gui/toolbar/ToolBar.cpp
     gui/toolbar/UndoRedoComponent.cpp
     gui/toolbar/SettingsButton.cpp
-    gui/toolbar/CPUMeter.cpp
     gui/toolbar/GlobalParamControls.cpp
     gui/toolbar/presets/PresetsComp.cpp
     gui/toolbar/presets/PresetsLoginDialog.cpp
@@ -35,7 +34,6 @@ target_sources(BYOD PRIVATE
     gui/utils/LookAndFeels.cpp
 
     state/StateManager.cpp
-    state/UIState.cpp
     state/ParamForwardManager.cpp
     state/presets/PresetInfoHelpers.cpp
     state/presets/PresetManager.cpp

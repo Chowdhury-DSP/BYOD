@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CPUMeter.h"
 #include "GlobalParamControls.h"
 #include "SettingsButton.h"
 #include "UndoRedoComponent.h"
@@ -20,7 +19,7 @@ private:
     GlobalParamControls globalParamControls;
 
     SettingsButton settingsButton;
-    CPUMeter cpuMeter;
+    chowdsp::CPUMeter cpuMeter;
 
     PresetsComp presetsComp;
 

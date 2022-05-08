@@ -28,11 +28,6 @@ void BYODPluginEditor::setResizeBehaviour()
                                int ((float) defaultHeight * 5.0f));
     setConstrainer (&constrainer);
     setResizable (true, true);
-
-    auto& uiState = plugin.getStateManager().getUIState();
-    uiState.attachToComponent (*this);
-    auto [width, height] = uiState.getLastEditorSize();
-    setSize (width, height);
 }
 
 void BYODPluginEditor::paint (Graphics& g)
@@ -43,7 +38,7 @@ void BYODPluginEditor::paint (Graphics& g)
 void BYODPluginEditor::resized()
 {
     auto bounds = getLocalBounds();
-    const auto barHeight = jmin (proportionOfHeight (0.06f), 50);
+    const auto barHeight = jmin (proportionOfHeight (0.05f), 50);
 
     titleBar.setBounds (bounds.removeFromTop (barHeight));
 

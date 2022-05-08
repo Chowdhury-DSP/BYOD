@@ -3,8 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
-- Added "Neural" mode to Centaur module
+- Added "Rotary" module.
+- Added "Neural" mode to Centaur module.
+- Added UI size to the saved plugin state.
 - Improved neural network-based modules performance and sound quality at different sample rates.
+- Improved UI rendering performance.
 - Fixed undo/redo not restoring preset name.
 
 ## [1.0.1] 2022-03-15
