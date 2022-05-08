@@ -1,6 +1,5 @@
 #pragma once
 
-#include "UIState.h"
 #include "processors/chain/ProcessorChain.h"
 
 class StateManager
@@ -20,7 +19,7 @@ private:
     ProcessorChain& procChain;
     chowdsp::PresetManager& presetManager;
 
-    UIState uiState;
+    chowdsp::UIState uiState;
 
     static const Identifier stateTag;
 

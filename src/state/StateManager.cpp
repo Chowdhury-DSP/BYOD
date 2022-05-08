@@ -1,11 +1,12 @@
 #include "StateManager.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
+#include "gui/GUIConstants.h"
 
 StateManager::StateManager (AudioProcessorValueTreeState& vtState, ProcessorChain& procs, chowdsp::PresetManager& presetMgr)
     : vts (vtState),
       procChain (procs),
       presetManager (presetMgr),
-      uiState (vts)
+      uiState (vts, GUIConstants::defaultWidth, GUIConstants::defaultHeight)
 {
 }
 
