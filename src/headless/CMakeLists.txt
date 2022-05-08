@@ -32,7 +32,10 @@ target_include_directories(BYOD_headless
         ../
         ../../modules
         ../../modules/RTNeural
-        ../../modules/chowdsp_utils/modules
+        ../../modules/chowdsp_utils/modules/dsp
+        ../../modules/chowdsp_utils/modules/gui
+        ../../modules/chowdsp_utils/modules/plugin
+        ../../modules/chowdsp_utils/modules/common
         ../../modules/JUCE/modules
         ../../modules/chowdsp_wdf/include
         ${juce_includes}
