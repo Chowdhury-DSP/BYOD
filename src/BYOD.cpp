@@ -85,6 +85,7 @@ AudioProcessorEditor* BYOD::createEditor()
         openGLHelper = std::make_unique<chowdsp::OpenGLHelper>();
 
     auto* editor = new BYODPluginEditor (*this);
+    stateManager->getUIState().attachToComponent (*editor);
     openGLHelper->setComponent (editor);
 
     return editor;
