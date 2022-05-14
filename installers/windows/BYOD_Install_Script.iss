@@ -17,7 +17,7 @@ DisableProgramGroupPage=yes
 DisableDirPage=yes
 DisableWelcomePage=no
 LicenseFile=../../LICENSE
-OutputBaseFilename="{#MyAppName}-Win-{#MyAppVersion}"
+OutputBaseFilename="{#MyAppName}-Win-64bit-{#MyAppVersion}"
 OutputDir=.
 SetupIconFile=byod.ico
 UninstallDisplayIcon=byod.ico
@@ -30,21 +30,16 @@ Name: "full"; Description: "Full installation"
 Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
 [Components]
-Name: "VST3_64"; Description: "VST3 Plugin 64-bit"; Types: full
-Name: "VST_64"; Description: "VST Plugin 64-bit"; Types: full
-Name: "VST3_32"; Description: "VST3 Plugin 32-bit"; Types: full
-Name: "VST_32"; Description: "VST Plugin 32-bit"; Types: full
+Name: "VST3_64"; Description: "VST3 Plugin"; Types: full
+Name: "VST_64"; Description: "VST Plugin"; Types: full
 Name: "Standalone"; Description: "Standalone Plugin"; Types: full
 Name: "AAX"; Description: "AAX Plugin"; Types: full
 
 [Files]
 Source: "../../bin/Win64/BYOD.vst3"; Excludes: "*.aaxplugin"; DestDir: "{code:GetDir|VST3_64}"; Components: VST3_64; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win64/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|VST_64}"; Components: VST_64; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../bin/Win32/BYOD.vst3"; Excludes: "*.aaxplugin"; DestDir: "{code:GetDir|VST3_32}"; Components: VST3_32; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../bin/Win32/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|VST_32}"; Components: VST_32; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win64/BYOD.exe"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|Standalone}"; Components: Standalone; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win64/BYOD.aaxplugin"; Excludes: "*.vst3"; DestDir: "{code:GetDir|AAX}"; Components: AAX; Flags: ignoreversion recursesubdirs createallsubdirs
-
 
 [Icons]
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
@@ -54,8 +49,6 @@ var
   AAXDirPage: TInputDirWizardPage;
   Vst3_64DirPage: TinputDirWizardPage;
   Vst_64DirPage: TinputDirWizardPage;
-  Vst3_32DirPage: TinputDirWizardPage;
-  Vst_32DirPage: TinputDirWizardPage;
   StandaloneDirPage: TinputDirWizardPage;
 
 procedure InitializeWizard;
@@ -91,28 +84,8 @@ begin
   Vst_64DirPage.add('');
   Vst_64DirPage.values[0] := ExpandConstant('{commoncf64}\VST');
 
-  //VST3 32-bit Dir Page
-  Vst3_32DirPage := CreateInputDirPage(Vst_64DirPage.ID,
-    'Select Install Location for VST3 32-bit', 'Where would you like to install the plugin?',
-    'VST3 32-bit plugin will be installed in the following folder.'#13#10#13#10 +
-    'To continue, click Next. If you would like to select a different folder, click Browse.',
-    False, 'New Folder');
-
-  Vst3_32DirPage.add('');
-  Vst3_32DirPage.values[0] := ExpandConstant('{commoncf32}\VST3');
-
-  //VST 64-bit Dir Page
-  Vst_32DirPage := CreateInputDirPage(Vst3_32DirPage.ID,
-    'Select Install Location for VST 32-bit', 'Where would you like to install the plugin?',
-    'VST 32-bit plugin will be installed in the following folder.'#13#10#13#10 +
-    'To continue, click Next. If you would like to select a different folder, click Browse.',
-    False, 'New Folder');
-
-  Vst_32DirPage.add('');
-  Vst_32DirPage.values[0] := ExpandConstant('{commoncf32}\VST');
-
   //Standalone Dir Page
-  StandaloneDirPage := CreateInputDirPage(Vst_32DirPage.ID,
+  StandaloneDirPage := CreateInputDirPage(Vst_64DirPage.ID,
     'Select Install Location for Standalone', 'Where would you like to install the plugin?',
     'Standalone plugin will be installed in the following folder.'#13#10#13#10 +
     'To continue, click Next. If you would like to select a different folder, click Browse.',
@@ -156,36 +129,12 @@ begin
       end
   end
 
-  else if (PageID = Vst3_32DirPage.ID) then
-  begin
-      Result := True;
-      Log('Selected 3: ' + WizardSelectedComponents(False));
-
-      if IsSelected ('vst3_32') then
-      begin
-        Log('Not Skipping');
-        Result := False;
-      end
-  end
-
   else if (PageID = Vst_64DirPage.ID) then
   begin
       Result := True;
       Log('Selected 4: ' + WizardSelectedComponents(False));
 
       if IsSelected ('vst_64') then
-      begin
-        Log('Not Skipping');
-        Result := False;
-      end
-  end
-
-  else if (PageID = Vst_32DirPage.ID) then
-  begin
-      Result := True;
-      Log('Selected 5: ' + WizardSelectedComponents(False));
-
-      if IsSelected ('vst_32') then
       begin
         Log('Not Skipping');
         Result := False;
@@ -210,12 +159,8 @@ begin
     Result := AAXDirPage.values[0]
   else if (Param = 'VST3_64') then
     Result := Vst3_64DirPage.values[0]
-  else if (Param = 'VST3_32') then
-    Result := Vst3_32DirPage.values[0]
   else if (Param = 'VST_64') then
     Result := Vst_64DirPage.values[0]
-  else if (Param = 'VST_32') then
-    Result := Vst_32DirPage.values[0]
   else if (Param = 'Standalone') then
     Result := StandaloneDirPage.values[0]
 end;
@@ -239,12 +184,6 @@ begin
 
   if IsSelected('vst_64') then
     S := S + Space +  GetDir('VST_64') + ' (VST 64-bit)' + NewLine;
-
-  if IsSelected('vst3_32') then
-    S := S + Space +  GetDir('VST3_32') + ' (VST3 32-bit)' + NewLine;
-
-  if IsSelected('vst_32') then
-    S := S + Space +  GetDir('VST_32') + ' (VST 32-bit)' + NewLine;
 
   if IsSelected('standalone') then
     S := S + Space +  GetDir('Standalone') + ' (Standalone)' + NewLine;
