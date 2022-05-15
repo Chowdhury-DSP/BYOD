@@ -34,9 +34,8 @@ public:
             delays[(size_t) i].setDelay (delaySamples[i]);
         }
 
-        using namespace chowdsp::SIMDUtils;
-        auto delaySamplesVec = VecType::fromRawArray (delaySamples);
-        feedback = powSIMD (VecType (0.001f * std::pow (10.0f, mix)), delaySamplesVec / VecType (t60 * fs));
+        auto delaySamplesVec = xsimd::load_aligned (delaySamples);
+        feedback = xsimd::pow (VecType (0.001f * std::pow (10.0f, mix)), delaySamplesVec / VecType (t60 * fs));
         feedback *= 0.23f * mix * (0.735f + 0.235f * reverbSize);
 
         float dampDB = -3.0f - 9.0f * damping;
@@ -49,14 +48,14 @@ public:
         for (int i = 0; i < 4; ++i)
             output[i] = delays[(size_t) i].popSample (ch);
 
-        auto outVec = VecType::fromRawArray (output);
+        auto outVec = xsimd::load_aligned (output);
 
         // householder matrix
-        constexpr auto householderFactor = -2.0f / (float) VecType::size();
-        outVec += outVec.sum() * householderFactor;
+        constexpr auto householderFactor = -2.0f / (float) VecType::size;
+        outVec += xsimd::hadd (outVec) * householderFactor;
 
         outVec *= feedback;
-        return shelfFilter.processSample (outVec.sum() / (float) VecType::size());
+        return shelfFilter.processSample (xsimd::hadd (outVec) / (float) VecType::size);
     }
 
     inline void pushSample (int ch, float x) noexcept
@@ -66,7 +65,7 @@ public:
     }
 
 private:
-    using VecType = dsp::SIMDRegister<float>;
+    using VecType = xsimd::batch<float>;
     using ReflectionDelay = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange3rd>;
     std::array<ReflectionDelay, 4> delays { ReflectionDelay { 1 << 18 },
                                             ReflectionDelay { 1 << 18 },

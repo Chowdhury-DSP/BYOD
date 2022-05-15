@@ -38,7 +38,7 @@ void BYODPluginEditor::paint (Graphics& g)
 void BYODPluginEditor::resized()
 {
     auto bounds = getLocalBounds();
-    const auto barHeight = jmin (proportionOfHeight (0.05f), 50);
+    const auto barHeight = jlimit (35, 50, proportionOfHeight (0.05f));
 
     titleBar.setBounds (bounds.removeFromTop (barHeight));
 

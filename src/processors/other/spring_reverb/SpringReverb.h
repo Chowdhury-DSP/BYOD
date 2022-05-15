@@ -37,7 +37,7 @@ private:
     chowdsp::StateVariableFilter<float> dcBlocker;
 
     static constexpr int allpassStages = 16;
-    using Vec = dsp::SIMDRegister<float>;
+    using Vec = xsimd::batch<float>;
     using APFCascade = std::array<SchroederAllpass<Vec, 2>, allpassStages>;
     APFCascade vecAPFs;
 

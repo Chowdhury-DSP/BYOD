@@ -27,7 +27,7 @@
  */
 namespace SurgeWaveshapers
 {
-using Vec4 = dsp::SIMDRegister<float>;
+using Vec4 = xsimd::batch<float>;
 
 enum ws_type
 {
@@ -96,7 +96,7 @@ constexpr int n_waveshaper_registers = 4;
 struct QuadFilterWaveshaperState
 {
     Vec4 R[n_waveshaper_registers];
-    dsp::SIMDRegister<uint32_t> init;
+    xsimd::batch_bool<float> init;
 };
 typedef Vec4 (*WaveshaperQFPtr) (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive);
 WaveshaperQFPtr GetQFPtrWaveshaper (int type);

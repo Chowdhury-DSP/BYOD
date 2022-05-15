@@ -7,7 +7,7 @@ const String delayTypeTag = "delay_type";
 const String pingPongTag = "ping_pong";
 } // namespace
 
-Delay::Delay (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
+DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
 {
     delayTimeMsParam = vts.getRawParameterValue ("time_ms");
     freqParam = vts.getRawParameterValue ("freq");
@@ -23,7 +23,7 @@ Delay::Delay (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout()
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-ParamLayout Delay::createParameterLayout()
+ParamLayout DelayModule::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
@@ -46,7 +46,7 @@ ParamLayout Delay::createParameterLayout()
     return { params.begin(), params.end() };
 }
 
-void Delay::prepare (double sampleRate, int samplesPerBlock)
+void DelayModule::prepare (double sampleRate, int samplesPerBlock)
 {
     fs = (float) sampleRate;
     stereoBuffer.setSize (2, samplesPerBlock);
@@ -73,7 +73,7 @@ void Delay::prepare (double sampleRate, int samplesPerBlock)
 }
 
 template <typename DelayType>
-void Delay::processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType& delayLine)
+void DelayModule::processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType& delayLine)
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
@@ -141,7 +141,7 @@ void Delay::processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType& delay
 }
 
 template <typename DelayType>
-void Delay::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLine)
+void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLine)
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
@@ -212,7 +212,7 @@ void Delay::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLi
     outputBuffers.getReference (0) = &bufferToProcess;
 }
 
-void Delay::processAudio (AudioBuffer<float>& buffer)
+void DelayModule::processAudio (AudioBuffer<float>& buffer)
 {
     feedbackSmoothBuffer.process (std::pow (feedbackParam->load() * 0.67f, 0.9f), buffer.getNumSamples());
     delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f);
@@ -245,7 +245,7 @@ void Delay::processAudio (AudioBuffer<float>& buffer)
     bypassNeedsReset = true;
 }
 
-void Delay::processAudioBypassed (AudioBuffer<float>& buffer)
+void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
 {
     if (bypassNeedsReset)
     {
@@ -259,7 +259,7 @@ void Delay::processAudioBypassed (AudioBuffer<float>& buffer)
     outputBuffers.getReference (0) = &buffer;
 }
 
-void Delay::addToPopupMenu (PopupMenu& menu)
+void DelayModule::addToPopupMenu (PopupMenu& menu)
 {
     menu.addSectionHeader ("Delay Type");
     int itemID = 0;

@@ -10,6 +10,9 @@ PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (pres
                                                       syncWindow (*this)
 #endif
 {
+    setNextPrevButton (Drawable::createFromImageData (BinaryData::RightArrow_svg, BinaryData::RightArrow_svgSize).get(), true);
+    setNextPrevButton (Drawable::createFromImageData (BinaryData::LeftArrow_svg, BinaryData::LeftArrow_svgSize).get(), false);
+
     presetListUpdated();
 
 #if BYOD_BUILD_PRESET_SERVER
