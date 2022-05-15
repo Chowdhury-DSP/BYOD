@@ -58,7 +58,7 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
         initializeWaveshaperRegister (lastShape, R);
         for (int i = 0; i < n_waveshaper_registers; ++i)
             wss.R[i] = Vec4 (R[i]);
-        wss.init = dsp::SIMDRegister<uint32_t> (0);
+        wss.init = false;
     }
 
     auto wsptr = GetQFPtrWaveshaper (lastShape);
@@ -73,13 +73,13 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
             for (int i = 0; i < numSamples; ++i)
             {
                 din[0] = data[i];
-                auto dat = Vec4::fromRawArray (din);
+                auto dat = xsimd::load_aligned (din);
                 auto drv = Vec4 (driveSmooth.getNextValue());
 
                 dat = wsptr (&wss, dat, drv);
 
                 float res alignas (16)[4];
-                dat.copyToRawArray (res);
+                dat.store_aligned (res);
 
                 data[i] = res[0];
             }
@@ -93,13 +93,13 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
             {
                 din[0] = left[i];
                 din[1] = right[i];
-                auto dat = Vec4::fromRawArray (din);
+                auto dat = xsimd::load_aligned (din);
                 auto drv = Vec4 (driveSmooth.getNextValue());
 
                 dat = wsptr (&wss, dat, drv);
 
                 float res alignas (16)[4];
-                dat.copyToRawArray (res);
+                dat.store_aligned (res);
 
                 left[i] = res[0];
                 right[i] = res[1];

@@ -88,7 +88,7 @@ void SpringReverb::setParams (const Params& params)
     auto apfG = 0.5f - 0.4f * params.spin;
     float apfGVec alignas (16)[4] = { apfG, -apfG, apfG, -apfG };
     for (auto& apf : vecAPFs)
-        apf.setParams (msToSamples (0.35f + 3.0f * params.size), Vec::fromRawArray (apfGVec));
+        apf.setParams (msToSamples (0.35f + 3.0f * params.size), xsimd::load_aligned (apfGVec));
 
     constexpr float dampFreqLow = 4000.0f;
     const float dampFreqHigh = jmin (18000.0f, fs * 0.48f);
@@ -146,10 +146,10 @@ void SpringReverb::processDownsampledBuffer (AudioBuffer<float>& buffer)
 
     auto doAPFProcess = [&]()
     {
-        auto yVec = Vec::fromRawArray (simdReg);
+        auto yVec = xsimd::load_aligned (simdReg);
         for (auto& apf : vecAPFs)
             yVec = apf.processSample (yVec);
-        yVec.copyToRawArray (simdReg);
+        yVec.store_aligned (simdReg);
     };
 
     auto doSpringOutput = [&] (int ch)

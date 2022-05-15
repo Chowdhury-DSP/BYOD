@@ -55,9 +55,9 @@ private:
 
     // state variables
 #if HYSTERESIS_USE_SIMD
-    dsp::SIMDRegister<double> M_n1 = 0.0;
-    dsp::SIMDRegister<double> H_n1 = 0.0;
-    dsp::SIMDRegister<double> H_d_n1 = 0.0;
+    xsimd::batch<double> M_n1 = 0.0;
+    xsimd::batch<double> H_n1 = 0.0;
+    xsimd::batch<double> H_d_n1 = 0.0;
 #else
     double M_n1 = 0.0;
     double H_n1 = 0.0;

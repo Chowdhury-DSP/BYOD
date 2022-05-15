@@ -96,7 +96,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
 
     { "Chorus", &processorFactory<Chorus> },
     { "Compressor", &processorFactory<Compressor> },
-    { "Delay", &processorFactory<Delay> },
+    { "Delay", &processorFactory<DelayModule> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Gate", &processorFactory<Gate> },
     { "Rotary", &processorFactory<Rotary> },

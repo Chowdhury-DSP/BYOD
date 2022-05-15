@@ -70,7 +70,7 @@ Vec4 CLIP (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 {
     const Vec4 x_min = Vec4 (-1.0f);
     const Vec4 x_max = Vec4 (1.0f);
-    return Vec4::max (Vec4::min ((in * drive), x_max), x_min);
+    return xsimd::max (xsimd::min ((in * drive), x_max), x_min);
 }
 
 [[maybe_unused]] Vec4 DIGI_SSE2 (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
@@ -81,7 +81,7 @@ Vec4 CLIP (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
     const Vec4 mofs = Vec4 (0.5f);
 
     Vec4 invdrive = Vec4 (1.0f) / drive;
-    Vec4 a = Vec4::truncate (mofs + (invdrive * (m16 * in)));
+    Vec4 a = xsimd::floor (mofs + (invdrive * (m16 * in)));
 
     return drive * (m16inv * (a - mofs));
 }
@@ -89,7 +89,7 @@ Vec4 CLIP (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 Vec4 TANH (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
 {
     auto x = in * drive;
-    return tanhSIMD (x);
+    return xsimd::tanh (x);
 }
 
 float Digi (const float x)
@@ -111,12 +111,12 @@ inline Vec4 Asym (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
     const auto tanh0p5 = Vec4 (0.46211715726f); // tanh(0.5)
 
     auto x = in * drive + Vec4 (0.5f);
-    auto isPos = Vec4::greaterThanOrEqual (x, Vec4 (0.0f));
-    auto pos = tanhSIMD (x);
+    auto isPos = x >= Vec4 (0.0f);
+    auto pos = xsimd::tanh (x);
     auto neg = chowdsp::Polynomials::horner<3> ({ Vec4 (0.07f), Vec4 (0.0054f), Vec4 (1.0f), Vec4 (0.0f) }, x);
-    neg = Vec4::max (neg, Vec4 (-10.0f));
+    neg = xsimd::max (neg, Vec4 (-10.0f));
 
-    return ((pos & isPos) + (neg & (~isPos))) - tanh0p5;
+    return xsimd::select (isPos, pos, neg) - tanh0p5;
 }
 
 template <int R1, int R2>
@@ -129,7 +129,7 @@ inline Vec4 dcBlock (QuadFilterWaveshaperState* __restrict s, Vec4 x)
     auto filtval = dx + (fac * s->R[R2]);
     s->R[R1] = x;
     s->R[R2] = filtval;
-    s->init = dsp::SIMDRegister<uint32_t> (0);
+    s->init = false;
     return filtval;
 }
 
@@ -144,25 +144,25 @@ Vec4 WS_PM1_LUT (const float* table, Vec4 in)
     static const Vec4 zero = Vec4 (0.0f);
 
     auto x = (in * dx) + ctr;
-    auto e = Vec4::truncate (Vec4::max (Vec4::min (x, UB), zero));
+    auto e = xsimd::floor (xsimd::max (xsimd::min (x, UB), zero));
     auto frac = x - e;
 
     // on PC write to memory & back as XMM -> GPR is slow on K8
     float e4 alignas (16)[4];
-    e.copyToRawArray (e4);
+    e.store_aligned (e4);
 
     float wsArr alignas (16)[4];
     wsArr[0] = table[(int) e4[0]];
     wsArr[1] = table[(int) e4[1]];
     wsArr[2] = table[(int) e4[2]];
     wsArr[3] = table[(int) e4[3]];
-    auto ws = Vec4::fromRawArray (wsArr);
+    auto ws = xsimd::load_aligned (wsArr);
 
     wsArr[0] = table[(int) e4[0] + 1];
     wsArr[1] = table[(int) e4[1] + 1];
     wsArr[2] = table[(int) e4[2] + 1];
     wsArr[3] = table[(int) e4[3] + 1];
-    auto wsn = Vec4::fromRawArray (wsArr);
+    auto wsn = xsimd::load_aligned (wsArr);
 
     auto res = ((one - frac) * ws) + (frac * wsn);
 
@@ -266,7 +266,7 @@ Vec4 CHEBY_CORE (QuadFilterWaveshaperState* __restrict s, Vec4 x, Vec4 drive)
     static const auto m1 = Vec4 (-1.0f);
     static const auto p1 = Vec4 (1.0f);
 
-    auto bound = K (Vec4::max (Vec4::min (x, p1), m1));
+    auto bound = K (xsimd::max (xsimd::min (x, p1), m1));
 
     if (useDCBlock)
     {
@@ -420,18 +420,18 @@ Vec4 ADAA (QuadFilterWaveshaperState* __restrict s, Vec4 x)
 
     const static auto tolF = 0.0001f;
     const static auto tol = Vec4 (tolF), ntol = Vec4 (-tolF);
-    auto ltt_i = Vec4::lessThan (dx, tol) & Vec4::greaterThan (dx, ntol); // dx < tol && dx > -tol
-    auto ltt = ltt_i | s->init;
-    auto dxDiv = Vec4 (1.0f) / ((tol & ltt) + (dx & (~ltt)));
+    auto ltt_i = (dx < tol) && (dx > ntol); // dx < tol && dx > -tol
+    auto ltt = ltt_i || s->init;
+    auto dxDiv = Vec4 (1.0f) / xsimd::select (ltt, tol, dx);
 
     auto fFromAD = dad * dxDiv;
-    auto r = (f & ltt) + (fFromAD & (~ltt));
+    auto r = xsimd::select (ltt, f, fFromAD);
 
     s->R[xR] = x;
     s->R[aR] = ad;
     if (updateInit)
     {
-        s->init = dsp::SIMDRegister<uint32_t> (0);
+        s->init = false;
     }
 
     return r;
@@ -446,8 +446,8 @@ void posrect_kernel (Vec4 x, Vec4& f, Vec4& adF)
      * observe that adF = F^2/2 in all cases
      */
     static const auto p5 = Vec4 (0.5f);
-    auto gz = Vec4::greaterThanOrEqual (x, Vec4 (0.0f));
-    f = x & gz;
+    auto gz = x >= Vec4 (0.0f);
+    f = xsimd::select (gz, x, (Vec4) 0);
     adF = p5 * (f * f);
 }
 
@@ -467,8 +467,8 @@ void negrect_kernel (Vec4 x, Vec4& f, Vec4& adF)
      * observe that adF = F^2/2 in all cases
      */
     static const auto p5 = Vec4 (0.5f);
-    auto gz = Vec4::lessThanOrEqual (x, Vec4 (0.0f));
-    f = x & gz;
+    auto gz = x <= Vec4 (0.0f);
+    f = xsimd::select (gz, x, (Vec4) 0);
     adF = p5 * (f * f);
 }
 
@@ -487,8 +487,8 @@ void fwrect_kernel (Vec4 x, Vec4& F, Vec4& adF)
      */
     static const auto p1 = Vec4 (1.f);
     static const auto p05 = Vec4 (0.5f);
-    auto gz = Vec4::greaterThanOrEqual (x, Vec4 (0.0f));
-    auto sgn = (p1 & gz) - (p1 & (~gz));
+    auto gz = x >= Vec4 (0.0f);
+    auto sgn = xsimd::select (gz, p1, -p1);
 
     F = sgn * x;
     adF = F * (x * p05); // sgn * x * x * 0.5
@@ -508,8 +508,8 @@ void softrect_kernel (Vec4 x, Vec4& F, Vec4& adF)
      */
     static const auto p2 = Vec4 (2.f);
     static const auto p1 = Vec4 (1.f);
-    auto gz = Vec4::greaterThanOrEqual (x, Vec4 (0.0f));
-    auto sgn = (p1 & gz) - (p1 & (~gz));
+    auto gz = x >= Vec4 (0.0f);
+    auto sgn = xsimd::select (gz, p1, -p1);
 
     F = (p2 * (sgn * x)) - p1;
     adF = (sgn * (x * x)) - x;
@@ -562,21 +562,21 @@ struct FolderADAA
     {
         static const auto p05 = Vec4 (0.5f);
         Vec4 val[pts - 1], adVal[pts - 1];
-        dsp::SIMDRegister<uint32_t> rangeMask[pts - 1];
+        xsimd::batch_bool<float> rangeMask[pts - 1];
 
         for (int i = 0; i < pts - 1; ++i)
         {
-            rangeMask[i] = Vec4::greaterThanOrEqual (x, xS[i]) & Vec4::lessThan (x, xS[i + 1]);
+            rangeMask[i] = (x >= xS[i]) && (x < xS[i + 1]);
             auto ox = x - xS[i];
             val[i] = (mS[i] * ox) + yS[i];
             adVal[i] = ((ox * ox) * (mS[i] * p05)) + ((yS[i] * x) + cS[i]);
         }
-        auto res = val[0] & rangeMask[0];
-        auto adres = adVal[0] & rangeMask[0];
+        auto res = xsimd::select (rangeMask[0], val[0], (Vec4) 0);
+        auto adres = xsimd::select (rangeMask[0], adVal[0], (Vec4) 0);
         for (int i = 1; i < pts - 1; ++i)
         {
-            res = res + (val[i] & rangeMask[i]);
-            adres = adres + (adVal[i] & rangeMask[i]);
+            res = res + xsimd::select (rangeMask[0], val[0], (Vec4) 0);
+            adres = adres + xsimd::select (rangeMask[0], adVal[0], (Vec4) 0);
         }
         f = res;
         adf = adres;
@@ -625,8 +625,8 @@ Vec4 ZAMSAT (QuadFilterWaveshaperState* __restrict s, Vec4 x, Vec4 drive)
     static const auto p1 = Vec4 (1.f);
     static const auto p2 = Vec4 (2.f);
 
-    auto gz = Vec4::greaterThanOrEqual (x, Vec4 (0.0f));
-    auto sgn = (p1 & gz) - (p1 & (~gz));
+    auto gz = x >= Vec4 (0.0f);
+    auto sgn = xsimd::select (gz, p1, -p1);
 
     auto twox = p2 * x;
     auto F = twox - (sgn * (x * x));
@@ -659,11 +659,11 @@ Vec4 OJD (QuadFilterWaveshaperState* __restrict, Vec4 x, Vec4 drive)
     static const auto denLow = Vec4 (1.f / (4 * (1 - 0.3f)));
     static const auto denHigh = Vec4 (1.f / (4 * (1 - 0.9f)));
 
-    auto maskNeg = Vec4::lessThanOrEqual (x, pm17); // in <= -1.7f
-    auto maskPos = Vec4::greaterThanOrEqual (x, p11); // in > 1.1f
-    auto maskLow = (~maskNeg) & Vec4::lessThan (x, pm03); // in > -1.7 && in < =0.3
-    auto maskHigh = (~maskPos) & Vec4::greaterThan (x, p09); // in > 0.9 && in < 1.1
-    auto maskMid = Vec4::greaterThanOrEqual (x, pm03) & Vec4::lessThanOrEqual (x, p09); // the middle
+    auto maskNeg = x <= pm17; // in <= -1.7f
+    auto maskPos = x >= p11; // in > 1.1f
+    auto maskLow = (! maskNeg) && (x < pm03); // in > -1.7 && in < =0.3
+    auto maskHigh = (! maskPos) && (x > p09); // in > 0.9 && in < 1.1
+    auto maskMid = (x >= pm03) && (x <= p09); // the middle
 
     static const auto vNeg = Vec4 (-1.0);
     static const auto vPos = Vec4 (1.0);
@@ -677,9 +677,11 @@ Vec4 OJD (QuadFilterWaveshaperState* __restrict, Vec4 x, Vec4 drive)
     auto vHi = xhi - (denHigh * (xhi * xhi));
     vHi = vHi + p09;
 
-    auto res =
-        (((vNeg & maskNeg) + (vLow & maskLow)) + ((vHi & maskHigh) + (vPos & maskPos))) + (vMid & maskMid);
-
+    auto res = xsimd::select (maskNeg, vNeg, (Vec4) 0)
+               + xsimd::select (maskLow, vLow, (Vec4) 0)
+               + xsimd::select (maskHigh, vHi, (Vec4) 0)
+               + xsimd::select (maskPos, vPos, (Vec4) 0)
+               + xsimd::select (maskMid, vMid, (Vec4) 0);
     return res;
 }
 

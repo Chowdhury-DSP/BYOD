@@ -29,9 +29,9 @@ struct HysteresisState
 
     // temp vars
 #if HYSTERESIS_USE_SIMD
-    dsp::SIMDRegister<double> Q, M_diff, L_prime, kap1, f1Denom, f1, f2, f3;
-    dsp::SIMDRegister<double> coth = 0.0;
-    dsp::SIMDRegister<double>::vMaskType nearZero;
+    xsimd::batch<double> Q, M_diff, L_prime, kap1, f1Denom, f1, f2, f3;
+    xsimd::batch<double> coth = 0.0;
+    xsimd::batch_bool<double> nearZero;
 #else
     double Q, M_diff, L_prime, kap1, f1Denom, f1, f2, f3;
     double coth = 0.0;
@@ -47,22 +47,12 @@ constexpr inline int sign (double x)
     return int (x > 0.0) - int (x < 0.0);
 }
 
-/** Signum function to determine the sign of the input. */
-template <typename T>
-inline juce::dsp::SIMDRegister<T> signumSIMD (juce::dsp::SIMDRegister<T> val)
-{
-    auto positive = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (juce::dsp::SIMDRegister<T> ((T) 0), val);
-    auto negative = juce::dsp::SIMDRegister<T> ((T) 1) & juce::dsp::SIMDRegister<T>::lessThan (val, juce::dsp::SIMDRegister<T> ((T) 0));
-    return positive - negative;
-}
-
 /** Langevin function */
 template <typename Float, typename Bool>
 static inline Float langevin (Float x, Float coth, Bool nearZero) noexcept
 {
 #if HYSTERESIS_USE_SIMD
-    auto notNearZero = ~nearZero;
-    return ((coth - ((Float) 1.0 / x)) & notNearZero) + ((x / 3.0) & nearZero);
+    return xsimd::select (nearZero, x / 3.0, coth - ((Float) 1.0 / x));
 #else
     return ! nearZero ? (coth) - (1.0 / x) : x / 3.0;
 #endif
@@ -73,8 +63,7 @@ template <typename Float, typename Bool>
 static inline Float langevinD (Float x, Float coth, Bool nearZero) noexcept
 {
 #if HYSTERESIS_USE_SIMD
-    auto notNearZero = ~nearZero;
-    return ((((Float) 1.0 / (x * x)) - (coth * coth) + 1.0) & notNearZero) + ((Float) ONE_THIRD & nearZero);
+    return xsimd::select (nearZero, (Float) ONE_THIRD, ((Float) 1.0 / (x * x)) - (coth * coth) + 1.0);
 #else
     return ! nearZero ? (1.0 / (x * x)) - (coth * coth) + 1.0 : ONE_THIRD;
 #endif
@@ -85,9 +74,7 @@ template <typename Float, typename Bool>
 static inline Float langevinD2 (Float x, Float coth, Bool nearZero) noexcept
 {
 #if HYSTERESIS_USE_SIMD
-    auto notNearZero = ~nearZero;
-    return (((Float) 2.0 * coth * (coth * coth - 1.0) - ((Float) 2.0 / (x * x * x))) & notNearZero)
-           + ((x * NEG_TWO_OVER_15) & nearZero);
+    return xsimd::select (nearZero, x * NEG_TWO_OVER_15, (Float) 2.0 * coth * (coth * coth - 1.0) - ((Float) 2.0 / (x * x * x)));
 #else
     return ! nearZero
                ? 2.0 * coth * (coth * coth - 1.0) - (2.0 / (x * x * x))
@@ -110,8 +97,8 @@ static inline Float hysteresisFunc (Float M, Float H, Float H_d, HysteresisState
     hp.Q = (H + M * HysteresisOps::HysteresisState::alpha) * (1.0 / hp.a);
 
 #if HYSTERESIS_USE_SIMD
-    hp.coth = (Float) 1.0 / tanhSIMD (hp.Q);
-    hp.nearZero = Float::lessThan (hp.Q, (Float) 0.001) & Float::greaterThan (hp.Q, (Float) -0.001);
+    hp.coth = (Float) 1.0 / xsimd::tanh (hp.Q);
+    hp.nearZero = (hp.Q < 0.001) && (hp.Q > -0.001);
 #else
     hp.coth = 1.0 / std::tanh (hp.Q);
     hp.nearZero = hp.Q < 0.001 && hp.Q > -0.001;
@@ -120,9 +107,9 @@ static inline Float hysteresisFunc (Float M, Float H, Float H_d, HysteresisState
     hp.M_diff = langevin (hp.Q, hp.coth, hp.nearZero) * hp.M_s - M;
 
 #if HYSTERESIS_USE_SIMD
-    const auto delta = ((Float) 1.0 & Float::greaterThanOrEqual (H_d, (Float) 0.0)) - ((Float) 1.0 & Float::lessThan (H_d, (Float) 0.0));
-    const auto delta_M = Float::equal (signumSIMD (delta), signumSIMD (hp.M_diff));
-    hp.kap1 = (Float) hp.nc & delta_M;
+    const auto delta = xsimd::select (H_d >= 0.0, (Float) 1, (Float) -1);
+    const auto delta_M = chowdsp::sign (delta) == chowdsp::sign (hp.M_diff);
+    hp.kap1 = xsimd::select (delta_M, (Float) hp.nc, (Float) 0);
 #else
     const auto delta = (Float) ((H_d >= 0.0) - (H_d < 0.0));
     const auto delta_M = (Float) (sign (delta) == sign (hp.M_diff));

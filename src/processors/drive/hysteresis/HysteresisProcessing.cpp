@@ -48,7 +48,7 @@ void HysteresisProcessing::cook (float drive, float width, float sat)
 
 void HysteresisProcessing::processBlock (double* bufferLeft, double* bufferRight, const int numSamples)
 {
-    using Float = dsp::SIMDRegister<double>;
+    using Float = xsimd::batch<double>;
 
     bool needsSmoothing = driveSmooth.isSmoothing() || widthSmooth.isSmoothing() || satSmooth.isSmoothing();
 
@@ -62,15 +62,15 @@ void HysteresisProcessing::processBlock (double* bufferLeft, double* bufferRight
 
             stereoVec[0] = bufferLeft[n];
             stereoVec[1] = bufferRight[n];
-            auto H = Float::fromRawArray (stereoVec);
+            auto H = xsimd::load_aligned (stereoVec);
             auto H_d = HysteresisOps::deriv (H, H_n1, H_d_n1, (Float) T);
             auto M = NRSolver<4> (H, H_d);
 
             // check for instability
 #if HYSTERESIS_USE_SIMD
-            auto notIllCondition = ~(chowdsp::SIMDUtils::isnanSIMD (M) | Float::greaterThan (M, (Float) upperLim));
-            M = M & notIllCondition;
-            H_d = H_d & notIllCondition;
+            auto notIllCondition = ! (xsimd::isnan (M) || (M > upperLim));
+            M = xsimd::select (notIllCondition, M, (Float) 0.0);
+            H_d = xsimd::select (notIllCondition, H_d, (Float) 0.0);
 #else
             bool illCondition = std::isnan (M) || M > upperLim;
             M = illCondition ? 0.0 : M;
@@ -81,7 +81,7 @@ void HysteresisProcessing::processBlock (double* bufferLeft, double* bufferRight
             H_n1 = H;
             H_d_n1 = H_d;
 
-            M.copyToRawArray (stereoVec);
+            M.store_aligned (stereoVec);
             bufferLeft[n] = stereoVec[0];
             bufferRight[n] = stereoVec[1];
         }
@@ -93,15 +93,15 @@ void HysteresisProcessing::processBlock (double* bufferLeft, double* bufferRight
         {
             stereoVec[0] = bufferLeft[n];
             stereoVec[1] = bufferRight[n];
-            auto H = Float::fromRawArray (stereoVec);
+            auto H = xsimd::load_aligned (stereoVec);
             auto H_d = HysteresisOps::deriv (H, H_n1, H_d_n1, (Float) T);
             auto M = NRSolver<4> (H, H_d);
 
             // check for instability
 #if HYSTERESIS_USE_SIMD
-            auto notIllCondition = ~(chowdsp::SIMDUtils::isnanSIMD (M) | Float::greaterThan (M, (Float) upperLim));
-            M = M & notIllCondition;
-            H_d = H_d & notIllCondition;
+            auto notIllCondition = ! (xsimd::isnan (M) || (M > upperLim));
+            M = xsimd::select (notIllCondition, M, (Float) 0.0);
+            H_d = xsimd::select (notIllCondition, H_d, (Float) 0.0);
 #else
             bool illCondition = std::isnan (M) || M > upperLim;
             M = illCondition ? 0.0 : M;
@@ -112,7 +112,7 @@ void HysteresisProcessing::processBlock (double* bufferLeft, double* bufferRight
             H_n1 = H;
             H_d_n1 = H_d;
 
-            M.copyToRawArray (stereoVec);
+            M.store_aligned (stereoVec);
             bufferLeft[n] = stereoVec[0];
             bufferRight[n] = stereoVec[1];
         }

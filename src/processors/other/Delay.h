@@ -2,10 +2,10 @@
 
 #include "../BaseProcessor.h"
 
-class Delay : public BaseProcessor
+class DelayModule : public BaseProcessor
 {
 public:
-    explicit Delay (UndoManager* um = nullptr);
+    explicit DelayModule (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Other; }
     static ParamLayout createParameterLayout();
@@ -73,5 +73,5 @@ private:
 
     bool bypassNeedsReset = false;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Delay)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayModule)
 };
