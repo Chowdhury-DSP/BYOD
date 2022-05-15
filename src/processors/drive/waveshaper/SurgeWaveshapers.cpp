@@ -575,8 +575,8 @@ struct FolderADAA
         auto adres = xsimd::select (rangeMask[0], adVal[0], (Vec4) 0);
         for (int i = 1; i < pts - 1; ++i)
         {
-            res = res + xsimd::select (rangeMask[0], val[0], (Vec4) 0);
-            adres = adres + xsimd::select (rangeMask[0], adVal[0], (Vec4) 0);
+            res = res + xsimd::select (rangeMask[i], val[i], (Vec4) 0);
+            adres = adres + xsimd::select (rangeMask[i], adVal[i], (Vec4) 0);
         }
         f = res;
         adf = adres;
