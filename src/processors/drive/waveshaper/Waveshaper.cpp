@@ -108,7 +108,7 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
     }
 }
 
-void Waveshaper::getCustomComponents (OwnedArray<Component>& customComps)
+bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps)
 {
     struct CustomBoxAttach : private ComboBox::Listener
     {
@@ -206,4 +206,6 @@ void Waveshaper::getCustomComponents (OwnedArray<Component>& customComps)
     };
 
     customComps.add (std::make_unique<WaveshapeComboBox> (vts));
+
+    return false;
 }

@@ -15,8 +15,6 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
-    void addToPopupMenu (PopupMenu& menu) override;
-
 private:
     template <typename DelayArrType>
     void processChorus (AudioBuffer<float>& buffer, DelayArrType& delay);
@@ -77,8 +75,6 @@ private:
 
     float fs = 48000.0f;
     AudioBuffer<float> stereoBuffer;
-
-    std::unique_ptr<ParameterAttachment> delayTypeAttach;
 
     bool bypassNeedsReset = false;
 

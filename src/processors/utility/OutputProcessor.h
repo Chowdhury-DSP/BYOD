@@ -15,7 +15,7 @@ public:
     void resetLevels();
     void processAudio (AudioBuffer<float>& buffer) override;
 
-    void getCustomComponents (OwnedArray<Component>& customComps) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps) override;
 
 private:
     LevelMeterComponent::LevelDataType rmsLevels {};

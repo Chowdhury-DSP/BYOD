@@ -44,6 +44,7 @@
 #include "utility/FreqBandSplitter.h"
 #include "utility/Mixer.h"
 #include "utility/Oscilloscope.h"
+#include "utility/Panner.h"
 #include "utility/StereoMerger.h"
 #include "utility/StereoSplitter.h"
 #include "utility/Tuner.h"
@@ -90,6 +91,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Frequency Splitter", &processorFactory<FreqBandSplitter> },
     { "Mixer", &processorFactory<Mixer> },
     { "Oscilloscope", &processorFactory<Oscilloscope> },
+    { "Panner", &processorFactory<Panner> },
     { "Stereo Merger", &processorFactory<StereoMerger> },
     { "Stereo Splitter", &processorFactory<StereoSplitter> },
     { "Tuner", &processorFactory<Tuner> },

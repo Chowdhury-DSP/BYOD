@@ -11,7 +11,7 @@ public:
     static ParamLayout createParameterLayout();
 
     void inputConnectionChanged (int portIndex, bool wasConnected) override;
-    void getCustomComponents (OwnedArray<Component>& customComps) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps) override;
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;

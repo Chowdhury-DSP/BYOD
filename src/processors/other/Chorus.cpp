@@ -21,9 +21,10 @@ Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus", createParameterLayou
     mixParam = vts.getRawParameterValue ("mix");
     delayTypeParam = vts.getRawParameterValue (delayTypeTag);
 
+    addPopupMenuParameter (delayTypeTag);
+
     uiOptions.backgroundColour = Colours::purple.brighter (0.25f);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
-    uiOptions.paramIDsToSkip = { delayTypeTag };
     uiOptions.info.description = "A multi-phase chorus effect. Use the right-click menu to enable lo-fi mode.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -202,30 +203,4 @@ void Chorus::processAudioBypassed (AudioBuffer<float>& buffer)
     }
 
     outputBuffers.getReference (0) = &buffer;
-}
-
-void Chorus::addToPopupMenu (PopupMenu& menu)
-{
-    menu.addSectionHeader ("Delay Type");
-    int itemID = 0;
-
-    auto* delayTypeChoiceParam = dynamic_cast<AudioParameterChoice*> (vts.getParameter (delayTypeTag));
-    delayTypeAttach = std::make_unique<ParameterAttachment> (
-        *delayTypeChoiceParam, [=] (float) {}, vts.undoManager);
-
-    for (const auto [index, delayTypeChoice] : sst::cpputils::enumerate (delayTypeChoiceParam->choices))
-    {
-        PopupMenu::Item delayTypeItem;
-        delayTypeItem.itemID = ++itemID;
-        delayTypeItem.text = delayTypeChoice;
-        delayTypeItem.action = [&, newParamVal = delayTypeChoiceParam->convertTo0to1 ((float) index)]
-        {
-            delayTypeAttach->setValueAsCompleteGesture (newParamVal);
-        };
-        delayTypeItem.colour = (delayTypeChoiceParam->getIndex() == (int) index) ? uiOptions.powerColour : Colours::white;
-
-        menu.addItem (delayTypeItem);
-    }
-
-    menu.addSeparator();
 }

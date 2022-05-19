@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Added "Rotary" module.
+- Added "Panner" module.
 - Added "Neural" mode to Centaur module.
 - Added UI size to the saved plugin state.
 - Improved neural network-based modules performance and sound quality at different sample rates.

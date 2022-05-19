@@ -60,7 +60,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         buttons.add (std::move (newButton));
     };
 
-    baseProc.getCustomComponents (customComponents);
+    auto customComponentsFirst = baseProc.getCustomComponents (customComponents);
 
     for (auto* param : vts.processor.getParameters())
     {
@@ -93,8 +93,10 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
             addButton (paramBool);
     }
 
-    for (auto* comp : customComponents)
+    for (int i = customComponents.size() - 1; i >= 0; --i)
     {
+        auto* comp = customComponents[i];
+
         addAndMakeVisible (comp);
         if (auto* sliderComp = dynamic_cast<Slider*> (comp))
         {
@@ -106,7 +108,11 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
             sliderComp->setColour (Slider::thumbColourId, accentColour);
 
             customComponents.removeObject (comp, false);
-            sliders.add (sliderComp);
+
+            if (customComponentsFirst)
+                sliders.insert (0, sliderComp);
+            else
+                sliders.add (sliderComp);
         }
         else if (auto* boxComp = dynamic_cast<ComboBox*> (comp))
         {
@@ -115,7 +121,11 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
             boxComp->setColour (ComboBox::arrowColourId, contrastColour);
 
             customComponents.removeObject (comp, false);
-            boxes.add (boxComp);
+
+            if (customComponentsFirst)
+                boxes.insert (0, boxComp);
+            else
+                boxes.add (boxComp);
         }
     }
 

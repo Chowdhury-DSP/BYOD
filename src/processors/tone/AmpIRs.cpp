@@ -146,7 +146,7 @@ void AmpIRs::fromXML (XmlElement* xml, bool loadPosition)
 }
 
 //==========================================================================
-void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
+bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
 {
     struct CustomBoxAttach : private ComboBox::Listener
     {
@@ -289,4 +289,6 @@ void AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
     };
 
     customComps.add (std::make_unique<IRComboBox> (vts, *this));
+
+    return false;
 }

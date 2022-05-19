@@ -108,6 +108,7 @@ target_sources(BYOD PRIVATE
     processors/utility/Mixer.cpp
     processors/utility/Oscilloscope.cpp
     processors/utility/OutputProcessor.cpp
+    processors/utility/Panner.cpp
     processors/utility/StereoMerger.cpp
     processors/utility/StereoSplitter.cpp
     processors/utility/Tuner.cpp
