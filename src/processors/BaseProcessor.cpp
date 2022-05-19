@@ -159,6 +159,69 @@ void BaseProcessor::removeConnection (const ConnectionInfo& info)
     }
 }
 
+void BaseProcessor::addPopupMenuParameter (const String& paramID)
+{
+    uiOptions.paramIDsToSkip.addIfNotAlreadyThere (paramID);
+    popupMenuParameterIDs.addIfNotAlreadyThere (paramID);
+}
+
+void BaseProcessor::addToPopupMenu (PopupMenu& menu)
+{
+    popupMenuParameterAttachments.clear();
+    int itemID = 0;
+
+    auto addChoiceParam = [this, &menu, &itemID] (AudioParameterChoice* param)
+    {
+        menu.addSectionHeader (param->name);
+
+        auto* attachment = popupMenuParameterAttachments.add (std::make_unique<ParameterAttachment> (
+            *param, [=] (float) {}, vts.undoManager));
+
+        for (const auto [index, paramChoice] : sst::cpputils::enumerate (param->choices))
+        {
+            PopupMenu::Item paramItem;
+            paramItem.itemID = ++itemID;
+            paramItem.text = paramChoice;
+            paramItem.action = [attachment, newParamVal = param->convertTo0to1 ((float) index)]
+            {
+                attachment->setValueAsCompleteGesture (newParamVal);
+            };
+            paramItem.colour = (param->getIndex() == (int) index) ? uiOptions.powerColour : Colours::white;
+
+            menu.addItem (paramItem);
+        }
+    };
+
+    auto addBoolParam = [this, &itemID, &menu] (AudioParameterBool* param)
+    {
+        auto* attachment = popupMenuParameterAttachments.add (std::make_unique<ParameterAttachment> (
+            *param, [] (float) {}, vts.undoManager));
+
+        PopupMenu::Item paramItem;
+        paramItem.itemID = ++itemID;
+        paramItem.text = param->name;
+        paramItem.action = [attachment, param]
+        { attachment->setValueAsCompleteGesture (param->get() ? 0.0f : 1.0f); };
+        paramItem.colour = param->get() ? uiOptions.powerColour : Colours::white;
+
+        menu.addItem (paramItem);
+    };
+
+    for (const auto& paramID : popupMenuParameterIDs)
+    {
+        auto* param = vts.getParameter (paramID);
+
+        if (auto* choiceParam = dynamic_cast<AudioParameterChoice*> (param))
+            addChoiceParam (choiceParam);
+        else if (auto* boolParam = dynamic_cast<AudioParameterBool*> (param))
+            addBoolParam (boolParam);
+        else
+            jassertfalse; // popup menu items are not supported for this type of parameter by default!
+
+        menu.addSeparator();
+    }
+}
+
 void BaseProcessor::setPosition (Point<int> pos, Rectangle<int> parentBounds)
 {
     if (parentBounds.getWidth() <= 0 || parentBounds.getHeight() <= 0)

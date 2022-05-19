@@ -69,14 +69,18 @@ public:
     ProcessorUIOptions& getUIOptions() { return uiOptions; }
     const ProcessorUIOptions& getUIOptions() const { return uiOptions; }
 
-    /** if your processor has custom UI components, create them here! */
-    virtual void getCustomComponents (OwnedArray<Component>& /*customComps*/) {}
+    /**
+     * If your processor has custom UI components, create them here!
+     *
+     * Return true if the custom components should be ordered before the other components on the UI.
+     */
+    virtual bool getCustomComponents (OwnedArray<Component>& /*customComps*/) { return false; }
 
     /** if your processor needs a custom looks and feel, create it here! (with the shared lnfAllocator) */
     virtual LookAndFeel* getCustomLookAndFeel() const { return nullptr; }
 
     /** add options to the processor's popup menu */
-    virtual void addToPopupMenu (PopupMenu& /*menu*/) {}
+    virtual void addToPopupMenu (PopupMenu& menu);
 
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
@@ -106,6 +110,8 @@ protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
     virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) {}
+
+    void addPopupMenuParameter (const String& paramID);
 
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
@@ -151,6 +157,9 @@ private:
 
     bool portMagnitudesOn = false;
     std::vector<PortMagnitude> portMagnitudes;
+
+    StringArray popupMenuParameterIDs;
+    OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };

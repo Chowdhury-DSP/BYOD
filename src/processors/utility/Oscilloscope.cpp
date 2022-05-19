@@ -109,7 +109,7 @@ Path Oscilloscope::ScopeBackgroundTask::getScopePath() const noexcept
 }
 
 //===================================================================
-void Oscilloscope::getCustomComponents (OwnedArray<Component>& customComps)
+bool Oscilloscope::getCustomComponents (OwnedArray<Component>& customComps)
 {
     struct ScopeComp : public Component,
                        private Timer
@@ -150,4 +150,5 @@ void Oscilloscope::getCustomComponents (OwnedArray<Component>& customComps)
     };
 
     customComps.add (std::make_unique<ScopeComp> (scopeTask));
+    return false;
 }

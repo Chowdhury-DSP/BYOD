@@ -11,13 +11,13 @@ Centaur::Centaur (UndoManager* um) : BaseProcessor ("Centaur", createParameterLa
 {
     levelParam = vts.getRawParameterValue (levelTag);
     modeParam = vts.getRawParameterValue (modeTag);
+    addPopupMenuParameter (modeTag);
 
     uiOptions.backgroundColour = Colour (0xFFDAA520);
     uiOptions.powerColour = Colour (0xFF14CBF2).brighter (0.5f);
     uiOptions.info.description = "Emulation of the Klon Centaur overdrive pedal. Use the right-click menu to enable neural mode.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
     uiOptions.info.infoLink = "https://github.com/jatinchowdhury18/KlonCentaur";
-    uiOptions.paramIDsToSkip = { modeTag };
 }
 
 ParamLayout Centaur::createParameterLayout()
@@ -109,30 +109,4 @@ void Centaur::processAudio (AudioBuffer<float>& buffer)
     }
 
     dcBlocker.processAudio (buffer);
-}
-
-void Centaur::addToPopupMenu (PopupMenu& menu)
-{
-    menu.addSectionHeader ("Mode");
-    int itemID = 0;
-
-    auto* modeChoiceParam = dynamic_cast<AudioParameterChoice*> (vts.getParameter (modeTag));
-    modeAttach = std::make_unique<ParameterAttachment> (
-        *modeChoiceParam, [=] (float) {}, vts.undoManager);
-
-    for (const auto [index, modeChoice] : sst::cpputils::enumerate (modeChoiceParam->choices))
-    {
-        PopupMenu::Item modeItem;
-        modeItem.itemID = ++itemID;
-        modeItem.text = modeChoice;
-        modeItem.action = [&, newParamVal = modeChoiceParam->convertTo0to1 ((float) index)]
-        {
-            modeAttach->setValueAsCompleteGesture (newParamVal);
-        };
-        modeItem.colour = (modeChoiceParam->getIndex() == (int) index) ? uiOptions.powerColour : Colours::white;
-
-        menu.addItem (modeItem);
-    }
-
-    menu.addSeparator();
 }

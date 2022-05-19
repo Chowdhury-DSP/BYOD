@@ -16,9 +16,11 @@ DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParam
     delayTypeParam = vts.getRawParameterValue (delayTypeTag);
     pingPongParam = vts.getRawParameterValue (pingPongTag);
 
+    addPopupMenuParameter (delayTypeTag);
+    addPopupMenuParameter (pingPongTag);
+
     uiOptions.backgroundColour = Colours::cyan.darker (0.1f);
     uiOptions.powerColour = Colours::gold;
-    uiOptions.paramIDsToSkip = { delayTypeTag, pingPongTag };
     uiOptions.info.description = "A simple delay effect with feedback. Use the right-click menu to enable lo-fi mode or a ping-pong effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -257,42 +259,4 @@ void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
     }
 
     outputBuffers.getReference (0) = &buffer;
-}
-
-void DelayModule::addToPopupMenu (PopupMenu& menu)
-{
-    menu.addSectionHeader ("Delay Type");
-    int itemID = 0;
-
-    auto* delayTypeChoiceParam = dynamic_cast<AudioParameterChoice*> (vts.getParameter (delayTypeTag));
-    delayTypeAttach = std::make_unique<ParameterAttachment> (
-        *delayTypeChoiceParam, [=] (float) {}, vts.undoManager);
-
-    for (const auto [index, delayTypeChoice] : sst::cpputils::enumerate (delayTypeChoiceParam->choices))
-    {
-        PopupMenu::Item delayTypeItem;
-        delayTypeItem.itemID = ++itemID;
-        delayTypeItem.text = delayTypeChoice;
-        delayTypeItem.action = [&, newParamVal = delayTypeChoiceParam->convertTo0to1 ((float) index)]
-        {
-            delayTypeAttach->setValueAsCompleteGesture (newParamVal);
-        };
-        delayTypeItem.colour = (delayTypeChoiceParam->getIndex() == (int) index) ? uiOptions.powerColour : Colours::white;
-
-        menu.addItem (delayTypeItem);
-    }
-
-    menu.addSeparator();
-
-    pingPongAttach = std::make_unique<ParameterAttachment> (
-        *vts.getParameter (pingPongTag), [=] (float) {}, vts.undoManager);
-
-    PopupMenu::Item pingPongItem;
-    pingPongItem.itemID = ++itemID;
-    pingPongItem.text = "Ping-Pong";
-    pingPongItem.action = [=]
-    { pingPongAttach->setValueAsCompleteGesture (1.0f - *pingPongParam); };
-    pingPongItem.colour = *pingPongParam == 1.0f ? uiOptions.powerColour : Colours::white;
-
-    menu.addItem (pingPongItem);
 }

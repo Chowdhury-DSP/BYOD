@@ -14,8 +14,6 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
-    void addToPopupMenu (PopupMenu& menu) override;
-
 private:
     template <typename DelayType>
     void processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType& delayLine);
@@ -67,9 +65,6 @@ private:
 
     float fs = 48000.0f;
     AudioBuffer<float> stereoBuffer;
-
-    std::unique_ptr<ParameterAttachment> delayTypeAttach;
-    std::unique_ptr<ParameterAttachment> pingPongAttach;
 
     bool bypassNeedsReset = false;
 

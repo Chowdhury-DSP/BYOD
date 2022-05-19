@@ -17,8 +17,6 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
-    void addToPopupMenu (PopupMenu& menu) override;
-
 private:
     std::atomic<float>* levelParam = nullptr;
     std::atomic<float>* modeParam = nullptr;
@@ -32,8 +30,6 @@ private:
     AudioBuffer<float> fadeBuffer;
 
     DCBlocker dcBlocker;
-
-    std::unique_ptr<ParameterAttachment> modeAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Centaur)
 };

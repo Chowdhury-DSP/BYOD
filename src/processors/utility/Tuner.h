@@ -10,7 +10,7 @@ public:
     ProcessorType getProcessorType() const override { return Utility; }
     static ParamLayout createParameterLayout();
 
-    void getCustomComponents (OwnedArray<Component>& customComps) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps) override;
     void inputConnectionChanged (int portIndex, bool wasConnected) override;
 
     void prepare (double sampleRate, int samplesPerBlock) override;

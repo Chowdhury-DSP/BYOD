@@ -13,8 +13,7 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
-    void addToPopupMenu (PopupMenu& menu) override;
-    void getCustomComponents (OwnedArray<Component>& customComps) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps) override;
 
 private:
     void fillLevelBuffer (AudioBuffer<float>& buffer, bool directControlOn);
@@ -31,8 +30,6 @@ private:
 
     AudioBuffer<float> levelBuffer;
     chowdsp::LevelDetector<float> level;
-
-    std::unique_ptr<ParameterAttachment> directControlAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnvelopeFilter)
 };

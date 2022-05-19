@@ -29,9 +29,10 @@ EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor ("Envelope Filt
     filterTypeParam = vts.getRawParameterValue ("filter_type");
     directControlParam = vts.getRawParameterValue (directControlTag);
 
+    addPopupMenuParameter (directControlTag);
+
     uiOptions.backgroundColour = Colours::purple.brighter();
     uiOptions.powerColour = Colours::yellow.darker (0.1f);
-    uiOptions.paramIDsToSkip = { directControlTag };
     uiOptions.info.description = "A envelope filter with lowpass, bandpass, and highpass filter types. Use the right-click menu to control the filter modulation directly";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -166,22 +167,7 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     buffer.applyGain (Decibels::decibelsToGain (-6.0f));
 }
 
-void EnvelopeFilter::addToPopupMenu (PopupMenu& menu)
-{
-    directControlAttach = std::make_unique<ParameterAttachment> (
-        *vts.getParameter (directControlTag), [=] (float) {}, vts.undoManager);
-
-    PopupMenu::Item directControlItem;
-    directControlItem.itemID = 1;
-    directControlItem.text = "Direct Control";
-    directControlItem.action = [=]
-    { directControlAttach->setValueAsCompleteGesture (1.0f - *directControlParam); };
-    directControlItem.colour = *directControlParam == 1.0f ? uiOptions.powerColour : Colours::white;
-
-    menu.addItem (directControlItem);
-}
-
-void EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
+bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
 {
     class ControlSlider : public Slider,
                           private AudioProcessorValueTreeState::Listener
@@ -264,4 +250,6 @@ void EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
     };
 
     customComps.add (std::make_unique<ControlSlider> (vts));
+
+    return false;
 }
