@@ -108,7 +108,7 @@ static inline Float hysteresisFunc (Float M, Float H, Float H_d, HysteresisState
 
 #if HYSTERESIS_USE_SIMD
     const auto delta = xsimd::select (H_d >= 0.0, (Float) 1, (Float) -1);
-    const auto delta_M = chowdsp::sign (delta) == chowdsp::sign (hp.M_diff);
+    const auto delta_M = chowdsp::Math::sign (delta) == chowdsp::Math::sign (hp.M_diff);
     hp.kap1 = xsimd::select (delta_M, (Float) hp.nc, (Float) 0);
 #else
     const auto delta = (Float) ((H_d >= 0.0) - (H_d < 0.0));
