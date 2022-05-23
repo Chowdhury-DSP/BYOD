@@ -26,7 +26,7 @@ void OutputStageProc::calcCoefs (float curLevel)
 
     // bilinear transform
     const auto K = 2.0f * fs;
-    chowdsp::Bilinear::BilinearTransform<float, 2>::call (b, a, bs, as, K);
+    chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b, a, bs, as, K);
 }
 
 void OutputStageProc::processBlock (float* block, const int numSamples) noexcept

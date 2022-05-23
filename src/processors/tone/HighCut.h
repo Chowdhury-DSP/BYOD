@@ -24,7 +24,7 @@ private:
 
         float b[2];
         float a[2];
-        chowdsp::Bilinear::BilinearTransform<float, 2>::call (b, a, b_s, a_s, K);
+        chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b, a, b_s, a_s, K);
 
         for (auto& filt : iir)
             filt.setCoefs (b, a);

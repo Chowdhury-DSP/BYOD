@@ -44,7 +44,7 @@ private:
         const auto a1 = c.C8 * c.R8 * (R5 + c.RT) + b1;
         const auto a0 = R5 + c.R8 + c.RT;
 
-        using namespace chowdsp::Bilinear;
+        using namespace chowdsp::ConformalMaps;
         float fLP = 1.0f / (MathConstants<float>::twoPi * c.R8 * c.C8);
         float fHP = 1.0f / (MathConstants<float>::twoPi * R5 * c.C9);
         float fc = std::sqrt (fLP * fHP);
@@ -52,7 +52,7 @@ private:
 
         float b[3];
         float a[3];
-        BilinearTransform<float, 3>::call (b, a, { b2, b1, b0 }, { a2, a1, a0 }, K);
+        Transform<float, 3>::bilinear (b, a, { b2, b1, b0 }, { a2, a1, a0 }, K);
 
         for (auto& filt : iir)
             filt.setCoefs (b, a);

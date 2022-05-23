@@ -48,10 +48,10 @@ void calcDriveAmpCoefs (FilterType& filter, float driveParam, float fs)
     b_s[2] = a_s[2] + R1_a1 * R2_b0;
     b_s[3] = a_s[3] + R1_a0 * R2_b0;
 
-    using namespace chowdsp::Bilinear;
+    using namespace chowdsp::ConformalMaps;
     float b_z[4] {};
     float a_z[4] {};
-    BilinearTransform<float, 4>::call (b_z, a_z, b_s, a_s, computeKValue (4000.0f, fs));
+    Transform<float, 4>::bilinear (b_z, a_z, b_s, a_s, computeKValue (4000.0f, fs));
     filter.setCoefs (b_z, a_z);
 }
 
@@ -62,10 +62,10 @@ void calcDriveaStageBypassedCoefs (FilterType& filter, float fs)
     float b_s[2] { C7 * (R9 + R10), 1.0f };
     float a_s[2] { C7 * R9, 1.0f };
 
-    using namespace chowdsp::Bilinear;
+    using namespace chowdsp::ConformalMaps;
     float b_z[2] {};
     float a_z[2] {};
-    BilinearTransform<float, 2>::call (b_z, a_z, b_s, a_s, 2.0f * fs);
+    Transform<float, 2>::bilinear (b_z, a_z, b_s, a_s, 2.0f * fs);
     filter.setCoefs (b_z, a_z);
 }
 } // namespace

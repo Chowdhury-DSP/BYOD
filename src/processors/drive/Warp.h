@@ -41,7 +41,7 @@ private:
 
             void calcCoefs (float fc, float qVal, float gain, float fs)
             {
-                using namespace chowdsp::Bilinear;
+                using namespace chowdsp::ConformalMaps;
 
                 const auto wc = MathConstants<float>::twoPi * fc;
                 const auto K = computeKValue (fc, fs);
@@ -52,7 +52,7 @@ private:
                 float kNum = gain > 1.0f ? kTerm * gain : kTerm;
                 float kDen = gain < 1.0f ? kTerm / gain : kTerm;
 
-                BilinearTransform<float, 3>::call (b, a, { kSqTerm, kNum, 1.0f }, { kSqTerm, kDen, 1.0f }, K);
+                Transform<float, 3>::bilinear (b, a, { kSqTerm, kNum, 1.0f }, { kSqTerm, kDen, 1.0f }, K);
             }
 
             float a[order + 1];
