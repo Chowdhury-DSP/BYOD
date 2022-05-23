@@ -23,7 +23,7 @@ void InputBufferProcessor::calcCoefs()
 
     // bilinear transform
     const auto K = 2.0f * fs;
-    chowdsp::Bilinear::BilinearTransform<float, 2>::call (b, a, bs, as, K);
+    chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b, a, bs, as, K);
 }
 
 void InputBufferProcessor::processBlock (float* buffer, const int numSamples) noexcept
