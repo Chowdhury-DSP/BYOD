@@ -8,8 +8,6 @@ else()
     set(CMAKE_CXX_STANDARD 20)
 endif()
 
-option(BYOD_BUILD_CLAP "Build a CLAP plugin target (experimental)" OFF)
-
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
@@ -95,7 +93,7 @@ juce_add_plugin(BYOD
     APP_GROUP_IDS ${APP_GROUP_IDS_TO_USE}
 )
 
-if(BYOD_BUILD_CLAP AND NOT IOS)
+if(NOT IOS)
     clap_juce_extensions_plugin(
         TARGET BYOD
         CLAP_ID "org.chowdsp.byod"
@@ -108,17 +106,8 @@ add_subdirectory(src)
 include_directories(src)
 add_subdirectory(res)
 
-include(modules/cmake/VersionInfo.cmake)
-
 target_compile_definitions(BYOD PUBLIC
     JUCE_VST3_CAN_REPLACE_VST2=0
-
-    BYOD_GIT_BRANCH="${GIT_BRANCH}"
-    BYOD_GIT_COMMIT_HASH="${GIT_COMMIT_HASH}"
-    BYOD_BUILD_FQDN="${PLUGIN_BUILD_FQDN}"
-    BYOD_CXX_COMPILER_ID="${CMAKE_CXX_COMPILER_ID}"
-    BYOD_CXX_COMPILER_VERSION="${CMAKE_CXX_COMPILER_VERSION}"
-
     BYOD_BUILD_PRESET_SERVER=${BYOD_BUILD_PRESET_SERVER_FLAG}
 )
 

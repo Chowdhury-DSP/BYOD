@@ -34,12 +34,15 @@ Name: "VST3_64"; Description: "VST3 Plugin"; Types: full
 Name: "VST_64"; Description: "VST Plugin"; Types: full
 Name: "Standalone"; Description: "Standalone Plugin"; Types: full
 Name: "AAX"; Description: "AAX Plugin"; Types: full
+Name: "CLAP_64"; Description: "Clap Plugin (0.25)"; Types: full
 
 [Files]
-Source: "../../bin/Win64/BYOD.vst3"; Excludes: "*.aaxplugin"; DestDir: "{code:GetDir|VST3_64}"; Components: VST3_64; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../bin/Win64/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|VST_64}"; Components: VST_64; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../bin/Win64/BYOD.exe"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|Standalone}"; Components: Standalone; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../bin/Win64/BYOD.aaxplugin"; Excludes: "*.vst3"; DestDir: "{code:GetDir|AAX}"; Components: AAX; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win64/BYOD.vst3"; Excludes: "*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST3_64}"; Components: VST3_64; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win64/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST_64}"; Components: VST_64; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win64/BYOD.exe"; Excludes: "*.vst3,*.aaxplugin,*.clap"; DestDir: "{code:GetDir|Standalone}"; Components: Standalone; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../bin/Win64/BYOD.aaxplugin"; Excludes: "*.vst3,*.clap"; DestDir: "{code:GetDir|AAX}"; Components: AAX; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../Bin/Win64/BYOD.clap"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{commoncf64}\Clap"; Components: CLAP_64; Flags: ignoreversion recursesubdirs createallsubdirs
+
 
 [Icons]
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"

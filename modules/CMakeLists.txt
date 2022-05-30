@@ -1,16 +1,15 @@
 add_subdirectory(JUCE)
-include(cmake/SubprojectVersion.cmake)
-subproject_version(JUCE juce_version)
-message(STATUS "VERSION for JUCE: ${juce_version}")
 
 # add custom JUCE modules
 add_subdirectory(chowdsp_utils)
 juce_add_modules(chowdsp_juce_dsp)
 add_subdirectory(chowdsp_wdf)
+add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
 
-if(BYOD_BUILD_CLAP AND NOT IOS)
-    add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
-endif()
+subproject_version(JUCE juce_version)
+message(STATUS "VERSION for JUCE: ${juce_version}")
+subproject_version(chowdsp_utils chowdsp_version)
+message(STATUS "VERSION for chowdsp_utils: ${chowdsp_version}")
 
 # add RTNeural
 set(RTNEURAL_XSIMD ON CACHE BOOL "Use RTNeural with XSIMD backend" FORCE)
@@ -65,6 +64,8 @@ target_compile_definitions(juce_plugin_modules
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
 )
+
+add_diagnostic_info(juce_plugin_modules)
 
 target_include_directories(juce_plugin_modules
     INTERFACE
