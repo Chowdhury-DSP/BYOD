@@ -1,6 +1,5 @@
 #include "SettingsButton.h"
 #include "BYOD.h"
-#include "SystemInfo.h"
 #include "gui/pedalboard/BoardViewport.h"
 #include "processors/chain/ProcessorChainPortMagnitudesHelper.h"
 
@@ -61,25 +60,8 @@ void SettingsButton::showSettingsMenu()
     menu.addItem ("Copy Diagnostic Info", [=]
                   { copyDiagnosticInfo(); });
 
-    // get top level component that is big enough
-    Component* parentComp = this;
-    int iters = 0;
-    while (true)
-    {
-        if (parentComp->getWidth() > 80 && parentComp->getHeight() > 100)
-            break;
-
-        parentComp = parentComp->getParentComponent();
-
-        if (iters > 5 || parentComp == nullptr)
-        {
-            jassertfalse; // unable to find component large enough!
-            return;
-        }
-    }
-
     auto options = PopupMenu::Options()
-                       .withParentComponent (parentComp)
+                       .withParentComponent (getTopLevelComponent())
                        .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::upwards)
                        .withStandardItemHeight (27);
     menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
@@ -142,5 +124,5 @@ void SettingsButton::openGLManu (PopupMenu& menu, int itemID)
 void SettingsButton::copyDiagnosticInfo()
 {
     Logger::writeToLog ("Copying diagnostic info...");
-    SystemClipboard::copyTextToClipboard (SystemInfo::getDiagnosticsString (proc));
+    SystemClipboard::copyTextToClipboard (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (proc));
 }

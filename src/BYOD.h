@@ -6,22 +6,17 @@
 #include "state/StateManager.h"
 
 class BYOD : public chowdsp::PluginBase<BYOD>
-#if HAS_CLAP_JUCE_EXTENSIONS
-    ,
-             private clap_juce_extensions::clap_properties
-#endif
 {
 public:
     BYOD();
 
     static void addParameters (Parameters& params);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
-    void releaseResources() override;
+    void releaseResources() override {}
     void processAudioBlock (AudioBuffer<float>& buffer) override;
     void processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 
     AudioProcessorEditor* createEditor() override;
-    String getWrapperTypeString() const;
 
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;

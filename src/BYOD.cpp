@@ -1,5 +1,4 @@
 #include "BYOD.h"
-#include "SystemInfo.h"
 #include "gui/BYODPluginEditor.h"
 #include "state/presets/PresetManager.h"
 
@@ -14,7 +13,7 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                logger (logFileSubDir, logFileNameRoot),
                procStore (&undoManager)
 {
-    Logger::writeToLog (SystemInfo::getDiagnosticsString (*this));
+    Logger::writeToLog (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (*this));
 
     pluginSettings->initialise (settingsFilePath);
     procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager, [&] (int l)
@@ -42,10 +41,6 @@ void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
 
     bypassDelay.prepare ({ sampleRate, (uint32) samplesPerBlock, 2 });
     bypassScratchBuffer.setSize (2, samplesPerBlock);
-}
-
-void BYOD::releaseResources()
-{
 }
 
 void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
@@ -89,17 +84,6 @@ AudioProcessorEditor* BYOD::createEditor()
     openGLHelper->setComponent (editor);
 
     return editor;
-}
-
-String BYOD::getWrapperTypeString() const
-{
-#if HAS_CLAP_JUCE_EXTENSIONS
-    // Since we are using 'external clap' this is the one JUCE API we can't override
-    if (wrapperType == wrapperType_Undefined && is_clap)
-        return "Clap";
-#endif
-
-    return AudioProcessor::getWrapperTypeDescription (wrapperType);
 }
 
 void BYOD::getStateInformation (MemoryBlock& destData)
