@@ -3,6 +3,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
+- Added support for the CLAP plugin format.
 - Added "Rotary" module.
 - Added "Panner" module.
 - Added "Neural" mode to Centaur module.
