@@ -39,7 +39,7 @@ Name: "CLAP_32"; Description: "Clap Plugin (0.25)"; Types: full
 Source: "../../bin/Win32/BYOD.vst3"; Excludes: "*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST3_32}"; Components: VST3_32; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win32/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST_32}"; Components: VST_32; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win32/BYOD.exe"; Excludes: "*.vst3,*.aaxplugin,*.clap"; DestDir: "{code:GetDir|Standalone}"; Components: Standalone; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../Bin/Win32/BYOD.clap"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{commoncf32}\Clap"; Components: CLAP_64; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../Bin/Win32/BYOD.clap"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{commoncf32}\Clap"; Components: CLAP_32; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
