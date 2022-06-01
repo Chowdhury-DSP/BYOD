@@ -34,7 +34,7 @@ Name: "VST3_64"; Description: "VST3 Plugin"; Types: full
 Name: "VST_64"; Description: "VST Plugin"; Types: full
 Name: "Standalone"; Description: "Standalone Plugin"; Types: full
 Name: "AAX"; Description: "AAX Plugin"; Types: full
-Name: "CLAP_64"; Description: "Clap Plugin (0.25)"; Types: full
+Name: "CLAP_64"; Description: "Clap Plugin (0.26)"; Types: full
 
 [Files]
 Source: "../../bin/Win64/BYOD.vst3"; Excludes: "*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST3_64}"; Components: VST3_64; Flags: ignoreversion recursesubdirs createallsubdirs

@@ -97,7 +97,7 @@ if(NOT IOS)
     clap_juce_extensions_plugin(
         TARGET BYOD
         CLAP_ID "org.chowdsp.byod"
-        CLAP_FEATURES distortion audio_effect
+        CLAP_FEATURES audio-effect distortion
     )
 endif()
 
