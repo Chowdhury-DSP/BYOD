@@ -33,7 +33,7 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom
 Name: "VST3_32"; Description: "VST3 Plugin"; Types: full
 Name: "VST_32"; Description: "VST Plugin"; Types: full
 Name: "Standalone"; Description: "Standalone Plugin"; Types: full
-Name: "CLAP_32"; Description: "Clap Plugin (0.26)"; Types: full
+Name: "CLAP_32"; Description: "CLAP Plugin"; Types: full
 
 [Files]
 Source: "../../bin/Win32/BYOD.vst3"; Excludes: "*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST3_32}"; Components: VST3_32; Flags: ignoreversion recursesubdirs createallsubdirs
