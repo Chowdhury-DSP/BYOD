@@ -41,7 +41,7 @@ Source: "../../bin/Win64/BYOD.vst3"; Excludes: "*.aaxplugin,*.clap"; DestDir: "{
 Source: "../../bin/Win64/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST_64}"; Components: VST_64; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win64/BYOD.exe"; Excludes: "*.vst3,*.aaxplugin,*.clap"; DestDir: "{code:GetDir|Standalone}"; Components: Standalone; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win64/BYOD.aaxplugin"; Excludes: "*.vst3,*.clap"; DestDir: "{code:GetDir|AAX}"; Components: AAX; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../Bin/Win64/BYOD.clap"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{commoncf64}\Clap"; Components: CLAP_64; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../Bin/Win64/BYOD.clap"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{commoncf64}\CLAP"; Components: CLAP_64; Flags: ignoreversion recursesubdirs createallsubdirs
 
 
 [Icons]
