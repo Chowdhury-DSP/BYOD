@@ -15,7 +15,7 @@ public:
 private:
     chowdsp::TitleComp titleComp;
 
-    struct BYODInfoComp;
+    using BYODInfoComp = chowdsp::InfoComp<BYOD>;
     std::unique_ptr<BYODInfoComp> infoComp;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TitleBar)
