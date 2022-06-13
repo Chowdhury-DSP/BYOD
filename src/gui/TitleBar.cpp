@@ -4,17 +4,6 @@
 
 namespace GUIColours = GUIConstants::Colours;
 
-struct BYODInfoProvider : public chowdsp::StandardInfoProvider
-{
-    //    static constexpr bool showDebugFlag() { return false; }
-    static juce::String getWrapperTypeString (const BYOD& proc) { return proc.getWrapperTypeString(); }
-};
-
-struct TitleBar::BYODInfoComp : public chowdsp::InfoComp<BYODInfoProvider, BYOD>
-{
-    BYODInfoComp (BYOD& plugin) : chowdsp::InfoComp<BYODInfoProvider, BYOD> (plugin) {}
-};
-
 TitleBar::TitleBar (BYOD& plugin)
 {
     addAndMakeVisible (titleComp);
