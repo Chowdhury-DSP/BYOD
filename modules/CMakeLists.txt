@@ -51,7 +51,9 @@ target_compile_definitions(juce_plugin_modules
         JUCE_JACK=1
         JUCE_ALSA=1
         JUCE_COREGRAPHICS_DRAW_ASYNC=1
+        CHOWDSP_USE_XSIMD=1
         CHOWDSP_USE_CUSTOM_JUCE_DSP=1
+        CHOWDSP_USE_FOLEYS_CLASSES=0
         JucePlugin_Manufacturer="chowdsp"
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
