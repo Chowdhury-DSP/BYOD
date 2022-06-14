@@ -51,16 +51,11 @@ target_compile_definitions(juce_plugin_modules
         JUCE_JACK=1
         JUCE_ALSA=1
         JUCE_COREGRAPHICS_DRAW_ASYNC=1
-        CHOWDSP_USE_XSIMD=1
         CHOWDSP_USE_CUSTOM_JUCE_DSP=1
-        CHOWDSP_USE_FOLEYS_CLASSES=0
         JucePlugin_Manufacturer="chowdsp"
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
         JUCE_MODAL_LOOPS_PERMITTED=1
-        FOLEYS_SHOW_GUI_EDITOR_PALLETTE=0
-        FOLEYS_ENABLE_BINARY_DATA=1
-        FOLEYS_ENABLE_OPEN_GL_CONTEXT=0 # Foley's editor should NOT use OpenGL by default
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
 )
