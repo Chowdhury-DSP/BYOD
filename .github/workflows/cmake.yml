@@ -14,7 +14,6 @@ on:
 
 jobs:
   build_and_test:
-    if: contains(toJson(github.event.commits), '***NO_CI***') == false && contains(toJson(github.event.commits), '[ci skip]') == false && contains(toJson(github.event.commits), '[skip ci]') == false
     name: Test plugin on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -60,7 +59,7 @@ jobs:
       run: build/BYOD --unit-tests --all
 
     - name: Validate
-      if: runner.os == 'MacOS'
+      if: runner.os == 'Windows'
       run: bash scripts/validate.sh
 
 #    - name: Setup debug session
