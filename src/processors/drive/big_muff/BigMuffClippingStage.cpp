@@ -70,7 +70,7 @@ void BigMuffClippingStage::prepare (double sampleRate)
     float a_s[] = { C5 * (R19 + R20), 1.0f };
     float b[2];
     float a[2];
-    chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b, a, b_s, a_s, 2.0f * fs);
+    chowdsp::ConformalMaps::Transform<float, 1>::bilinear (b, a, b_s, a_s, 2.0f * fs);
     inputFilter[0].setCoefs (b, a);
     inputFilter[1].setCoefs (b, a);
 

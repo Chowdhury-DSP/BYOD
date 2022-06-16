@@ -31,7 +31,7 @@ public:
         as[1] = 1.0f;
 
         const auto K = 2.0f * fs;
-        chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b, a, bs, as, K);
+        chowdsp::ConformalMaps::Transform<float, 1>::bilinear (b, a, bs, as, K);
     }
 
 private:

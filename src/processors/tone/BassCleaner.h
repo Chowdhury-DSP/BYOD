@@ -20,7 +20,7 @@ private:
         float a_s[] { C3 * C4 * Rv1Val * R4, R4 * (C3 + C4) + C3 * Rv1Val, 1.0f };
 
         float b[3], a[3];
-        chowdsp::ConformalMaps::Transform<float, 3>::bilinear (b, a, b_s, a_s, 2.0f * fs);
+        chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b, a, b_s, a_s, 2.0f * fs);
 
         b[0] *= 3200.0f;
         b[1] *= 3200.0f;

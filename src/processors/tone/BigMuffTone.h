@@ -52,7 +52,7 @@ private:
 
         float b[3];
         float a[3];
-        Transform<float, 3>::bilinear (b, a, { b2, b1, b0 }, { a2, a1, a0 }, K);
+        Transform<float, 2>::bilinear (b, a, { b2, b1, b0 }, { a2, a1, a0 }, K);
 
         for (auto& filt : iir)
             filt.setCoefs (b, a);

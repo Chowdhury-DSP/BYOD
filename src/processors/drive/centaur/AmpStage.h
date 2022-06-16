@@ -49,7 +49,7 @@ public:
         const float wc = chowdsp::ConformalMaps::calcPoleFreq (as[0], as[1], as[2]);
         const auto K = wc == 0.0f ? 2.0f * fs : wc / std::tan (wc / (2.0f * fs));
 
-        chowdsp::ConformalMaps::Transform<float, 3>::bilinear (b, a, bs, as, K);
+        chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b, a, bs, as, K);
     }
 
     void processBlock (float* block, const int numSamples) noexcept
