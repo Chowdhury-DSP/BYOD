@@ -52,7 +52,7 @@ private:
                 float kNum = gain > 1.0f ? kTerm * gain : kTerm;
                 float kDen = gain < 1.0f ? kTerm / gain : kTerm;
 
-                Transform<float, 3>::bilinear (b, a, { kSqTerm, kNum, 1.0f }, { kSqTerm, kDen, 1.0f }, K);
+                Transform<float, 2>::bilinear (b, a, { kSqTerm, kNum, 1.0f }, { kSqTerm, kDen, 1.0f }, K);
             }
 
             float a[order + 1];

@@ -28,7 +28,7 @@ private:
 
         // bilinear transform
         float aU[2], bU[2];
-        chowdsp::ConformalMaps::Transform<float, 2>::bilinear (bU, aU, b_s, a_s, K);
+        chowdsp::ConformalMaps::Transform<float, 1>::bilinear (bU, aU, b_s, a_s, K);
 
         // flip pole inside unit circle to ensure stability
         float b[] { bU[0] / aU[1], bU[1] / aU[1] };
