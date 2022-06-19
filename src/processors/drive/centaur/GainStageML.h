@@ -17,7 +17,7 @@ private:
         numModels = 5,
     };
 
-    using RNNModel = ResampledRNN<8, SampleGRU<float, 1, 8>>;
+    using RNNModel = ResampledRNN<8, RTNeural::GRULayerT>;
     using ModelPair = std::array<RNNModel, 2>;
     std::array<ModelPair, numModels> gainStageML;
 
