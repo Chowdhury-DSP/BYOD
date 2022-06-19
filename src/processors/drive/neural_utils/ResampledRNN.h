@@ -1,9 +1,8 @@
 #pragma once
 
-#include "SampleGRU.h"
-#include "SampleLSTM.h"
+#include <pch.h>
 
-template <int hiddenSize, typename RecurrentLayerType = SampleLSTM<float, 1, hiddenSize>, typename ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<>>
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT>
 class ResampledRNN
 {
 public:
@@ -19,9 +18,7 @@ public:
     template <bool useRedisuals = false>
     void process (juce::dsp::AudioBlock<float>& block)
     {
-        auto&& processBlock = dsp::AudioBlock<float> { block };
-        if (needsResampling)
-            processBlock = resampler.processIn (block);
+        auto&& processBlock = oversampler->processSamplesUp (block);
 
         const auto numSamples = (int) processBlock.getNumSamples();
         auto* x = processBlock.getChannelPointer (0);
@@ -37,21 +34,17 @@ public:
                 x[i] = model.forward (&x[i]);
         }
 
-        if (needsResampling)
-            resampler.processOut (processBlock, block);
-
-        block *= gainCorrection;
+        oversampler->processSamplesDown (block);
     }
 
 private:
+    static constexpr auto DefaultSRCMode = RTNeural::SampleRateCorrectionMode::LinInterp;
+    using RecurrentLayerTypeComplete = RecurrentLayerType<float, 1, hiddenSize, DefaultSRCMode>;
     using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
-    RTNeural::ModelT<float, 1, 1, RecurrentLayerType, DenseLayerType> model;
+    RTNeural::ModelT<float, 1, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
 
-    chowdsp::ResampledProcess<ResamplerType> resampler;
-
+    std::unique_ptr<dsp::Oversampling<float>> oversampler;
     double targetSampleRate = 48000.0;
-    bool needsResampling = true;
-    float gainCorrection = 1.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResampledRNN)
 };

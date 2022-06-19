@@ -60,43 +60,51 @@ void loadGRUModel (ModelType& model, const nlohmann::json& weights_json)
 }
 } // namespace
 
-template <int hiddenSize, typename RecurrentLayerType, typename ResamplerType>
-void ResampledRNN<hiddenSize, RecurrentLayerType, ResamplerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+void ResampledRNN<hiddenSize, RecurrentLayerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
 {
     targetSampleRate = modelSampleRate;
 
     MemoryInputStream jsonInputStream (modelData, (size_t) modelDataSize, false);
     auto weightsJson = nlohmann::json::parse (jsonInputStream.readEntireStreamAsString().toStdString());
 
-    if constexpr (std::is_same_v<RecurrentLayerType, SampleGRU<float, 1, 8>>) // Centaur model has keras-style weights
+    if constexpr (std::is_same_v<RecurrentLayerTypeComplete, RTNeural::GRULayerT<float, 1, 8, DefaultSRCMode>>) // Centaur model has keras-style weights
         loadGRUModel (model, weightsJson);
     else
         loadLSTMModel (model, hiddenSize, weightsJson);
 }
 
-template <int hiddenSize, typename RecurrentLayerType, typename ResamplerType>
-void ResampledRNN<hiddenSize, RecurrentLayerType, ResamplerType>::prepare (double sampleRate, int samplesPerBlock)
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+void ResampledRNN<hiddenSize, RecurrentLayerType>::prepare (double sampleRate, int samplesPerBlock)
 {
-    const auto rnnDelaySamples = (int) std::ceil (sampleRate / targetSampleRate);
-    auto targetSampleRateToUse = targetSampleRate * rnnDelaySamples;
+    auto resampledSampleRate = sampleRate;
+    int resampleOrder = 0;
+    for (; resampleOrder <= 4; ++resampleOrder)
+    {
+        if (resampledSampleRate >= targetSampleRate)
+            break;
 
-    needsResampling = sampleRate != targetSampleRateToUse;
-    resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, targetSampleRateToUse);
+        resampledSampleRate *= 2.0;
+    }
 
-    model.template get<0>().prepare (rnnDelaySamples);
+    const auto rnnDelaySamples = resampledSampleRate / targetSampleRate;
+    jassert (rnnDelaySamples >= 1.0);
+
+    oversampler = std::make_unique<dsp::Oversampling<float>> (2, (size_t) resampleOrder, dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
+    oversampler->initProcessing ((size_t) samplesPerBlock);
+
+    model.template get<0>().prepare ((float) rnnDelaySamples);
     model.reset();
-
-    gainCorrection = Decibels::decibelsToGain (-3.0f * (float) std::log2 (sampleRate / targetSampleRate));
 }
 
-template <int hiddenSize, typename RecurrentLayerType, typename ResamplerType>
-void ResampledRNN<hiddenSize, RecurrentLayerType, ResamplerType>::reset()
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+void ResampledRNN<hiddenSize, RecurrentLayerType>::reset()
 {
-    resampler.reset();
+    oversampler->reset();
     model.reset();
 }
 
 //=======================================================
-template class ResampledRNN<20, SampleLSTM<float, 1, 20>, chowdsp::ResamplingTypes::LanczosResampler<>>; // GuitarML
-template class ResampledRNN<28, SampleLSTM<float, 1, 28>, chowdsp::ResamplingTypes::LanczosResampler<>>; // MetalFace
-template class ResampledRNN<8, SampleGRU<float, 1, 8>, chowdsp::ResamplingTypes::LanczosResampler<>>; // Centaur
+template class ResampledRNN<20, RTNeural::LSTMLayerT>; // GuitarML
+template class ResampledRNN<28, RTNeural::LSTMLayerT>; // MetalFace
+template class ResampledRNN<8, RTNeural::GRULayerT>; // Centaur
