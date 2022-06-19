@@ -1,12 +1,11 @@
 #pragma once
 
 #include "../neural_utils/ResampledRNN.h"
-#include "../neural_utils/SampleGRU.h"
 
 class GainStageML
 {
 public:
-    GainStageML (AudioProcessorValueTreeState& vts);
+    explicit GainStageML (AudioProcessorValueTreeState& vts);
 
     void reset (double sampleRate, int samplesPerBlock);
     void processBlock (AudioBuffer<float>& buffer);
