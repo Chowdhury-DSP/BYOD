@@ -10,9 +10,6 @@
 [submodule "modules/magic_enum"]
 	path = modules/magic_enum
 	url = https://github.com/Neargye/magic_enum
-[submodule "modules/chowdsp_juce_dsp"]
-	path = modules/chowdsp_juce_dsp
-	url = https://github.com/Chowdhury-DSP/chowdsp_juce_dsp
 [submodule "modules/sst-cpputils"]
 	path = modules/sst-cpputils
 	url = https://github.com/surge-synthesizer/sst-cpputils

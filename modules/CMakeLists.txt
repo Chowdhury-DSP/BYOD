@@ -2,7 +2,6 @@ add_subdirectory(JUCE)
 
 # add custom JUCE modules
 add_subdirectory(chowdsp_utils)
-juce_add_modules(chowdsp_juce_dsp)
 add_subdirectory(chowdsp_wdf)
 add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
 
@@ -27,7 +26,6 @@ target_link_libraries(juce_plugin_modules
         BinaryData
         juce::juce_audio_utils
         juce::juce_audio_plugin_client
-        chowdsp_juce_dsp
         chowdsp::chowdsp_dsp_utils
         chowdsp::chowdsp_gui
         chowdsp::chowdsp_plugin_base
@@ -51,7 +49,6 @@ target_compile_definitions(juce_plugin_modules
         JUCE_JACK=1
         JUCE_ALSA=1
         JUCE_COREGRAPHICS_DRAW_ASYNC=1
-        CHOWDSP_USE_CUSTOM_JUCE_DSP=1
         JucePlugin_Manufacturer="chowdsp"
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
