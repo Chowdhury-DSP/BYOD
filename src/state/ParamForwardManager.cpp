@@ -1,36 +1,19 @@
 #include "ParamForwardManager.h"
 
-namespace
-{
-constexpr int maxNumParams = 500;
-
-String getForwardParamID (int paramNum)
-{
-    return "forward_param_" + String (paramNum);
-}
-} // namespace
-
-ParamForwardManager::ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& procChain) : chain (procChain)
+ParamForwardManager::ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& procChain) : chowdsp::ForwardingParametersManager<ParamForwardManager, 500> (vts),
+                                                                                                          chain (procChain)
 {
     chain.addListener (this);
-
-    for (int i = 0; i < maxNumParams; ++i)
-    {
-        auto id = getForwardParamID (i);
-        auto forwardedParam = std::make_unique<chowdsp::ForwardingParameter> (id, nullptr, "Blank");
-
-        forwardedParam->setProcessor (&vts.processor);
-        forwardedParams.add (forwardedParam.get());
-        vts.processor.addParameter (forwardedParam.release());
-    }
 }
 
 ParamForwardManager::~ParamForwardManager()
 {
     chain.removeListener (this);
+}
 
-    for (auto* param : forwardedParams)
-        param->setParam (nullptr);
+String ParamForwardManager::getForwardingParameterID (int paramNum)
+{
+    return "forward_param_" + String (paramNum);
 }
 
 void ParamForwardManager::processorAdded (BaseProcessor* proc)
@@ -40,7 +23,7 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
 
     // Find a range in forwardedParams with numParams empty params in a row
     int count = 0;
-    for (int i = 0; i < forwardedParams.size(); ++i)
+    for (int i = 0; i < (int) forwardedParams.size(); ++i)
     {
         if (forwardedParams[i]->getParam() == nullptr)
             count++;

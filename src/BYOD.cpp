@@ -30,6 +30,7 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
 void BYOD::addParameters (Parameters& params)
 {
     ProcessorChain::createParameters (params);
+    ParamForwardManager::addParameters (params);
 }
 
 void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
