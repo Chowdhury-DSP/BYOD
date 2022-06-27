@@ -42,8 +42,10 @@ public:
 
         // set to mono
         plugin.getVTS().getParameter ("mono_mode")->setValueNotifyingHost (0.0f);
+        MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         AudioBuffer<float> buffer (2, blockSize);
+        buffer.clear();
         chain.processAudio (buffer);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
@@ -95,8 +97,10 @@ public:
 
         // set to stereo
         plugin.getVTS().getParameter ("mono_mode")->setValueNotifyingHost (0.35f);
+        MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         AudioBuffer<float> buffer (2, blockSize);
+        buffer.clear();
         chain.processAudio (buffer);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
@@ -132,8 +136,10 @@ public:
 
         // set to stereo
         plugin.getVTS().getParameter ("mono_mode")->setValueNotifyingHost (0.35f);
+        MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         AudioBuffer<float> buffer (2, blockSize);
+        buffer.clear();
         chain.processAudio (buffer);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
@@ -169,8 +175,10 @@ public:
 
         // set to stereo
         plugin.getVTS().getParameter ("mono_mode")->setValueNotifyingHost (0.35f);
+        MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         AudioBuffer<float> buffer (2, blockSize);
+        buffer.clear();
         chain.processAudio (buffer);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
@@ -189,8 +197,10 @@ public:
         beginTest ("Mono Input Test");
         monoInputTest();
 
-        beginTest ("Stereo Input Test");
+        beginTest ("Stereo Input Test (in order)");
         stereoInputTest (true);
+
+        beginTest ("Stereo Input Test (out of order)");
         stereoInputTest (false);
 
         beginTest ("Left Channel Test");
