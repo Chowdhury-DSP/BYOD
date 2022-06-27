@@ -45,6 +45,7 @@ public:
         MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         AudioBuffer<float> buffer (2, blockSize);
+        buffer.clear();
         chain.processAudio (buffer);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
@@ -99,6 +100,7 @@ public:
         MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         AudioBuffer<float> buffer (2, blockSize);
+        buffer.clear();
         chain.processAudio (buffer);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
@@ -137,6 +139,7 @@ public:
         MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         AudioBuffer<float> buffer (2, blockSize);
+        buffer.clear();
         chain.processAudio (buffer);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
@@ -175,6 +178,7 @@ public:
         MessageManager::getInstance()->runDispatchLoopUntil (100);
 
         AudioBuffer<float> buffer (2, blockSize);
+        buffer.clear();
         chain.processAudio (buffer);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
