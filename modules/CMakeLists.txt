@@ -3,7 +3,6 @@ add_subdirectory(JUCE)
 # add custom JUCE modules
 add_subdirectory(chowdsp_utils)
 add_subdirectory(chowdsp_wdf)
-add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
 
 subproject_version(JUCE juce_version)
 message(STATUS "VERSION for JUCE: ${juce_version}")
@@ -39,6 +38,15 @@ target_link_libraries(juce_plugin_modules
         juce::juce_recommended_lto_flags
         warning_flags
 )
+
+if(NOT IOS AND BYOD_BUILD_CLAP)
+    add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
+    target_link_libraries(juce_plugin_modules
+        PRIVATE
+            chowdsp::chowdsp_clap_extensions
+            clap_juce_extensions
+    )
+endif()
 
 target_compile_definitions(juce_plugin_modules
     PUBLIC
