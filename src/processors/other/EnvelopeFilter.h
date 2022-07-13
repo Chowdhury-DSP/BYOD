@@ -26,7 +26,7 @@ private:
     std::atomic<float>* filterTypeParam = nullptr;
     std::atomic<float>* directControlParam = nullptr;
 
-    chowdsp::StateVariableFilter<float> filter;
+    //    chowdsp::StateVariableFilter<float> filter; // needs to be multi-mode filter...
 
     AudioBuffer<float> levelBuffer;
     chowdsp::LevelDetector<float> level;

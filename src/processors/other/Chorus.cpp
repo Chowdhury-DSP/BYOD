@@ -134,10 +134,10 @@ void Chorus::processChorus (AudioBuffer<float>& buffer, DelayArrType& delay)
                 x[n] += delay[ch][i].popSample (0);
             }
 
-            x[n] = aaFilter.processSample<chowdsp::StateVariableFilterType::Lowpass> (ch, x[n]);
+            x[n] = aaFilter.processSample (ch, x[n]);
 
             feedbackState[ch] = fbSmooth[ch].getNextValue() * x[n];
-            feedbackState[ch] = dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, feedbackState[ch]);
+            feedbackState[ch] = dcBlocker.processSample (ch, feedbackState[ch]);
         }
     }
 }

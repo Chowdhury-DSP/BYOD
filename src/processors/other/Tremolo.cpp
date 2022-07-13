@@ -136,7 +136,7 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     waveBlock.multiplyBy (depthGainSmooth);
     depthAddSmooth.setTargetValue (1.0f - depthVal);
     addSmoothed (waveBlock, depthAddSmooth);
-    filter.process<decltype (waveCtx), chowdsp::StateVariableFilterType::Lowpass> (waveCtx);
+    filter.process (waveCtx);
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {

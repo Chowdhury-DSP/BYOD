@@ -25,6 +25,7 @@ target_link_libraries(juce_plugin_modules
         BinaryData
         juce::juce_audio_utils
         juce::juce_audio_plugin_client
+        juce::juce_dsp
         chowdsp::chowdsp_dsp_utils
         chowdsp::chowdsp_gui
         chowdsp::chowdsp_plugin_base
@@ -61,6 +62,7 @@ target_compile_definitions(juce_plugin_modules
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
         JUCE_MODAL_LOOPS_PERMITTED=1
+        CHOWDSP_USING_JUCE=1
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
 )

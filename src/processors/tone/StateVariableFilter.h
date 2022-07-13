@@ -21,7 +21,7 @@ private:
     std::atomic<float>* modeParam = nullptr;
 
     FreqSmooth freqSmooth;
-    chowdsp::StateVariableFilter<float> svf;
+    //    chowdsp::StateVariableFilter<float> svf; // @TODO: need a multi-mode version of the filter
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateVariableFilter)
 };
