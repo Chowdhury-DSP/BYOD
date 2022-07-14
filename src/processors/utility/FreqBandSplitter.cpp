@@ -53,7 +53,7 @@ void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
 
     for (auto& b : buffers)
         b.makeCopyOf (buffer, true);
-    
+
     // high band
     {
         dsp::AudioBlock<float> block { buffers[0] };
