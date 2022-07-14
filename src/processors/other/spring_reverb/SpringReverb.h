@@ -22,19 +22,20 @@ public:
     void setParams (const Params& params);
 
     int prepareRebuffering (const dsp::ProcessSpec& spec) override;
-    void processRebufferedBlock (AudioBuffer<float>& buffer) override;
+    void processRebufferedBlock (const chowdsp::BufferView<float>& buffer) override;
 
 private:
     void processDownsampledBuffer (AudioBuffer<float>& buffer);
 
-    chowdsp::Downsampler<float, 8> downsample;
-    chowdsp::Upsampler<float, 8> upsample;
+    using AAFilter = chowdsp::ButterworthFilter<8>;
+    chowdsp::Downsampler<float, AAFilter> downsample;
+    chowdsp::Upsampler<float, AAFilter> upsample;
     AudioBuffer<float> downsampledBuffer;
 
     chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange3rd> delay { 1 << 18 };
     float feedbackGain = 0.0f;
 
-    chowdsp::StateVariableFilter<float> dcBlocker;
+    chowdsp::SVFHighpass<float> dcBlocker;
 
     static constexpr int allpassStages = 16;
     using Vec = xsimd::batch<float>;
@@ -48,7 +49,7 @@ private:
     float fs = 48000.0f; // downsampled sample rate
     int blockSize = 256; // downsampled block size
 
-    chowdsp::StateVariableFilter<float> lpf;
+    chowdsp::SVFLowpass<float> lpf;
 
     ReflectionNetwork reflectionNetwork; // early reflections
 
