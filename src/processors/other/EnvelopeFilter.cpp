@@ -61,7 +61,7 @@ void EnvelopeFilter::prepare (double sampleRate, int samplesPerBlock)
     auto monoSpec = spec;
     monoSpec.numChannels = 1;
 
-    //    filter.prepare (spec);
+    filter.prepare (spec);
     level.prepare (monoSpec);
 
     levelBuffer.setSize (1, samplesPerBlock);
@@ -100,30 +100,37 @@ void EnvelopeFilter::fillLevelBuffer (AudioBuffer<float>& buffer, bool directCon
     level.process (levelCtx);
 }
 
-//template <chowdsp::StateVariableFilterType FilterType, typename ModFreqFunc>
-//void processFilter (AudioBuffer<float>& buffer, chowdsp::StateVariableFilter<float>& filter, ModFreqFunc&& getModFreq)
-//{
-//    const auto numChannels = buffer.getNumChannels();
-//    const auto numSamples = buffer.getNumSamples();
-//
-//    for (int ch = 0; ch < numChannels; ++ch)
-//    {
-//        auto* x = buffer.getWritePointer (ch);
-//
-//        int i = 0;
-//        for (int n = 0; n < numSamples - mSize; n += mSize)
-//        {
-//            filter.setCutoffFrequency (getModFreq (i));
-//            for (; i < n + mSize; ++i)
-//                x[i] = filter.processSample<FilterType> (ch, x[i]);
-//        }
-//
-//        // process leftover samples
-//        filter.setCutoffFrequency (getModFreq (i));
-//        for (; i < numSamples; ++i)
-//            x[i] = filter.processSample<FilterType> (ch, x[i]);
-//    }
-//}
+template <chowdsp::StateVariableFilterType FilterType, typename ModFreqFunc>
+void processFilter (AudioBuffer<float>& buffer, chowdsp::SVFMultiMode<float>& filter, ModFreqFunc&& getModFreq)
+{
+    if constexpr (FilterType == chowdsp::StateVariableFilterType::Lowpass)
+        filter.setMode (0.0f);
+    else if constexpr (FilterType == chowdsp::StateVariableFilterType::Bandpass)
+        filter.setMode (0.5f);
+    else if constexpr (FilterType == chowdsp::StateVariableFilterType::Highpass)
+        filter.setMode (1.0f);
+
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        auto* x = buffer.getWritePointer (ch);
+
+        int i = 0;
+        for (int n = 0; n < numSamples - mSize; n += mSize)
+        {
+            filter.setCutoffFrequency (getModFreq (i));
+            for (; i < n + mSize; ++i)
+                x[i] = filter.processSample (ch, x[i]);
+        }
+
+        // process leftover samples
+        filter.setCutoffFrequency (getModFreq (i));
+        for (; i < numSamples; ++i)
+            x[i] = filter.processSample (ch, x[i]);
+    }
+}
 
 void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
 {
@@ -133,7 +140,7 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     fillLevelBuffer (buffer, directControlOn);
 
     auto filterFreqHz = freqParam->load();
-    //    filter.setResonance (getQ (resParam->load()));
+    filter.setQValue (getQ (resParam->load()));
 
     auto freqModGain = directControlOn ? 10.0f : (20.0f * senseParam->load());
     auto* levelPtr = levelBuffer.getReadPointer (0);
@@ -144,25 +151,25 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
         return jlimit (20.0f, 20.0e3f, filterFreqHz + freqModGain * levelPtr[i] * filterFreqHz);
     };
 
-    //    using SVFType = chowdsp::StateVariableFilterType;
-    //    auto filterType = (int) filterTypeParam->load();
-    //    switch (filterType)
-    //    {
-    //        case 0:
-    //            processFilter<SVFType::Lowpass> (buffer, filter, getModFreq);
-    //            break;
-    //
-    //        case 1:
-    //            processFilter<SVFType::Bandpass> (buffer, filter, getModFreq);
-    //            break;
-    //
-    //        case 2:
-    //            processFilter<SVFType::Highpass> (buffer, filter, getModFreq);
-    //            break;
-    //
-    //        default:
-    //            jassertfalse;
-    //    }
+    using SVFType = chowdsp::StateVariableFilterType;
+    auto filterType = (int) filterTypeParam->load();
+    switch (filterType)
+    {
+        case 0:
+            processFilter<SVFType::Lowpass> (buffer, filter, getModFreq);
+            break;
+
+        case 1:
+            processFilter<SVFType::Bandpass> (buffer, filter, getModFreq);
+            break;
+
+        case 2:
+            processFilter<SVFType::Highpass> (buffer, filter, getModFreq);
+            break;
+
+        default:
+            jassertfalse;
+    }
 
     buffer.applyGain (Decibels::decibelsToGain (-6.0f));
 }
