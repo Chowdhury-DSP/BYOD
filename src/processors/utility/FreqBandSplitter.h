@@ -20,15 +20,15 @@ private:
     std::atomic<float>* crossLowParam = nullptr;
     std::atomic<float>* crossHighParam = nullptr;
 
-    chowdsp::StateVariableFilter<float> lowCrossLPF1;
-    chowdsp::StateVariableFilter<float> lowCrossLPF2;
-    chowdsp::StateVariableFilter<float> lowCrossHPF1;
-    chowdsp::StateVariableFilter<float> lowCrossHPF2;
+    chowdsp::SVFLowpass<float> lowCrossLPF1;
+    chowdsp::SVFLowpass<float> lowCrossLPF2;
+    chowdsp::SVFHighpass<float> lowCrossHPF1;
+    chowdsp::SVFHighpass<float> lowCrossHPF2;
 
-    chowdsp::StateVariableFilter<float> highCrossLPF1;
-    chowdsp::StateVariableFilter<float> highCrossLPF2;
-    chowdsp::StateVariableFilter<float> highCrossHPF1;
-    chowdsp::StateVariableFilter<float> highCrossHPF2;
+    chowdsp::SVFLowpass<float> highCrossLPF1;
+    chowdsp::SVFLowpass<float> highCrossLPF2;
+    chowdsp::SVFHighpass<float> highCrossHPF1;
+    chowdsp::SVFHighpass<float> highCrossHPF2;
 
     std::array<AudioBuffer<float>, numOuts> buffers;
 

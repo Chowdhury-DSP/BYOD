@@ -41,15 +41,12 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override
     {
         filter.setCutoffFrequency (*freqHzParam);
-
-        dsp::AudioBlock<float> block { buffer };
-        dsp::ProcessContextReplacing<float> context { block };
-        filter.process<decltype (context), chowdsp::StateVariableFilterType::Highpass> (context);
+        filter.processBlock (buffer);
     }
 
 private:
     std::atomic<float>* freqHzParam = nullptr;
-    chowdsp::StateVariableFilter<float> filter;
+    chowdsp::SVFHighpass<float> filter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DCBlocker)
 };

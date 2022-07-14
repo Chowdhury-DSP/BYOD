@@ -53,9 +53,9 @@ private:
         void setFilterFreq (float freqHz) { lpf.setCutoffFrequency (freqHz); }
 
         inline void pushSample (int channel, float sample) { delay.pushSample (channel, sample); }
-        inline float popSample (int channel) { return lpf.processSample<chowdsp::StateVariableFilterType::Lowpass> (channel, delay.popSample (channel)); }
+        inline float popSample (int channel) { return lpf.processSample (channel, delay.popSample (channel)); }
 
-        chowdsp::StateVariableFilter<float> lpf;
+        chowdsp::SVFLowpass<float> lpf;
         chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th> delay { 1 << 18 };
     };
 
@@ -67,11 +67,11 @@ private:
     DelaySet<LofiDelayType> lofiDelay;
     int prevDelayTypeIndex = 0;
 
-    chowdsp::StateVariableFilter<float> aaFilter;
+    chowdsp::SVFLowpass<float> aaFilter;
 
     float feedbackState[2] { 0.0f, 0.0f };
     SmoothedValue<float, ValueSmoothingTypes::Linear> fbSmooth[2];
-    chowdsp::StateVariableFilter<float> dcBlocker;
+    chowdsp::SVFHighpass<float> dcBlocker;
 
     float fs = 48000.0f;
     AudioBuffer<float> stereoBuffer;

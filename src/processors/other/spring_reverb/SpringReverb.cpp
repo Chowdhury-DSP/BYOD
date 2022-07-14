@@ -99,7 +99,7 @@ void SpringReverb::setParams (const Params& params)
     reflectionNetwork.setParams (params.size, t60Seconds, reflSkew, params.damping);
 }
 
-void SpringReverb::processRebufferedBlock (AudioBuffer<float>& buffer)
+void SpringReverb::processRebufferedBlock (const chowdsp::BufferView<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     const auto numChannels = buffer.getNumChannels();
@@ -141,7 +141,7 @@ void SpringReverb::processDownsampledBuffer (AudioBuffer<float>& buffer)
     auto doSpringInput = [=, &shakePtr] (int ch, float input, int n) -> float
     {
         auto output = std::tanh (input - feedbackGain * delay.popSample (ch));
-        return dcBlocker.processSample<chowdsp::StateVariableFilterType::Highpass> (ch, output) + shakePtr[n];
+        return dcBlocker.processSample (ch, output) + shakePtr[n];
     };
 
     auto doAPFProcess = [&]()
@@ -159,7 +159,7 @@ void SpringReverb::processDownsampledBuffer (AudioBuffer<float>& buffer)
 
         simdReg[chIdx] -= reflectionNetwork.popSample (ch);
         reflectionNetwork.pushSample (ch, simdReg[chIdx]);
-        simdReg[chIdx] = lpf.processSample<chowdsp::StateVariableFilterType::Lowpass> (ch, simdReg[chIdx]);
+        simdReg[chIdx] = lpf.processSample (ch, simdReg[chIdx]);
     };
 
     if (numChannels == 1)

@@ -21,7 +21,7 @@ private:
     std::atomic<float>* waveParam = nullptr;
     std::atomic<float>* depthParam = nullptr;
 
-    chowdsp::StateVariableFilter<float> filter;
+    chowdsp::SVFLowpass<float> filter;
     chowdsp::SineWave<float> sine;
 
     AudioBuffer<float> waveBuffer;

@@ -27,7 +27,10 @@ void FreqBandSplitter::prepare (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
 
-    for (auto filt : { &lowCrossLPF1, &lowCrossLPF2, &lowCrossHPF1, &lowCrossHPF2, &highCrossLPF1, &highCrossLPF2, &highCrossHPF1, &highCrossHPF2 })
+    for (auto filt : { &lowCrossLPF1, &lowCrossLPF2, &highCrossLPF1, &highCrossLPF2 })
+        filt->prepare (spec);
+
+    for (auto filt : { &lowCrossHPF1, &lowCrossHPF2, &highCrossHPF1, &highCrossHPF2 })
         filt->prepare (spec);
 
     for (auto& b : buffers)
@@ -36,42 +39,45 @@ void FreqBandSplitter::prepare (double sampleRate, int samplesPerBlock)
 
 void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
 {
-    for (auto filt : { &lowCrossLPF1, &lowCrossLPF2, &lowCrossHPF1, &lowCrossHPF2 })
+    for (auto filt : { &lowCrossLPF1, &lowCrossLPF2 })
         filt->setCutoffFrequency (*crossLowParam);
 
-    for (auto filt : { &highCrossLPF1, &highCrossLPF2, &highCrossHPF1, &highCrossHPF2 })
+    for (auto filt : { &lowCrossHPF1, &lowCrossHPF2 })
+        filt->setCutoffFrequency (*crossLowParam);
+
+    for (auto filt : { &highCrossLPF1, &highCrossLPF2 })
+        filt->setCutoffFrequency (*crossHighParam);
+
+    for (auto filt : { &highCrossHPF1, &highCrossHPF2 })
         filt->setCutoffFrequency (*crossHighParam);
 
     for (auto& b : buffers)
         b.makeCopyOf (buffer, true);
-
-    constexpr auto LPF = chowdsp::StateVariableFilterType::Lowpass;
-    constexpr auto HPF = chowdsp::StateVariableFilterType::Highpass;
-
+    
     // high band
     {
         dsp::AudioBlock<float> block { buffers[0] };
         dsp::ProcessContextReplacing<float> ctx { block };
-        highCrossHPF1.process<decltype (ctx), HPF> (ctx);
-        highCrossHPF2.process<decltype (ctx), HPF> (ctx);
+        highCrossHPF1.process (ctx);
+        highCrossHPF2.process (ctx);
     }
 
     // mid band
     {
         dsp::AudioBlock<float> block { buffers[1] };
         dsp::ProcessContextReplacing<float> ctx { block };
-        lowCrossHPF1.process<decltype (ctx), HPF> (ctx);
-        lowCrossHPF2.process<decltype (ctx), HPF> (ctx);
-        highCrossLPF1.process<decltype (ctx), LPF> (ctx);
-        highCrossLPF2.process<decltype (ctx), LPF> (ctx);
+        lowCrossHPF1.process (ctx);
+        lowCrossHPF2.process (ctx);
+        highCrossLPF1.process (ctx);
+        highCrossLPF2.process (ctx);
     }
 
     // low band
     {
         dsp::AudioBlock<float> block { buffers[2] };
         dsp::ProcessContextReplacing<float> ctx { block };
-        lowCrossLPF1.process<decltype (ctx), LPF> (ctx);
-        lowCrossLPF2.process<decltype (ctx), LPF> (ctx);
+        lowCrossLPF1.process (ctx);
+        lowCrossLPF2.process (ctx);
     }
 
     for (int i = 0; i < numOuts; ++i)
