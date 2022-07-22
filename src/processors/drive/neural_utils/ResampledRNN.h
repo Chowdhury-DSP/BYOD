@@ -18,32 +18,45 @@ public:
     template <bool useRedisuals = false>
     void process (juce::dsp::AudioBlock<float>& block)
     {
-        auto&& processBlock = oversampler->processSamplesUp (block);
-
-        const auto numSamples = (int) processBlock.getNumSamples();
-        auto* x = processBlock.getChannelPointer (0);
-
-        if constexpr (useRedisuals)
+        auto processNNInternal = [this] (const chowdsp::BufferView<float>& bufferView)
         {
-            for (int i = 0; i < numSamples; ++i)
-                x[i] += model.forward (&x[i]);
+            const auto numSamples = bufferView.getNumSamples();
+            auto* x = bufferView.getWritePointer (0);
+
+            if constexpr (useRedisuals)
+            {
+                for (int i = 0; i < numSamples; ++i)
+                    x[i] += model.forward (&x[i]);
+            }
+            else
+            {
+                for (int i = 0; i < numSamples; ++i)
+                    x[i] = model.forward (&x[i]);
+            }
+        };
+
+        if (! needsResampling)
+        {
+            processNNInternal (block);
         }
         else
         {
-            for (int i = 0; i < numSamples; ++i)
-                x[i] = model.forward (&x[i]);
+            auto bufferView = chowdsp::BufferView<float> { block };
+            auto blockAtSampleRate = resampler.processIn (bufferView);
+            processNNInternal (blockAtSampleRate);
+            resampler.processOut (blockAtSampleRate, bufferView);
         }
-
-        oversampler->processSamplesDown (block);
     }
 
 private:
-    static constexpr auto DefaultSRCMode = RTNeural::SampleRateCorrectionMode::LinInterp;
+    static constexpr auto DefaultSRCMode = RTNeural::SampleRateCorrectionMode::NoInterp;
     using RecurrentLayerTypeComplete = RecurrentLayerType<float, 1, hiddenSize, DefaultSRCMode>;
     using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
     RTNeural::ModelT<float, 1, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
 
-    std::unique_ptr<dsp::Oversampling<float>> oversampler;
+    using ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<>;
+    chowdsp::ResampledProcess<ResamplerType> resampler;
+    bool needsResampling = true;
     double targetSampleRate = 48000.0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResampledRNN)

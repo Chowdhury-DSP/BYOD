@@ -77,30 +77,32 @@ void ResampledRNN<hiddenSize, RecurrentLayerType>::initialise (const void* model
 template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
 void ResampledRNN<hiddenSize, RecurrentLayerType>::prepare (double sampleRate, int samplesPerBlock)
 {
-    auto resampledSampleRate = sampleRate;
-    int resampleOrder = 0;
-    for (; resampleOrder <= 4; ++resampleOrder)
+    const auto [resampleRatio, rnnDelaySamples] = [] (auto curFs, auto targetFs)
     {
-        if (resampledSampleRate >= targetSampleRate)
-            break;
+        if (curFs == targetFs)
+            return std::make_pair (1.0, 1);
 
-        resampledSampleRate *= 2.0;
-    }
+        if (curFs > targetFs)
+        {
+            const auto delaySamples = std::ceil (curFs / targetFs);
+            return std::make_pair (delaySamples * targetFs / curFs, (int) delaySamples);
+        }
 
-    const auto rnnDelaySamples = resampledSampleRate / targetSampleRate;
-    jassert (rnnDelaySamples >= 1.0);
+        // curFs < targetFs
+        return std::make_pair (targetFs / curFs, 1);
+    }(sampleRate, targetSampleRate);
 
-    oversampler = std::make_unique<dsp::Oversampling<float>> (2, (size_t) resampleOrder, dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
-    oversampler->initProcessing ((size_t) samplesPerBlock);
+    needsResampling = resampleRatio != 1.0;
+    resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, sampleRate * resampleRatio);
 
-    model.template get<0>().prepare ((float) rnnDelaySamples);
+    model.template get<0>().prepare (rnnDelaySamples);
     model.reset();
 }
 
 template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
 void ResampledRNN<hiddenSize, RecurrentLayerType>::reset()
 {
-    oversampler->reset();
+    resampler.reset();
     model.reset();
 }
 
