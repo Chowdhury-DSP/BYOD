@@ -53,7 +53,7 @@ private:
     using RecurrentLayerTypeComplete = RecurrentLayerType<float, 1, hiddenSize, DefaultSRCMode>;
     using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
     RTNeural::ModelT<float, 1, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
-    
+
     using ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<>;
     chowdsp::ResampledProcess<ResamplerType> resampler;
     bool needsResampling = true;
