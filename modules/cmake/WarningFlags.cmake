@@ -18,6 +18,7 @@ if(WIN32)
             /wd5051 # for [[maybe-unused]] in RTNeural
             /wd5054 # for Eigen
             /wd4127 # RTNeural is C++14, but C++17+ prefers if constexpr
+            /wd4324 # structure padded due to alignment specifier
         )
     endif()
 elseif((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang"))
