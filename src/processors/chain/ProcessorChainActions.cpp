@@ -26,9 +26,18 @@ public:
 
         auto osFactor = chain.ioProcessor.getOversamplingFactor();
         newProc->prepareProcessing (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
+        
+        auto* newProcPtr = newProc.get();
+        WaitableEvent waiter;
+        chain.actionQueue.emplace ([&chain, &waiter, p = std::move (newProc)]() mutable
+                                   {
+                                       chain.procs.add (std::move (p));
+                                       waiter.signal(); });
 
-        SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
-        auto* newProcPtr = chain.procs.add (std::move (newProc));
+        // @TODO: we don't want to be blocking the message thread here.
+        // Let's figure out a better way to signal the message thread
+        // when the processor has been added to the chain
+        waiter.wait();
 
         for (auto* param : newProcPtr->getParameters())
         {
@@ -54,8 +63,10 @@ public:
                 procToRemove->getVTS().removeParameterListener (paramCast->paramID, &chain);
         }
 
-        SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
-        chain.procs.removeObject (procToRemove, false);
+        // @TODO: what if the application is shut-down before the proc is removed from
+        // the chain? Then we'll have a double-delete!
+        chain.actionQueue.emplace ([&chain, procToRemove]()
+                                   { chain.procs.removeObject (procToRemove, false); });
     }
 
     static void addConnection (ProcessorChain& chain, const ConnectionInfo& info)

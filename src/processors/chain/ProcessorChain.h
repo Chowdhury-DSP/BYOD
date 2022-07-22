@@ -54,8 +54,11 @@ private:
 
     OwnedArray<BaseProcessor> procs;
     ProcessorStore& procStore;
-    SpinLock processingLock;
+    //    SpinLock processingLock;
     UndoManager* um;
+
+    using Action = dsp::FixedSizeFunction<64, void()>;
+    moodycamel::ReaderWriterQueue<Action> actionQueue { 100 };
 
     InputProcessor inputProcessor;
     AudioBuffer<float> inputBuffer;
