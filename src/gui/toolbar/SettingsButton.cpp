@@ -61,7 +61,7 @@ void SettingsButton::showSettingsMenu()
                   { copyDiagnosticInfo(); });
 
     auto options = PopupMenu::Options()
-                       .withParentComponent (getTopLevelComponent())
+                       .withParentComponent (getParentComponent()->getParentComponent()) // BYODPluginEditor
                        .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::upwards)
                        .withStandardItemHeight (27);
     menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
