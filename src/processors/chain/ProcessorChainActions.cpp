@@ -1,4 +1,5 @@
 #include "ProcessorChainActions.h"
+#include "ProcessorChainActionHelper.h"
 
 namespace ProcessorChainHelpers
 {
@@ -20,24 +21,27 @@ void removeOutputConnectionsFromProcessor (ProcessorChain& chain, BaseProcessor*
 class ProcChainActions
 {
 public:
-    static BaseProcessor* addProcessor (ProcessorChain& chain, BaseProcessor::Ptr newProc)
+    static void addProcessor (ProcessorChain& chain, BaseProcessor::Ptr newProc)
     {
         Logger::writeToLog (String ("Creating processor: ") + newProc->getName());
 
+        auto* newProcPtr = newProc.get();
+
         auto osFactor = chain.ioProcessor.getOversamplingFactor();
         newProc->prepareProcessing (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
-        
-        auto* newProcPtr = newProc.get();
-        WaitableEvent waiter;
-        chain.actionQueue.emplace ([&chain, &waiter, p = std::move (newProc)]() mutable
-                                   {
-                                       chain.procs.add (std::move (p));
-                                       waiter.signal(); });
 
-        // @TODO: we don't want to be blocking the message thread here.
-        // Let's figure out a better way to signal the message thread
-        // when the processor has been added to the chain
-        waiter.wait();
+        std::atomic_bool hasProcBeenAdded { false };
+        chain.getActionHelper().actionQueue.emplace (
+            [&chain, &hasProcBeenAdded, p = std::move (newProc)]() mutable
+            {
+                chain.procs.add (std::move (p));
+                hasProcBeenAdded = true;
+            });
+
+        // Ideally we wouldn't be blocking the message thread here, but unfortunately
+        // the undo manager will get out of sync if we don't!
+        while (! hasProcBeenAdded)
+            Thread::sleep (4);
 
         for (auto* param : newProcPtr->getParameters())
         {
@@ -46,10 +50,9 @@ public:
         }
 
         chain.listeners.call (&ProcessorChain::Listener::processorAdded, newProcPtr);
-        return newProcPtr;
     }
 
-    static void removeProcessor (ProcessorChain& chain, BaseProcessor* procToRemove)
+    static void removeProcessor (ProcessorChain& chain, BaseProcessor* procToRemove, BaseProcessor::Ptr& saveProc)
     {
         Logger::writeToLog (String ("Removing processor: ") + procToRemove->getName());
 
@@ -63,10 +66,11 @@ public:
                 procToRemove->getVTS().removeParameterListener (paramCast->paramID, &chain);
         }
 
-        // @TODO: what if the application is shut-down before the proc is removed from
-        // the chain? Then we'll have a double-delete!
-        chain.actionQueue.emplace ([&chain, procToRemove]()
-                                   { chain.procs.removeObject (procToRemove, false); });
+        chain.getActionHelper().actionQueue.emplace (
+            [&procs = chain.procs, procToRemove, &saveProc]()
+            {
+                saveProc.reset (procs.removeAndReturn (procs.indexOf (procToRemove)));
+            });
     }
 
     static void addConnection (ProcessorChain& chain, const ConnectionInfo& info)
@@ -122,14 +126,19 @@ bool AddOrRemoveProcessor::perform()
     {
         jassert (actionProcPtr != nullptr);
 
-        ProcChainActions::removeProcessor (chain, actionProcPtr);
-        actionProc.reset (actionProcPtr);
+        ProcChainActions::removeProcessor (chain, actionProcPtr, actionProc);
+        //        auto& um = actionProc->getVTS().undoManager;
+        //        const_cast<UndoManager*> (um) = nullptr;
+        //        um = nullptr;
+        //        actionProc->getVTS()
+        //        um = nullptr;
     }
     else
     {
         jassert (actionProc != nullptr);
 
-        actionProcPtr = ProcChainActions::addProcessor (chain, std::move (actionProc));
+        actionProcPtr = actionProc.get();
+        ProcChainActions::addProcessor (chain, std::move (actionProc));
     }
 
     if (! wasDirty)
@@ -144,14 +153,14 @@ bool AddOrRemoveProcessor::undo()
     {
         jassert (actionProc != nullptr);
 
-        actionProcPtr = ProcChainActions::addProcessor (chain, std::move (actionProc));
+        actionProcPtr = actionProc.get();
+        ProcChainActions::addProcessor (chain, std::move (actionProc));
     }
     else
     {
         jassert (actionProcPtr != nullptr);
 
-        ProcChainActions::removeProcessor (chain, actionProcPtr);
-        actionProc.reset (actionProcPtr);
+        ProcChainActions::removeProcessor (chain, actionProcPtr, actionProc);
     }
 
     if (! wasDirty)

@@ -29,6 +29,7 @@ ProcessorChain::ProcessorChain (ProcessorStore& store,
                                                                                       presetManager (presetMgr)
 {
     actionHelper = std::make_unique<ProcessorChainActionHelper> (*this);
+
     stateHelper = std::make_unique<ProcessorChainStateHelper> (*this);
     portMagsHelper = std::make_unique<ProcessorChainPortMagnitudesHelper> (*this);
 
@@ -64,8 +65,9 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
 
     ioProcessor.prepare (sampleRate, samplesPerBlock);
 
-    //    SpinLock::ScopedLockType scopedProcessingLock (processingLock);
     initializeProcessors();
+
+    wasProcessCalled = false;
 }
 
 void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed)
@@ -148,12 +150,8 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
 
 void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
 {
-    // @TODO: refactor this logic to a separate function,
-    // so we can make sure it still gets called when the
-    // plugin is bypassed or suspended
-    Action currentAction;
-    while (actionQueue.try_dequeue (currentAction))
-        currentAction();
+    wasProcessCalled = true;
+    actionHelper->processActions();
 
     // process input (oversampling, input gain, etc)
     bool sampleRateChange = false;
