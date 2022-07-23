@@ -21,6 +21,7 @@ private:
     ProcessorChain& chain;
     BaseProcessor::Ptr actionProc;
     BaseProcessor* actionProcPtr = nullptr;
+
     const bool isRemoving;
     const bool wasDirty;
 

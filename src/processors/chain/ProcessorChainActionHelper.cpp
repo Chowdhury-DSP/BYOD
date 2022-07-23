@@ -8,6 +8,35 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
     { addProcessor (std::move (newProc)); };
     chain.procStore.replaceProcessorCallback = [=] (auto newProc, auto procToReplace)
     { replaceProcessor (std::move (newProc), procToReplace); };
+
+    startTimer (50);
+}
+
+ProcessorChainActionHelper::~ProcessorChainActionHelper() = default;
+
+void ProcessorChainActionHelper::processActions()
+{
+    Action currentAction;
+    while (actionQueue.try_dequeue (currentAction))
+        currentAction();
+}
+
+void ProcessorChainActionHelper::hiResTimerCallback()
+{
+    if (chowdsp::AtomicHelpers::compareNegate (chain.wasProcessCalled))
+    {
+        // the audio thread is currently processing!
+        timersSinceLastProcess = 0;
+        return;
+    }
+
+    if (timersSinceLastProcess++ > 5)
+    {
+        // 5 timers have gone by and the audio thread still hasn't processed
+        // anything, so let's run any built-up actions ourself!
+        timersSinceLastProcess = 0;
+        processActions();
+    }
 }
 
 void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)

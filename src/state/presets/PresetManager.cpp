@@ -119,6 +119,7 @@ void PresetManager::loadBYODFactoryPresets()
     addPresets (factoryPresets);
 
     loadDefaultPreset();
+    vts.undoManager->clearUndoHistory();
 }
 
 #if BYOD_BUILD_PRESET_SERVER
