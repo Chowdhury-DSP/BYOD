@@ -27,17 +27,24 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
     {
         if (forwardedParams[i]->getParam() == nullptr)
             count++;
+        else
+            count = 0;
 
         if (count == numParams)
         {
-            for (int j = numParams; j > 0; --j)
-            {
-                auto* forwardParam = forwardedParams[i + 1 - j];
-                auto* procParam = procParams[numParams - j];
+            int startOffset = i + 1 - numParams;
+            setParameterRange (startOffset,
+                               startOffset + numParams,
+                               [&procParams, &proc, startOffset] (int index) -> chowdsp::ParameterForwardingInfo
+                               {
+                                   auto* procParam = procParams[index - startOffset];
 
-                if (auto* paramCast = dynamic_cast<RangedAudioParameter*> (procParam))
-                    forwardParam->setParam (paramCast, proc->getName() + ": " + paramCast->name);
-            }
+                                   if (auto* paramCast = dynamic_cast<RangedAudioParameter*> (procParam))
+                                       return { paramCast, proc->getName() + ": " + paramCast->name };
+
+                                   jassertfalse;
+                                   return {};
+                               });
 
             break;
         }
@@ -47,15 +54,13 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
 void ParamForwardManager::processorRemoved (const BaseProcessor* proc)
 {
     auto& procParams = proc->getParameters();
-    for (auto* param : forwardedParams)
+
+    for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
     {
-        if (auto* internalParam = param->getParam())
+        if (auto* internalParam = param->getParam(); internalParam == procParams[0])
         {
-            for (auto* procParam : procParams)
-            {
-                if (procParam == internalParam)
-                    param->setParam (nullptr);
-            }
+            clearParameterRange ((int) index, (int) index + procParams.size());
+            break;
         }
     }
 }
