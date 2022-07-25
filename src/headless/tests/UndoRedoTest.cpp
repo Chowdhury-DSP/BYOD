@@ -142,12 +142,15 @@ public:
               { return undoManager->redo(); } }
         };
 
-        constexpr int nIter = 250;
+        constexpr int nIter = 100;
+        auto rand = getRandom();
         for (int count = 0; count < nIter;)
         {
             auto& action = actions[rand.nextInt ((int) actions.size())];
             if (action.action())
             {
+                int timeUntilNextAction = rand.nextInt ({ 5, 500 });
+                juce::MessageManager::getInstance()->runDispatchLoopUntil (timeUntilNextAction);
                 action.numTimesCalled++;
                 count++;
             }

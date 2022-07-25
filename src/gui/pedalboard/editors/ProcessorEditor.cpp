@@ -206,7 +206,7 @@ Port* ProcessorEditor::getPort (int portIndex, bool isInput)
     return getPortPrivate (portIndex, isInput);
 }
 
-Point<int> ProcessorEditor::getPortLocation (int portIndex, bool isInput) const
+juce::Point<int> ProcessorEditor::getPortLocation (int portIndex, bool isInput) const
 {
     return getPortPrivate (portIndex, isInput)->getBounds().getCentre();
 }

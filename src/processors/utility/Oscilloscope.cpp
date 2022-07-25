@@ -65,10 +65,10 @@ void Oscilloscope::ScopeBackgroundTask::resetTask()
     scopePath.lineTo (mapXY (samplesToDisplay, 0.0f));
 }
 
-Point<float> Oscilloscope::ScopeBackgroundTask::mapXY (int sampleIndex, float yVal) const
+juce::Point<float> Oscilloscope::ScopeBackgroundTask::mapXY (int sampleIndex, float yVal) const
 {
-    return Point { jmap (float (sampleIndex), 0.0f, float (samplesToDisplay), bounds.getX(), bounds.getRight()),
-                   jmap (yVal, -1.0f, 1.0f, bounds.getBottom(), bounds.getY()) };
+    return juce::Point { jmap (float (sampleIndex), 0.0f, float (samplesToDisplay), bounds.getX(), bounds.getRight()),
+                         jmap (yVal, -1.0f, 1.0f, bounds.getBottom(), bounds.getY()) };
 }
 
 void Oscilloscope::ScopeBackgroundTask::runTask (const AudioBuffer<float>& buffer)

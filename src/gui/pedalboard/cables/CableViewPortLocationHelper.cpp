@@ -22,7 +22,7 @@ bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const B
     return result;
 }
 
-void getClosestPort (const Point<int>& pos, ProcessorEditor* editor, int& minDistance, CableView::EditorPort& closestPort, bool wantsInputPort, float scaleFactor)
+void getClosestPort (const juce::Point<int>& pos, ProcessorEditor* editor, int& minDistance, CableView::EditorPort& closestPort, bool wantsInputPort, float scaleFactor)
 {
     int numPorts = wantsInputPort ? editor->getProcPtr()->getNumInputs() : editor->getProcPtr()->getNumOutputs();
     const auto portDistanceLimit = CableConstants::getPortDistanceLimit (scaleFactor);
@@ -47,7 +47,7 @@ CableViewPortLocationHelper::CableViewPortLocationHelper (CableView& cv) : cable
 {
 }
 
-Point<int> CableViewPortLocationHelper::getPortLocation (const CableView::EditorPort& editorPort)
+juce::Point<int> CableViewPortLocationHelper::getPortLocation (const CableView::EditorPort& editorPort)
 {
     auto portLocation = editorPort.editor->getPortLocation (editorPort.portIndex, editorPort.isInput);
     return portLocation + editorPort.editor->getBounds().getTopLeft();
@@ -59,7 +59,7 @@ bool CableViewPortLocationHelper::isInputPortConnected (const CableView::EditorP
                                        { return cable->endProc == editorPort.editor->getProcPtr() && cable->endIdx == editorPort.portIndex; });
 }
 
-CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const
+CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const juce::Point<int>& pos, const BaseProcessor* sourceProc) const
 {
     auto result = CableView::EditorPort {};
     int minDistance = -1;
@@ -80,7 +80,7 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const Po
     return result;
 }
 
-CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const Point<int>& pos, const Component* compUnderMouse) const
+CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const juce::Point<int>& pos, const Component* compUnderMouse) const
 {
     auto result = CableView::EditorPort {};
     int minDistance = -1;

@@ -25,7 +25,7 @@ private:
         void resetTask() override;
         void runTask (const AudioBuffer<float>& data) override;
 
-        Point<float> mapXY (int sampleIndex, float yVal) const;
+        juce::Point<float> mapXY (int sampleIndex, float yVal) const;
         void setBounds (Rectangle<int> newBounds);
         Path getScopePath() const noexcept;
 
