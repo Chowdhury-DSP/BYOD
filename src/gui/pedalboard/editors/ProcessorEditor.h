@@ -12,7 +12,7 @@ class ProcessorEditor : public Component
         Listener,
         listeners,
         virtual void showInfoComp (const BaseProcessor&) {}\
-        virtual void editorDragged (ProcessorEditor&, const MouseEvent&, const Point<int>&) {}\
+        virtual void editorDragged (ProcessorEditor&, const MouseEvent&, const juce::Point<int>&) {}\
         virtual void duplicateProcessor (const ProcessorEditor&) {}\
     )
     // clang-format on
@@ -29,7 +29,7 @@ public:
     const ProcessorUIOptions& getUIOptions() const { return procUI; }
 
     Port* getPort (int portIndex, bool isInput);
-    Point<int> getPortLocation (int portIndex, bool isInput) const;
+    juce::Point<int> getPortLocation (int portIndex, bool isInput) const;
     void setConnectionStatus (bool isConnected, int portIndex, bool isInput);
     Colour getColour() const noexcept { return procUI.backgroundColour; }
 
@@ -53,7 +53,7 @@ private:
     OwnedArray<Port> inputPorts;
     OwnedArray<Port> outputPorts;
 
-    Point<int> mouseDownOffset;
+    juce::Point<int> mouseDownOffset;
 
     DrawableButton settingsButton { "Settings", DrawableButton::ImageFitted };
 

@@ -7,11 +7,11 @@ class CableViewPortLocationHelper
 public:
     explicit CableViewPortLocationHelper (CableView& cableView);
 
-    static Point<int> getPortLocation (const CableView::EditorPort& editorPort);
+    static juce::Point<int> getPortLocation (const CableView::EditorPort& editorPort);
     bool isInputPortConnected (const CableView::EditorPort& editorPort) const;
 
-    CableView::EditorPort getNearestInputPort (const Point<int>& pos, const BaseProcessor* sourceProc) const;
-    CableView::EditorPort getNearestPort (const Point<int>& pos, const Component* compUnderMouse = nullptr) const;
+    CableView::EditorPort getNearestInputPort (const juce::Point<int>& pos, const BaseProcessor* sourceProc) const;
+    CableView::EditorPort getNearestPort (const juce::Point<int>& pos, const Component* compUnderMouse = nullptr) const;
 
 private:
     CableView& cableView;

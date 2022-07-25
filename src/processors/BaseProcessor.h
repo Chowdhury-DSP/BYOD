@@ -100,9 +100,9 @@ public:
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }
 
-    void setPosition (Point<int> pos, Rectangle<int> parentBounds);
+    void setPosition (juce::Point<int> pos, Rectangle<int> parentBounds);
     void setPosition (const BaseProcessor& other) { editorPosition = other.editorPosition; }
-    Point<int> getPosition (Rectangle<int> parentBounds);
+    juce::Point<int> getPosition (Rectangle<int> parentBounds);
 
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
 
@@ -138,7 +138,7 @@ private:
     Array<AudioBuffer<float>> inputBuffers;
     int numInputsReady = 0;
 
-    Point<float> editorPosition;
+    juce::Point<float> editorPosition;
 
     struct ConvolutionMessageQueue : public dsp::ConvolutionMessageQueue
     {

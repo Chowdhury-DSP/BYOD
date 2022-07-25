@@ -52,7 +52,7 @@ void LevelMeterComponent::paint (Graphics& g)
     //        auto right = (float) meterMarkBounds.getRight();
     //        g.drawLine (right - 6.0f, y, right, y);
     //
-    //        const auto labelBounds = meterMarkBounds.withHeight (20).withCentre (Point { meterMarkBounds.getCentreX(), (int) y });
+    //        const auto labelBounds = meterMarkBounds.withHeight (20).withCentre (juce::Point { meterMarkBounds.getCentreX(), (int) y });
     //        g.drawFittedText (String ((int) dbLevel), labelBounds, Justification::centred, 1);
     //    }
 }

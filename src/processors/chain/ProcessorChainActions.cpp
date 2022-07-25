@@ -120,18 +120,38 @@ AddOrRemoveProcessor::AddOrRemoveProcessor (ProcessorChain& procChain, BaseProce
 {
 }
 
+template <typename PointerType>
+bool waitForPointerCheck (const PointerType& pointer, int waitCycles = 6)
+{
+    int count = 0;
+    while (pointer == nullptr)
+    {
+        if (count >= waitCycles)
+            return false;
+
+        juce::MessageManager::getInstance()->runDispatchLoopUntil (50);
+        count++;
+    }
+
+    return true;
+}
+
 bool AddOrRemoveProcessor::perform()
 {
     if (isRemoving)
     {
-        jassert (actionProcPtr != nullptr);
+        if (! waitForPointerCheck (actionProcPtr))
+            return false;
 
+        jassert (actionProcPtr != nullptr);
         ProcChainActions::removeProcessor (chain, actionProcPtr, actionProc);
     }
     else
     {
-        jassert (actionProc != nullptr);
+        if (! waitForPointerCheck (actionProc))
+            return false;
 
+        jassert (actionProc != nullptr);
         actionProcPtr = actionProc.get();
         ProcChainActions::addProcessor (chain, std::move (actionProc));
     }
@@ -146,15 +166,19 @@ bool AddOrRemoveProcessor::undo()
 {
     if (isRemoving)
     {
-        jassert (actionProc != nullptr);
+        if (! waitForPointerCheck (actionProc))
+            return false;
 
+        jassert (actionProc != nullptr);
         actionProcPtr = actionProc.get();
         ProcChainActions::addProcessor (chain, std::move (actionProc));
     }
     else
     {
-        jassert (actionProcPtr != nullptr);
+        if (! waitForPointerCheck (actionProcPtr))
+            return false;
 
+        jassert (actionProcPtr != nullptr);
         ProcChainActions::removeProcessor (chain, actionProcPtr, actionProc);
     }
 

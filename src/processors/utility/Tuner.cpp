@@ -106,7 +106,7 @@ bool Tuner::getCustomComponents (OwnedArray<Component>& customComps)
 
             const auto height = (float) bounds.getHeight();
             auto tickLength = height * 0.15f;
-            const auto bottomCentre = Point { bounds.getCentreX(), bounds.getBottom() }.toFloat();
+            const auto bottomCentre = juce::Point { bounds.getCentreX(), bounds.getBottom() }.toFloat();
             for (auto cents : { -50, -25, -10, 0, 10, 25, 50 })
             {
                 auto angle = getAngleForCents (cents);
@@ -130,7 +130,7 @@ bool Tuner::getCustomComponents (OwnedArray<Component>& customComps)
         {
             const auto height = (float) bounds.getHeight();
             const auto lineLength = height * 0.925f;
-            const auto bottomCentre = Point { bounds.getCentreX(), bounds.getBottom() }.toFloat();
+            const auto bottomCentre = juce::Point { bounds.getCentreX(), bounds.getBottom() }.toFloat();
 
             auto angle = getAngleForCents (cents);
             auto line = Line<float>::fromStartAndAngle (bottomCentre, lineLength, angle);
