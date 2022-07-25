@@ -52,7 +52,7 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
     processBypassDelay (bypassScratchBuffer);
 
     // real processing here!
-    //    procs->processAudio (buffer);
+    procs->processAudio (buffer);
 }
 
 void BYOD::processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer&)
