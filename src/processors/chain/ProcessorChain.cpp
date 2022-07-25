@@ -29,8 +29,11 @@ ProcessorChain::ProcessorChain (ProcessorStore& store,
                                                                                       presetManager (presetMgr)
 {
     actionHelper = std::make_unique<ProcessorChainActionHelper> (*this);
+
     stateHelper = std::make_unique<ProcessorChainStateHelper> (*this);
     portMagsHelper = std::make_unique<ProcessorChainPortMagnitudesHelper> (*this);
+
+    procs.ensureStorageAllocated (100);
 }
 
 ProcessorChain::~ProcessorChain() = default;
@@ -62,8 +65,9 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
 
     ioProcessor.prepare (sampleRate, samplesPerBlock);
 
-    SpinLock::ScopedLockType scopedProcessingLock (processingLock);
     initializeProcessors();
+
+    wasProcessCalled = false;
 }
 
 void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed)
@@ -146,9 +150,8 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
 
 void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
 {
-    SpinLock::ScopedTryLockType tryProcessingLock (processingLock);
-    if (! tryProcessingLock.isLocked())
-        return;
+    wasProcessCalled = true;
+    actionHelper->processActions();
 
     // process input (oversampling, input gain, etc)
     bool sampleRateChange = false;

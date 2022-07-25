@@ -14,7 +14,7 @@ constexpr int getScaleDim (int dim, float scaleFactor)
     return int ((float) dim * scaleFactor);
 }
 
-Point<int> getRandomPosition (const Component& comp)
+juce::Point<int> getRandomPosition (const Component& comp)
 {
     auto b = comp.getLocalBounds()
                  .withWidth (comp.getWidth() * 2 / 3)
@@ -23,7 +23,7 @@ Point<int> getRandomPosition (const Component& comp)
     auto randX = jmax (comp.proportionOfWidth (0.1f), 1);
     auto randY = jmax (comp.proportionOfHeight (0.1f), 1);
     auto& rand = Random::getSystemRandom();
-    return b.getCentre() + Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
+    return b.getCentre() + juce::Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
 }
 } // namespace
 
@@ -145,7 +145,7 @@ void BoardComponent::showInfoComp (const BaseProcessor& proc)
     infoComp.toFront (true);
 }
 
-void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e, const Point<int>& mouseOffset)
+void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset)
 {
     const auto relE = e.getEventRelativeTo (this);
     const auto bounds = getBounds();
@@ -216,7 +216,7 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> 
 
     auto* proc = editor->getProcPtr();
     auto position = proc->getPosition (getBounds());
-    if (position == Point (0, 0) && getWidth() > 0 && getHeight() > 0) // no position set yet
+    if (position == juce::Point (0, 0) && getWidth() > 0 && getHeight() > 0) // no position set yet
     {
         if (bounds == Rectangle<int> {})
             bounds = Rectangle (thisEditorWidth, thisEditorHeight).withCentre (nextEditorPosition);

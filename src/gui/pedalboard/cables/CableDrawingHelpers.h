@@ -16,8 +16,8 @@ constexpr float floorDB = -60.0f;
 
 namespace CableDrawingHelpers
 {
-void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float> end, Colour endColour, float scaleFactor, float levelDB = CableConstants::floorDB);
+void drawCable (Graphics& g, juce::Point<float> start, Colour startColour, juce::Point<float> end, Colour endColour, float scaleFactor, float levelDB = CableConstants::floorDB);
 
-void drawCablePortGlow (Graphics& g, Point<int> location, float scaleFactor);
+void drawCablePortGlow (Graphics& g, juce::Point<int> location, float scaleFactor);
 
 } // namespace CableDrawingHelpers

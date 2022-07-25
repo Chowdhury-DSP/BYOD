@@ -17,7 +17,7 @@ public:
     void setScaleFactor (float newScaleFactor);
 
     void showInfoComp (const BaseProcessor& proc) override;
-    void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const Point<int>& mouseOffset) override;
+    void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset) override;
     void duplicateProcessor (const ProcessorEditor& editor) override;
 
     void processorAdded (BaseProcessor* newProc) override;
@@ -48,7 +48,7 @@ private:
 
     TextButton newProcButton;
     chowdsp::PopupMenuHelper popupMenu;
-    Point<int> nextEditorPosition {};
+    juce::Point<int> nextEditorPosition {};
     bool addingFromNewProcButton = false;
     bool addingFromRightClick = false;
 
