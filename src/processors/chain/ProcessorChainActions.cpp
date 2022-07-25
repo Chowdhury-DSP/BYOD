@@ -127,11 +127,6 @@ bool AddOrRemoveProcessor::perform()
         jassert (actionProcPtr != nullptr);
 
         ProcChainActions::removeProcessor (chain, actionProcPtr, actionProc);
-        //        auto& um = actionProc->getVTS().undoManager;
-        //        const_cast<UndoManager*> (um) = nullptr;
-        //        um = nullptr;
-        //        actionProc->getVTS()
-        //        um = nullptr;
     }
     else
     {
