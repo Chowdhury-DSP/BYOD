@@ -68,7 +68,7 @@ void Oscilloscope::ScopeBackgroundTask::resetTask()
 juce::Point<float> Oscilloscope::ScopeBackgroundTask::mapXY (int sampleIndex, float yVal) const
 {
     return juce::Point { jmap (float (sampleIndex), 0.0f, float (samplesToDisplay), bounds.getX(), bounds.getRight()),
-                   jmap (yVal, -1.0f, 1.0f, bounds.getBottom(), bounds.getY()) };
+                         jmap (yVal, -1.0f, 1.0f, bounds.getBottom(), bounds.getY()) };
 }
 
 void Oscilloscope::ScopeBackgroundTask::runTask (const AudioBuffer<float>& buffer)
