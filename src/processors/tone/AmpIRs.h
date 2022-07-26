@@ -33,7 +33,7 @@ private:
     using IRType = std::pair<void*, size_t>;
     std::unordered_map<String, IRType> irMap;
 
-    dsp::Convolution convolution;
+    dsp::Convolution convolution { juce::dsp::Convolution::NonUniform { 256 } };
     dsp::Gain<float> gain;
 
     dsp::DryWetMixer<float> dryWetMixer;

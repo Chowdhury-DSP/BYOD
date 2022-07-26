@@ -54,7 +54,7 @@ private:
     using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
     RTNeural::ModelT<float, 1, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
 
-    using ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<>;
+    using ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<8192, 8>;
     chowdsp::ResampledProcess<ResamplerType> resampler;
     bool needsResampling = true;
     double targetSampleRate = 48000.0;
