@@ -2,12 +2,10 @@
 
 #include "ProcessorChain.h"
 
-class ProcessorChainStateHelper : private AsyncUpdater
+class ProcessorChainStateHelper
 {
 public:
     explicit ProcessorChainStateHelper (ProcessorChain& thisChain);
-
-    void handleAsyncUpdate() override;
 
     std::unique_ptr<XmlElement> saveProcChain();
     void loadProcChain (const XmlElement* xml, bool loadingPreset = false);
@@ -18,9 +16,7 @@ private:
     ProcessorChain& chain;
     UndoManager* um;
 
-    CriticalSection crit;
-    std::unique_ptr<XmlElement> xmlStateToLoad;
-    bool isLoadingPreset = false;
+    chowdsp::SharedDeferredAction mainThreadStateLoader;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChainStateHelper)
 };

@@ -32,30 +32,25 @@ String getProcessorName (const String& tag)
 ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain) : chain (thisChain),
                                                                                    um (chain.um)
 {
-}
-
-void ProcessorChainStateHelper::handleAsyncUpdate()
-{
-    ScopedLock sl (crit);
-    if (xmlStateToLoad != nullptr)
-    {
-        loadProcChainInternal (xmlStateToLoad.get(), isLoadingPreset);
-        xmlStateToLoad.reset();
-    }
+    //    Timer::callAfterDelay (2000,
+    //                           [this]
+    //                           {
+    //                               auto xml = saveProcChain();
+    //                               Thread::launch ([this, xml = *xml]
+    //                                               { loadProcChain (&xml); });
+    //                           });
 }
 
 void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, bool loadingPreset)
 {
-    if (MessageManager::existsAndIsCurrentThread())
+    if (xml == nullptr)
     {
-        loadProcChainInternal (xml, loadingPreset);
+        jassertfalse; // something has gone wrong!
         return;
     }
 
-    ScopedLock sl (crit);
-    isLoadingPreset = loadingPreset;
-    xmlStateToLoad = std::make_unique<XmlElement> (*xml);
-    triggerAsyncUpdate();
+    mainThreadStateLoader->call ([this, loadingPreset, xmlState = *xml]
+                                 { loadProcChainInternal (&xmlState, loadingPreset); });
 }
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
