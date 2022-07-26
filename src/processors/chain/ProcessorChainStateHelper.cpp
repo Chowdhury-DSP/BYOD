@@ -32,13 +32,6 @@ String getProcessorName (const String& tag)
 ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain) : chain (thisChain),
                                                                                    um (chain.um)
 {
-    //    Timer::callAfterDelay (2000,
-    //                           [this]
-    //                           {
-    //                               auto xml = saveProcChain();
-    //                               Thread::launch ([this, xml = *xml]
-    //                                               { loadProcChain (&xml); });
-    //                           });
 }
 
 void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, bool loadingPreset)
@@ -49,16 +42,14 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, bool loadi
         return;
     }
 
-    mainThreadStateLoader->call ([this, loadingPreset, xmlState = *xml]
-                                 { loadProcChainInternal (&xmlState, loadingPreset); });
+    mainThreadStateLoader->call ([this, loadingPreset, xmlState = *xml] { loadProcChainInternal (&xmlState, loadingPreset); });
 }
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");
 
-    auto saveProcessor = [&] (BaseProcessor* proc)
-    {
+    auto saveProcessor = [&] (BaseProcessor* proc) {
         auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
 
@@ -111,8 +102,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bo
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps, bool shouldLoadState = true)
-    {
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps, bool shouldLoadState = true) {
         if (procXml->getNumChildElements() > 0)
         {
             if (shouldLoadState)
