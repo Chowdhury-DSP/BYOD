@@ -34,36 +34,22 @@ ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain)
 {
 }
 
-void ProcessorChainStateHelper::handleAsyncUpdate()
-{
-    ScopedLock sl (crit);
-    if (xmlStateToLoad != nullptr)
-    {
-        loadProcChainInternal (xmlStateToLoad.get(), isLoadingPreset);
-        xmlStateToLoad.reset();
-    }
-}
-
 void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, bool loadingPreset)
 {
-    if (MessageManager::existsAndIsCurrentThread())
+    if (xml == nullptr)
     {
-        loadProcChainInternal (xml, loadingPreset);
+        jassertfalse; // something has gone wrong!
         return;
     }
 
-    ScopedLock sl (crit);
-    isLoadingPreset = loadingPreset;
-    xmlStateToLoad = std::make_unique<XmlElement> (*xml);
-    triggerAsyncUpdate();
+    mainThreadStateLoader->call ([this, loadingPreset, xmlState = *xml] { loadProcChainInternal (&xmlState, loadingPreset); });
 }
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
 {
     auto xml = std::make_unique<XmlElement> ("proc_chain");
 
-    auto saveProcessor = [&] (BaseProcessor* proc)
-    {
+    auto saveProcessor = [&] (BaseProcessor* proc) {
         auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
 
@@ -116,8 +102,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bo
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps, bool shouldLoadState = true)
-    {
+    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps, bool shouldLoadState = true) {
         if (procXml->getNumChildElements() > 0)
         {
             if (shouldLoadState)
