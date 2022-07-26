@@ -51,7 +51,7 @@ private:
         inline float popSample (int channel) { return lpf.processSample (channel, delay.popSample (channel)); }
 
         chowdsp::SVFLowpass<float> lpf;
-        chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th> delay { 1 << 18 };
+        chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th> delay { 1 << 20 };
     };
     CleanDelayType cleanDelayLine;
 

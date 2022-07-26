@@ -2,7 +2,7 @@
 
 set -e
 
-pluginval_version="v0.3.0"
+pluginval_version="v1.0.0-beta5"
 
 # install functions
 install_pluginval_linux()
