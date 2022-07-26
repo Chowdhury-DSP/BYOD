@@ -44,7 +44,7 @@ echo "Pluginval installed at ${pluginval}"
 # run
 for plugin in "${plugins[@]}"; do
     echo "Validating ${plugin}"
-    if $pluginval --strictness-level 8 --validate-in-process --validate $plugin --output-dir pluginval-logs --timeout-ms 500000;
+    if $pluginval --strictness-level 7 --validate-in-process --validate $plugin --output-dir pluginval-logs --timeout-ms 500000;
     then
       echo "PLUGINVAL SUCCESS"
     else
