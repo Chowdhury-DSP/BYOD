@@ -2,7 +2,7 @@
 
 set -e
 
-pluginval_version="v0.3.0"
+pluginval_version="v1.0.0-beta5"
 
 # install functions
 install_pluginval_linux()
@@ -44,7 +44,7 @@ echo "Pluginval installed at ${pluginval}"
 # run
 for plugin in "${plugins[@]}"; do
     echo "Validating ${plugin}"
-    if $pluginval --strictness-level 5 --validate-in-process --validate $plugin --output-dir pluginval-logs --timeout-ms 300000;
+    if $pluginval --strictness-level 7 --validate-in-process --validate $plugin --output-dir pluginval-logs --timeout-ms 500000;
     then
       echo "PLUGINVAL SUCCESS"
     else

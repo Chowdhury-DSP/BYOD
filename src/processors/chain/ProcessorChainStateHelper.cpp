@@ -34,28 +34,16 @@ ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain)
 {
 }
 
-void ProcessorChainStateHelper::handleAsyncUpdate()
-{
-    ScopedLock sl (crit);
-    if (xmlStateToLoad != nullptr)
-    {
-        loadProcChainInternal (xmlStateToLoad.get(), isLoadingPreset);
-        xmlStateToLoad.reset();
-    }
-}
-
 void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, bool loadingPreset)
 {
-    if (MessageManager::existsAndIsCurrentThread())
+    if (xml == nullptr)
     {
-        loadProcChainInternal (xml, loadingPreset);
+        jassertfalse; // something has gone wrong!
         return;
     }
 
-    ScopedLock sl (crit);
-    isLoadingPreset = loadingPreset;
-    xmlStateToLoad = std::make_unique<XmlElement> (*xml);
-    triggerAsyncUpdate();
+    mainThreadStateLoader->call ([this, loadingPreset, xmlState = *xml]
+                                 { loadProcChainInternal (&xmlState, loadingPreset); });
 }
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()

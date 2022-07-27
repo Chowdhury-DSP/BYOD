@@ -52,8 +52,11 @@ void ProcessorChain::initializeProcessors()
     inputProcessor.prepareProcessing (osSampleRate, osSamplesPerBlock);
     outputProcessor.prepareProcessing (osSampleRate, osSamplesPerBlock);
 
-    for (auto* processor : procs)
-        processor->prepareProcessing (osSampleRate, osSamplesPerBlock);
+    for (int i = procs.size() - 1; i >= 0; --i)
+    {
+        if (auto* proc = procs[i])
+            proc->prepareProcessing (osSampleRate, osSamplesPerBlock);
+    }
 }
 
 void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
