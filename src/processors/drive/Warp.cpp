@@ -71,7 +71,7 @@ ParamLayout Warp::createParameterLayout()
     createFreqParameter (params, "freq", "Freq", 100.0f, 1000.0f, 250.0f, 250.0f);
     createGainDBParameter (params, "gain", "Gain", 0.0f, 12.0f, 6.0f);
     createPercentParameter (params, "fb", "Feedback", 0.5f);
-    emplace_param<VTSParam> (params, "fb_drive", "FB Drive", String(), createNormalisableRange (1.0f, 10.0f, 5.0f), 5.0f, &floatValToString, &stringToFloatVal);
+    emplace_param<chowdsp::FloatParameter> (params, "fb_drive", "FB Drive", createNormalisableRange (1.0f, 10.0f, 5.0f), 5.0f, &floatValToString, &stringToFloatVal);
 
     return { params.begin(), params.end() };
 }

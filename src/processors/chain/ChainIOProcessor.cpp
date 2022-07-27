@@ -24,10 +24,13 @@ void ChainIOProcessor::createParameters (Parameters& params)
                                                                  OSMode::MinPhase);
 
     using namespace ParameterHelpers;
-    params.push_back (std::make_unique<AudioParameterChoice> (monoModeTag, "Mode", StringArray { "Mono", "Stereo", "Left", "Right" }, 0));
-    createGainDBParameter (params, inGainTag, "In Gain", -72.0f, 18.0f, 0.0f, 0.0f);
-    createGainDBParameter (params, outGainTag, "Out Gain", -72.0f, 18.0f, 0.0f, 0.0f);
-    createPercentParameter (params, dryWetTag, "Dry/Wet", 1.0f);
+    params.push_back (std::make_unique<AudioParameterChoice> (juce::ParameterID { monoModeTag, 100 },
+                                                              "Mode",
+                                                              StringArray { "Mono", "Stereo", "Left", "Right" },
+                                                              0));
+    createGainDBParameter (params, { inGainTag, 100 }, "In Gain", -72.0f, 18.0f, 0.0f, 0.0f);
+    createGainDBParameter (params, { outGainTag, 100 }, "Out Gain", -72.0f, 18.0f, 0.0f, 0.0f);
+    createPercentParameter (params, { dryWetTag, 100 }, "Dry/Wet", 1.0f);
 }
 
 void ChainIOProcessor::prepare (double sampleRate, int samplesPerBlock)

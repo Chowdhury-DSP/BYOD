@@ -30,13 +30,7 @@ ParamLayout DelayModule::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    params.push_back (std::make_unique<VTSParam> ("time_ms",
-                                                  "Delay Time",
-                                                  String(),
-                                                  createNormalisableRange (20.0f, 2000.0f, 200.0f),
-                                                  100.0f,
-                                                  timeMsValToString,
-                                                  stringToTimeMsVal));
+    createTimeMsParameter (params, "time_ms", "Delay Time", createNormalisableRange (20.0f, 2000.0f, 200.0f), 100.0f);
 
     createFreqParameter (params, "freq", "Cutoff", 500.0f, 10000.0f, 4000.0f, 10000.0f);
     createPercentParameter (params, "feedback", "Feedback", 0.0f);

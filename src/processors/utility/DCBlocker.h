@@ -21,13 +21,7 @@ public:
     {
         using namespace ParameterHelpers;
         auto params = createBaseParams();
-        params.push_back (std::make_unique<VTSParam> ("freq",
-                                                      "Frequency",
-                                                      String(),
-                                                      NormalisableRange<float> { 5.0f, 50.0f },
-                                                      30.0f,
-                                                      &freqValToString,
-                                                      &stringToFreqVal));
+        createFreqParameter (params, "freq", "Frequency", 5.0f, 50.0f, 27.5f, 30.0f);
 
         return { params.begin(), params.end() };
     }

@@ -118,9 +118,9 @@ ParamLayout Gate::createParameterLayout()
     auto params = createBaseParams();
 
     createGainDBParameter (params, "thresh", "Threshold", -60.0f, 0.0f, -35.0f);
-    emplace_param<VTSParam> (params, "attack", "Attack", String(), createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f, &timeMsValToString, &stringToTimeMsVal);
-    emplace_param<VTSParam> (params, "hold", "Hold", String(), createNormalisableRange (10.0f, 1000.0f, 100.0f), 200.0f, &timeMsValToString, &stringToTimeMsVal);
-    emplace_param<VTSParam> (params, "release", "Release", String(), createNormalisableRange (10.0f, 1000.0f, 100.0f), 400.0f, &timeMsValToString, &stringToTimeMsVal);
+    createTimeMsParameter (params, "attack", "Attack", createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f);
+    createTimeMsParameter (params, "hold", "Hold", createNormalisableRange (10.0f, 1000.0f, 100.0f), 200.0f);
+    createTimeMsParameter (params, "release", "Release", createNormalisableRange (10.0f, 1000.0f, 100.0f), 400.0f);
     createGainDBParameter (params, "makeup", "Gain", -12.0f, 12.0f, 0.0f);
 
     return { params.begin(), params.end() };

@@ -21,13 +21,7 @@ public:
     {
         using namespace ParameterHelpers;
         auto params = createBaseParams();
-        params.push_back (std::make_unique<VTSParam> ("bias",
-                                                      "Bias",
-                                                      String(),
-                                                      NormalisableRange<float> { -0.25f, 0.25f },
-                                                      0.0f,
-                                                      &floatValToString,
-                                                      &stringToFloatVal));
+        emplace_param<chowdsp::FloatParameter> (params, "bias", "Bias", NormalisableRange { -0.25f, 0.25f }, 0.0f, &floatValToString, &stringToFloatVal);
 
         return { params.begin(), params.end() };
     }

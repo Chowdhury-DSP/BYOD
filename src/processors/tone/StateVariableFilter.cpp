@@ -32,18 +32,19 @@ ParamLayout StateVariableFilter::createParameterLayout()
     createFreqParameter (params, "freq", "Freq.", 20.0f, 20000.0f, 2000.0f, 8000.0f);
 
     auto qRange = createNormalisableRange (0.2f, 5.0f, 0.7071f);
-    params.push_back (std::make_unique<VTSParam> ("q_value",
-                                                  "Q",
-                                                  String(),
-                                                  qRange,
-                                                  0.7071f,
-                                                  &floatValToString,
-                                                  &stringToFloatVal));
+    emplace_param<chowdsp::FloatParameter> (params,
+                                            "q_value",
+                                            "Q",
+                                            qRange,
+                                            0.7071f,
+                                            &floatValToString,
+                                            &stringToFloatVal);
 
-    params.push_back (std::make_unique<AudioParameterChoice> (modeTag,
-                                                              "Mode",
-                                                              StringArray { "LPF", "HPF", "BPF" },
-                                                              0));
+    emplace_param<AudioParameterChoice> (params,
+                                         modeTag,
+                                         "Mode",
+                                         StringArray { "LPF", "HPF", "BPF" },
+                                         0);
 
     // @TODO: for compatibility with version 1 we need this to be off by default,
     // but when we add version streaming we should make this true by default for new versions

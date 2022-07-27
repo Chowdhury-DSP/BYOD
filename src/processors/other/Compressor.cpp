@@ -95,15 +95,11 @@ ParamLayout Compressor::createParameterLayout()
     auto params = createBaseParams();
 
     createGainDBParameter (params, "thresh", "Threshold", -30.0f, 6.0f, 0.0f);
-    emplace_param<VTSParam> (
-        params, "ratio", "Ratio", String(), createNormalisableRange (1.0f, 10.0f, 2.0f), 2.0f, [] (float val)
-        { return String (val, 1) + " : 1"; },
-        [] (const String& s)
-        { return s.upToFirstOccurrenceOf (":", false, true).getFloatValue(); });
+    createRatioParameter (params, "ratio", "Ratio", createNormalisableRange (1.0f, 10.0f, 2.0f), 2.0f);
     createGainDBParameter (params, "knee", "Knee", 0.0f, 18.0f, 6.0f);
 
-    emplace_param<VTSParam> (params, "attack", "Attack", String(), createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f, &timeMsValToString, &stringToTimeMsVal);
-    emplace_param<VTSParam> (params, "release", "Release", String(), createNormalisableRange (10.0f, 1000.0f, 100.0f), 100.0f, &timeMsValToString, &stringToTimeMsVal);
+    createTimeMsParameter (params, "attack", "Attack", createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f);
+    createTimeMsParameter (params, "release", "Release", createNormalisableRange (10.0f, 1000.0f, 100.0f), 100.0f);
     createGainDBParameter (params, "makeup", "Gain", -12.0f, 12.0f, 0.0f);
 
     return { params.begin(), params.end() };

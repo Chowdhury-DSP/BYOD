@@ -39,9 +39,9 @@ ParamLayout Panner::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createBidirectionalPercentParameter (params, mainPanTag, "Pan");
-    createBidirectionalPercentParameter (params, leftPanTag, "Left Pan", -1.0f);
-    createBidirectionalPercentParameter (params, rightPanTag, "Right Pan", 1.0f);
+    createBipolarPercentParameter (params, mainPanTag, "Pan");
+    createBipolarPercentParameter (params, leftPanTag, "Left Pan", -1.0f);
+    createBipolarPercentParameter (params, rightPanTag, "Right Pan", 1.0f);
     createPercentParameter (params, stereoWidthTag, "Width", 1.0f);
 
     createPercentParameter (params, modDepthTag, "Depth", 0.0f);

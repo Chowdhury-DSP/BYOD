@@ -11,9 +11,11 @@ ParamForwardManager::~ParamForwardManager()
     chain.removeListener (this);
 }
 
-String ParamForwardManager::getForwardingParameterID (int paramNum)
+juce::ParameterID ParamForwardManager::getForwardingParameterID (int paramNum)
 {
-    return "forward_param_" + String (paramNum);
+    // if we decide to increase the number of forwarding parameters in the future,
+    // make sure to use a different version tag for the new parameters!
+    return { "forward_param_" + String (paramNum), 100 };
 }
 
 void ParamForwardManager::processorAdded (BaseProcessor* proc)
