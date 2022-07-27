@@ -10,10 +10,11 @@ class CableView : public Component,
                   private Timer
 {
 public:
-    explicit CableView (const BoardComponent* comp);
+    explicit CableView (BoardComponent* comp);//keeping this board component const would be ideal
     ~CableView() override;
 
     void paint (Graphics& g) override;
+    void resized() override;
     void mouseDown (const MouseEvent& e) override;
     void mouseDrag (const MouseEvent& e) override;
     void mouseUp (const MouseEvent& e) override;
@@ -21,7 +22,10 @@ public:
     auto* getConnectionHelper() { return connectionHelper.get(); }
     auto* getPortLocationHelper() { return portLocationHelper.get(); }
     void processorBeingAdded (BaseProcessor* newProc);
+    void processorBeingAdded (BaseProcessor* newProc, BaseProcessor* inProc, BaseProcessor* outProc, Cable* c);
     void processorBeingRemoved (const BaseProcessor* proc);
+    
+    void updateCables();
 
     void setScaleFactor (float newScaleFactor);
 
@@ -34,8 +38,7 @@ public:
 
 private:
     void timerCallback() override;
-
-    const BoardComponent* board = nullptr;
+    BoardComponent* board = nullptr; //should be const
     OwnedArray<Cable> cables;
 
     float scaleFactor = 1.0f;

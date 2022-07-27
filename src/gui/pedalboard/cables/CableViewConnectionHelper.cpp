@@ -54,6 +54,48 @@ void CableViewConnectionHelper::processorBeingAdded (BaseProcessor* newProc)
     addConnectionsForProcessor (cables, newProc, board);
 }
 
+void CableViewConnectionHelper::processorBeingAdded (BaseProcessor* newProc, BaseProcessor* inProc, BaseProcessor* outProc, Cable* oldCable)
+{
+
+    for (auto* cable : cables)
+    {
+        if(cable->endProc == oldCable->endProc)
+        {
+            
+            cable->endProc = newProc;
+            cable->endIdx = 0;//should bot be 0
+
+            const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
+            auto firstConnection = cableToConnection (*cable);
+            board->procChain.getActionHelper().addConnection (std::move (firstConnection));
+
+            auto* addedCable = cables.add (std::make_unique<Cable> (newProc, 0));//should just be call to create cable function
+            
+            addedCable->startProc = newProc;
+            addedCable->endIdx = 0;
+            
+            addedCable->endProc = oldCable->endProc;
+            addedCable->endIdx = oldCable->endIdx;
+            
+            //const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
+            auto secondConnection = cableToConnection (*addedCable);
+            board->procChain.getActionHelper().addConnection (std::move (secondConnection));
+            
+            board->procChain.getActionHelper().removeConnection (cableToConnection (*cable));
+            //cables.removeObject (cable);
+            
+            
+            cableView.repaint();
+            cableView.updateCables();
+            return;
+
+
+        }
+        
+    }
+    
+}
+
 void CableViewConnectionHelper::processorBeingRemoved (const BaseProcessor* proc)
 {
     for (int i = cables.size() - 1; i >= 0; --i)

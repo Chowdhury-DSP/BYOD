@@ -8,6 +8,7 @@ bin/
 .vscode/
 .idea/
 .cache/
+xcode/
 
 # Mac extras
 .DS_Store

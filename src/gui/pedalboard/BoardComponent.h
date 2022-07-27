@@ -51,6 +51,8 @@ private:
     juce::Point<int> nextEditorPosition {};
     bool addingFromNewProcButton = false;
     bool addingFromRightClick = false;
+    bool generatedFromCableClick = false;
+    OwnedArray<Cable> newCables;
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 
