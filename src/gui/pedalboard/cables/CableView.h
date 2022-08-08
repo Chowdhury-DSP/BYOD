@@ -11,7 +11,7 @@ class CableView : public Component,
                   private Timer
 {
 public:
-    explicit CableView (BoardComponent* comp);//keeping this board component const would be ideal
+    explicit CableView (BoardComponent* comp); //keeping this board component const would be ideal
     ~CableView() override;
 
     void paint (Graphics& g) override;
@@ -32,11 +32,11 @@ public:
         int portIndex = 0;
         bool isInput = false;
     };
-    
+
     std::unique_ptr<MouseEvent> cableMouse = nullptr;
     bool mouseClicked = false; // Used within the Cable hitTest() method, because each cables bounds are the size of
-                               // CableView, each Cable hitTest() method is always activated when a mouse is on screen
-                               // this provides a bool to check so Cable hitTest() is not always checking.
+        // CableView, each Cable hitTest() method is always activated when a mouse is on screen
+        // this provides a bool to check so Cable hitTest() is not always checking.
 
 private:
     void timerCallback() override;

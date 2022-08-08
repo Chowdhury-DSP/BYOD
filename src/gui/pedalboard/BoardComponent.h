@@ -52,7 +52,6 @@ private:
     juce::Point<int> nextEditorPosition {};
     bool addingFromNewProcButton = false;
     bool addingFromRightClick = false;
-    
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 

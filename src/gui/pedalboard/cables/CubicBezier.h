@@ -1,12 +1,10 @@
 
 struct CubicBezier
 {
-    
-    CubicBezier()//Can do better then this
+    CubicBezier() //Can do better then this
     {
-        
     }
-    
+
     CubicBezier (juce::Point<float> p1, juce::Point<float> p2, juce::Point<float> p3, juce::Point<float> p4)
     {
         /* calculate the polynomial coefficients */

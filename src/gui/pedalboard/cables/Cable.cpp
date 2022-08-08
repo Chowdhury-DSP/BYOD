@@ -4,9 +4,7 @@
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
-
-
-Cable::Cable(const BoardComponent* comp, const CableView& cv, const ConnectionInfo connection): startProc(connection.startProc), startIdx (connection.startPort), endProc (connection.endProc), endIdx (connection.endPort), cableView(cv), board(comp), cableColour (0xFFD0592C)
+Cable::Cable (const BoardComponent* comp, const CableView& cv, const ConnectionInfo connection) : startProc (connection.startProc), startIdx (connection.startPort), endProc (connection.endProc), endIdx (connection.endPort), cableView (cv), board (comp), cableColour (0xFFD0592C)
 {
 }
 
@@ -64,8 +62,7 @@ void Cable::drawCable (Graphics& g, juce::Point<float> start, Colour startColour
     drawCableEndCircle (g, end, endColour);
 }
 
-
-void Cable::paint (Graphics& g) 
+void Cable::paint (Graphics& g)
 {
     g.setColour (cableColour.brighter (0.1f));
     auto* startEditor = board->findEditorForProcessor (startProc);
@@ -83,7 +80,7 @@ void Cable::paint (Graphics& g)
         endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, endIdx, true }).toFloat();
         endColour = endEditor->getColour();
         levelDB = endProc->getInputLevelDB (endIdx);
-        
+
         drawCable (g, startPortLocation, startColour, endPortLocation, endColour);
     }
     else if (cableView.cableMouse != nullptr) // If cable has been created and is being dragged
@@ -92,21 +89,19 @@ void Cable::paint (Graphics& g)
     }
 }
 
-bool Cable::hitTest(int x, int y)
+bool Cable::hitTest (int x, int y)
 {
-    if(cableView.mouseClicked)
+    if (cableView.mouseClicked)
     {
-        juce::Point clickedP((float)x, (float)y );
+        juce::Point clickedP ((float) x, (float) y);
         for (int i = 1; i <= numPointsInPath; ++i)
         {
             auto pointOnPath = bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath);
-            if (clickedP.getDistanceFrom(pointOnPath) < cablethickness)
+            if (clickedP.getDistanceFrom (pointOnPath) < cablethickness)
             {
                 return true;
             }
         }
     }
     return false;
-        
 }
-

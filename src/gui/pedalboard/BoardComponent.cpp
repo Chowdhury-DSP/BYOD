@@ -107,7 +107,6 @@ void BoardComponent::resized()
     newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
 
-    
     repaint();
 }
 
@@ -121,11 +120,11 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
 
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain));
     addAndMakeVisible (newEditor);
-    
+
     setEditorPosition (newEditor);
-    
+
     newEditor->addListener (this);
-    
+
     repaint();
 
     cableView.processorBeingAdded (newProc);
