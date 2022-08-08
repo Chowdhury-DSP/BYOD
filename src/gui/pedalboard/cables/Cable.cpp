@@ -91,17 +91,15 @@ void Cable::paint (Graphics& g)
 
 bool Cable::hitTest (int x, int y)
 {
-    if (cableView.mouseClicked)
+    juce::Point clickedP ((float) x, (float) y);
+    for (int i = 1; i <= numPointsInPath; ++i)
     {
-        juce::Point clickedP ((float) x, (float) y);
-        for (int i = 1; i <= numPointsInPath; ++i)
+        auto pointOnPath = bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath);
+        if (clickedP.getDistanceFrom (pointOnPath) < cablethickness)
         {
-            auto pointOnPath = bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath);
-            if (clickedP.getDistanceFrom (pointOnPath) < cablethickness)
-            {
-                return true;
-            }
+            return true;
         }
     }
+    
     return false;
 }

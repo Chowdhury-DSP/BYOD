@@ -8,7 +8,6 @@ public:
     explicit CableViewConnectionHelper (CableView& cableView);
 
     void processorBeingAdded (BaseProcessor* newProc);
-    void processorBeingAddedFromCableClick (BaseProcessor* newProc, Cable* c); //rename this?
     void processorBeingRemoved (const BaseProcessor* proc);
 
     void refreshConnections() override;

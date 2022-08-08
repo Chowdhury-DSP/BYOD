@@ -53,7 +53,6 @@ void CableView::resized()
 
 void CableView::mouseDown (const MouseEvent& e)
 {
-    mouseClicked = true;
 
     if (e.eventComponent == nullptr)
         return; // not a valid mouse event
@@ -65,10 +64,10 @@ void CableView::mouseDown (const MouseEvent& e)
             juce::Point clicked (e.getMouseDownX(), e.getMouseDownY());
             if (cable->contains (clicked)) // Checks hitTest method for cable
             {
-                mouseClicked = false;
+
                 board->popupMenu.showPopupMenu();
                 connectionHelper->clickOnCable (cable);
-                break;
+                return;
             }
         }
     }
@@ -90,7 +89,6 @@ void CableView::mouseDown (const MouseEvent& e)
         cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
         isDraggingCable = true;
     }
-    mouseClicked = false;
 }
 
 void CableView::mouseDrag (const MouseEvent& e)

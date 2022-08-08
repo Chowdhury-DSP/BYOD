@@ -121,13 +121,14 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain));
     addAndMakeVisible (newEditor);
 
+    cableView.processorBeingAdded (newProc);
     setEditorPosition (newEditor);
 
     newEditor->addListener (this);
 
     repaint();
 
-    cableView.processorBeingAdded (newProc);
+    
 }
 
 void BoardComponent::processorRemoved (const BaseProcessor* proc)
