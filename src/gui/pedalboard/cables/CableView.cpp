@@ -8,24 +8,9 @@ CableView::CableView (BoardComponent* comp) : board (comp)
 {
     setInterceptsMouseClicks (false, true);
     startTimerHz (36);
-
-    updateCables();
     
     connectionHelper = std::make_unique<CableViewConnectionHelper> (*this);
     portLocationHelper = std::make_unique<CableViewPortLocationHelper> (*this);
-
-}
-
-void CableView::updateCables()
-{
-    for (auto* cable : cables)
-    {
-        addChildComponent(cable);
-        addAndMakeVisible(cable);
-        cable->setBounds(getLocalBounds());
-        
-    }
-    
 }
 
 CableView::~CableView() = default;
@@ -46,40 +31,14 @@ void CableView::paint (Graphics& g)
         }
     }
 
-    g.setColour (cableColour.brighter (0.1f));
-    for (auto* cable : cables)
+    if (cableMouse != nullptr)
     {
-        auto* startEditor = board->findEditorForProcessor (cable->startProc);
-        jassert (startEditor != nullptr);
-
-        auto startPortLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, cable->startIdx, false });
-
-        if (cable->endProc != nullptr)
+        auto mousePos = cableMouse->getPosition();
+        const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->startProc);
+        if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
         {
-            auto* endEditor = board->findEditorForProcessor (cable->endProc);
-            jassert (endEditor != nullptr);
-
-            auto endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, cable->endIdx, true });
-
-            auto startColour = startEditor->getColour();
-            auto endColour = endEditor->getColour();
-            auto levelDB = cable->endProc->getInputLevelDB (cable->endIdx);
-            cable->drawCable (g, startPortLocation.toFloat(), startColour, endPortLocation.toFloat(), endColour, scaleFactor, levelDB);
-            cable->repaint();
-        }
-        else if (connectionHelper->cableMouse != nullptr)
-        {
-            auto mousePos = connectionHelper->cableMouse->getPosition();
-            const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cable->startProc);
-            if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
-            {
-                auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
-                drawCablePortGlow (g, endPortLocation, scaleFactor);
-            }
-
-            auto colour = startEditor->getColour();
-            cable->drawCable (g, startPortLocation.toFloat(), colour, mousePos.toFloat(), colour, scaleFactor, 0.0f);//this 0 hre dannger
-            cable->repaint();
+            auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
+            drawCablePortGlow (g, endPortLocation, scaleFactor);
         }
     }
 }
@@ -90,40 +49,31 @@ void CableView::resized()
     {
         cable->setBounds(getLocalBounds());
     }
-    
 }
 
 void CableView::mouseDown (const MouseEvent& e)
 {
+    mouseClicked = true;
     
     if(e.eventComponent == nullptr)
         return;// not a valid mouse event
     
     if(e.mods.isPopupMenu())
     {
-        for(int i = 0; i < cables.size(); ++i)
+        for (auto* cable : cables)
         {
-            Point clicked(e.getMouseDownX(), e.getMouseDownY());
-            if(cables[i]->contains(clicked)) //checks hitTest method for cable
+            juce::Point clicked(e.getMouseDownX(), e.getMouseDownY());
+            if(cable->contains(clicked)) // Checks hitTest method for cable
             {
+                mouseClicked = false;
                 board->popupMenu.showPopupMenu();
-                
-                board->newCables.add(cables[i]);
-                board->generatedFromCableClick = true;
-                
-                Logger::writeToLog ("CLICK ON PATH " + std::to_string(i));
+                connectionHelper->clickOnCable(cable);
+                break;
             }
-            else
-            {
-                Logger::writeToLog ("NOT ON PATH");
-            }
-            
-            
         }
     }
     
-    
-    if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || e.eventComponent == nullptr)
+    if (e.mods.isAnyModifierKeyDown())
         return; // not a valid mouse event
 
     nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition(), e.source.getComponentUnderMouse());
@@ -132,29 +82,31 @@ void CableView::mouseDown (const MouseEvent& e)
 
     if (nearestPort.isInput)
     {
-        connectionHelper->destroyCable (nearestPort.editor, nearestPort.portIndex);
+        connectionHelper->destroyCable (nearestPort.editor->getProcPtr(), nearestPort.portIndex);
     }
     else
     {
-        connectionHelper->createCable (nearestPort.editor, nearestPort.portIndex, e);
+        connectionHelper->createCable ({nearestPort.editor->getProcPtr(), nearestPort.portIndex, nullptr, 0});
+        cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
         isDraggingCable = true;
     }
+    mouseClicked = false;
 }
 
 void CableView::mouseDrag (const MouseEvent& e)
 {
     if (isDraggingCable)
-        connectionHelper->refreshCable (e);
+        cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
 }
 
 void CableView::mouseUp (const MouseEvent& e)
 {
     if (isDraggingCable)
     {
+        cableMouse.reset();
         connectionHelper->releaseCable (e);
         isDraggingCable = false;
     }
-    updateCables();
 }
 
 void CableView::timerCallback()
@@ -164,23 +116,15 @@ void CableView::timerCallback()
     repaint();
 }
 
-void CableView::setScaleFactor (float newScaleFactor)
-{
-    scaleFactor = newScaleFactor;
-    repaint();
-}
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)
 {
     connectionHelper->processorBeingAdded (newProc);
 }
 
-void CableView::processorBeingAdded (BaseProcessor* newProc, BaseProcessor* inProc, BaseProcessor* outProc, Cable* c)
-{
-    connectionHelper->processorBeingAdded (newProc, inProc, outProc, c);
-}
-
 void CableView::processorBeingRemoved (const BaseProcessor* proc)
 {
     connectionHelper->processorBeingRemoved (proc);
 }
+
+

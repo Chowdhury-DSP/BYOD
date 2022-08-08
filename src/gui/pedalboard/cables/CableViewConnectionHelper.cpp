@@ -5,10 +5,6 @@
 
 namespace
 {
-std::unique_ptr<Cable> connectionToCable (const ConnectionInfo& connection)
-{
-    return std::make_unique<Cable> (connection.startProc, connection.startPort, connection.endProc, connection.endPort);
-}
 
 ConnectionInfo cableToConnection (const Cable& cable)
 {
@@ -27,7 +23,7 @@ void updateConnectionStatuses (const BoardComponent* board, const ConnectionInfo
         editor->setConnectionStatus (isConnected, connection.endPort, true);
 }
 
-void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent* board)
+void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent* board, const CableView& cableView)
 {
     for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
     {
@@ -35,8 +31,7 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc,
         for (int cIdx = 0; cIdx < numConnections; ++cIdx)
         {
             const auto& connection = proc->getOutputConnection (portIdx, cIdx);
-            cables.add (connectionToCable (connection));
-
+            cables.add(std::make_unique<Cable>(board, cableView, connection));
             updateConnectionStatuses (board, connection, true);
         }
     }
@@ -51,50 +46,9 @@ CableViewConnectionHelper::CableViewConnectionHelper (CableView& cv) : cableView
 
 void CableViewConnectionHelper::processorBeingAdded (BaseProcessor* newProc)
 {
-    addConnectionsForProcessor (cables, newProc, board);
+    addConnectionsForProcessor (cables, newProc, board, cableView);
 }
 
-void CableViewConnectionHelper::processorBeingAdded (BaseProcessor* newProc, BaseProcessor* inProc, BaseProcessor* outProc, Cable* oldCable)
-{
-
-    for (auto* cable : cables)
-    {
-        if(cable->endProc == oldCable->endProc)
-        {
-            
-            cable->endProc = newProc;
-            cable->endIdx = 0;//should bot be 0
-
-            const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
-            auto firstConnection = cableToConnection (*cable);
-            board->procChain.getActionHelper().addConnection (std::move (firstConnection));
-
-            auto* addedCable = cables.add (std::make_unique<Cable> (newProc, 0));//should just be call to create cable function
-            
-            addedCable->startProc = newProc;
-            addedCable->endIdx = 0;
-            
-            addedCable->endProc = oldCable->endProc;
-            addedCable->endIdx = oldCable->endIdx;
-            
-            //const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
-            auto secondConnection = cableToConnection (*addedCable);
-            board->procChain.getActionHelper().addConnection (std::move (secondConnection));
-            
-            board->procChain.getActionHelper().removeConnection (cableToConnection (*cable));
-            //cables.removeObject (cable);
-            
-            
-            cableView.repaint();
-            cableView.updateCables();
-            return;
-
-
-        }
-        
-    }
-    
-}
 
 void CableViewConnectionHelper::processorBeingRemoved (const BaseProcessor* proc)
 {
@@ -113,9 +67,13 @@ void CableViewConnectionHelper::refreshConnections()
     cables.clear();
 
     for (auto* proc : board->procChain.getProcessors())
-        addConnectionsForProcessor (cables, proc, board);
-
-    addConnectionsForProcessor (cables, &board->procChain.getInputProcessor(), board);
+        addConnectionsForProcessor (cables, proc, board, cableView);
+    addConnectionsForProcessor (cables, &board->procChain.getInputProcessor(), board, cableView);
+    
+    for (auto* cable : cables)
+    {
+        addCableToView(cable);
+    }
 
     cableView.repaint();
 }
@@ -126,8 +84,8 @@ void CableViewConnectionHelper::connectionAdded (const ConnectionInfo& info)
 
     if (ignoreConnectionCallbacks)
         return;
-
-    cables.add (connectionToCable (info));
+    
+    createCable(info);
 
     cableView.repaint();
 }
@@ -154,23 +112,23 @@ void CableViewConnectionHelper::connectionRemoved (const ConnectionInfo& info)
     cableView.repaint();
 }
 
-void CableViewConnectionHelper::createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e)
+void CableViewConnectionHelper::addCableToView(Cable* cable)
 {
-    cables.add (std::make_unique<Cable> (origin->getProcPtr(), portIndex));
-    cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (&cableView)));
-    cableView.repaint();
+    cableView.addChildComponent(cable);
+    cableView.addAndMakeVisible(cable);
+    cable->setBounds(cableView.getLocalBounds());
 }
 
-void CableViewConnectionHelper::refreshCable (const MouseEvent& e)
+void CableViewConnectionHelper::createCable (const ConnectionInfo& connection)
 {
-    cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (&cableView)));
-    cableView.repaint();
+    cables.add (std::make_unique<Cable> (board, cableView, connection));
+    addCableToView(cables.getLast());
 }
+
+
 
 void CableViewConnectionHelper::releaseCable (const MouseEvent& e)
 {
-    cableMouse.reset();
-
     // check if we're releasing near an output port
     auto relMouse = e.getEventRelativeTo (&cableView);
     auto mousePos = relMouse.getPosition();
@@ -179,9 +137,10 @@ void CableViewConnectionHelper::releaseCable (const MouseEvent& e)
     auto [editor, portIdx, _] = cableView.getPortLocationHelper()->getNearestInputPort (mousePos, cable->startProc);
     if (editor != nullptr)
     {
-        cable->endProc = editor->getProcPtr();
+        auto proc = editor->getProcPtr();
+        cable->endProc = proc;
         cable->endIdx = portIdx;
-
+        
         const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
         auto connection = cableToConnection (*cable);
         board->procChain.getActionHelper().addConnection (std::move (connection));
@@ -196,9 +155,8 @@ void CableViewConnectionHelper::releaseCable (const MouseEvent& e)
     cableView.repaint();
 }
 
-void CableViewConnectionHelper::destroyCable (ProcessorEditor* origin, int portIndex)
+void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex)
 {
-    const auto* proc = origin->getProcPtr();
     for (auto* cable : cables)
     {
         if (cable->endProc == proc && cable->endIdx == portIndex)
@@ -206,10 +164,15 @@ void CableViewConnectionHelper::destroyCable (ProcessorEditor* origin, int portI
             const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
             board->procChain.getActionHelper().removeConnection (cableToConnection (*cable));
             cables.removeObject (cable);
-
             break;
         }
     }
 
     cableView.repaint();
+}
+
+
+void CableViewConnectionHelper::clickOnCable(Cable* clickedCable)
+{
+    board->procChain.getActionHelper().clickOnCable(clickedCable->startProc, clickedCable->endProc);
 }

@@ -21,7 +21,7 @@ struct CubicBezier
         p1y = p1.getY();
     }
 
-    juce::Point<float> pointOnCubicBezier (float t)
+    juce::Point<float> getPointOnCubicBezier (float t)
     {
         using namespace chowdsp::Polynomials;
 

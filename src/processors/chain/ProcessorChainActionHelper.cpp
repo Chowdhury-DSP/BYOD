@@ -14,14 +14,60 @@ ProcessorChainActionHelper::~ProcessorChainActionHelper() = default;
 
 void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)
 {
+    
+    
     if (newProc == nullptr)
     {
         jassertfalse; // unable to create this processor!
         return;
     }
+    
+    if(generatedFromCableClick)
+    {
+        AddProcessorFromCableClick(std::move(newProc));
+        generatedFromCableClick = false;
+    }
+    else
+    {
+        um->beginNewTransaction();
+        um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
+    }
 
+}
+
+void ProcessorChainActionHelper::AddProcessorFromCableClick(BaseProcessor::Ptr newProc)
+{
+    
     um->beginNewTransaction();
+    
+    // Destroy old cable connection
+    auto minIncomingPorts = jmin(cableClickEndProc->getNumInputs(), cableClickStartProc->getNumOutputs());
+    for (int portIdx = 0; portIdx < minIncomingPorts; ++portIdx)
+    {
+        um->perform (new AddOrRemoveConnection (chain, {cableClickStartProc, portIdx, cableClickEndProc, portIdx}, true));
+    }
+    
+    // In order for the undo manager to work properly, when it destroys the processor on an undo there should be no
+    // output connections for that processor,otherwise we run into recursive undos. To mitigate this, we can add the
+    // newProc first, then add the connections to it so when an undo happens, the connections are removed first, then
+    // the processor is removed last. We get the newProcRaw values because after the addition of the newProc with
+    // std:move(newProc) newProc will be null and we wont be able to use it for adding connection info.
+    BaseProcessor* newProcRaw = newProc.get();
     um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
+    
+    // Attach cable(s) to newProc input
+    for (int portIdx = 0; portIdx < minIncomingPorts; ++portIdx)
+    {
+        um->perform (new AddOrRemoveConnection (chain, {cableClickStartProc, portIdx, newProcRaw, portIdx}));
+    }
+    
+    // Attach cable(s) to newProc output
+    auto minOutgoingPorts = jmin(cableClickEndProc->getNumInputs(), newProcRaw->getNumOutputs());//bad name
+    for (int portIdx = 0; portIdx < minOutgoingPorts; ++portIdx)
+    {
+        um->perform (new AddOrRemoveConnection (chain, {newProcRaw, portIdx, cableClickEndProc, portIdx}));
+    }
+    
 }
 
 void ProcessorChainActionHelper::removeProcessor (BaseProcessor* procToRemove)
@@ -120,6 +166,13 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
     }
 
     um->perform (new AddOrRemoveProcessor (chain, procToReplace));
+}
+
+void ProcessorChainActionHelper::clickOnCable(BaseProcessor* startProc, BaseProcessor* endProc)
+{
+    cableClickStartProc = startProc;
+    cableClickEndProc = endProc;
+    generatedFromCableClick = true;
 }
 
 void ProcessorChainActionHelper::addConnection (ConnectionInfo&& info)

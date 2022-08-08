@@ -3,47 +3,52 @@
 #include "processors/BaseProcessor.h"
 #include "../editors/ProcessorEditor.h"
 #include "../editors/ProcessorEditor.h"
+#include "CableView.h"
 #include <pch.h> //do i need this?
 #include "CubicBezier.h"
 
-
+class BoardComponent;
+class CableView;
 class CableViewConnectionHelper;
 class CableViewPortLocationHelper;
 class Cable: public Component
 {
     public:
     
-    Cable (BaseProcessor* start, int startPort);
-    Cable (BaseProcessor* start, int startPort, BaseProcessor* end, int endPort);
+    Cable (const BoardComponent* comp, const CableView& cv, const ConnectionInfo connection);
     ~Cable() override;
     
-    void paint (Graphics& g) override;
-        
-    auto createCablePath (Point<float> start, Point<float> end, float scaleFactor);
     
+    auto createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
     float getCableThickness (float levelDB);
-    
-    void drawCableShadow (Graphics& g, const Path& cablePath, float thickness);
-    
-    void drawCable (Graphics& g, Point<float> start, Colour startColour, Point<float> end, Colour endColour, float scaleFactor, float levelDB);
-    
-    void drawCableEndCircle (Graphics& g, Point<float> centre, Colour colour, float scaleFactor);
-    
+    void drawCableShadow (Graphics& g, float thickness);
+    void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour);
+    void drawCable (Graphics& g, juce::Point<float> start, Colour startColour, juce::Point<float> end, Colour endColour);
+    void paint (Graphics& g) override;
     bool hitTest(int x, int y) override;
 
-    BaseProcessor* startProc = nullptr;//getters and setterss
-    int startIdx;
+    BaseProcessor* startProc = nullptr;
+    int startIdx = 0;
 
     BaseProcessor* endProc = nullptr;
     int endIdx = 0;
+    
 
 private:
+    const CableView& cableView;
+    const BoardComponent* board = nullptr;
     
-    Path cablePath;//should this be in initializer list and const
-    int nump;
+    Path cablePath;
+    int numPointsInPath;
     CubicBezier bezier;
     float cablethickness;
-    chowdsp::PopupMenuHelper popupMenu;
+    
+    juce::Point<float> startPortLocation;
+    Colour startColour;
+    Colour endColour;
+    juce::Point<float> endPortLocation;
+    float scaleFactor;
+    float levelDB;
     
     
     const Colour cableColour; // currently only used for "glow"

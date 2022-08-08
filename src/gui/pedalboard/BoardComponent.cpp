@@ -59,7 +59,6 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
     procChain.addListener (cableView.getConnectionHelper());
 
     cableView.getConnectionHelper()->refreshConnections();
-    cableView.updateCables();
 
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
@@ -79,9 +78,13 @@ BoardComponent::~BoardComponent()
 void BoardComponent::setScaleFactor (float newScaleFactor)
 {
     scaleFactor = newScaleFactor;
-    cableView.setScaleFactor (scaleFactor);
 
     resized();
+}
+
+float BoardComponent::getScaleFactor() const
+{
+    return scaleFactor;
 }
 
 void BoardComponent::resized()
@@ -118,22 +121,14 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
 
     auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain));
     addAndMakeVisible (newEditor);
-
-    if(generatedFromCableClick)
-    {
-        cableView.processorBeingAdded (newProc, c->startProc, c->endProc, newCables.getLast());
-        generatedFromCableClick = false;
-    }
-    else
-    {
-        cableView.processorBeingAdded (newProc);
-    }
-
+    
     setEditorPosition (newEditor);
-
+    
     newEditor->addListener (this);
-
+    
     repaint();
+
+    cableView.processorBeingAdded (newProc);
 }
 
 void BoardComponent::processorRemoved (const BaseProcessor* proc)

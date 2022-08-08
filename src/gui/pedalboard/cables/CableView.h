@@ -3,6 +3,7 @@
 #include "../editors/ProcessorEditor.h"
 #include "Cable.h"
 
+class Cable;
 class BoardComponent;
 class CableViewConnectionHelper;
 class CableViewPortLocationHelper;
@@ -22,12 +23,8 @@ public:
     auto* getConnectionHelper() { return connectionHelper.get(); }
     auto* getPortLocationHelper() { return portLocationHelper.get(); }
     void processorBeingAdded (BaseProcessor* newProc);
-    void processorBeingAdded (BaseProcessor* newProc, BaseProcessor* inProc, BaseProcessor* outProc, Cable* c);
+    void processorBeingAddedFromCableClick (BaseProcessor* newProc, Cable* c);
     void processorBeingRemoved (const BaseProcessor* proc);
-    
-    void updateCables();
-
-    void setScaleFactor (float newScaleFactor);
 
     struct EditorPort
     {
@@ -35,6 +32,11 @@ public:
         int portIndex = 0;
         bool isInput = false;
     };
+    
+    std::unique_ptr<MouseEvent> cableMouse = nullptr;
+    bool mouseClicked = false; // Used within the Cable hitTest() method, because each cables bounds are the size of
+                               // CableView, each Cable hitTest() method is always activated when a mouse is on screen
+                               // this provides a bool to check so Cable hitTest() is not always checking.
 
 private:
     void timerCallback() override;
