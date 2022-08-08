@@ -100,6 +100,6 @@ bool Cable::hitTest (int x, int y)
             return true;
         }
     }
-    
+
     return false;
 }

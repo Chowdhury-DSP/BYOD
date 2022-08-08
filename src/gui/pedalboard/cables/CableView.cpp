@@ -53,7 +53,6 @@ void CableView::resized()
 
 void CableView::mouseDown (const MouseEvent& e)
 {
-
     if (e.eventComponent == nullptr)
         return; // not a valid mouse event
 
@@ -64,7 +63,6 @@ void CableView::mouseDown (const MouseEvent& e)
             juce::Point clicked (e.getMouseDownX(), e.getMouseDownY());
             if (cable->contains (clicked)) // Checks hitTest method for cable
             {
-
                 board->popupMenu.showPopupMenu();
                 connectionHelper->clickOnCable (cable);
                 return;

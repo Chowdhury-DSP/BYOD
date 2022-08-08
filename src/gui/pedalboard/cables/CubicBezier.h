@@ -1,8 +1,8 @@
 
 struct CubicBezier
 {
-    CubicBezier(): ax(0.0f), bx(0.0f), cx(0.0f), p1x(0.0f), ay(0.0f), by(0.0f), cy(0.0f), p1y(0)
-    {        
+    CubicBezier() : ax (0.0f), bx (0.0f), cx (0.0f), p1x (0.0f), ay (0.0f), by (0.0f), cy (0.0f), p1y (0)
+    {
     }
 
     CubicBezier (juce::Point<float> p1, juce::Point<float> p2, juce::Point<float> p3, juce::Point<float> p4)

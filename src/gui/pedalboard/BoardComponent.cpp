@@ -127,8 +127,6 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     newEditor->addListener (this);
 
     repaint();
-
-    
 }
 
 void BoardComponent::processorRemoved (const BaseProcessor* proc)
