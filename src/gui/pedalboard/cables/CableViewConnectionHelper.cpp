@@ -171,7 +171,7 @@ void CableViewConnectionHelper::clickOnCable (Cable* clickedCable)
 {
     PopupMenu menu;
     PopupMenu::Options options;
-    board->showNewProcMenu(menu, options, true, clickedCable);
-    
+    board->showNewProcMenu (menu, options, true, clickedCable);
+
     menu.showMenuAsync (options);
 }

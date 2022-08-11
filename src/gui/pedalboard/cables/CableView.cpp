@@ -82,7 +82,7 @@ bool CableView::cableBeingDragged() const
     return isDraggingCable;
 }
 
-juce::Point<float> CableView::getCableMousePosition() const 
+juce::Point<float> CableView::getCableMousePosition() const
 {
     return cableMouse->getPosition().toFloat();
 }

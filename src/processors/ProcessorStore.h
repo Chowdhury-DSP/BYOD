@@ -22,7 +22,7 @@ private:
     friend class ProcessorChainActionHelper;
 
     static StoreMap store;
-    
+
     std::function<void (BaseProcessor::Ptr)> addProcessorCallback = nullptr;
     std::function<void (BaseProcessor::Ptr, BaseProcessor*)> replaceProcessorCallback = nullptr;
     std::function<void (BaseProcessor::Ptr, BaseProcessor*, BaseProcessor*)> addProcessorFromCableClickCallback = nullptr;

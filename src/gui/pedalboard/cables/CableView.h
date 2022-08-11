@@ -24,10 +24,10 @@ public:
     auto* getPortLocationHelper() { return portLocationHelper.get(); }
     void processorBeingAdded (BaseProcessor* newProc);
     void processorBeingRemoved (const BaseProcessor* proc);
-    
+
     bool cableBeingDragged() const;
     juce::Point<float> getCableMousePosition() const;
-    
+
     struct EditorPort
     {
         ProcessorEditor* editor = nullptr;
@@ -35,18 +35,15 @@ public:
         bool isInput = false;
     };
 
-    
-
 private:
     void timerCallback() override;
-    
+
     BoardComponent* board = nullptr;
     OwnedArray<Cable> cables;
 
     float scaleFactor = 1.0f;
     bool isDraggingCable = false;
     std::unique_ptr<MouseEvent> cableMouse = nullptr;
-    
 
     friend class CableViewConnectionHelper;
     std::unique_ptr<CableViewConnectionHelper> connectionHelper;

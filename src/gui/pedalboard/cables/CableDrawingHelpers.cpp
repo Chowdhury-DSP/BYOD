@@ -2,7 +2,6 @@
 
 namespace CableDrawingHelpers
 {
-
 using namespace CableConstants;
 
 void drawCablePortGlow (Graphics& g, juce::Point<int> location, float scaleFactor)

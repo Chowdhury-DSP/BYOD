@@ -164,7 +164,6 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
     um->perform (new AddOrRemoveProcessor (chain, procToReplace));
 }
 
-
 void ProcessorChainActionHelper::addConnection (ConnectionInfo&& info)
 {
     um->beginNewTransaction();

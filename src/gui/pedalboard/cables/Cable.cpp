@@ -40,7 +40,7 @@ bool Cable::hitTest (int x, int y)
     return false;
 }
 
-float Cable::getCableThickness ()
+float Cable::getCableThickness()
 {
     levelDB = jlimit (floorDB, 0.0f, levelDB);
     auto levelMult = std::pow (jmap (levelDB, floorDB, 0.0f, 0.0f, 1.0f), 0.9f);
@@ -81,7 +81,7 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
 
 void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
-    cablethickness = getCableThickness ();
+    cablethickness = getCableThickness();
     cablePath = createCablePath (start, end, scaleFactor);
     drawCableShadow (g, cablethickness);
 
@@ -113,11 +113,9 @@ void Cable::paint (Graphics& g)
 
         drawCable (g, startPortLocation, endPortLocation);
     }
-     else if (cableView.cableBeingDragged())
+    else if (cableView.cableBeingDragged())
     {
         endColour = startColour;
         drawCable (g, startPortLocation, cableView.getCableMousePosition());
     }
 }
-
-

@@ -186,10 +186,10 @@ void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& optio
     }
 
     int menuID = 0;
-    
-    if(generatedfromCableClick)
+
+    if (generatedfromCableClick)
     {
-        jassert(clickedCable != nullptr);
+        jassert (clickedCable != nullptr);
         procChain.getProcStore().createProcFromCableClickList (menu, menuID, clickedCable->startProc, clickedCable->endProc);
     }
     else

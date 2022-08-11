@@ -168,9 +168,8 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
             item.text = procDesc.first;
             item.action = [&store, &procDesc, procToReplace, cableClickStartProc, cableClickEndProc]
             {
-
                 if (cableClickStartProc != nullptr && cableClickEndProc != nullptr)
-                    store.addProcessorFromCableClickCallback(procDesc.second (store.undoManager), cableClickStartProc, cableClickEndProc);
+                    store.addProcessorFromCableClickCallback (procDesc.second (store.undoManager), cableClickStartProc, cableClickEndProc);
                 else if (procToReplace != nullptr)
                     store.replaceProcessorCallback (procDesc.second (store.undoManager), procToReplace);
                 else
@@ -193,7 +192,9 @@ void createProcListUnfiltered (const ProcessorStore& store, PopupMenu& menu, int
     createProcListFiltered (
         store, menu, menuID, [] (auto...)
         { return true; },
-        procToReplace, cableClickStartProc, cableClickEndProc);
+        procToReplace,
+        cableClickStartProc,
+        cableClickEndProc);
 }
 
 void ProcessorStore::createProcList (PopupMenu& menu, int& menuID) const
@@ -213,12 +214,12 @@ void ProcessorStore::createProcReplaceList (PopupMenu& menu, int& menuID, BasePr
                    && procInfo.numOutputs == procToReplace->getNumOutputs()
                    && name != procToReplace->getName();
         },
-        procToReplace, nullptr, nullptr);
+        procToReplace,
+        nullptr,
+        nullptr);
 }
 
 void ProcessorStore::createProcFromCableClickList (PopupMenu& menu, int& menuID, BaseProcessor* cableClickStartProc, BaseProcessor* cableClickEndProc) const
 {
     createProcListUnfiltered (*this, menu, menuID, nullptr, cableClickStartProc, cableClickEndProc);
-    
-    
 }

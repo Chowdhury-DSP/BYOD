@@ -13,7 +13,7 @@ class Cable : public Component
 public:
     Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection);
     ~Cable() override;
-    
+
     void mouseDown (const MouseEvent& e) override;
 
     void paint (Graphics& g) override;
@@ -26,9 +26,8 @@ public:
     int endIdx = 0;
 
 private:
-    
     auto createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
-    float getCableThickness ();
+    float getCableThickness();
     void drawCableShadow (Graphics& g, float thickness);
     void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour);
     void drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end);
@@ -46,7 +45,6 @@ private:
     juce::Point<float> endPortLocation;
     float scaleFactor;
     float levelDB;
-
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
 };
