@@ -14,6 +14,7 @@ public:
 
     void createProcList (PopupMenu& menu, int& menuID) const;
     void createProcReplaceList (PopupMenu& menu, int& menuID, BaseProcessor* procToReplace) const;
+    void createProcFromCableClickList (PopupMenu& menu, int& menuID, BaseProcessor* startProc, BaseProcessor* endProc) const;
 
     static StoreMap& getStoreMap() { return store; }
 
@@ -21,9 +22,10 @@ private:
     friend class ProcessorChainActionHelper;
 
     static StoreMap store;
-
+    
     std::function<void (BaseProcessor::Ptr)> addProcessorCallback = nullptr;
     std::function<void (BaseProcessor::Ptr, BaseProcessor*)> replaceProcessorCallback = nullptr;
+    std::function<void (BaseProcessor::Ptr, BaseProcessor*, BaseProcessor*)> addProcessorFromCableClickCallback = nullptr;
 
     struct ProcInfo
     {
@@ -36,7 +38,7 @@ private:
     UndoManager* undoManager;
 
     template <typename FilterType>
-    friend void createProcListFiltered (const ProcessorStore&, PopupMenu&, int&, FilterType&&, BaseProcessor*);
+    friend void createProcListFiltered (const ProcessorStore&, PopupMenu&, int&, FilterType&&, BaseProcessor*, BaseProcessor*, BaseProcessor*);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorStore)
 };

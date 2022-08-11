@@ -1,6 +1,18 @@
 
 struct CubicBezier
 {
+    /*
+        The logic here was borrowed from TAL Noisemaker,
+        as permitted unger GPLv2. Original source code
+        is here: https://github.com/DISTRHO/DISTRHO-Ports/blob/master/ports-legacy/tal-noisemaker/source/EnvelopeEditor/SplineUtility.h
+
+        cp is a 4 element array where:
+        cp[0] is the starting point, or P0 in the above diagram
+        cp[1] is the first control point, or P1 in the above diagram
+        cp[2] is the second control point, or P2 in the above diagram
+        cp[3] is the end point, or P3 in the above diagram
+        t is the parameter value, 0 <= t <= 1
+    */
     CubicBezier() : ax (0.0f), bx (0.0f), cx (0.0f), p1x (0.0f), ay (0.0f), by (0.0f), cy (0.0f), p1y (0)
     {
     }

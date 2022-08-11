@@ -17,7 +17,6 @@ CableView::~CableView() = default;
 
 void CableView::paint (Graphics& g)
 {
-    using namespace CableConstants;
     using namespace CableDrawingHelpers;
 
     if (nearestPort.editor != nullptr)
@@ -53,24 +52,7 @@ void CableView::resized()
 
 void CableView::mouseDown (const MouseEvent& e)
 {
-    if (e.eventComponent == nullptr)
-        return; // not a valid mouse event
-
-    if (e.mods.isPopupMenu())
-    {
-        for (auto* cable : cables)
-        {
-            juce::Point clicked (e.getMouseDownX(), e.getMouseDownY());
-            if (cable->contains (clicked)) // Checks hitTest method for cable
-            {
-                board->popupMenu.showPopupMenu();
-                connectionHelper->clickOnCable (cable);
-                return;
-            }
-        }
-    }
-
-    if (e.mods.isAnyModifierKeyDown())
+    if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || e.eventComponent == nullptr)
         return; // not a valid mouse event
 
     nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition(), e.source.getComponentUnderMouse());
@@ -84,7 +66,7 @@ void CableView::mouseDown (const MouseEvent& e)
     else
     {
         connectionHelper->createCable ({ nearestPort.editor->getProcPtr(), nearestPort.portIndex, nullptr, 0 });
-        cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
+        cableMouse = std::make_unique<MouseEvent> (e.getEventRelativeTo (this));
         isDraggingCable = true;
     }
 }
@@ -92,7 +74,17 @@ void CableView::mouseDown (const MouseEvent& e)
 void CableView::mouseDrag (const MouseEvent& e)
 {
     if (isDraggingCable)
-        cableMouse = std::make_unique<MouseEvent> (std::move (e.getEventRelativeTo (this)));
+        cableMouse = std::make_unique<MouseEvent> (e.getEventRelativeTo (this));
+}
+
+bool CableView::cableBeingDragged() const
+{
+    return isDraggingCable;
+}
+
+juce::Point<float> CableView::getCableMousePosition() const 
+{
+    return cableMouse->getPosition().toFloat();
 }
 
 void CableView::mouseUp (const MouseEvent& e)

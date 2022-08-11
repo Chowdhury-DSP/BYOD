@@ -8,6 +8,13 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
     { addProcessor (std::move (newProc)); };
     chain.procStore.replaceProcessorCallback = [=] (auto newProc, auto procToReplace)
     { replaceProcessor (std::move (newProc), procToReplace); };
+<<<<<<< HEAD
+=======
+    chain.procStore.addProcessorFromCableClickCallback = [=] (auto newProc, auto startProc, auto endProc)
+    { addProcessorFromCableClick (std::move (newProc), startProc, endProc); };
+
+    startTimer (50);
+>>>>>>> PR changes, improved cable click menu
 }
 
 ProcessorChainActionHelper::~ProcessorChainActionHelper() = default;
@@ -19,12 +26,6 @@ void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)
         jassertfalse; // unable to create this processor!
         return;
     }
-
-    if (generatedFromCableClick)
-    {
-        AddProcessorFromCableClick (std::move (newProc));
-        generatedFromCableClick = false;
-    }
     else
     {
         um->beginNewTransaction();
@@ -32,15 +33,15 @@ void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)
     }
 }
 
-void ProcessorChainActionHelper::AddProcessorFromCableClick (BaseProcessor::Ptr newProc)
+void ProcessorChainActionHelper::addProcessorFromCableClick (BaseProcessor::Ptr newProc, BaseProcessor* startProc, BaseProcessor* endProc)
 {
     um->beginNewTransaction();
 
     // Destroy old cable connection
-    auto minIncomingPorts = jmin (cableClickEndProc->getNumInputs(), cableClickStartProc->getNumOutputs());
+    auto minIncomingPorts = jmin (endProc->getNumInputs(), startProc->getNumOutputs());
     for (int portIdx = 0; portIdx < minIncomingPorts; ++portIdx)
     {
-        um->perform (new AddOrRemoveConnection (chain, { cableClickStartProc, portIdx, cableClickEndProc, portIdx }, true));
+        um->perform (new AddOrRemoveConnection (chain, { startProc, portIdx, endProc, portIdx }, true));
     }
 
     // In order for the undo manager to work properly, when it destroys the processor on an undo there should be no
@@ -54,14 +55,14 @@ void ProcessorChainActionHelper::AddProcessorFromCableClick (BaseProcessor::Ptr 
     // Attach cable(s) to newProc input
     for (int portIdx = 0; portIdx < minIncomingPorts; ++portIdx)
     {
-        um->perform (new AddOrRemoveConnection (chain, { cableClickStartProc, portIdx, newProcRaw, portIdx }));
+        um->perform (new AddOrRemoveConnection (chain, { startProc, portIdx, newProcRaw, portIdx }));
     }
 
     // Attach cable(s) to newProc output
-    auto minOutgoingPorts = jmin (cableClickEndProc->getNumInputs(), newProcRaw->getNumOutputs()); //bad name
+    auto minOutgoingPorts = jmin (endProc->getNumInputs(), newProcRaw->getNumOutputs()); //bad name
     for (int portIdx = 0; portIdx < minOutgoingPorts; ++portIdx)
     {
-        um->perform (new AddOrRemoveConnection (chain, { newProcRaw, portIdx, cableClickEndProc, portIdx }));
+        um->perform (new AddOrRemoveConnection (chain, { newProcRaw, portIdx, endProc, portIdx }));
     }
 }
 
@@ -163,12 +164,6 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
     um->perform (new AddOrRemoveProcessor (chain, procToReplace));
 }
 
-void ProcessorChainActionHelper::clickOnCable (BaseProcessor* startProc, BaseProcessor* endProc)
-{
-    cableClickStartProc = startProc;
-    cableClickEndProc = endProc;
-    generatedFromCableClick = true;
-}
 
 void ProcessorChainActionHelper::addConnection (ConnectionInfo&& info)
 {

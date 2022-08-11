@@ -168,7 +168,7 @@ void BoardComponent::duplicateProcessor (const ProcessorEditor& editor)
     procChain.getProcStore().duplicateProcessor (*editor.getProcPtr());
 }
 
-void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options)
+void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, bool generatedfromCableClick, Cable* clickedCable)
 {
     if (addingFromNewProcButton)
     {
@@ -186,7 +186,16 @@ void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& optio
     }
 
     int menuID = 0;
-    procChain.getProcStore().createProcList (menu, menuID);
+    
+    if(generatedfromCableClick)
+    {
+        jassert(clickedCable != nullptr);
+        procChain.getProcStore().createProcFromCableClickList (menu, menuID, clickedCable->startProc, clickedCable->endProc);
+    }
+    else
+    {
+        procChain.getProcStore().createProcList (menu, menuID);
+    }
 
     options = options
                   .withParentComponent (this)

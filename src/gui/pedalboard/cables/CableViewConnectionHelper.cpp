@@ -22,7 +22,7 @@ void updateConnectionStatuses (const BoardComponent* board, const ConnectionInfo
         editor->setConnectionStatus (isConnected, connection.endPort, true);
 }
 
-void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent* board, const CableView& cableView)
+void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent* board, CableView& cableView)
 {
     for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
     {
@@ -169,5 +169,9 @@ void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex
 
 void CableViewConnectionHelper::clickOnCable (Cable* clickedCable)
 {
-    board->procChain.getActionHelper().clickOnCable (clickedCable->startProc, clickedCable->endProc);
+    PopupMenu menu;
+    PopupMenu::Options options;
+    board->showNewProcMenu(menu, options, true, clickedCable);
+    
+    menu.showMenuAsync (options);
 }

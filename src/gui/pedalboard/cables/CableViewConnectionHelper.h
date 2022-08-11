@@ -25,7 +25,7 @@ public:
 
 private:
     CableView& cableView;
-    const BoardComponent* board = nullptr;
+    BoardComponent* board = nullptr;
     OwnedArray<Cable>& cables;
 
     bool ignoreConnectionCallbacks = false;

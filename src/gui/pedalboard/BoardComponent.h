@@ -29,7 +29,7 @@ public:
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
 
 private:
-    void showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options);
+    void showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, bool generatedfromCableClick = false, Cable* clickedCable = nullptr);
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
 
     ProcessorChain& procChain;

@@ -8,19 +8,14 @@
 
 class BoardComponent;
 class CableView;
-class CableViewConnectionHelper;
-class CableViewPortLocationHelper;
 class Cable : public Component
 {
 public:
-    Cable (const BoardComponent* comp, const CableView& cv, const ConnectionInfo connection);
+    Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection);
     ~Cable() override;
+    
+    void mouseDown (const MouseEvent& e) override;
 
-    auto createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
-    float getCableThickness (float levelDB);
-    void drawCableShadow (Graphics& g, float thickness);
-    void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour);
-    void drawCable (Graphics& g, juce::Point<float> start, Colour startColour, juce::Point<float> end, Colour endColour);
     void paint (Graphics& g) override;
     bool hitTest (int x, int y) override;
 
@@ -31,7 +26,13 @@ public:
     int endIdx = 0;
 
 private:
-    const CableView& cableView;
+    
+    auto createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
+    float getCableThickness ();
+    void drawCableShadow (Graphics& g, float thickness);
+    void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour);
+    void drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end);
+    CableView& cableView;
     const BoardComponent* board = nullptr;
 
     Path cablePath;
@@ -46,14 +47,6 @@ private:
     float scaleFactor;
     float levelDB;
 
-    const Colour cableColour; // currently only used for "glow"
-    static constexpr float cableThickness = 5.0f;
-    static constexpr float portCircleThickness = 1.5f;
-
-    static constexpr int getPortDistanceLimit (float scaleFactor) { return int (20.0f * scaleFactor); }
-    static constexpr auto portOffset = 50.0f;
-
-    static constexpr float floorDB = -60.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
 };

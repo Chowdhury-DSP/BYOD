@@ -148,7 +148,7 @@ void ProcessorStore::duplicateProcessor (BaseProcessor& procToDuplicate)
 }
 
 template <typename FilterType>
-void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, FilterType&& filter, BaseProcessor* procToReplace)
+void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, FilterType&& filter, BaseProcessor* procToReplace, BaseProcessor* cableClickStartProc, BaseProcessor* cableClickEndProc)
 {
     for (auto type : { Drive, Tone, Utility, Other })
     {
@@ -166,12 +166,15 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
             PopupMenu::Item item;
             item.itemID = ++menuID;
             item.text = procDesc.first;
-            item.action = [&store, &procDesc, procToReplace]
+            item.action = [&store, &procDesc, procToReplace, cableClickStartProc, cableClickEndProc]
             {
-                if (procToReplace == nullptr)
-                    store.addProcessorCallback (procDesc.second (store.undoManager));
-                else
+
+                if (cableClickStartProc != nullptr && cableClickEndProc != nullptr)
+                    store.addProcessorFromCableClickCallback(procDesc.second (store.undoManager), cableClickStartProc, cableClickEndProc);
+                else if (procToReplace != nullptr)
                     store.replaceProcessorCallback (procDesc.second (store.undoManager), procToReplace);
+                else
+                    store.addProcessorCallback (procDesc.second (store.undoManager));
             };
 
             subMenu.addItem (item);
@@ -185,12 +188,12 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
     }
 }
 
-void createProcListUnfiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, BaseProcessor* procToReplace = nullptr)
+void createProcListUnfiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, BaseProcessor* procToReplace = nullptr, BaseProcessor* cableClickStartProc = nullptr, BaseProcessor* cableClickEndProc = nullptr)
 {
     createProcListFiltered (
         store, menu, menuID, [] (auto...)
         { return true; },
-        procToReplace);
+        procToReplace, cableClickStartProc, cableClickEndProc);
 }
 
 void ProcessorStore::createProcList (PopupMenu& menu, int& menuID) const
@@ -210,5 +213,12 @@ void ProcessorStore::createProcReplaceList (PopupMenu& menu, int& menuID, BasePr
                    && procInfo.numOutputs == procToReplace->getNumOutputs()
                    && name != procToReplace->getName();
         },
-        procToReplace);
+        procToReplace, nullptr, nullptr);
+}
+
+void ProcessorStore::createProcFromCableClickList (PopupMenu& menu, int& menuID, BaseProcessor* cableClickStartProc, BaseProcessor* cableClickEndProc) const
+{
+    createProcListUnfiltered (*this, menu, menuID, nullptr, cableClickStartProc, cableClickEndProc);
+    
+    
 }

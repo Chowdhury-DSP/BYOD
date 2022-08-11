@@ -4,13 +4,43 @@
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
-Cable::Cable (const BoardComponent* comp, const CableView& cv, const ConnectionInfo connection) : startProc (connection.startProc), startIdx (connection.startPort), endProc (connection.endProc), endIdx (connection.endPort), cableView (cv), board (comp), cableColour (0xFFD0592C)
+using namespace CableConstants;
+
+Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection) : startProc (connection.startProc),
+                                                                                            startIdx (connection.startPort),
+                                                                                            endProc (connection.endProc),
+                                                                                            endIdx (connection.endPort),
+                                                                                            cableView (cv),
+                                                                                            board (comp)
 {
 }
 
 Cable::~Cable() = default;
 
-float Cable::getCableThickness (float levelDB)
+void Cable::mouseDown (const MouseEvent& e)
+{
+    if (e.mods.isPopupMenu())
+    {
+        cableView.getConnectionHelper()->clickOnCable (this);
+    }
+}
+
+bool Cable::hitTest (int x, int y)
+{
+    juce::Point clickedP ((float) x, (float) y);
+    for (int i = 1; i <= numPointsInPath; ++i)
+    {
+        auto pointOnPath = bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath);
+        if (clickedP.getDistanceFrom (pointOnPath) < cablethickness)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+float Cable::getCableThickness ()
 {
     levelDB = jlimit (floorDB, 0.0f, levelDB);
     auto levelMult = std::pow (jmap (levelDB, floorDB, 0.0f, 0.0f, 1.0f), 0.9f);
@@ -49,9 +79,9 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
     g.drawEllipse (circle, portCircleThickness);
 }
 
-void Cable::drawCable (Graphics& g, juce::Point<float> start, Colour startColour, juce::Point<float> end, Colour endColour)
+void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
-    cablethickness = getCableThickness (levelDB);
+    cablethickness = getCableThickness ();
     cablePath = createCablePath (start, end, scaleFactor);
     drawCableShadow (g, cablethickness);
 
@@ -81,25 +111,13 @@ void Cable::paint (Graphics& g)
         endColour = endEditor->getColour();
         levelDB = endProc->getInputLevelDB (endIdx);
 
-        drawCable (g, startPortLocation, startColour, endPortLocation, endColour);
+        drawCable (g, startPortLocation, endPortLocation);
     }
-    else if (cableView.cableMouse != nullptr) // If cable has been created and is being dragged
+     else if (cableView.cableBeingDragged())
     {
-        drawCable (g, startPortLocation, startColour, cableView.cableMouse->getPosition().toFloat(), startColour);
+        endColour = startColour;
+        drawCable (g, startPortLocation, cableView.getCableMousePosition());
     }
 }
 
-bool Cable::hitTest (int x, int y)
-{
-    juce::Point clickedP ((float) x, (float) y);
-    for (int i = 1; i <= numPointsInPath; ++i)
-    {
-        auto pointOnPath = bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath);
-        if (clickedP.getDistanceFrom (pointOnPath) < cablethickness)
-        {
-            return true;
-        }
-    }
 
-    return false;
-}
