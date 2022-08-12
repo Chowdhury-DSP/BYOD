@@ -25,7 +25,7 @@ private:
 
     std::function<void (BaseProcessor::Ptr)> addProcessorCallback = nullptr;
     std::function<void (BaseProcessor::Ptr, BaseProcessor*)> replaceProcessorCallback = nullptr;
-    std::function<void (BaseProcessor::Ptr, BaseProcessor*, BaseProcessor*)> addProcessorFromCableClickCallback = nullptr;
+    std::function<void (BaseProcessor::Ptr, BaseProcessor*, BaseProcessor*)> replaceConnectionWithProcessorCallback = nullptr;
 
     struct ProcInfo
     {

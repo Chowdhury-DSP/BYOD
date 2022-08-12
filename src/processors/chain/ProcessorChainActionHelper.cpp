@@ -9,9 +9,14 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
     chain.procStore.replaceProcessorCallback = [=] (auto newProc, auto procToReplace)
     { replaceProcessor (std::move (newProc), procToReplace); };
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     chain.procStore.addProcessorFromCableClickCallback = [=] (auto newProc, auto startProc, auto endProc)
     { addProcessorFromCableClick (std::move (newProc), startProc, endProc); };
+=======
+    chain.procStore.replaceConnectionWithProcessorCallback = [=] (auto newProc, auto startProc, auto endProc)
+    { replaceConnectionWithProcessor (std::move (newProc), startProc, endProc); };
+>>>>>>> replaceConnectionWithProcessor name change
 
     startTimer (50);
 >>>>>>> PR changes, improved cable click menu
@@ -33,7 +38,7 @@ void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)
     }
 }
 
-void ProcessorChainActionHelper::addProcessorFromCableClick (BaseProcessor::Ptr newProc, BaseProcessor* startProc, BaseProcessor* endProc)
+void ProcessorChainActionHelper::replaceConnectionWithProcessor (BaseProcessor::Ptr newProc, BaseProcessor* startProc, BaseProcessor* endProc)
 {
     um->beginNewTransaction();
 

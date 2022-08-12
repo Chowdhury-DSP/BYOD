@@ -169,7 +169,7 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
             item.action = [&store, &procDesc, procToReplace, cableClickStartProc, cableClickEndProc]
             {
                 if (cableClickStartProc != nullptr && cableClickEndProc != nullptr)
-                    store.addProcessorFromCableClickCallback (procDesc.second (store.undoManager), cableClickStartProc, cableClickEndProc);
+                    store.replaceConnectionWithProcessorCallback (procDesc.second (store.undoManager), cableClickStartProc, cableClickEndProc);
                 else if (procToReplace != nullptr)
                     store.replaceProcessorCallback (procDesc.second (store.undoManager), procToReplace);
                 else
