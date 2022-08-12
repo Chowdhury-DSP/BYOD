@@ -167,11 +167,7 @@ void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex
     cableView.repaint();
 }
 
-void CableViewConnectionHelper::clickOnCable (Cable* clickedCable)
+void CableViewConnectionHelper::clickOnCable (PopupMenu& menu, PopupMenu::Options& options, Cable* clickedCable)
 {
-    PopupMenu menu;
-    PopupMenu::Options options;
-    board->showNewProcMenu (menu, options, true, clickedCable);
-
-    menu.showMenuAsync (options);
+    board->showNewProcMenu (menu, options, clickedCable);
 }

@@ -13,8 +13,6 @@ public:
     Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection);
     ~Cable() override;
 
-    void mouseDown (const MouseEvent& e) override;
-
     void paint (Graphics& g) override;
     bool hitTest (int x, int y) override; 
     
@@ -32,6 +30,8 @@ private:
     void drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end);
     CableView& cableView;
     const BoardComponent* board = nullptr;
+    
+    chowdsp::PopupMenuHelper popupMenu;
 
     Path cablePath;
     int numPointsInPath;

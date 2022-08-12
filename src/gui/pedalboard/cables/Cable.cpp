@@ -13,17 +13,12 @@ Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo co
                                                                                             cableView (cv),
                                                                                             board (comp)
 {
+    popupMenu.setAssociatedComponent (this);
+    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
+    { cableView.getConnectionHelper()->clickOnCable (menu, options, this); };
 }
 
 Cable::~Cable() = default;
-
-void Cable::mouseDown (const MouseEvent& e)
-{
-    if (e.mods.isPopupMenu())
-    {
-        cableView.getConnectionHelper()->clickOnCable (this);
-    }
-}
 
 bool Cable::hitTest (int x, int y)
 {
