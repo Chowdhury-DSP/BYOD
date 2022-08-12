@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../editors/ProcessorEditor.h"
-#include "CableView.h"
 #include "CubicBezier.h"
 #include "processors/BaseProcessor.h"
 #include <pch.h>
@@ -17,8 +16,8 @@ public:
     void mouseDown (const MouseEvent& e) override;
 
     void paint (Graphics& g) override;
-    bool hitTest (int x, int y) override;
-
+    bool hitTest (int x, int y) override; 
+    
     BaseProcessor* startProc = nullptr;
     int startIdx = 0;
 

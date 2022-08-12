@@ -3,7 +3,6 @@
 #include "../editors/ProcessorEditor.h"
 #include "Cable.h"
 
-class Cable;
 class BoardComponent;
 class CableViewConnectionHelper;
 class CableViewPortLocationHelper;
