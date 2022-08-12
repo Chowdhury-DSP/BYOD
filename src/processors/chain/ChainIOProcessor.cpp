@@ -21,7 +21,8 @@ void ChainIOProcessor::createParameters (Parameters& params)
                                                                  { OSFactor::OneX, OSFactor::TwoX, OSFactor::FourX, OSFactor::EightX, OSFactor::SixteenX },
                                                                  { OSMode::MinPhase, OSMode::LinPhase },
                                                                  OSFactor::TwoX,
-                                                                 OSMode::MinPhase);
+                                                                 OSMode::MinPhase,
+                                                                 100);
 
     using namespace ParameterHelpers;
     params.push_back (std::make_unique<AudioParameterChoice> (juce::ParameterID { monoModeTag, 100 },
