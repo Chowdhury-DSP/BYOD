@@ -66,6 +66,15 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
 
 ProcessorEditor::~ProcessorEditor() = default;
 
+void ProcessorEditor::addToBoard (BoardComponent* boardComp)
+{
+    connections += {
+        showInfoComp.connect<&BoardComponent::showInfoComp> (boardComp),
+        editorDragged.connect<&BoardComponent::editorDragged> (boardComp),
+        duplicateProcessor.connect<&BoardComponent::duplicateProcessor> (boardComp),
+    };
+}
+
 void ProcessorEditor::processorSettingsCallback (PopupMenu& menu, PopupMenu::Options& options)
 {
     proc.addToPopupMenu (menu);
@@ -79,10 +88,10 @@ void ProcessorEditor::processorSettingsCallback (PopupMenu& menu, PopupMenu::Opt
         menu.addSubMenu ("Replace", replaceProcMenu);
 
     menu.addItem ("Duplicate", [&]
-                  { listeners.call (&Listener::duplicateProcessor, *this); });
+                  { duplicateProcessor (*this); });
 
-    menu.addItem ("Info", [&]
-                  { listeners.call (&Listener::showInfoComp, proc); });
+    menu.addItem ("Info", [this]
+                  { showInfoComp (proc); });
 
     menu.setLookAndFeel (lnfAllocator->getLookAndFeel<ProcessorLNF>());
     options = options
@@ -186,7 +195,7 @@ void ProcessorEditor::mouseDown (const MouseEvent& e)
 
 void ProcessorEditor::mouseDrag (const MouseEvent& e)
 {
-    listeners.call (&Listener::editorDragged, *this, e, mouseDownOffset);
+    editorDragged (*this, e, mouseDownOffset);
 }
 
 Port* ProcessorEditor::getPortPrivate (int portIndex, bool isInput) const

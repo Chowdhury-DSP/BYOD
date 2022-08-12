@@ -7,15 +7,6 @@
 
 class ProcessorEditor : public Component
 {
-    // clang-format off
-    CREATE_LISTENER (
-        Listener,
-        listeners,
-        virtual void showInfoComp (const BaseProcessor&) {}\
-        virtual void editorDragged (ProcessorEditor&, const MouseEvent&, const juce::Point<int>&) {}\
-        virtual void duplicateProcessor (const ProcessorEditor&) {}\
-    )
-    // clang-format on
 public:
     ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs);
     ~ProcessorEditor() override;
@@ -24,6 +15,8 @@ public:
     void resized() override;
     void mouseDown (const MouseEvent& e) override;
     void mouseDrag (const MouseEvent& e) override;
+
+    void addToBoard (class BoardComponent* boardComp);
 
     BaseProcessor* getProcPtr() const { return &proc; }
     const ProcessorUIOptions& getUIOptions() const { return procUI; }
@@ -39,6 +32,11 @@ private:
 
     void resetProcParameters();
     void createReplaceProcMenu (PopupMenu& menu);
+
+    rocket::signal<void(const BaseProcessor&)> showInfoComp;
+    rocket::signal<void(ProcessorEditor&, const MouseEvent&, const juce::Point<int>&)> editorDragged;
+    rocket::signal<void(const ProcessorEditor&)> duplicateProcessor;
+    rocket::scoped_connection_container connections;
 
     BaseProcessor& proc;
     ProcessorChain& procChain;
