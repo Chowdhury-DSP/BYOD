@@ -25,23 +25,14 @@ public:
     {
         Logger::writeToLog (String ("Creating processor: ") + newProc->getName());
 
-        auto* newProcPtr = newProc.get();
-
         auto osFactor = chain.ioProcessor.getOversamplingFactor();
         newProc->prepareProcessing (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
 
-        std::atomic_bool hasProcBeenAdded { false };
-        chain.getActionHelper().actionQueue.emplace (
-            [&chain, &hasProcBeenAdded, p = std::move (newProc)]() mutable
-            {
-                chain.procs.add (std::move (p));
-                hasProcBeenAdded = true;
-            });
-
-        // Ideally we wouldn't be blocking the message thread here, but unfortunately
-        // the undo manager will get out of sync if we don't!
-        while (! hasProcBeenAdded)
-            Thread::sleep (4);
+        BaseProcessor* newProcPtr = nullptr;
+        {
+            SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
+            newProcPtr = chain.procs.add (std::move (newProc));
+        }
 
         for (auto* param : newProcPtr->getParameters())
         {
@@ -66,11 +57,8 @@ public:
                 procToRemove->getVTS().removeParameterListener (paramCast->paramID, &chain);
         }
 
-        chain.getActionHelper().actionQueue.emplace (
-            [&procs = chain.procs, procToRemove, &saveProc]()
-            {
-                saveProc.reset (procs.removeAndReturn (procs.indexOf (procToRemove)));
-            });
+        SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
+        saveProc.reset (chain.procs.removeAndReturn (chain.procs.indexOf (procToRemove)));
     }
 
     static void addConnection (ProcessorChain& chain, const ConnectionInfo& info)
