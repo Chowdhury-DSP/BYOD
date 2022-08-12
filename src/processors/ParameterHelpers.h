@@ -24,10 +24,4 @@ inline float iLogPot (float x)
 {
     return (std::pow (0.1f, x) - 1.0f) / -0.9f;
 }
-
-inline void createBidirectionalPercentParameter (Params& params, const juce::String& id, const juce::String& name, float defaultValue = 0.0f)
-{
-    emplace_param<VTSParam> (params, id, name, String(), NormalisableRange { -1.0f, 1.0f }, defaultValue, &percentValToString, &stringToPercentVal);
-}
-
 } // namespace ParameterHelpers

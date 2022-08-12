@@ -9,7 +9,7 @@ public:
     ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& chain);
     ~ParamForwardManager() override;
 
-    static String getForwardingParameterID (int paramNum);
+    static juce::ParameterID getForwardingParameterID (int paramNum);
 
     void processorAdded (BaseProcessor* proc) override;
     void processorRemoved (const BaseProcessor* proc) override;

@@ -21,7 +21,7 @@ else()
     set(JUCE_FORMATS AU VST3 Standalone)
 endif()
 
-# Build LV2 only on Linux
+# Build LV2 only on Linux (for now... we should test on Win and Mac too)
 if(UNIX AND NOT APPLE)
     message(STATUS "Building LV2 plugin format")
     list(APPEND JUCE_FORMATS LV2)

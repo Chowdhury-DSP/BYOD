@@ -18,13 +18,7 @@ ParamLayout Mixer::createParameterLayout()
     auto params = createBaseParams();
     for (int i = 0; i < numIns; ++i)
     {
-        params.push_back (std::make_unique<VTSParam> ("gain" + String (i),
-                                                      "Channel " + String (i + 1),
-                                                      String(),
-                                                      NormalisableRange<float> { -18.0f, 18.0f },
-                                                      0.0f,
-                                                      &gainValToString,
-                                                      &stringToGainVal));
+        createGainDBParameter (params, "gain" + String (i), "Channel " + String (i + 1), -18.0f, 18.0f, 0.0f);
     }
 
     return { params.begin(), params.end() };

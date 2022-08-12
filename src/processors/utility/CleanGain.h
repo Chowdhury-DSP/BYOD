@@ -21,13 +21,7 @@ public:
     {
         using namespace ParameterHelpers;
         auto params = createBaseParams();
-        params.push_back (std::make_unique<VTSParam> ("gain",
-                                                      "Gain",
-                                                      String(),
-                                                      NormalisableRange<float> { -18.0f, 18.0f },
-                                                      0.0f,
-                                                      &gainValToString,
-                                                      &stringToGainVal));
+        createGainDBParameter (params, "gain", "Gain", -18.0f, 18.0f, 0.0f);
 
         return { params.begin(), params.end() };
     }
