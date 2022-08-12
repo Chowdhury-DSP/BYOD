@@ -2,8 +2,7 @@
 
 #include "ProcessorChain.h"
 
-class ProcessorChainPortMagnitudesHelper : private chowdsp::GlobalPluginSettings::Listener,
-                                           private ProcessorChain::Listener
+class ProcessorChainPortMagnitudesHelper : private chowdsp::GlobalPluginSettings::Listener
 {
 public:
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
@@ -11,7 +10,7 @@ public:
     explicit ProcessorChainPortMagnitudesHelper (ProcessorChain& procChain);
     ~ProcessorChainPortMagnitudesHelper() override;
 
-    void processorAdded (BaseProcessor* proc) override;
+    void processorAdded (BaseProcessor* proc);
 
     void globalSettingChanged (SettingID settingID) override;
     void preparePortMagnitudes();
@@ -20,6 +19,7 @@ public:
 
 private:
     ProcessorChain& chain;
+    rocket::scoped_connection_container connections;
 
     std::atomic_bool portMagsOn { true };
     bool prevPortMagsOn = true;

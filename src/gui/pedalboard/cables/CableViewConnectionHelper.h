@@ -2,7 +2,7 @@
 
 #include "CableView.h"
 
-class CableViewConnectionHelper : public ProcessorChain::Listener
+class CableViewConnectionHelper
 {
 public:
     explicit CableViewConnectionHelper (CableView& cableView);
@@ -10,9 +10,10 @@ public:
     void processorBeingAdded (BaseProcessor* newProc);
     void processorBeingRemoved (const BaseProcessor* proc);
 
-    void refreshConnections() override;
-    void connectionAdded (const ConnectionInfo& info) override;
-    void connectionRemoved (const ConnectionInfo& info) override;
+    void refreshConnections();
+    void connectionAdded (const ConnectionInfo& info);
+    void connectionRemoved (const ConnectionInfo& info);
+    auto& getCallbackConnections() { return connections; }
 
     void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e);
     void refreshCable (const MouseEvent& e);
@@ -27,6 +28,8 @@ private:
     OwnedArray<Cable>& cables;
 
     bool ignoreConnectionCallbacks = false;
+
+    rocket::scoped_connection_container connections; // @TODO: having this named "connections" is super confusing!
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CableViewConnectionHelper)
 };

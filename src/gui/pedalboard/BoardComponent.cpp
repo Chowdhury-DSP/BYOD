@@ -55,8 +55,18 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
     for (auto* p : procs.getProcessors())
         processorAdded (p);
 
-    procChain.addListener (this);
-    procChain.addListener (cableView.getConnectionHelper());
+    connections += {
+        procChain.processorAdded.connect<&BoardComponent::processorAdded> (this),
+        procChain.processorRemoved.connect<&BoardComponent::processorRemoved> (this),
+        procChain.refreshConnections.connect<&BoardComponent::refreshConnections> (this),
+    };
+
+    auto* connectionHelper = cableView.getConnectionHelper();
+    connectionHelper->getCallbackConnections() += {
+        procChain.connectionAdded.connect<&CableViewConnectionHelper::connectionAdded> (connectionHelper),
+        procChain.connectionRemoved.connect<&CableViewConnectionHelper::connectionRemoved> (connectionHelper),
+        procChain.refreshConnections.connect<&CableViewConnectionHelper::refreshConnections> (connectionHelper),
+    };
 
     cableView.getConnectionHelper()->refreshConnections();
 
@@ -68,8 +78,6 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 BoardComponent::~BoardComponent()
 {
     removeMouseListener (&cableView);
-    procChain.removeListener (this);
-    procChain.removeListener (cableView.getConnectionHelper());
 }
 
 void BoardComponent::setScaleFactor (float newScaleFactor)

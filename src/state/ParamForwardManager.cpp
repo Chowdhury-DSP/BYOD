@@ -3,13 +3,13 @@
 ParamForwardManager::ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& procChain) : chowdsp::ForwardingParametersManager<ParamForwardManager, 500> (vts),
                                                                                                           chain (procChain)
 {
-    chain.addListener (this);
+    connections += {
+        chain.processorAdded.connect<&ParamForwardManager::processorAdded> (this),
+        chain.processorRemoved.connect<&ParamForwardManager::processorRemoved> (this),
+    };
 }
 
-ParamForwardManager::~ParamForwardManager()
-{
-    chain.removeListener (this);
-}
+ParamForwardManager::~ParamForwardManager() = default;
 
 juce::ParameterID ParamForwardManager::getForwardingParameterID (int paramNum)
 {
