@@ -54,6 +54,7 @@ private:
 
     OwnedArray<BaseProcessor> procs;
     ProcessorStore& procStore;
+    SpinLock processingLock;
     UndoManager* um;
 
     InputProcessor inputProcessor;
@@ -75,8 +76,6 @@ private:
 
     friend class ProcessorChainPortMagnitudesHelper;
     std::unique_ptr<ProcessorChainPortMagnitudesHelper> portMagsHelper;
-
-    std::atomic_bool wasProcessCalled { false };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

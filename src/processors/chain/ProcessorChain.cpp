@@ -68,9 +68,8 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
 
     ioProcessor.prepare (sampleRate, samplesPerBlock);
 
+    SpinLock::ScopedLockType scopedProcessingLock (processingLock);
     initializeProcessors();
-
-    wasProcessCalled = false;
 }
 
 void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed)
@@ -153,8 +152,9 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
 
 void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
 {
-    wasProcessCalled = true;
-    actionHelper->processActions();
+    SpinLock::ScopedTryLockType tryProcessingLock (processingLock);
+    if (! tryProcessingLock.isLocked())
+        return;
 
     // process input (oversampling, input gain, etc)
     bool sampleRateChange = false;
