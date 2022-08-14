@@ -100,7 +100,7 @@ void CableView::mouseUp (const MouseEvent& e)
 void CableView::timerCallback()
 {
     const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
-    nearestPort = portLocationHelper->getNearestPort (mousePos, Desktop::getInstance().getMainMouseSource().getComponentUnderMouse());
+    nearestPort = portLocationHelper->getNearestPort (mousePos, board);
     repaint();
 }
 
