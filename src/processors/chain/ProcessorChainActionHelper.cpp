@@ -8,23 +8,9 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
     { addProcessor (std::move (newProc)); };
     chain.procStore.replaceProcessorCallback = [=] (auto newProc, auto procToReplace)
     { replaceProcessor (std::move (newProc), procToReplace); };
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    chain.procStore.addProcessorFromCableClickCallback = [=] (auto newProc, auto startProc, auto endProc)
-    { addProcessorFromCableClick (std::move (newProc), startProc, endProc); };
-=======
-    chain.procStore.replaceConnectionWithProcessorCallback = [=] (auto newProc, auto startProc, auto endProc)
-    { replaceConnectionWithProcessor (std::move (newProc), startProc, endProc); };
->>>>>>> replaceConnectionWithProcessor name change
-=======
     chain.procStore.replaceConnectionWithProcessorCallback = [=] (auto newProc, auto connectionInfo)
     { replaceConnectionWithProcessor (std::move (newProc), connectionInfo); };
->>>>>>> 1-1 connections and connection object replacement
 
-    startTimer (50);
->>>>>>> PR changes, improved cable click menu
 }
 
 ProcessorChainActionHelper::~ProcessorChainActionHelper() = default;

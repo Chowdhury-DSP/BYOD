@@ -17,18 +17,6 @@ public:
     void removeConnection (ConnectionInfo&& info);
 
 private:
-<<<<<<< HEAD
-=======
-    void hiResTimerCallback() override;
-
-<<<<<<< HEAD
-    bool generatedFromCableClick = false;
-    BaseProcessor* cableClickStartProc = nullptr;
-    BaseProcessor* cableClickEndProc = nullptr;
-
->>>>>>> Generate new proc off cable click
-=======
->>>>>>> PR changes, improved cable click menu
     ProcessorChain& chain;
     UndoManager* um;
 
