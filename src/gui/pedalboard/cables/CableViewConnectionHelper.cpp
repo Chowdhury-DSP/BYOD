@@ -169,5 +169,5 @@ void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex
 
 void CableViewConnectionHelper::clickOnCable (PopupMenu& menu, PopupMenu::Options& options, Cable* clickedCable)
 {
-    board->showNewProcMenu (menu, options, clickedCable);
+    board->showNewProcMenu (menu, options, clickedCable->getConnectionInfo());
 }

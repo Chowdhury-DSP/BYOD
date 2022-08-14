@@ -15,7 +15,7 @@ Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo co
 {
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
-    { cableView.getConnectionHelper()->clickOnCable (menu, options, this); };
+    { cableView.getConnectionHelper()->clickOnCable (menu, options, this);};
 }
 
 Cable::~Cable() = default;
@@ -33,6 +33,18 @@ bool Cable::hitTest (int x, int y)
     }
 
     return false;
+}
+
+ConnectionInfo* Cable::getConnectionInfo()
+{
+    ConnectionInfo connection;
+    connection.startProc = startProc;
+    connection.endProc = endProc;
+    connection.startPort = startIdx;
+    connection.endPort = endIdx;
+    
+    connectionInfoPtr = std::make_unique<ConnectionInfo> (connection);
+    return connectionInfoPtr.get();
 }
 
 float Cable::getCableThickness()

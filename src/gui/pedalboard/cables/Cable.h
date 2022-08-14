@@ -22,6 +22,8 @@ public:
     BaseProcessor* endProc = nullptr;
     int endIdx = 0;
 
+    ConnectionInfo* getConnectionInfo();
+
 private:
     auto createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
     float getCableThickness();
@@ -32,6 +34,8 @@ private:
     const BoardComponent* board = nullptr;
     
     chowdsp::PopupMenuHelper popupMenu;
+    
+    std::unique_ptr<ConnectionInfo> connectionInfoPtr = nullptr;
 
     Path cablePath;
     int numPointsInPath;

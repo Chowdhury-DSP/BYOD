@@ -10,6 +10,7 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
     { replaceProcessor (std::move (newProc), procToReplace); };
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     chain.procStore.addProcessorFromCableClickCallback = [=] (auto newProc, auto startProc, auto endProc)
     { addProcessorFromCableClick (std::move (newProc), startProc, endProc); };
@@ -17,6 +18,10 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
     chain.procStore.replaceConnectionWithProcessorCallback = [=] (auto newProc, auto startProc, auto endProc)
     { replaceConnectionWithProcessor (std::move (newProc), startProc, endProc); };
 >>>>>>> replaceConnectionWithProcessor name change
+=======
+    chain.procStore.replaceConnectionWithProcessorCallback = [=] (auto newProc, auto connectionInfo)
+    { replaceConnectionWithProcessor (std::move (newProc), connectionInfo); };
+>>>>>>> 1-1 connections and connection object replacement
 
     startTimer (50);
 >>>>>>> PR changes, improved cable click menu
@@ -38,37 +43,18 @@ void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)
     }
 }
 
-void ProcessorChainActionHelper::replaceConnectionWithProcessor (BaseProcessor::Ptr newProc, BaseProcessor* startProc, BaseProcessor* endProc)
+void ProcessorChainActionHelper::replaceConnectionWithProcessor (BaseProcessor::Ptr newProc, ConnectionInfo& connectionInfo)
 {
     um->beginNewTransaction();
 
-    // Destroy old cable connection
-    auto minIncomingPorts = jmin (endProc->getNumInputs(), startProc->getNumOutputs());
-    for (int portIdx = 0; portIdx < minIncomingPorts; ++portIdx)
-    {
-        um->perform (new AddOrRemoveConnection (chain, { startProc, portIdx, endProc, portIdx }, true));
-    }
+    um->perform (new AddOrRemoveConnection (chain, {connectionInfo.startProc, 0, connectionInfo.endProc, 0}, true));
 
-    // In order for the undo manager to work properly, when it destroys the processor on an undo there should be no
-    // output connections for that processor,otherwise we run into recursive undos. To mitigate this, we can add the
-    // newProc first, then add the connections to it so when an undo happens, the connections are removed first, then
-    // the processor is removed last. We get the newProcRaw values because after the addition of the newProc with
-    // std:move(newProc) newProc will be null and we wont be able to use it for adding connection info.
-    BaseProcessor* newProcRaw = newProc.get();
+    auto newProcRaw = newProc.get();
     um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
 
-    // Attach cable(s) to newProc input
-    for (int portIdx = 0; portIdx < minIncomingPorts; ++portIdx)
-    {
-        um->perform (new AddOrRemoveConnection (chain, { startProc, portIdx, newProcRaw, portIdx }));
-    }
+    um->perform (new AddOrRemoveConnection (chain, {connectionInfo.startProc, 0, newProcRaw, 0 }));
 
-    // Attach cable(s) to newProc output
-    auto minOutgoingPorts = jmin (endProc->getNumInputs(), newProcRaw->getNumOutputs()); //bad name
-    for (int portIdx = 0; portIdx < minOutgoingPorts; ++portIdx)
-    {
-        um->perform (new AddOrRemoveConnection (chain, { newProcRaw, portIdx, endProc, portIdx }));
-    }
+    um->perform (new AddOrRemoveConnection (chain, { newProcRaw, 0, connectionInfo.endProc, 0 }));
 }
 
 void ProcessorChainActionHelper::removeProcessor (BaseProcessor* procToRemove)
