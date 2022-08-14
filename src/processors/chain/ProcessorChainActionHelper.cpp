@@ -10,7 +10,6 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
     { replaceProcessor (std::move (newProc), procToReplace); };
     chain.procStore.replaceConnectionWithProcessorCallback = [=] (auto newProc, auto connectionInfo)
     { replaceConnectionWithProcessor (std::move (newProc), connectionInfo); };
-
 }
 
 ProcessorChainActionHelper::~ProcessorChainActionHelper() = default;
