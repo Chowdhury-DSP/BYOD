@@ -10,10 +10,11 @@ class CableView : public Component,
                   private Timer
 {
 public:
-    explicit CableView (const BoardComponent* comp);
+    explicit CableView (BoardComponent* comp);
     ~CableView() override;
 
     void paint (Graphics& g) override;
+    void resized() override;
     void mouseDown (const MouseEvent& e) override;
     void mouseDrag (const MouseEvent& e) override;
     void mouseUp (const MouseEvent& e) override;
@@ -23,7 +24,8 @@ public:
     void processorBeingAdded (BaseProcessor* newProc);
     void processorBeingRemoved (const BaseProcessor* proc);
 
-    void setScaleFactor (float newScaleFactor);
+    bool cableBeingDragged() const;
+    juce::Point<float> getCableMousePosition() const;
 
     struct EditorPort
     {
@@ -35,11 +37,12 @@ public:
 private:
     void timerCallback() override;
 
-    const BoardComponent* board = nullptr;
+    BoardComponent* board = nullptr;
     OwnedArray<Cable> cables;
 
     float scaleFactor = 1.0f;
     bool isDraggingCable = false;
+    std::unique_ptr<MouseEvent> cableMouse = nullptr;
 
     friend class CableViewConnectionHelper;
     std::unique_ptr<CableViewConnectionHelper> connectionHelper;

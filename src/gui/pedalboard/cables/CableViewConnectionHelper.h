@@ -14,16 +14,17 @@ public:
     void connectionAdded (const ConnectionInfo& info) override;
     void connectionRemoved (const ConnectionInfo& info) override;
 
-    void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e);
-    void refreshCable (const MouseEvent& e);
+    void addCableToView (Cable* cable);
+    void createCable (const ConnectionInfo& connection);
     void releaseCable (const MouseEvent& e);
-    void destroyCable (ProcessorEditor* origin, int portIndex);
+    void destroyCable (BaseProcessor* proc, int portIndex);
 
+    void clickOnCable (PopupMenu& menu, PopupMenu::Options& options, Cable* clickedCable);
     std::unique_ptr<MouseEvent> cableMouse;
 
 private:
     CableView& cableView;
-    const BoardComponent* board = nullptr;
+    BoardComponent* board = nullptr;
     OwnedArray<Cable>& cables;
 
     bool ignoreConnectionCallbacks = false;

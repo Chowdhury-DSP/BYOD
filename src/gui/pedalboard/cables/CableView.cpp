@@ -4,9 +4,9 @@
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
-CableView::CableView (const BoardComponent* comp) : board (comp)
+CableView::CableView (BoardComponent* comp) : board (comp)
 {
-    setInterceptsMouseClicks (false, false);
+    setInterceptsMouseClicks (false, true);
     startTimerHz (36);
 
     connectionHelper = std::make_unique<CableViewConnectionHelper> (*this);
@@ -17,7 +17,6 @@ CableView::~CableView() = default;
 
 void CableView::paint (Graphics& g)
 {
-    using namespace CableConstants;
     using namespace CableDrawingHelpers;
 
     if (nearestPort.editor != nullptr)
@@ -31,39 +30,23 @@ void CableView::paint (Graphics& g)
         }
     }
 
-    g.setColour (cableColour.brighter (0.1f));
+    if (cableMouse != nullptr)
+    {
+        auto mousePos = cableMouse->getPosition();
+        const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->startProc);
+        if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
+        {
+            auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
+            drawCablePortGlow (g, endPortLocation, scaleFactor);
+        }
+    }
+}
+
+void CableView::resized()
+{
     for (auto* cable : cables)
     {
-        auto* startEditor = board->findEditorForProcessor (cable->startProc);
-        jassert (startEditor != nullptr);
-
-        auto startPortLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, cable->startIdx, false });
-
-        if (cable->endProc != nullptr)
-        {
-            auto* endEditor = board->findEditorForProcessor (cable->endProc);
-            jassert (endEditor != nullptr);
-
-            auto endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, cable->endIdx, true });
-
-            auto startColour = startEditor->getColour();
-            auto endColour = endEditor->getColour();
-            auto levelDB = cable->endProc->getInputLevelDB (cable->endIdx);
-            drawCable (g, startPortLocation.toFloat(), startColour, endPortLocation.toFloat(), endColour, scaleFactor, levelDB);
-        }
-        else if (connectionHelper->cableMouse != nullptr)
-        {
-            auto mousePos = connectionHelper->cableMouse->getPosition();
-            const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cable->startProc);
-            if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
-            {
-                auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
-                drawCablePortGlow (g, endPortLocation, scaleFactor);
-            }
-
-            auto colour = startEditor->getColour();
-            drawCable (g, startPortLocation.toFloat(), colour, mousePos.toFloat(), colour, scaleFactor);
-        }
+        cable->setBounds (getLocalBounds());
     }
 }
 
@@ -78,11 +61,12 @@ void CableView::mouseDown (const MouseEvent& e)
 
     if (nearestPort.isInput)
     {
-        connectionHelper->destroyCable (nearestPort.editor, nearestPort.portIndex);
+        connectionHelper->destroyCable (nearestPort.editor->getProcPtr(), nearestPort.portIndex);
     }
     else
     {
-        connectionHelper->createCable (nearestPort.editor, nearestPort.portIndex, e);
+        connectionHelper->createCable ({ nearestPort.editor->getProcPtr(), nearestPort.portIndex, nullptr, 0 });
+        cableMouse = std::make_unique<MouseEvent> (e.getEventRelativeTo (this));
         isDraggingCable = true;
     }
 }
@@ -90,13 +74,24 @@ void CableView::mouseDown (const MouseEvent& e)
 void CableView::mouseDrag (const MouseEvent& e)
 {
     if (isDraggingCable)
-        connectionHelper->refreshCable (e);
+        cableMouse = std::make_unique<MouseEvent> (e.getEventRelativeTo (this));
+}
+
+bool CableView::cableBeingDragged() const
+{
+    return isDraggingCable;
+}
+
+juce::Point<float> CableView::getCableMousePosition() const
+{
+    return cableMouse->getPosition().toFloat();
 }
 
 void CableView::mouseUp (const MouseEvent& e)
 {
     if (isDraggingCable)
     {
+        cableMouse.reset();
         connectionHelper->releaseCable (e);
         isDraggingCable = false;
     }
@@ -105,13 +100,7 @@ void CableView::mouseUp (const MouseEvent& e)
 void CableView::timerCallback()
 {
     const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
-    nearestPort = portLocationHelper->getNearestPort (mousePos, Desktop::getInstance().getMainMouseSource().getComponentUnderMouse());
-    repaint();
-}
-
-void CableView::setScaleFactor (float newScaleFactor)
-{
-    scaleFactor = newScaleFactor;
+    nearestPort = portLocationHelper->getNearestPort (mousePos, board);
     repaint();
 }
 
