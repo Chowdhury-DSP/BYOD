@@ -47,12 +47,12 @@ void ProcessorChainActionHelper::replaceConnectionWithProcessor (BaseProcessor::
 {
     um->beginNewTransaction();
 
-    um->perform (new AddOrRemoveConnection (chain, {connectionInfo.startProc, 0, connectionInfo.endProc, 0}, true));
+    um->perform (new AddOrRemoveConnection (chain, { connectionInfo.startProc, 0, connectionInfo.endProc, 0 }, true));
 
     auto newProcRaw = newProc.get();
     um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
 
-    um->perform (new AddOrRemoveConnection (chain, {connectionInfo.startProc, 0, newProcRaw, 0 }));
+    um->perform (new AddOrRemoveConnection (chain, { connectionInfo.startProc, 0, newProcRaw, 0 }));
 
     um->perform (new AddOrRemoveConnection (chain, { newProcRaw, 0, connectionInfo.endProc, 0 }));
 }

@@ -14,8 +14,8 @@ public:
     ~Cable() override;
 
     void paint (Graphics& g) override;
-    bool hitTest (int x, int y) override; 
-    
+    bool hitTest (int x, int y) override;
+
     BaseProcessor* startProc = nullptr;
     int startIdx = 0;
 
@@ -32,9 +32,9 @@ private:
     void drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end);
     CableView& cableView;
     const BoardComponent* board = nullptr;
-    
+
     chowdsp::PopupMenuHelper popupMenu;
-    
+
     std::unique_ptr<ConnectionInfo> connectionInfoPtr = nullptr;
 
     Path cablePath;

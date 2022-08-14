@@ -15,7 +15,7 @@ Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo co
 {
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
-    { cableView.getConnectionHelper()->clickOnCable (menu, options, this);};
+    { cableView.getConnectionHelper()->clickOnCable (menu, options, this); };
 }
 
 Cable::~Cable() = default;
@@ -42,7 +42,7 @@ ConnectionInfo* Cable::getConnectionInfo()
     connection.endProc = endProc;
     connection.startPort = startIdx;
     connection.endPort = endIdx;
-    
+
     connectionInfoPtr = std::make_unique<ConnectionInfo> (connection);
     return connectionInfoPtr.get();
 }
