@@ -5,7 +5,6 @@
 
 namespace
 {
-
 void updateConnectionStatuses (const BoardComponent* board, const ConnectionInfo& connection, bool isConnected)
 {
     if (auto* editor = board->findEditorForProcessor (connection.startProc))
@@ -154,7 +153,7 @@ void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex
         if (cable->connectionInfo.endProc == proc && cable->connectionInfo.endPort == portIndex)
         {
             const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
-            board->procChain.getActionHelper().removeConnection (std::move(cable->connectionInfo));
+            board->procChain.getActionHelper().removeConnection (std::move (cable->connectionInfo));
             cables.removeObject (cable);
             break;
         }

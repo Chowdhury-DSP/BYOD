@@ -6,7 +6,7 @@
 
 using namespace CableConstants;
 
-Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection) : connectionInfo(connection),
+Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection) : connectionInfo (connection),
                                                                                             cableView (cv),
                                                                                             board (comp)
 {

@@ -15,9 +15,8 @@ public:
 
     void paint (Graphics& g) override;
     bool hitTest (int x, int y) override;
-    
-    ConnectionInfo connectionInfo;
 
+    ConnectionInfo connectionInfo;
 
 private:
     auto createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
