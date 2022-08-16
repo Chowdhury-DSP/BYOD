@@ -15,14 +15,9 @@ public:
 
     void paint (Graphics& g) override;
     bool hitTest (int x, int y) override;
+    
+    ConnectionInfo connectionInfo;
 
-    BaseProcessor* startProc = nullptr;
-    int startIdx = 0;
-
-    BaseProcessor* endProc = nullptr;
-    int endIdx = 0;
-
-    ConnectionInfo* getConnectionInfo();
 
 private:
     auto createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
@@ -34,8 +29,6 @@ private:
     const BoardComponent* board = nullptr;
 
     chowdsp::PopupMenuHelper popupMenu;
-
-    std::unique_ptr<ConnectionInfo> connectionInfoPtr = nullptr;
 
     Path cablePath;
     int numPointsInPath;

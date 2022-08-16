@@ -6,10 +6,7 @@
 
 using namespace CableConstants;
 
-Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection) : startProc (connection.startProc),
-                                                                                            startIdx (connection.startPort),
-                                                                                            endProc (connection.endProc),
-                                                                                            endIdx (connection.endPort),
+Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection) : connectionInfo(connection),
                                                                                             cableView (cv),
                                                                                             board (comp)
 {
@@ -33,18 +30,6 @@ bool Cable::hitTest (int x, int y)
     }
 
     return false;
-}
-
-ConnectionInfo* Cable::getConnectionInfo()
-{
-    ConnectionInfo connection;
-    connection.startProc = startProc;
-    connection.endProc = endProc;
-    connection.startPort = startIdx;
-    connection.endPort = endIdx;
-
-    connectionInfoPtr = std::make_unique<ConnectionInfo> (connection);
-    return connectionInfoPtr.get();
 }
 
 float Cable::getCableThickness()
@@ -102,21 +87,21 @@ void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float>
 void Cable::paint (Graphics& g)
 {
     g.setColour (cableColour.brighter (0.1f));
-    auto* startEditor = board->findEditorForProcessor (startProc);
+    auto* startEditor = board->findEditorForProcessor (connectionInfo.startProc);
     jassert (startEditor != nullptr);
 
-    startPortLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, startIdx, false }).toFloat();
+    startPortLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, connectionInfo.startPort, false }).toFloat();
     scaleFactor = board->getScaleFactor();
     startColour = startEditor->getColour();
 
-    if (endProc != nullptr)
+    if (connectionInfo.endProc != nullptr)
     {
-        auto* endEditor = board->findEditorForProcessor (endProc);
+        auto* endEditor = board->findEditorForProcessor (connectionInfo.endProc);
         jassert (endEditor != nullptr);
 
-        endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, endIdx, true }).toFloat();
+        endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, connectionInfo.endPort, true }).toFloat();
         endColour = endEditor->getColour();
-        levelDB = endProc->getInputLevelDB (endIdx);
+        levelDB = connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort);
 
         drawCable (g, startPortLocation, endPortLocation);
     }

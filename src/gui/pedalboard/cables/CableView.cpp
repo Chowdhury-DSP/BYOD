@@ -33,7 +33,7 @@ void CableView::paint (Graphics& g)
     if (cableMouse != nullptr)
     {
         auto mousePos = cableMouse->getPosition();
-        const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->startProc);
+        const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->connectionInfo.startProc);
         if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
         {
             auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
