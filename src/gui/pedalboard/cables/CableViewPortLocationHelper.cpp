@@ -15,8 +15,8 @@ bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const B
     bool result = false;
     for (auto* cable : cables)
     {
-        if (cable->endProc == sourceProc)
-            result |= wouldConnectingCreateFeedbackLoop (cable->startProc, destProc, cables);
+        if (cable->connectionInfo.endProc == sourceProc)
+            result |= wouldConnectingCreateFeedbackLoop (cable->connectionInfo.startProc, destProc, cables);
     }
 
     return result;
@@ -56,7 +56,7 @@ juce::Point<int> CableViewPortLocationHelper::getPortLocation (const CableView::
 bool CableViewPortLocationHelper::isInputPortConnected (const CableView::EditorPort& editorPort) const
 {
     return sst::cpputils::contains_if (cables, [&editorPort] (auto* cable)
-                                       { return cable->endProc == editorPort.editor->getProcPtr() && cable->endIdx == editorPort.portIndex; });
+                                       { return cable->connectionInfo.endProc == editorPort.editor->getProcPtr() && cable->connectionInfo.endPort == editorPort.portIndex; });
 }
 
 CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const juce::Point<int>& pos, const BaseProcessor* sourceProc) const

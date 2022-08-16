@@ -8,6 +8,8 @@ ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChai
     { addProcessor (std::move (newProc)); };
     chain.procStore.replaceProcessorCallback = [=] (auto newProc, auto procToReplace)
     { replaceProcessor (std::move (newProc), procToReplace); };
+    chain.procStore.replaceConnectionWithProcessorCallback = [=] (auto newProc, auto connectionInfo)
+    { replaceConnectionWithProcessor (std::move (newProc), connectionInfo); };
 }
 
 ProcessorChainActionHelper::~ProcessorChainActionHelper() = default;
@@ -19,9 +21,25 @@ void ProcessorChainActionHelper::addProcessor (BaseProcessor::Ptr newProc)
         jassertfalse; // unable to create this processor!
         return;
     }
+    else
+    {
+        um->beginNewTransaction();
+        um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
+    }
+}
 
+void ProcessorChainActionHelper::replaceConnectionWithProcessor (BaseProcessor::Ptr newProc, ConnectionInfo& connectionInfo)
+{
     um->beginNewTransaction();
+
+    um->perform (new AddOrRemoveConnection (chain, { connectionInfo.startProc, connectionInfo.startPort, connectionInfo.endProc, connectionInfo.endPort }, true));
+
+    auto newProcRaw = newProc.get();
     um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
+
+    um->perform (new AddOrRemoveConnection (chain, { connectionInfo.startProc, connectionInfo.startPort, newProcRaw, connectionInfo.endPort }));
+
+    um->perform (new AddOrRemoveConnection (chain, { newProcRaw, connectionInfo.startPort, connectionInfo.endProc, connectionInfo.endPort }));
 }
 
 void ProcessorChainActionHelper::removeProcessor (BaseProcessor* procToRemove)
