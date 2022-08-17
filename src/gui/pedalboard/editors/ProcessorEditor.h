@@ -33,10 +33,10 @@ private:
     void resetProcParameters();
     void createReplaceProcMenu (PopupMenu& menu);
 
-    rocket::signal<void(const BaseProcessor&)> showInfoComp;
-    rocket::signal<void(ProcessorEditor&, const MouseEvent&, const juce::Point<int>&)> editorDragged;
-    rocket::signal<void(const ProcessorEditor&)> duplicateProcessor;
-    rocket::scoped_connection_container connections;
+    chowdsp::Broadcaster<void (const BaseProcessor&)> showInfoCompBroadcaster;
+    chowdsp::Broadcaster<void (ProcessorEditor&, const MouseEvent&, const juce::Point<int>&)> editorDraggedBroadcaster;
+    chowdsp::Broadcaster<void (const ProcessorEditor&)> duplicateProcessorBroadcaster;
+    chowdsp::ScopedCallbackList broadcasterCallbacks;
 
     BaseProcessor& proc;
     ProcessorChain& procChain;

@@ -6,8 +6,8 @@ ProcessorChainPortMagnitudesHelper::ProcessorChainPortMagnitudesHelper (Processo
     portMagsOn.store (pluginSettings->getProperty<bool> (cableVizOnOffID));
     prevPortMagsOn = portMagsOn.load();
 
-    connections += {
-        chain.processorAdded.connect<&ProcessorChainPortMagnitudesHelper::processorAdded> (this)
+    callbacks += {
+        chain.processorAddedBroadcaster.connect<&ProcessorChainPortMagnitudesHelper::processorAdded> (this)
     };
 
     chain.getInputProcessor().resetPortMagnitudes (prevPortMagsOn);

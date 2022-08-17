@@ -16,7 +16,7 @@ public:
 private:
     ProcessorChain& chain;
 
-    rocket::scoped_connection_container connections;
+    chowdsp::ScopedCallbackList callbacks;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamForwardManager)
 };

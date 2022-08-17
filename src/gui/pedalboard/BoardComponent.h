@@ -30,7 +30,7 @@ private:
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
 
     ProcessorChain& procChain;
-    rocket::scoped_connection_container connections;
+    chowdsp::ScopedCallbackList callbacks;
 
     OwnedArray<ProcessorEditor> processorEditors;
     InfoComponent infoComp;

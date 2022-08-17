@@ -13,7 +13,7 @@ public:
     void refreshConnections();
     void connectionAdded (const ConnectionInfo& info);
     void connectionRemoved (const ConnectionInfo& info);
-    auto& getCallbackConnections() { return connections; }
+    auto& getCallbacks() { return callbacks; }
 
     void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e);
     void refreshCable (const MouseEvent& e);
@@ -29,7 +29,7 @@ private:
 
     bool ignoreConnectionCallbacks = false;
 
-    rocket::scoped_connection_container connections; // @TODO: having this named "connections" is super confusing!
+    chowdsp::ScopedCallbackList callbacks;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CableViewConnectionHelper)
 };

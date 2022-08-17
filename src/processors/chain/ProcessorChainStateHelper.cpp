@@ -199,5 +199,5 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bo
         }
     }
 
-    chain.refreshConnections();
+    chain.refreshConnectionsBroadcaster();
 }

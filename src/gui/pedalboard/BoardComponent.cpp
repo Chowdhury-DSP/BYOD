@@ -55,17 +55,17 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
     for (auto* p : procs.getProcessors())
         processorAdded (p);
 
-    connections += {
-        procChain.processorAdded.connect<&BoardComponent::processorAdded> (this),
-        procChain.processorRemoved.connect<&BoardComponent::processorRemoved> (this),
-        procChain.refreshConnections.connect<&BoardComponent::refreshConnections> (this),
+    callbacks += {
+        procChain.processorAddedBroadcaster.connect<&BoardComponent::processorAdded> (this),
+        procChain.processorRemovedBroadcaster.connect<&BoardComponent::processorRemoved> (this),
+        procChain.refreshConnectionsBroadcaster.connect<&BoardComponent::refreshConnections> (this),
     };
 
     auto* connectionHelper = cableView.getConnectionHelper();
-    connectionHelper->getCallbackConnections() += {
-        procChain.connectionAdded.connect<&CableViewConnectionHelper::connectionAdded> (connectionHelper),
-        procChain.connectionRemoved.connect<&CableViewConnectionHelper::connectionRemoved> (connectionHelper),
-        procChain.refreshConnections.connect<&CableViewConnectionHelper::refreshConnections> (connectionHelper),
+    connectionHelper->getCallbacks() += {
+        procChain.connectionAddedBroadcaster.connect<&CableViewConnectionHelper::connectionAdded> (connectionHelper),
+        procChain.connectionRemovedBroadcaster.connect<&CableViewConnectionHelper::connectionRemoved> (connectionHelper),
+        procChain.refreshConnectionsBroadcaster.connect<&CableViewConnectionHelper::refreshConnections> (connectionHelper),
     };
 
     cableView.getConnectionHelper()->refreshConnections();

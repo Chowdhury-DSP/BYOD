@@ -3,9 +3,9 @@
 ParamForwardManager::ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& procChain) : chowdsp::ForwardingParametersManager<ParamForwardManager, 500> (vts),
                                                                                                           chain (procChain)
 {
-    connections += {
-        chain.processorAdded.connect<&ParamForwardManager::processorAdded> (this),
-        chain.processorRemoved.connect<&ParamForwardManager::processorRemoved> (this),
+    callbacks += {
+        chain.processorAddedBroadcaster.connect<&ParamForwardManager::processorAdded> (this),
+        chain.processorRemovedBroadcaster.connect<&ParamForwardManager::processorRemoved> (this),
     };
 }
 

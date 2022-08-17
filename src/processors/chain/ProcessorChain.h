@@ -33,11 +33,11 @@ public:
     auto& getStateHelper() { return *stateHelper; }
     auto& getOversampling() { return ioProcessor.getOversampling(); }
 
-    rocket::signal<void (BaseProcessor*)> processorAdded;
-    rocket::signal<void (const BaseProcessor*)> processorRemoved;
-    rocket::signal<void()> refreshConnections;
-    rocket::signal<void (const ConnectionInfo&)> connectionAdded;
-    rocket::signal<void (const ConnectionInfo&)> connectionRemoved;
+    chowdsp::Broadcaster<void (BaseProcessor*)> processorAddedBroadcaster;
+    chowdsp::Broadcaster<void (const BaseProcessor*)> processorRemovedBroadcaster;
+    chowdsp::Broadcaster<void()> refreshConnectionsBroadcaster;
+    chowdsp::Broadcaster<void (const ConnectionInfo&)> connectionAddedBroadcaster;
+    chowdsp::Broadcaster<void (const ConnectionInfo&)> connectionRemovedBroadcaster;
 
 private:
     void initializeProcessors();

@@ -18,7 +18,7 @@ public:
 
 private:
     ProcessorChain& chain;
-    rocket::scoped_connection_container connections;
+    chowdsp::ScopedCallbackList callbacks;
 
     std::atomic_bool portMagsOn { true };
     bool prevPortMagsOn = true;
