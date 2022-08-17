@@ -2,7 +2,7 @@
 
 BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
 {
-    pluginSettings->addProperties ({ { defaultZoomSettingID, 1.0 } }, this);
+    pluginSettings->addProperties<&BoardViewport::globalSettingChanged> ({ { defaultZoomSettingID, 1.0 } }, *this);
     setScaleFactor ((float) pluginSettings->getProperty<double> (defaultZoomSettingID));
 
     setViewedComponent (&comp, false);
@@ -33,12 +33,6 @@ BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
     };
 
     addAndMakeVisible (scaleLabel);
-}
-
-BoardViewport::~BoardViewport()
-{
-    pluginSettings->removePropertyListener (this);
-    getHorizontalScrollBar().setLookAndFeel (nullptr);
 }
 
 void BoardViewport::globalSettingChanged (SettingID settingID)

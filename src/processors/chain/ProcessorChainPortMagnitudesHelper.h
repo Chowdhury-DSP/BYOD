@@ -2,17 +2,16 @@
 
 #include "ProcessorChain.h"
 
-class ProcessorChainPortMagnitudesHelper : private chowdsp::GlobalPluginSettings::Listener
+class ProcessorChainPortMagnitudesHelper : public chowdsp::TrackedByBroadcasters
 {
 public:
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
     explicit ProcessorChainPortMagnitudesHelper (ProcessorChain& procChain);
-    ~ProcessorChainPortMagnitudesHelper() override;
 
     void processorAdded (BaseProcessor* proc);
 
-    void globalSettingChanged (SettingID settingID) override;
+    void globalSettingChanged (SettingID settingID);
     void preparePortMagnitudes();
 
     static constexpr SettingID cableVizOnOffID = "cable_viz_onoff";

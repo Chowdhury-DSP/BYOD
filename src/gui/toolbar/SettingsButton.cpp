@@ -16,17 +16,12 @@ SettingsButton::SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper* og
     Logger::writeToLog ("Checking OpenGL availability...");
     const auto shouldUseOpenGLByDefault = openGLHelper != nullptr && openGLHelper->isOpenGLAvailable();
     Logger::writeToLog ("OpenGL is available on this system: " + String (shouldUseOpenGLByDefault ? "TRUE" : "FALSE"));
-    pluginSettings->addProperties ({ { openglID, shouldUseOpenGLByDefault } }, this);
+    pluginSettings->addProperties<&SettingsButton::globalSettingChanged> ({ { openglID, shouldUseOpenGLByDefault } }, *this);
     globalSettingChanged (openglID);
 
     setImages (Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize).get());
     onClick = [=]
     { showSettingsMenu(); };
-}
-
-SettingsButton::~SettingsButton()
-{
-    pluginSettings->removePropertyListener (this);
 }
 
 void SettingsButton::globalSettingChanged (SettingID settingID)

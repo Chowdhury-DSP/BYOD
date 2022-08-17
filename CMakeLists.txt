@@ -80,7 +80,6 @@ juce_add_plugin(BYOD
     VST3_CATEGORIES Fx Distortion
     AU_MAIN_TYPE kAudioUnitType_Effect
     AAX_CATEGORY AAX_ePlugInCategory_Harmonic
-    LV2_URI https://github.com/Chowdhury-DSP/BYOD
 
     MICROPHONE_PERMISSION_ENABLED TRUE
     NEEDS_STORE_KIT TRUE
@@ -109,6 +108,7 @@ add_subdirectory(res)
 
 target_compile_definitions(BYOD PUBLIC
     JUCE_VST3_CAN_REPLACE_VST2=0
+    JUCE_LV2URI="https://github.com/Chowdhury-DSP/BYOD"
     BYOD_BUILD_PRESET_SERVER=${BYOD_BUILD_PRESET_SERVER_FLAG}
 )
 

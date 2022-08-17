@@ -13,7 +13,6 @@
 #include <JuceHeader.h>
 
 // Any other widely used headers that don't change...
-#include "rocket.hpp"
 #include <Eigen/Dense>
 #include <RTNeural/RTNeural.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>

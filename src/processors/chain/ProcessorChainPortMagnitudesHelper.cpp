@@ -2,7 +2,7 @@
 
 ProcessorChainPortMagnitudesHelper::ProcessorChainPortMagnitudesHelper (ProcessorChain& procChain) : chain (procChain)
 {
-    pluginSettings->addProperties ({ { cableVizOnOffID, true } }, this);
+    pluginSettings->addProperties<&ProcessorChainPortMagnitudesHelper::globalSettingChanged> ({ { cableVizOnOffID, true } }, *this);
     portMagsOn.store (pluginSettings->getProperty<bool> (cableVizOnOffID));
     prevPortMagsOn = portMagsOn.load();
 
@@ -12,11 +12,6 @@ ProcessorChainPortMagnitudesHelper::ProcessorChainPortMagnitudesHelper (Processo
 
     chain.getInputProcessor().resetPortMagnitudes (prevPortMagsOn);
     chain.getOutputProcessor().resetPortMagnitudes (prevPortMagsOn);
-}
-
-ProcessorChainPortMagnitudesHelper::~ProcessorChainPortMagnitudesHelper()
-{
-    pluginSettings->removePropertyListener (this);
 }
 
 void ProcessorChainPortMagnitudesHelper::processorAdded (BaseProcessor* proc)
