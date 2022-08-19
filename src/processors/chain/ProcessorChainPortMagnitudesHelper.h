@@ -2,14 +2,13 @@
 
 #include "ProcessorChain.h"
 
-class ProcessorChainPortMagnitudesHelper : public chowdsp::TrackedByBroadcasters
+class ProcessorChainPortMagnitudesHelper
 {
 public:
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
     explicit ProcessorChainPortMagnitudesHelper (ProcessorChain& procChain);
-
-    void processorAdded (BaseProcessor* proc);
+    ~ProcessorChainPortMagnitudesHelper();
 
     void globalSettingChanged (SettingID settingID);
     void preparePortMagnitudes();
@@ -18,7 +17,7 @@ public:
 
 private:
     ProcessorChain& chain;
-    chowdsp::ScopedCallbackList callbacks;
+    chowdsp::ScopedCallback onProcessorAdded;
 
     std::atomic_bool portMagsOn { true };
     bool prevPortMagsOn = true;

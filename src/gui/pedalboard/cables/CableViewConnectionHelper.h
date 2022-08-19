@@ -9,11 +9,7 @@ public:
 
     void processorBeingAdded (BaseProcessor* newProc);
     void processorBeingRemoved (const BaseProcessor* proc);
-
-    void refreshConnections();
-    void connectionAdded (const ConnectionInfo& info);
-    void connectionRemoved (const ConnectionInfo& info);
-    auto& getCallbacks() { return callbacks; }
+    void connectToProcessorChain (ProcessorChain& procChain);
 
     void createCable (ProcessorEditor* origin, int portIndex, const MouseEvent& e);
     void refreshCable (const MouseEvent& e);
@@ -23,6 +19,10 @@ public:
     std::unique_ptr<MouseEvent> cableMouse;
 
 private:
+    void refreshConnections();
+    void connectionAdded (const ConnectionInfo& info);
+    void connectionRemoved (const ConnectionInfo& info);
+
     CableView& cableView;
     const BoardComponent* board = nullptr;
     OwnedArray<Cable>& cables;

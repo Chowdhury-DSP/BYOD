@@ -29,7 +29,6 @@ ProcessorChain::ProcessorChain (ProcessorStore& store,
                                                                                       presetManager (presetMgr)
 {
     actionHelper = std::make_unique<ProcessorChainActionHelper> (*this);
-
     stateHelper = std::make_unique<ProcessorChainStateHelper> (*this);
     portMagsHelper = std::make_unique<ProcessorChainPortMagnitudesHelper> (*this);
 

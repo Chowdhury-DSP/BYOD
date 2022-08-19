@@ -61,14 +61,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
         procChain.refreshConnectionsBroadcaster.connect<&BoardComponent::refreshConnections> (this),
     };
 
-    auto* connectionHelper = cableView.getConnectionHelper();
-    connectionHelper->getCallbacks() += {
-        procChain.connectionAddedBroadcaster.connect<&CableViewConnectionHelper::connectionAdded> (connectionHelper),
-        procChain.connectionRemovedBroadcaster.connect<&CableViewConnectionHelper::connectionRemoved> (connectionHelper),
-        procChain.refreshConnectionsBroadcaster.connect<&CableViewConnectionHelper::refreshConnections> (connectionHelper),
-    };
-
-    cableView.getConnectionHelper()->refreshConnections();
+    cableView.getConnectionHelper()->connectToProcessorChain (procChain);
 
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
