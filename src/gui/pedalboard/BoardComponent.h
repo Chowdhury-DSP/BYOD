@@ -5,9 +5,7 @@
 #include "editors/ProcessorEditor.h"
 #include "gui/utils/LookAndFeels.h"
 
-class BoardComponent final : public Component,
-                             private ProcessorChain::Listener,
-                             private ProcessorEditor::Listener
+class BoardComponent final : public Component
 {
 public:
     explicit BoardComponent (ProcessorChain& procs);
@@ -16,13 +14,13 @@ public:
     void resized() override;
     void setScaleFactor (float newScaleFactor);
 
-    void showInfoComp (const BaseProcessor& proc) override;
-    void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset) override;
-    void duplicateProcessor (const ProcessorEditor& editor) override;
+    void showInfoComp (const BaseProcessor& proc);
+    void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset);
+    void duplicateProcessor (const ProcessorEditor& editor);
 
-    void processorAdded (BaseProcessor* newProc) override;
-    void processorRemoved (const BaseProcessor* proc) override;
-    void refreshConnections() override { resized(); }
+    void processorAdded (BaseProcessor* newProc);
+    void processorRemoved (const BaseProcessor* proc);
+    void refreshConnections() { resized(); }
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
@@ -32,6 +30,7 @@ private:
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
 
     ProcessorChain& procChain;
+    chowdsp::ScopedCallbackList callbacks;
 
     OwnedArray<ProcessorEditor> processorEditors;
     InfoComponent infoComp;

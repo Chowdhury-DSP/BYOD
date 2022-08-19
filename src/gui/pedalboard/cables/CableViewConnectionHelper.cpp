@@ -66,6 +66,17 @@ void CableViewConnectionHelper::processorBeingRemoved (const BaseProcessor* proc
     }
 }
 
+void CableViewConnectionHelper::connectToProcessorChain (ProcessorChain& procChain)
+{
+    callbacks += {
+        procChain.connectionAddedBroadcaster.connect<&CableViewConnectionHelper::connectionAdded> (this),
+        procChain.connectionRemovedBroadcaster.connect<&CableViewConnectionHelper::connectionRemoved> (this),
+        procChain.refreshConnectionsBroadcaster.connect<&CableViewConnectionHelper::refreshConnections> (this),
+    };
+
+    refreshConnections();
+}
+
 void CableViewConnectionHelper::refreshConnections()
 {
     cables.clear();

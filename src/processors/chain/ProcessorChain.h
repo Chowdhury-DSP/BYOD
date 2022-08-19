@@ -11,17 +11,6 @@ class ProcessorChainPortMagnitudesHelper;
 class ProcessorChainStateHelper;
 class ProcessorChain : private AudioProcessorValueTreeState::Listener
 {
-    // clang-format off
-    CREATE_LISTENER (
-        Listener,
-        listeners,
-        virtual void processorAdded (BaseProcessor* /*proc*/) {}\
-        virtual void processorRemoved (const BaseProcessor* /*proc*/) {}\
-        virtual void refreshConnections() {}\
-        virtual void connectionAdded (const ConnectionInfo& /*info*/) {}\
-        virtual void connectionRemoved (const ConnectionInfo& /*info*/) {}\
-    )
-    // clang-format on
 public:
     ProcessorChain (ProcessorStore& store,
                     AudioProcessorValueTreeState& vts,
@@ -43,6 +32,12 @@ public:
     auto& getActionHelper() { return *actionHelper; }
     auto& getStateHelper() { return *stateHelper; }
     auto& getOversampling() { return ioProcessor.getOversampling(); }
+
+    chowdsp::Broadcaster<void (BaseProcessor*)> processorAddedBroadcaster;
+    chowdsp::Broadcaster<void (const BaseProcessor*)> processorRemovedBroadcaster;
+    chowdsp::Broadcaster<void()> refreshConnectionsBroadcaster;
+    chowdsp::Broadcaster<void (const ConnectionInfo&)> connectionAddedBroadcaster;
+    chowdsp::Broadcaster<void (const ConnectionInfo&)> connectionRemovedBroadcaster;
 
 private:
     void initializeProcessors();
