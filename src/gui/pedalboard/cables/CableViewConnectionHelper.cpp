@@ -73,7 +73,7 @@ void CableViewConnectionHelper::connectToProcessorChain (ProcessorChain& procCha
         procChain.connectionRemovedBroadcaster.connect<&CableViewConnectionHelper::connectionRemoved> (this),
         procChain.refreshConnectionsBroadcaster.connect<&CableViewConnectionHelper::refreshConnections> (this),
     };
-    
+
     refreshConnections();
 }
 
