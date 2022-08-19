@@ -41,11 +41,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
     addAndMakeVisible (inputEditor.get());
-    inputEditor->addListener (this);
+    inputEditor->addToBoard (this);
 
     outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain);
     addAndMakeVisible (outputEditor.get());
-    outputEditor->addListener (this);
+    outputEditor->addToBoard (this);
 
     addChildComponent (infoComp);
     addAndMakeVisible (cableView);
@@ -55,10 +55,13 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
     for (auto* p : procs.getProcessors())
         processorAdded (p);
 
-    procChain.addListener (this);
-    procChain.addListener (cableView.getConnectionHelper());
+    callbacks += {
+        procChain.processorAddedBroadcaster.connect<&BoardComponent::processorAdded> (this),
+        procChain.processorRemovedBroadcaster.connect<&BoardComponent::processorRemoved> (this),
+        procChain.refreshConnectionsBroadcaster.connect<&BoardComponent::refreshConnections> (this),
+    };
 
-    cableView.getConnectionHelper()->refreshConnections();
+    cableView.getConnectionHelper()->connectToProcessorChain (procChain);
 
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
@@ -67,12 +70,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 
 BoardComponent::~BoardComponent()
 {
-    inputEditor->removeListener (this);
-    outputEditor->removeListener (this);
-
     removeMouseListener (&cableView);
-    procChain.removeListener (this);
-    procChain.removeListener (cableView.getConnectionHelper());
 }
 
 void BoardComponent::setScaleFactor (float newScaleFactor)
@@ -120,7 +118,7 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
     cableView.processorBeingAdded (newProc);
     setEditorPosition (newEditor);
 
-    newEditor->addListener (this);
+    newEditor->addToBoard (this);
 
     repaint();
 }
@@ -131,7 +129,6 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
 
     if (auto* editor = findEditorForProcessor (proc))
     {
-        editor->removeListener (this);
         processorEditors.removeObject (editor);
     }
 

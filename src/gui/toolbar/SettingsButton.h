@@ -4,15 +4,14 @@
 
 class BYOD;
 class SettingsButton : public DrawableButton,
-                       private chowdsp::GlobalPluginSettings::Listener
+                       public chowdsp::TrackedByBroadcasters
 {
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
 public:
     SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper* openGLHelper);
-    ~SettingsButton() override;
 
-    void globalSettingChanged (SettingID settingID) final;
+    void globalSettingChanged (SettingID settingID);
 
 private:
     void showSettingsMenu();

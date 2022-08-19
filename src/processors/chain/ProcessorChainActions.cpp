@@ -40,7 +40,7 @@ public:
                 newProcPtr->getVTS().addParameterListener (paramCast->paramID, &chain);
         }
 
-        chain.listeners.call (&ProcessorChain::Listener::processorAdded, newProcPtr);
+        chain.processorAddedBroadcaster (newProcPtr);
     }
 
     static void removeProcessor (ProcessorChain& chain, BaseProcessor* procToRemove, BaseProcessor::Ptr& saveProc)
@@ -49,7 +49,7 @@ public:
 
         ProcessorChainHelpers::removeOutputConnectionsFromProcessor (chain, procToRemove, chain.um);
 
-        chain.listeners.call (&ProcessorChain::Listener::processorRemoved, procToRemove);
+        chain.processorRemovedBroadcaster (procToRemove);
 
         for (auto* param : procToRemove->getParameters())
         {
@@ -68,7 +68,7 @@ public:
                             + String (info.endPort));
 
         info.startProc->addConnection (ConnectionInfo (info));
-        chain.listeners.call (&ProcessorChain::Listener::connectionAdded, info);
+        chain.connectionAddedBroadcaster (info);
     }
 
     static void removeConnection (ProcessorChain& chain, const ConnectionInfo& info)
@@ -78,7 +78,7 @@ public:
                             + String (info.endPort));
 
         info.startProc->removeConnection (info);
-        chain.listeners.call (&ProcessorChain::Listener::connectionRemoved, info);
+        chain.connectionRemovedBroadcaster (info);
     }
 
     static bool getPresetWasDirty (ProcessorChain& chain)

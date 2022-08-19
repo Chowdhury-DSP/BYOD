@@ -4,17 +4,16 @@
 #include "BoardComponent.h"
 
 class BoardViewport : public Viewport,
-                      private chowdsp::GlobalPluginSettings::Listener
+                      public chowdsp::TrackedByBroadcasters
 {
 public:
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
     explicit BoardViewport (ProcessorChain& procChain);
-    ~BoardViewport() override;
 
     void resized() override;
 
-    void globalSettingChanged (SettingID settingID) override;
+    void globalSettingChanged (SettingID settingID);
 
     static constexpr SettingID defaultZoomSettingID = "default_zoom";
 
