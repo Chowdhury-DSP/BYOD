@@ -13,6 +13,7 @@ public:
 
     void resized() override;
     void setScaleFactor (float newScaleFactor);
+    float getScaleFactor() const;
 
     void showInfoComp (const BaseProcessor& proc);
     void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset);
@@ -26,7 +27,7 @@ public:
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
 
 private:
-    void showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options);
+    void showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, ConnectionInfo* connectionInfo = nullptr);
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
 
     ProcessorChain& procChain;

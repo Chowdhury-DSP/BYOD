@@ -16,6 +16,7 @@ target_sources(BYOD PRIVATE
     gui/pedalboard/cables/CableViewConnectionHelper.cpp
     gui/pedalboard/cables/CableViewPortLocationHelper.cpp
     gui/pedalboard/cables/CableView.cpp
+    gui/pedalboard/cables/Cable.cpp
     gui/pedalboard/editors/KnobsComponent.cpp
     gui/pedalboard/editors/Port.cpp
     gui/pedalboard/editors/ProcessorEditor.cpp

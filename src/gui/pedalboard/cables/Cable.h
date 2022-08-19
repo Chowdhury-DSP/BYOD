@@ -1,27 +1,45 @@
 #pragma once
 
+#include "../editors/ProcessorEditor.h"
+#include "CubicBezier.h"
 #include "processors/BaseProcessor.h"
+#include <pch.h>
 
-struct Cable
+class BoardComponent;
+class CableView;
+class Cable : public Component
 {
-    Cable (BaseProcessor* start, int startPort) : startProc (start),
-                                                  startIdx (startPort)
-    {
-    }
+public:
+    Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection);
+    ~Cable() override;
 
-    Cable (BaseProcessor* start, int startPort, BaseProcessor* end, int endPort) : startProc (start),
-                                                                                   startIdx (startPort),
-                                                                                   endProc (end),
-                                                                                   endIdx (endPort)
-    {
-    }
+    void paint (Graphics& g) override;
+    bool hitTest (int x, int y) override;
 
-    BaseProcessor* startProc = nullptr;
-    int startIdx;
-
-    BaseProcessor* endProc = nullptr;
-    int endIdx = 0;
+    ConnectionInfo connectionInfo;
 
 private:
+    auto createCablePath (juce::Point<float> start, juce::Point<float> end);
+    float getCableThickness();
+    void drawCableShadow (Graphics& g, float thickness);
+    void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour) const;
+    void drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end);
+    CableView& cableView;
+    const BoardComponent* board = nullptr;
+
+    chowdsp::PopupMenuHelper popupMenu;
+
+    Path cablePath {};
+    int numPointsInPath = 0;
+    CubicBezier bezier;
+    float cablethickness = 0.0f;
+
+    juce::Point<float> startPortLocation;
+    Colour startColour;
+    Colour endColour;
+    juce::Point<float> endPortLocation;
+    float scaleFactor = 1.0f;
+    float levelDB = -100.0f;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
 };

@@ -76,9 +76,13 @@ BoardComponent::~BoardComponent()
 void BoardComponent::setScaleFactor (float newScaleFactor)
 {
     scaleFactor = newScaleFactor;
-    cableView.setScaleFactor (scaleFactor);
 
     resized();
+}
+
+float BoardComponent::getScaleFactor() const
+{
+    return scaleFactor;
 }
 
 void BoardComponent::resized()
@@ -131,7 +135,6 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
     {
         processorEditors.removeObject (editor);
     }
-
     repaint();
 }
 
@@ -162,7 +165,7 @@ void BoardComponent::duplicateProcessor (const ProcessorEditor& editor)
     procChain.getProcStore().duplicateProcessor (*editor.getProcPtr());
 }
 
-void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options)
+void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, ConnectionInfo* connectionInfo)
 {
     if (addingFromNewProcButton)
     {
@@ -180,7 +183,15 @@ void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& optio
     }
 
     int menuID = 0;
-    procChain.getProcStore().createProcList (menu, menuID);
+
+    if (connectionInfo != nullptr)
+    {
+        procChain.getProcStore().createProcFromCableClickList (menu, menuID, connectionInfo);
+    }
+    else
+    {
+        procChain.getProcStore().createProcList (menu, menuID);
+    }
 
     options = options
                   .withParentComponent (this)

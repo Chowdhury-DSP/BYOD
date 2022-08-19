@@ -11,6 +11,7 @@ public:
     void addProcessor (BaseProcessor::Ptr newProc);
     void removeProcessor (BaseProcessor* procToRemove);
     void replaceProcessor (BaseProcessor::Ptr newProc, BaseProcessor* procToReplace);
+    void replaceConnectionWithProcessor (BaseProcessor::Ptr newProc, ConnectionInfo& connectionInfo);
 
     void addConnection (ConnectionInfo&& info);
     void removeConnection (ConnectionInfo&& info);
