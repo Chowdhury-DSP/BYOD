@@ -19,27 +19,27 @@ public:
     ConnectionInfo connectionInfo;
 
 private:
-    auto createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
+    auto createCablePath (juce::Point<float> start, juce::Point<float> end);
     float getCableThickness();
     void drawCableShadow (Graphics& g, float thickness);
-    void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour);
+    void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour) const;
     void drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end);
     CableView& cableView;
     const BoardComponent* board = nullptr;
 
     chowdsp::PopupMenuHelper popupMenu;
 
-    Path cablePath;
-    int numPointsInPath;
+    Path cablePath {};
+    int numPointsInPath = 0;
     CubicBezier bezier;
-    float cablethickness;
+    float cablethickness = 0.0f;
 
     juce::Point<float> startPortLocation;
     Colour startColour;
     Colour endColour;
     juce::Point<float> endPortLocation;
-    float scaleFactor;
-    float levelDB;
+    float scaleFactor = 1.0f;
+    float levelDB = -100.0f;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
 };

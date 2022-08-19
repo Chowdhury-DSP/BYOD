@@ -39,7 +39,7 @@ float Cable::getCableThickness()
     return cableThickness * (1.0f + 0.9f * levelMult);
 }
 
-auto Cable::createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor)
+auto Cable::createCablePath (juce::Point<float> start, juce::Point<float> end)
 {
     const auto pointOff = portOffset + scaleFactor;
     bezier = CubicBezier (start, start.translated (pointOff, 0.0f), end.translated (-pointOff, 0.0f), end);
@@ -61,7 +61,7 @@ void Cable::drawCableShadow (Graphics& g, float thickness)
     g.strokePath (cableShadow, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
 }
 
-void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour)
+void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour) const
 {
     auto circle = (Rectangle { cableThickness, cableThickness } * 2.4f * scaleFactor).withCentre (centre);
     g.setColour (colour);
@@ -74,7 +74,7 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
 void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
     cablethickness = getCableThickness();
-    cablePath = createCablePath (start, end, scaleFactor);
+    cablePath = createCablePath (start, end);
     drawCableShadow (g, cablethickness);
 
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
