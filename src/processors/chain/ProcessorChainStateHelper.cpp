@@ -34,7 +34,7 @@ ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain)
 {
 }
 
-void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, bool loadingPreset)
+void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, const chowdsp::Version& stateVersion, bool loadingPreset)
 {
     if (xml == nullptr)
     {
@@ -42,8 +42,8 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, bool loadi
         return;
     }
 
-    mainThreadStateLoader->call ([this, loadingPreset, xmlState = *xml]
-                                 { loadProcChainInternal (&xmlState, loadingPreset); });
+    mainThreadStateLoader->call ([this, stateVersion, loadingPreset, xmlState = *xml]
+                                 { loadProcChainInternal (&xmlState, stateVersion, loadingPreset); });
 }
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
@@ -92,7 +92,7 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
     return std::move (xml);
 }
 
-void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bool loadingPreset)
+void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, const chowdsp::Version& stateVersion, bool loadingPreset)
 {
     if (! loadingPreset)
         um->beginNewTransaction();
@@ -104,12 +104,12 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, bo
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
-    auto loadProcessorState = [=] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps, bool shouldLoadState = true)
+    auto loadProcessorState = [this, &stateVersion] (XmlElement* procXml, BaseProcessor* newProc, auto& connectionMaps, bool shouldLoadState = true)
     {
         if (procXml->getNumChildElements() > 0)
         {
             if (shouldLoadState)
-                newProc->fromXML (procXml->getChildElement (0));
+                newProc->fromXML (procXml->getChildElement (0), stateVersion);
             else // don't load state, only load position
                 newProc->loadPositionInfoFromXML (procXml->getChildElement (0));
         }

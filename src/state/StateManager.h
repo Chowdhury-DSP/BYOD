@@ -14,14 +14,15 @@ public:
 
     auto& getUIState() { return uiState; }
 
+    static void setCurrentPluginVersionInXML (XmlElement* xml);
+    static chowdsp::Version getPluginVersionFromXML (const XmlElement* xml);
+
 private:
     AudioProcessorValueTreeState& vts;
     ProcessorChain& procChain;
     chowdsp::PresetManager& presetManager;
 
     chowdsp::UIState uiState;
-
-    static const Identifier stateTag;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateManager)
 };

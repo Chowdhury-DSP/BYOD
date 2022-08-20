@@ -7,9 +7,12 @@ All notable changes to this project will be documented in this file.
 - Added "Rotary" module.
 - Added "Panner" module.
 - Added "Neural" mode to Centaur module.
+- Added "Multi-Mode" option to SVF module.
+- Added UI control to replace a wire with a 1-input/1-output module.
 - Added UI size to the saved plugin state.
 - Improved neural network-based modules performance and sound quality at different sample rates.
 - Improved UI rendering performance.
+- Fixed cutoff frequency behaviour in High Cut module.
 - Fixed undo/redo not restoring preset name.
 
 ## [1.0.1] 2022-03-15

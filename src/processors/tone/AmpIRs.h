@@ -4,10 +4,6 @@
 
 class AmpIRs : public BaseProcessor, private AudioProcessorValueTreeState::Listener
 {
-    CREATE_LISTENER (
-        AmpIRListener,
-        listeners,
-        virtual void irChanged() {})
 public:
     explicit AmpIRs (UndoManager* um = nullptr);
     ~AmpIRs() override;
@@ -24,7 +20,7 @@ public:
     bool getCustomComponents (OwnedArray<Component>& customComps) override;
 
     std::unique_ptr<XmlElement> toXML() override;
-    void fromXML (XmlElement* xml, bool loadPosition) override;
+    void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
 
 private:
     std::atomic<float>* mixParam = nullptr;
@@ -42,6 +38,7 @@ private:
     Array<File> irFiles;
     File curFile = File();
     CriticalSection irMutex;
+    chowdsp::Broadcaster<void()> irChangedBroadcaster;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmpIRs)
 };
