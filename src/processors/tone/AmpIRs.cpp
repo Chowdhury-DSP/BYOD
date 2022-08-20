@@ -90,7 +90,7 @@ void AmpIRs::loadIRFromFile (const File& file)
 
     irFiles.addIfNotAlreadyThere (file);
     curFile = file;
-    listeners.call (&AmpIRListener::irChanged);
+    irChangedBroadcaster();
     vts.getParameter (irTag)->setValueNotifyingHost (1.0f);
 
     ScopedLock sl (irMutex);
@@ -134,9 +134,9 @@ std::unique_ptr<XmlElement> AmpIRs::toXML()
     return std::move (xml);
 }
 
-void AmpIRs::fromXML (XmlElement* xml, bool loadPosition)
+void AmpIRs::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)
 {
-    BaseProcessor::fromXML (xml, loadPosition);
+    BaseProcessor::fromXML (xml, version, loadPosition);
 
     auto irFile = File (xml->getStringAttribute ("ir_file"));
     if (irFile.getFullPathName().isNotEmpty())
@@ -204,7 +204,7 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
         bool ignoreCallbacks = false;
     };
 
-    struct IRComboBox : public ComboBox, private AmpIRs::AmpIRListener
+    struct IRComboBox : public ComboBox
     {
         IRComboBox (AudioProcessorValueTreeState& vtState, AmpIRs& airs) : ampIRs (airs), vts (vtState)
         {
@@ -213,20 +213,15 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
             refreshBox();
 
             setName (irTag + "__box");
-            ampIRs.addAmpIRListener (this);
-        }
 
-        ~IRComboBox() override
-        {
-            ampIRs.removeAmpIRListener (this);
+            onIRChanged = ampIRs.irChangedBroadcaster.connect ([this]
+                                                               { refreshBox(); });
         }
 
         void visibilityChanged() override
         {
             setName (vts.getParameter (irTag)->name);
         }
-
-        void irChanged() override { refreshBox(); }
 
         void refreshBox()
         {
@@ -286,6 +281,7 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
         AudioProcessorValueTreeState& vts;
         std::unique_ptr<CustomBoxAttach> attachment;
         std::shared_ptr<FileChooser> fileChooser;
+        chowdsp::ScopedCallback onIRChanged;
     };
 
     customComps.add (std::make_unique<IRComboBox> (vts, *this));

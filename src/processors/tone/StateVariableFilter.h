@@ -15,6 +15,8 @@ public:
 
     using FreqSmooth = SmoothedValue<float, ValueSmoothingTypes::Multiplicative>;
 
+    void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
+
 private:
     bool getCustomComponents (OwnedArray<Component>& customComps) override;
 

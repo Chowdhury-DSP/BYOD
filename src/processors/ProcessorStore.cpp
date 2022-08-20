@@ -142,7 +142,7 @@ void ProcessorStore::duplicateProcessor (BaseProcessor& procToDuplicate)
 {
     auto newProc = createProcByName (procToDuplicate.getName());
     if (newProc != nullptr)
-        newProc->fromXML (procToDuplicate.toXML().get(), false);
+        newProc->fromXML (procToDuplicate.toXML().get(), chowdsp::Version { JucePlugin_VersionString }, false);
 
     addProcessorCallback (std::move (newProc));
 }

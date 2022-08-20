@@ -1,6 +1,7 @@
 #include "PresetManager.h"
 #include "PresetInfoHelpers.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
+#include "../StateManager.h"
 
 namespace
 {
@@ -221,7 +222,9 @@ bool PresetManager::syncServerPresetsToLocal()
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
 {
-    return procChain->getStateHelper().saveProcChain();
+    auto xml = procChain->getStateHelper().saveProcChain();
+    StateManager::setCurrentPluginVersionInXML (xml.get());
+    return xml;
 }
 
 void PresetManager::loadPresetState (const XmlElement* xml)
@@ -235,7 +238,8 @@ void PresetManager::loadPresetState (const XmlElement* xml)
         um->perform (new ChangePresetAction (*this));
     }
 
-    procChain->getStateHelper().loadProcChain (xml, true);
+    const auto statePluginVersion = StateManager::getPluginVersionFromXML (xml);
+    procChain->getStateHelper().loadProcChain (xml, statePluginVersion, true);
 }
 
 File PresetManager::getPresetFile (const chowdsp::Preset& preset) const

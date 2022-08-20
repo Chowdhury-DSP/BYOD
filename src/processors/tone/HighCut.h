@@ -13,13 +13,15 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
+    void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
+
 private:
     inline void calcCoefs (float Rv2Val) noexcept
     {
         float b_s[] { 0.0, 1.0f };
         float a_s[] { (R3 + Rv2Val) * C8, 1.0f };
 
-        float fc = 1.0f / ((R3 + Rv2Val) * C8);
+        float fc = 1.0f / (MathConstants<float>::twoPi * ((R3 + Rv2Val) * C8));
         float K = fc / std::tanh (fc / (2.0f * fs));
 
         float b[2];
