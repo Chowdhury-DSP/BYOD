@@ -34,7 +34,7 @@ void HighCut::prepare (double sampleRate, int samplesPerBlock)
     ignoreUnused (samplesPerBlock);
     fs = (float) sampleRate;
 
-    Rv2.reset (sampleRate, 0.01);
+    Rv2.reset (sampleRate, 0.025);
     Rv2.setCurrentAndTargetValue (freq2Rv2 (*cutoffParam, C8, R3));
     calcCoefs (Rv2.getCurrentValue());
 
