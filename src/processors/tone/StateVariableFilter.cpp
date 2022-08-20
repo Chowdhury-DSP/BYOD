@@ -46,9 +46,7 @@ ParamLayout StateVariableFilter::createParameterLayout()
                                          StringArray { "LPF", "HPF", "BPF" },
                                          0);
 
-    // @TODO: for compatibility with version 1 we need this to be off by default,
-    // but when we add version streaming we should make this true by default for new versions
-    emplace_param<AudioParameterBool> (params, multiModeTag, "Multi-Mode", false);
+    emplace_param<AudioParameterBool> (params, multiModeTag, "Multi-Mode", true);
     createPercentParameter (params, multiModeTypeTag, "Mode", 0.0f);
 
     return { params.begin(), params.end() };
@@ -126,6 +124,18 @@ void StateVariableFilter::processAudio (AudioBuffer<float>& buffer)
     }
 }
 
+void StateVariableFilter::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)
+{
+    BaseProcessor::fromXML (xml, version, loadPosition);
+
+    if (version <= chowdsp::Version { "1.0.1" })
+    {
+        // Multi-mode behaviour was only added in version 1.0.2, so we need to
+        // make sure we don't break older patches.
+        vts.getParameter (multiModeTag)->setValueNotifyingHost (0.0f);
+    }
+}
+
 bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComps)
 {
     class ModeControl : public Slider,
@@ -137,11 +147,11 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
             addChildComponent (modeSelector);
             addChildComponent (multiModeSlider);
 
-            modeSelectorAttach = std::make_unique<BoxAttachment> (vts, modeTag, modeSelector);
-            multiModeAttach = std::make_unique<SliderAttachment> (vts, multiModeTypeTag, multiModeSlider);
-
             modeSelector.addItemList (dynamic_cast<AudioParameterChoice*> (vts.getParameter (modeTag))->choices, 1);
             modeSelector.setSelectedItemIndex (0);
+
+            modeSelectorAttach = std::make_unique<BoxAttachment> (vts, modeTag, modeSelector);
+            multiModeAttach = std::make_unique<SliderAttachment> (vts, multiModeTypeTag, multiModeSlider);
 
             setName (modeTag + "__" + multiModeTypeTag + "__");
 

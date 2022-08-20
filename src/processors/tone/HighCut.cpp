@@ -5,7 +5,7 @@ namespace
 {
 constexpr float freq2Rv2 (float cutoff, float C8, float R3)
 {
-    return (1.0f / (C8 * cutoff)) - R3;
+    return (1.0f / (MathConstants<float>::twoPi * C8 * cutoff)) - R3;
 }
 } // namespace
 
@@ -24,7 +24,7 @@ ParamLayout HighCut::createParameterLayout()
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createFreqParameter (params, "cutoff", "Cutoff", 200.0f, 20.0e3f, 2000.0f, 5000.0f);
+    createFreqParameter (params, "cutoff", "Cutoff", 30.0f, 20.0e3f, 2000.0f, 5000.0f);
 
     return { params.begin(), params.end() };
 }
@@ -34,7 +34,7 @@ void HighCut::prepare (double sampleRate, int samplesPerBlock)
     ignoreUnused (samplesPerBlock);
     fs = (float) sampleRate;
 
-    Rv2.reset (sampleRate, 0.01);
+    Rv2.reset (sampleRate, 0.025);
     Rv2.setCurrentAndTargetValue (freq2Rv2 (*cutoffParam, C8, R3));
     calcCoefs (Rv2.getCurrentValue());
 
@@ -77,5 +77,19 @@ void HighCut::processAudio (AudioBuffer<float>& buffer)
             for (int n = 0; n < buffer.getNumSamples(); ++n)
                 x[ch][n] = iir[ch].processSample (x[ch][n]);
         }
+    }
+}
+
+void HighCut::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)
+{
+    BaseProcessor::fromXML (xml, version, loadPosition);
+
+    if (version <= chowdsp::Version { "1.0.1" })
+    {
+        // Up to version 1.0.2, this module had a bug where the cutoff frequency was off by a factor of 2*pi.
+        // The bug is fixed now, but we need to make sure we don't break patches from earlier versions.
+        auto* freqParam = vts.getParameter ("cutoff");
+        const auto v101FreqHz = freqParam->convertFrom0to1 (freqParam->getValue()) / MathConstants<float>::twoPi;
+        freqParam->setValueNotifyingHost (freqParam->convertTo0to1 (v101FreqHz));
     }
 }

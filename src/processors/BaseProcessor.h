@@ -61,7 +61,7 @@ public:
 
     // state save/load methods
     virtual std::unique_ptr<XmlElement> toXML();
-    virtual void fromXML (XmlElement* xml, bool loadPosition = true);
+    virtual void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition = true);
     void loadPositionInfoFromXML (XmlElement* xml);
 
     // interface for processor editors

@@ -105,7 +105,7 @@ std::unique_ptr<XmlElement> BaseProcessor::toXML()
     return std::move (xml);
 }
 
-void BaseProcessor::fromXML (XmlElement* xml, bool loadPosition)
+void BaseProcessor::fromXML (XmlElement* xml, const chowdsp::Version&, bool loadPosition)
 {
     if (xml == nullptr)
         return;
