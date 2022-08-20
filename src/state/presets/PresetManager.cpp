@@ -1,7 +1,7 @@
 #include "PresetManager.h"
+#include "../StateManager.h"
 #include "PresetInfoHelpers.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
-#include "../StateManager.h"
 
 namespace
 {
