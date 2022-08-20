@@ -86,6 +86,8 @@ void HighCut::fromXML (XmlElement* xml, const chowdsp::Version& version, bool lo
 
     if (version <= chowdsp::Version { "1.0.1" })
     {
+        // Up to version 1.0.2, this module had a bug where the cutoff frequency was off by a factor of 2*pi.
+        // The bug is fixed now, but we need to make sure we don't break patches from earlier versions.
         auto* freqParam = vts.getParameter ("cutoff");
         const auto v101FreqHz = freqParam->convertFrom0to1 (freqParam->getValue()) / MathConstants<float>::twoPi;
         freqParam->setValueNotifyingHost (freqParam->convertTo0to1 (v101FreqHz));
