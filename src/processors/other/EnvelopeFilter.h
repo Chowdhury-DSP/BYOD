@@ -25,8 +25,6 @@ private:
     std::atomic<float>* freqModParam = nullptr;
     std::atomic<float>* filterTypeParam = nullptr;
     std::atomic<float>* directControlParam = nullptr;
-    std::atomic<float>* continuousModeParam = nullptr;
-    std::atomic<float>* filterMultiModeParam = nullptr;
 
     chowdsp::SVFMultiMode<float> filter;
 

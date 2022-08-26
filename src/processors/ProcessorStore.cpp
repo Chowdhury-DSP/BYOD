@@ -10,6 +10,7 @@
 #include "drive/diode_circuits/DiodeClipper.h"
 #include "drive/diode_circuits/DiodeRectifier.h"
 #include "drive/hysteresis/Hysteresis.h"
+#include "drive/junior_b/JuniorB.h"
 #include "drive/king_of_tone/KingOfToneDrive.h"
 #include "drive/mxr_distortion/MXRDistortion.h"
 #include "drive/tube_amp/TubeAmp.h"
@@ -63,6 +64,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Distortion Plus", &processorFactory<MXRDistortion> },
     { "GuitarML", &processorFactory<GuitarMLAmp> },
     { "Hysteresis", &processorFactory<Hysteresis> },
+    { "Junior B", &processorFactory<JuniorB> },
     { "Tone King", &processorFactory<KingOfToneDrive> },
     { "Metal Face", &processorFactory<MetalFace> },
     { "Muff Drive", &processorFactory<BigMuffDrive> },

@@ -14,6 +14,7 @@ set(binary_data_files
     guitar_ml_models/BluesJR_FullD.json
     guitar_ml_models/TS9_FullD.json
     guitar_ml_models/metal_face_model.json
+    guitar_ml_models/junior_1_stage.json
     guitar_ml_models/centaur/centaur_0.json
     guitar_ml_models/centaur/centaur_25.json
     guitar_ml_models/centaur/centaur_50.json
