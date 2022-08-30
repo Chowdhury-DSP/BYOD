@@ -3,6 +3,7 @@
 #include "JuniorBWDF.h"
 #include "NeuralTriodeModel.h"
 #include "processors/BaseProcessor.h"
+#include "../../utility/DCBlocker.h"
 
 class JuniorB : public BaseProcessor
 {
@@ -39,6 +40,7 @@ private:
 
     chowdsp::Gain<float> driveGain, wetGain, dryGain;
     chowdsp::Buffer<float> dryBuffer;
+    chowdsp::FirstOrderHPF<float> dcBlocker;
 
     bool preBuffering = false;
 

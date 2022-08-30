@@ -48,12 +48,15 @@ void JuniorB::prepare (double sampleRate, int samplesPerBlock)
         gain->setRampDurationSeconds (0.05);
     }
 
+    dcBlocker.prepare (2);
+    dcBlocker.calcCoefs (25.0f, (float) sampleRate);
+
     dryBuffer.setMaxSize (2, samplesPerBlock);
 
     // pre-buffering
     ScopedValueSetter svs { preBuffering, true };
     AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 5000; i += samplesPerBlock)
+    for (int i = 0; i < 10000; i += samplesPerBlock)
     {
         buffer.clear();
         processAudio (buffer);
@@ -85,6 +88,8 @@ void JuniorB::processAudio (AudioBuffer<float>& buffer)
                 x[n] = wdfStage.process (x[n]);
         }
     }
+
+    dcBlocker.processBlock (buffer);
 
     const auto dryGainLinear = std::sin (0.5f * MathConstants<float>::pi * (1.0f - blendPercent));
     const auto wetGainLinear = std::sin (0.5f * MathConstants<float>::pi * blendPercent);
