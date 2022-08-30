@@ -19,7 +19,7 @@ private:
     chowdsp::FloatParameter* driveParamPct = nullptr;
     chowdsp::FloatParameter* blendParamPct = nullptr;
     chowdsp::ChoiceParameter* stagesParam = nullptr;
-    
+
     using TriodeModel = NeuralTriodeModel<float, TriodeModelELuApprox<float, 4, 8>>;
     TriodeModel triode_model_4_8_elu { BinaryData::junior_1_stage_json, BinaryData::junior_1_stage_jsonSize };
 

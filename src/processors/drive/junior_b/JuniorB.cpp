@@ -74,7 +74,7 @@ void JuniorB::processAudio (AudioBuffer<float>& buffer)
 
     driveGain.setGainDecibels (drivePercent * 12.0f);
     driveGain.process (buffer);
-    
+
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* x = buffer.getWritePointer (ch);

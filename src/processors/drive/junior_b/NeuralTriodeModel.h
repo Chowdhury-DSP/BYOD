@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pch.h>
 #include "EluApprox.h"
+#include <pch.h>
 
 constexpr int triodeModelNumInputs = 2;
 constexpr int triodeModelNumOutputs = 2;

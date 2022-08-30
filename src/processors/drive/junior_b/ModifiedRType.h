@@ -15,7 +15,7 @@ namespace rtype_detail
         // input vector (a) of size 1 x nRows
         // output vector (b) of size 1 x nCols
 
-// No SIMD for now
+        // No SIMD for now
         for (int r = 0; r < nRows; ++r)
             b_[r] = (T) 0;
 
@@ -115,8 +115,8 @@ private:
     rtype_detail::Matrix<T, numUpPortsPad, numDownPorts> S12 {};
     rtype_detail::Matrix<T, numDownPortsPad, numUpPorts + numDownPorts> S21_S22 {};
 
-    T a_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPorts]{}; // vector of inputs to Rport from down the tree
-    T b_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPortsPad]{}; // vector of outputs from Rport to down the tree
-    T b_up_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numUpPortsPad]{}; // vector of outputs from Rport to down the tree
+    T a_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPorts] {}; // vector of inputs to Rport from down the tree
+    T b_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPortsPad] {}; // vector of outputs from Rport to down the tree
+    T b_up_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numUpPortsPad] {}; // vector of outputs from Rport to down the tree
 };
 } // namespace chowdsp::wdft
