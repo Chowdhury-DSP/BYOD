@@ -51,11 +51,12 @@ void JuniorB::prepare (double sampleRate, int samplesPerBlock)
     dryBuffer.setMaxSize (2, samplesPerBlock);
 
     // pre-buffering
+    ScopedValueSetter svs { preBuffering, true };
     AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 10000; i += samplesPerBlock)
+    for (int i = 0; i < 5000; i += samplesPerBlock)
     {
         buffer.clear();
-        processAudio (buffer); // @TODO: let's make sure we're pre-buffering all the stages
+        processAudio (buffer);
     }
 }
 
@@ -69,13 +70,11 @@ void JuniorB::processAudio (AudioBuffer<float>& buffer)
 
     const auto drivePercent = driveParamPct->getCurrentValue();
     const auto blendPercent = blendParamPct->getCurrentValue();
-    const auto numStages = stagesParam->getIndex() + 1;
+    const auto numStages = ! preBuffering ? stagesParam->getIndex() + 1 : maxNumStages;
 
     driveGain.setGainDecibels (drivePercent * 12.0f);
     driveGain.process (buffer);
-
-    // @TODO: improve performance (matrix multiply?)
-    // Also, I think we're sometimes getting NaNs from this, but it always seems to be triggered on initialization?
+    
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* x = buffer.getWritePointer (ch);
@@ -90,7 +89,7 @@ void JuniorB::processAudio (AudioBuffer<float>& buffer)
     const auto dryGainLinear = std::sin (0.5f * MathConstants<float>::pi * (1.0f - blendPercent));
     const auto wetGainLinear = std::sin (0.5f * MathConstants<float>::pi * blendPercent);
     const auto polarityGain = numStages % 2 == 1 ? -1.0f : 1.0f;
-    const auto makeupGainDB = (-15.0f + 9.0f * (1.0f - drivePercent)) * std::pow ((float) numStages, 0.25f); // @TODO: this gain normalization get's a bit wonky at 3-4 stages
+    const auto makeupGainDB = (-15.0f + 9.0f * (1.0f - drivePercent)) * std::pow ((float) numStages, 0.2f);
     const auto makeupGain = polarityGain * juce::Decibels::decibelsToGain (makeupGainDB);
     wetGain.setGainLinear (wetGainLinear * makeupGain);
     dryGain.setGainLinear (dryGainLinear);
@@ -98,7 +97,5 @@ void JuniorB::processAudio (AudioBuffer<float>& buffer)
     wetGain.process (buffer);
     dryGain.process (dryBuffer);
 
-    // @TODO: use BufferMath::add...
-    for (int ch = 0; ch < numChannels; ++ch)
-        buffer.addFrom (ch, 0, dryBuffer.getReadPointer (ch), numSamples);
+    chowdsp::BufferMath::addBufferData (dryBuffer, buffer);
 }

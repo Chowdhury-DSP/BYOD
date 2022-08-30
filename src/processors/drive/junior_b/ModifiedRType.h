@@ -15,9 +15,7 @@ namespace rtype_detail
         // input vector (a) of size 1 x nRows
         // output vector (b) of size 1 x nCols
 
-#if 0 // defined(XSIMD_HPP)
-        // @TODO: actually implement this...
-#else // No SIMD
+// No SIMD for now
         for (int r = 0; r < nRows; ++r)
             b_[r] = (T) 0;
 
@@ -26,10 +24,8 @@ namespace rtype_detail
             for (int r = 0; r < nRows; ++r)
                 b_[r] += S_[c][r] * a_[c];
         }
-#endif // SIMD options
     }
-
-}
+} // namespace rtype_detail
 
 template <typename T, int numUpPorts, typename ImpedanceCalculator, typename... PortTypes>
 class RtypeAdaptorMultN : public BaseWDF
@@ -49,7 +45,8 @@ public:
         for (int i = 0; i < numUpPorts; i++)
             b_up_vec[i] = (T) 0;
 
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t) { port.connectToParent (this); },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t)
+                                      { port.connectToParent (this); },
                                       downPorts);
     }
 
@@ -62,7 +59,8 @@ public:
     constexpr auto getPortImpedances()
     {
         std::array<T, numDownPorts> portImpedances {};
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) { portImpedances[i] = port.wdf.R; },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      { portImpedances[i] = port.wdf.R; },
                                       downPorts);
 
         return portImpedances;
@@ -92,31 +90,33 @@ public:
         for (int i = 0; i < numDownPorts; ++i)
             mat_mul_vec[numUpPorts + i] = a_down_vec[i];
 
-        rtype_detail::VecMatMult<T, numDownPorts, numUpPorts + numDownPorts> (S21_S22, mat_mul_vec, b_down_vec);
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
-                                          port.incident (b_down_vec[i]); },
+        rtype_detail::VecMatMult<T, numDownPortsPad, numUpPorts + numDownPorts> (S21_S22, mat_mul_vec, b_down_vec);
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      { port.incident (b_down_vec[i]); },
                                       downPorts);
     }
 
     /** Computes the reflected wave */
     inline T* reflected() noexcept
     {
-        rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {
-                                          a_down_vec[i] = port.reflected(); },
+        rtype_detail::forEachInTuple ([&] (auto& port, size_t i)
+                                      { a_down_vec[i] = port.reflected(); },
                                       downPorts);
 
-        rtype_detail::VecMatMult<T, numUpPorts, numDownPorts> (S12, a_down_vec, b_up_vec);
+        rtype_detail::VecMatMult<T, numUpPortsPad, numDownPorts> (S12, a_down_vec, b_up_vec);
         return b_up_vec;
     }
 
 private:
     std::tuple<PortTypes&...> downPorts; // tuple of ports connected to RtypeAdaptor
 
-    rtype_detail::Matrix<T, numUpPorts, numDownPorts> S12;
-    rtype_detail::Matrix<T, numDownPorts, numUpPorts + numDownPorts> S21_S22;
+    static constexpr int numUpPortsPad = Math::ceiling_divide (numUpPorts, 4) * 4;
+    static constexpr int numDownPortsPad = Math::ceiling_divide (numDownPorts, 4) * 4;
+    rtype_detail::Matrix<T, numUpPortsPad, numDownPorts> S12 {};
+    rtype_detail::Matrix<T, numDownPortsPad, numUpPorts + numDownPorts> S21_S22 {};
 
-    T a_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPorts]; // vector of inputs to Rport from down the tree
-    T b_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPorts]; // vector of outputs from Rport to down the tree
-    T b_up_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numUpPorts]; // vector of outputs from Rport to down the tree
+    T a_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPorts]{}; // vector of inputs to Rport from down the tree
+    T b_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPortsPad]{}; // vector of outputs from Rport to down the tree
+    T b_up_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numUpPortsPad]{}; // vector of outputs from Rport to down the tree
 };
-}
+} // namespace chowdsp::wdft

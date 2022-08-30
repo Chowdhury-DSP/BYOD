@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include "EluApprox.h"
 
 constexpr int triodeModelNumInputs = 2;
 constexpr int triodeModelNumOutputs = 2;
@@ -13,6 +14,9 @@ using TriodeModelReLu = TriodeModelType<T, NLayers, HiddenSize, RTNeural::ReLuAc
 
 template <typename T, int NLayers, int HiddenSize>
 using TriodeModelELu = TriodeModelType<T, NLayers, HiddenSize, RTNeural::ELuActivationT<T, HiddenSize>>;
+
+template <typename T, int NLayers, int HiddenSize>
+using TriodeModelELuApprox = TriodeModelType<T, NLayers, HiddenSize, ELuActivationApproxT<T, HiddenSize>>;
 
 template <typename T, int HiddenSize, typename ActivationType>
 struct TriodeModelType<T, 2, HiddenSize, ActivationType>
