@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../../utility/DCBlocker.h"
 #include "JuniorBWDF.h"
 #include "NeuralTriodeModel.h"
 #include "processors/BaseProcessor.h"
-#include "../../utility/DCBlocker.h"
 
 class JuniorB : public BaseProcessor
 {
