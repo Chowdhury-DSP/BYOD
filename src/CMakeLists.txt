@@ -71,6 +71,7 @@ target_sources(BYOD PRIVATE
     processors/drive/diode_circuits/DiodeRectifier.cpp
     processors/drive/hysteresis/Hysteresis.cpp
     processors/drive/hysteresis/HysteresisProcessing.cpp
+    processors/drive/junior_b/JuniorB.cpp
     processors/drive/king_of_tone/KingOfToneDrive.cpp
     processors/drive/mxr_distortion/MXRDistortion.cpp
     processors/drive/neural_utils/ResampledRNN.cpp
