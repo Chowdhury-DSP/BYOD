@@ -59,11 +59,11 @@ jobs:
       shell: bash
       env:
         CMAKE_ARGS: ${{ matrix.cmake_args }}
-      run: cmake -Bbuild $CMAKE_ARGS
+      run: cmake -Bbuild -DBYOD_BUILD_ADD_ON_MODULES=ON $CMAKE_ARGS
 
     - name: Build
       shell: bash
-      run: cmake --build build --config Release -DBYOD_BUILD_ADD_ON_MODULES=ON --parallel 4
+      run: cmake --build build --config Release --parallel 4
 
     - name: Unit Tests
       if: runner.os == 'Linux'
