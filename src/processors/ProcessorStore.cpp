@@ -50,6 +50,10 @@
 #include "utility/StereoSplitter.h"
 #include "utility/Tuner.h"
 
+#if BYOD_ENABLE_ADD_ON_MODULES
+#include <AddOnProcessorStore.h>
+#endif
+
 template <typename ProcType>
 static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 {
@@ -106,6 +110,10 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Rotary", &processorFactory<Rotary> },
     { "Tremolo", &processorFactory<Tremolo> },
     { "Spring Reverb", &processorFactory<SpringReverbProcessor> },
+
+#if BYOD_ENABLE_ADD_ON_MODULES
+    BYOD_STORE_MAP_ADD_ON_MODULES
+#endif
 };
 
 ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)

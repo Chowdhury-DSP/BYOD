@@ -139,3 +139,8 @@ if(IOS)
             XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
             XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
 endif()
+
+option(BYOD_BUILD_ADD_ON_MODULES "Build BYOD with add-on modules" ON)
+if(BYOD_BUILD_ADD_ON_MODULES)
+    add_subdirectory(modules/BYOD-add-ons)
+endif()

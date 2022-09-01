@@ -10,6 +10,9 @@ on:
     - main
     - develop
 
+  repository_dispatch:
+    types: [add_ons_push]
+
   workflow_dispatch:
 
 jobs:
@@ -44,6 +47,14 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Checkout add-ons
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        repository: Chowdhury-DSP/BYOD-add-ons
+        path: modules/BYOD-add-ons
+        token: ${{ secrets.OUR_GITHUB_PAT }}
+
     - name: Configure
       shell: bash
       env:
@@ -52,7 +63,7 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --config Release --parallel 4
+      run: cmake --build build --config Release -DBYOD_BUILD_ADD_ON_MODULES=ON --parallel 4
 
     - name: Unit Tests
       if: runner.os == 'Linux'
