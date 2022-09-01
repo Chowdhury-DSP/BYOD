@@ -10,6 +10,9 @@ on:
     - main
     - develop
 
+  repository_dispatch:
+    types: [add_ons_push]
+
   workflow_dispatch:
 
 jobs:
@@ -27,9 +30,17 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Checkout add-ons
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        repository: Chowdhury-DSP/BYOD-add-ons
+        path: modules/BYOD-add-ons
+        token: ${{ secrets.OUR_GITHUB_PAT }}
+
     - name: Configure
       shell: bash
-      run: cmake -Bbuild -GXcode -D"CMAKE_OSX_ARCHITECTURES=arm64"
+      run: cmake -Bbuild -GXcode -DBYOD_BUILD_ADD_ON_MODULES=ON -D"CMAKE_OSX_ARCHITECTURES=arm64"
 
     - name: Build
       shell: bash

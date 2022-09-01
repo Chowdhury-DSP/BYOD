@@ -4,6 +4,8 @@ cmake-build*/
 bin/
 *.exe
 
+*add-ons*
+
 # IDE extras
 .vscode/
 .idea/
