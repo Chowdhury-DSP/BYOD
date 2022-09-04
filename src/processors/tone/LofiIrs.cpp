@@ -85,6 +85,8 @@ void LofiIrs::prepare (double sampleRate, int samplesPerBlock)
 
     dryWetMixer.prepare (spec);
     dryWetMixerMono.prepare ({ sampleRate, (uint32) samplesPerBlock, 1 });
+
+    makeupGainDB = Decibels::gainToDecibels (std::sqrt (96000.0f / (float) sampleRate));
 }
 
 void LofiIrs::processAudio (AudioBuffer<float>& buffer)
@@ -96,7 +98,7 @@ void LofiIrs::processAudio (AudioBuffer<float>& buffer)
     dsp::ProcessContextReplacing<float> context (block);
 
     dryWet.setWetMixProportion (mixParam->load());
-    gain.setGainDecibels (gainParam->load());
+    gain.setGainDecibels (gainParam->load() + makeupGainDB);
 
     dryWet.pushDrySamples (block);
     convolution.process (context);

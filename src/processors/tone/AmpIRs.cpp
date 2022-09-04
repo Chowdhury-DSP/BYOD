@@ -60,6 +60,11 @@ ParamLayout AmpIRs::createParameterLayout()
     return { params.begin(), params.end() };
 }
 
+void AmpIRs::setMakeupGain (float irSampleRate)
+{
+    makeupGainDB.store (Decibels::gainToDecibels (std::sqrt (irSampleRate / fs)));
+}
+
 void AmpIRs::parameterChanged (const String& parameterID, float newValue)
 {
     if (parameterID != irTag)
@@ -73,18 +78,47 @@ void AmpIRs::parameterChanged (const String& parameterID, float newValue)
     auto& irData = irMap[irName];
     curFile = File();
 
+    setMakeupGain (96000.0f);
+
     ScopedLock sl (irMutex);
     convolution.loadImpulseResponse (irData.first, irData.second, dsp::Convolution::Stereo::yes, dsp::Convolution::Trim::yes, 0);
 }
 
 void AmpIRs::loadIRFromFile (const File& file)
 {
-    if (! file.existsAsFile())
+    auto failToLoad = [this] (const File& f, const String& message)
     {
-        irFiles.removeAllInstancesOf (file);
-        AlertWindow::showMessageBoxAsync (AlertWindow::AlertIconType::WarningIcon, "IR File Not Found!", "The following IR file was not found: " + file.getFullPathName());
+        irFiles.removeAllInstancesOf (f);
+        AlertWindow::showMessageBoxAsync (AlertWindow::AlertIconType::WarningIcon, "Unable to load IR!", message);
         vts.getParameter (irTag)->setValueNotifyingHost (0.0f);
         curFile = File();
+    };
+
+    if (! file.existsAsFile())
+    {
+        failToLoad (file, "The following IR file was not found: " + file.getFullPathName());
+        return;
+    }
+
+    AudioFormatManager manager;
+    manager.registerBasicFormats();
+    std::unique_ptr<AudioFormatReader> formatReader (manager.createReaderFor (std::make_unique<FileInputStream> (file)));
+
+    if (formatReader == nullptr)
+    {
+        failToLoad (file, "The following IR file was not valid: " + file.getFullPathName());
+        return;
+    }
+
+    const auto fileLength = static_cast<size_t> (formatReader->lengthInSamples);
+    AudioBuffer<float> resultBuffer { jlimit (1, 2, static_cast<int> (formatReader->numChannels)), static_cast<int> (fileLength) };
+
+    if (! formatReader->read (resultBuffer.getArrayOfWritePointers(),
+                              resultBuffer.getNumChannels(),
+                              0,
+                              resultBuffer.getNumSamples()))
+    {
+        failToLoad (file, "Unable to read from IR file: " + file.getFullPathName());
         return;
     }
 
@@ -93,12 +127,16 @@ void AmpIRs::loadIRFromFile (const File& file)
     irChangedBroadcaster();
     vts.getParameter (irTag)->setValueNotifyingHost (1.0f);
 
+    setMakeupGain ((float) formatReader->sampleRate);
+
     ScopedLock sl (irMutex);
-    convolution.loadImpulseResponse (file, dsp::Convolution::Stereo::yes, dsp::Convolution::Trim::yes, 0);
+    convolution.loadImpulseResponse (std::move (resultBuffer), formatReader->sampleRate, dsp::Convolution::Stereo::yes, dsp::Convolution::Trim::yes, dsp::Convolution::Normalise::yes);
 }
 
 void AmpIRs::prepare (double sampleRate, int samplesPerBlock)
 {
+    fs = (float) sampleRate;
+
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
     convolution.prepare (spec);
 
@@ -107,6 +145,11 @@ void AmpIRs::prepare (double sampleRate, int samplesPerBlock)
 
     dryWetMixer.prepare (spec);
     dryWetMixerMono.prepare ({ sampleRate, (uint32) samplesPerBlock, 1 });
+
+    if (curFile == File {})
+        parameterChanged (irTag, vts.getRawParameterValue (irTag)->load());
+    else
+        loadIRFromFile (curFile);
 }
 
 void AmpIRs::processAudio (AudioBuffer<float>& buffer)
@@ -118,7 +161,7 @@ void AmpIRs::processAudio (AudioBuffer<float>& buffer)
     dsp::ProcessContextReplacing<float> context (block);
 
     dryWet.setWetMixProportion (mixParam->load());
-    gain.setGainDecibels (gainParam->load());
+    gain.setGainDecibels (gainParam->load() + makeupGainDB.load());
 
     dryWet.pushDrySamples (block);
     convolution.process (context);
