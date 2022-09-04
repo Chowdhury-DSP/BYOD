@@ -100,7 +100,9 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const juce::P
     if (compUnderMouse != nullptr)
     {
         const auto* port = result.editor->getPort (result.portIndex, result.isInput);
-        if (! sst::cpputils::contains (std::array<const Component*, 3> { board, result.editor, port }, compUnderMouse))
+
+        const auto isCableUnderMouse = compUnderMouse->getName() == Cable::componentName.data();
+        if (! (isCableUnderMouse || sst::cpputils::contains (std::array<const Component*, 3> { board, result.editor, port }, compUnderMouse)))
             return {}; // wrong component under the mouse!
     }
 

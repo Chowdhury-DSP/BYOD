@@ -35,7 +35,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
     addAndMakeVisible (newProcButton);
     newProcButton.onClick = [&]
     {
-        addingFromNewProcButton = true;
+        ScopedValueSetter svs { addingFromNewProcButton, true };
         popupMenu.showPopupMenu();
     };
 
@@ -65,7 +65,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
 
     popupMenu.setAssociatedComponent (this);
     popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
-    { showNewProcMenu (menu, options); };
+    {
+        menu.addSectionHeader ("Add Processor:");
+        menu.addSeparator();
+        showNewProcMenu (menu, options);
+    };
 }
 
 BoardComponent::~BoardComponent()
@@ -170,7 +174,6 @@ void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& optio
     if (addingFromNewProcButton)
     {
         nextEditorPosition = getRandomPosition (*this);
-        addingFromNewProcButton = false;
     }
     else
     {
