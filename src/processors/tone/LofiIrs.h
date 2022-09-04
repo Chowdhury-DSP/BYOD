@@ -26,6 +26,9 @@ private:
     dsp::Convolution convolution;
     dsp::Gain<float> gain;
 
+    float makeupGainDB = 0.0f;
+    float fs = 48000.0f;
+
     dsp::DryWetMixer<float> dryWetMixer;
     dsp::DryWetMixer<float> dryWetMixerMono;
 

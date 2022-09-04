@@ -23,6 +23,8 @@ public:
     void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
 
 private:
+    void setMakeupGain (float irSampleRate);
+
     std::atomic<float>* mixParam = nullptr;
     std::atomic<float>* gainParam = nullptr;
 
@@ -31,9 +33,11 @@ private:
 
     dsp::Convolution convolution { juce::dsp::Convolution::NonUniform { 256 } };
     dsp::Gain<float> gain;
+    std::atomic<float> makeupGainDB { 0.0f };
 
     dsp::DryWetMixer<float> dryWetMixer;
     dsp::DryWetMixer<float> dryWetMixerMono;
+    float fs = 48000.0f;
 
     Array<File> irFiles;
     File curFile = File();
