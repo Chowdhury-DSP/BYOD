@@ -88,7 +88,7 @@ private:
     };
 
     using RType = wdft::RootRtypeAdaptor<float, ImpedanceCalc, decltype (P1), decltype (S1), decltype (P2_low), decltype (P2_high), decltype (R11), decltype (S3)>;
-    RType R { std::tie (P1, S1, P2_low, P2_high, R11, S3) };
+    RType R { P1, S1, P2_low, P2_high, R11, S3 };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TubeScreamerToneWDF)
 };

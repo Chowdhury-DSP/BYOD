@@ -77,7 +77,7 @@ private:
         }
     };
 
-    wdft::RootRtypeAdaptor<float, ImpedanceCalc, decltype (S1), decltype (S3), decltype (S2), Cap, Res, Cap> R { std::tie (S1, S3, S2, Cap2, Res4, Cap3) };
+    wdft::RootRtypeAdaptor<float, ImpedanceCalc, decltype (S1), decltype (S3), decltype (S2), Cap, Res, Cap> R { S1, S3, S2, Cap2, Res4, Cap3 };
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> pot1Smooth, pot2Smooth, pot3Smooth;
 

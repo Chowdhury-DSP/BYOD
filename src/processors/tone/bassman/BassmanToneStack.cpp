@@ -13,16 +13,22 @@ void BassmanToneStack::prepare (double sr)
 
 void BassmanToneStack::setSMatrixData()
 {
-    auto pot1 = pot1Smooth.getNextValue();
-    Res1m.setResistanceValue (pot1 * R1);
-    Res1p.setResistanceValue ((1.0f - pot1) * R1);
+    {
+        chowdsp::wdft::ScopedDeferImpedancePropagation deferImpedance { S1, S3, S4 };
 
-    auto pot2 = pot2Smooth.getNextValue();
-    Res2.setResistanceValue (pot2 * R2);
+        auto pot1 = pot1Smooth.getNextValue();
+        Res1m.setResistanceValue (pot1 * R1);
+        Res1p.setResistanceValue ((1.0f - pot1) * R1);
 
-    auto pot3 = pot3Smooth.getNextValue();
-    Res3m.setResistanceValue (pot3 * R3);
-    Res3p.setResistanceValue ((1.0f - pot3) * R3);
+        auto pot2 = pot2Smooth.getNextValue();
+        Res2.setResistanceValue (pot2 * R2);
+
+        auto pot3 = pot3Smooth.getNextValue();
+        Res3m.setResistanceValue (pot3 * R3);
+        Res3p.setResistanceValue ((1.0f - pot3) * R3);
+    }
+
+    S2.propagateImpedanceChange();
 }
 
 void BassmanToneStack::process (float* buffer, const int numSamples) noexcept

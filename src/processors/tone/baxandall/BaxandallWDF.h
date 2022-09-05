@@ -83,7 +83,7 @@ private:
     };
 
     using RType = wdft::RtypeAdaptor<float, 5, ImpedanceCalc, decltype (S4), decltype (P1), decltype (Resc), decltype (S3), decltype (S2)>;
-    RType R { std::tie (S4, P1, Resc, S3, S2) };
+    RType R { S4, P1, Resc, S3, S2 };
 
     // Port F
     wdft::CapacitorT<float> Ca { 1.0e-6f };
