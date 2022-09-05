@@ -80,7 +80,7 @@ struct JuniorBWDF
     };
 
     using RType = wdft::RtypeAdaptorMultN<Float, 2, ImpedanceCalc, decltype (P1), decltype (P2), decltype (P3)>;
-    RType R { std::tie (P1, P2, P3) };
+    RType R { P1, P2, P3 };
 
     TriodeModelType& triode_model;
 };

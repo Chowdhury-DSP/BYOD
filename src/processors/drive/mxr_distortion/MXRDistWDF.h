@@ -83,7 +83,7 @@ private:
         }
     };
 
-    wdft::RtypeAdaptor<float, 3, ImpedanceCalc, decltype (R4), decltype (P2), decltype (S4)> R { std::tie (R4, P2, S4) };
+    wdft::RtypeAdaptor<float, 3, ImpedanceCalc, decltype (R4), decltype (P2), decltype (S4)> R { R4, P2, S4 };
 
     // Port D
     wdft::ResistorT<float> R5 { 10.0e3f };

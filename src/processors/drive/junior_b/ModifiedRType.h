@@ -34,7 +34,7 @@ public:
     /** Number of ports connected to RtypeAdaptor */
     static constexpr auto numDownPorts = int (sizeof...(PortTypes));
 
-    explicit RtypeAdaptorMultN (std::tuple<PortTypes&...> dps) : downPorts (dps)
+    explicit RtypeAdaptorMultN (PortTypes&... dps) : downPorts (std::tie (dps...))
     {
         for (int i = 0; i < numDownPorts; i++)
         {

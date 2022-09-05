@@ -109,7 +109,7 @@ private:
         }
     };
 
-    wdft::RtypeAdaptor<float, 0, ImpedanceCalc, decltype (P1), decltype (S2), decltype (RL)> R { std::tie (P1, S2, RL) };
+    wdft::RtypeAdaptor<float, 0, ImpedanceCalc, decltype (P1), decltype (S2), decltype (RL)> R { P1, S2, RL };
 
     // Port A
     static constexpr auto R9 = 500.0e3f;
