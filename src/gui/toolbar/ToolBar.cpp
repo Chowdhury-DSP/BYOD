@@ -37,6 +37,7 @@ void ToolBar::resized()
 
     bounds.removeFromLeft (3);
     globalParamControls.setBounds (bounds.removeFromLeft (proportionOfWidth (0.55f)));
+    bounds.removeFromLeft (3);
 
     settingsButton.setBounds (bounds.removeFromRight (getHeight()).reduced (4));
     cpuMeter.setBounds (bounds.removeFromRight (proportionOfWidth (0.04f)).reduced (3, 6));

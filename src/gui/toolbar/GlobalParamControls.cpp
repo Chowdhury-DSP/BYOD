@@ -71,7 +71,7 @@ void GlobalParamControls::resized()
         box->setBounds (bounds.removeFromLeft (proportionOfWidth (compProportion)).reduced (3, 5));
 
     for (auto& slider : sliders)
-        slider->setBounds (bounds.removeFromLeft (jmin (proportionOfWidth (compProportion), 125)).reduced (2, 3));
+        slider->setBounds (bounds.removeFromLeft (proportionOfWidth (compProportion)).reduced (2, 3));
 
     osMenu.setBounds (bounds.removeFromLeft (proportionOfWidth (compProportion)).reduced (2, 5));
 }

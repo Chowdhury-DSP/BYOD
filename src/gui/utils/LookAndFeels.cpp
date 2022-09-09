@@ -185,22 +185,29 @@ Font BottomBarLNF::getFontForSliderHeight (int height)
     return { jmin ((float) height * 0.5f, 19.0f) };
 }
 
-void BottomBarLNF::drawRotarySlider (Graphics& g, int, int, int, int height, float, const float, const float, Slider& slider)
+void BottomBarLNF::drawRotarySlider (Graphics& g, int x, int y, int, int height, float, const float, const float, Slider& slider)
 {
     g.setColour (Colours::white); // @TODO: make colour selectable
     g.setFont (getFontForSliderHeight (height).boldened());
 
     String text = slider.getName() + ": ";
     int width = getNameWidth (height, text);
-    g.drawFittedText (text, 0, 0, width, height, Justification::centred, 1);
+    g.drawFittedText (text, x, y, width, height, Justification::right, 1);
 }
 
 Slider::SliderLayout BottomBarLNF::getSliderLayout (Slider& slider)
 {
+    const auto fullWidth = slider.getWidth();
+    const auto nameTextWidth = getNameWidth (slider.getHeight(), slider.getName() + ":_");
+    const auto labelTextWidth = getNameWidth (slider.getHeight(), "_______");
+    static constexpr int middlePadding = 5;
+    const auto sidePadding = (fullWidth - (nameTextWidth + middlePadding + labelTextWidth)) / 2;
+
     auto layout = LookAndFeel_V4::getSliderLayout (slider);
-    layout.textBoxBounds = slider.getLocalBounds()
-                               .removeFromRight (slider.getWidth()
-                                                 - getNameWidth (slider.getHeight(), slider.getName() + ":_") + 3);
+    auto centeredSliderBounds = slider.getLocalBounds().withSizeKeepingCentre (fullWidth - 2 * sidePadding, slider.getHeight());
+    layout.sliderBounds = centeredSliderBounds.removeFromLeft (nameTextWidth);
+    layout.textBoxBounds = centeredSliderBounds;
+
     return layout;
 }
 
@@ -210,6 +217,7 @@ Label* BottomBarLNF::createSliderTextBox (Slider& slider)
     label->setInterceptsMouseClicks (false, false);
     label->setColour (Label::outlineColourId, Colours::transparentBlack);
     label->setColour (Label::outlineWhenEditingColourId, Colours::transparentBlack);
+    label->setColour (TextEditor::backgroundColourId, Colours::red);
     label->setJustificationType (Justification::left);
     label->setFont (getFontForSliderHeight (slider.getHeight()).boldened());
 
@@ -217,7 +225,7 @@ Label* BottomBarLNF::createSliderTextBox (Slider& slider)
     {
         if (auto* editor = label->getCurrentTextEditor())
         {
-            editor->setBounds (label->getLocalBounds());
+            editor->setBounds (label->getLocalBounds().withHeight (label->getHeight() - 3));
             editor->setColour (CaretComponent::caretColourId, Colour (0xFFC954D4));
             editor->setColour (TextEditor::backgroundColourId, Colours::transparentBlack);
             editor->setJustification (Justification::left);
