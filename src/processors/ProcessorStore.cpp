@@ -160,30 +160,39 @@ void ProcessorStore::duplicateProcessor (BaseProcessor& procToDuplicate)
 template <typename FilterType>
 void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, FilterType&& filter, BaseProcessor* procToReplace, ConnectionInfo* connectionInfo)
 {
+#if BYOD_ENABLE_ADD_ON_MODULES
+    auto addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
+#endif
+
     for (auto type : { Drive, Tone, Utility, Other })
     {
         PopupMenu subMenu;
-        for (auto& procDesc : store.store)
+        for (const auto& [procName, procCreator] : store.store)
         {
-            const auto& procInfo = store.procTypeStore.at (procDesc.first);
+            const auto& procInfo = store.procTypeStore.at (procName);
 
             if (procInfo.type != type)
                 continue;
 
-            if (! filter (procDesc.first, procInfo))
+            if (! filter (procName, procInfo))
                 continue;
 
+#if BYOD_ENABLE_ADD_ON_MODULES
+            if (! addOnProcessorStore->isModuleAvailable (procName))
+                continue;
+#endif
+            
             PopupMenu::Item item;
             item.itemID = ++menuID;
-            item.text = procDesc.first;
-            item.action = [&store, &procDesc, procToReplace, connectionInfo]
+            item.text = procName;
+            item.action = [&store, &procCreator = procCreator, procToReplace, connectionInfo]
             {
                 if (connectionInfo != nullptr)
-                    store.replaceConnectionWithProcessorCallback (procDesc.second (store.undoManager), *connectionInfo);
+                    store.replaceConnectionWithProcessorCallback (procCreator (store.undoManager), *connectionInfo);
                 else if (procToReplace != nullptr)
-                    store.replaceProcessorCallback (procDesc.second (store.undoManager), procToReplace);
+                    store.replaceProcessorCallback (procCreator (store.undoManager), procToReplace);
                 else
-                    store.addProcessorCallback (procDesc.second (store.undoManager));
+                    store.addProcessorCallback (procCreator (store.undoManager));
             };
 
             subMenu.addItem (item);

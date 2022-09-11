@@ -49,11 +49,17 @@ void SettingsButton::showSettingsMenu()
     openGLManu (menu, 300);
 
     menu.addSeparator();
-    menu.addItem ("View Source Code", [=]
+    menu.addItem ("View Source Code", []
                   { URL ("https://github.com/Chowdhury-DSP/BYOD").launchInDefaultBrowser(); });
 
-    menu.addItem ("Copy Diagnostic Info", [=]
+    menu.addItem ("Copy Diagnostic Info", [this]
                   { copyDiagnosticInfo(); });
+
+#if BYOD_ENABLE_ADD_ON_MODULES
+    menu.addSeparator();
+    menu.addItem ("Purchase Add-On Modules", [this]
+                  { modulePacksDialog.show(); });
+#endif
 
     auto options = PopupMenu::Options()
                        .withParentComponent (getParentComponent()->getParentComponent()) // BYODPluginEditor
