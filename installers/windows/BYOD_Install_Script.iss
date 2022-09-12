@@ -39,9 +39,9 @@ Name: "CLAP_64"; Description: "CLAP Plugin"; Types: full
 [Files]
 Source: "../../bin/Win64/BYOD.vst3"; Excludes: "*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST3_64}"; Components: VST3_64; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win64/BYOD.dll"; Excludes: "*.vst3,*.aaxplugin,*.clap"; DestDir: "{code:GetDir|VST_64}"; Components: VST_64; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "../../Bin/Win64/BYOD.clap"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{code:GetDir|CLAP_64}"; Components: CLAP_64; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win64/BYOD.exe"; Excludes: "*.vst3,*.aaxplugin,*.clap"; DestDir: "{code:GetDir|Standalone}"; Components: Standalone; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "../../bin/Win64/BYOD.aaxplugin"; Excludes: "*.vst3,*.clap"; DestDir: "{code:GetDir|AAX}"; Components: AAX; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "../../Bin/Win64/BYOD.clap"; Excludes: "*.vst3,*.aaxplugin"; DestDir: "{commoncf64}\CLAP"; Components: CLAP_64; Flags: ignoreversion recursesubdirs createallsubdirs
 
 
 [Icons]
@@ -166,6 +166,8 @@ begin
     Result := Vst_64DirPage.values[0]
   else if (Param = 'Standalone') then
     Result := StandaloneDirPage.values[0]
+  else if (Param = 'CLAP_64') then
+    Result := ExpandConstant('{commoncf64}\CLAP')
 end;
 
 function UpdateReadyMemo(Space, NewLine, MemoUserInfoInfo, MemoDirInfo, MemoTypeInfo,
@@ -187,6 +189,9 @@ begin
 
   if IsSelected('vst_64') then
     S := S + Space +  GetDir('VST_64') + ' (VST 64-bit)' + NewLine;
+
+  if IsSelected('clap_64') then
+    S := S + Space +  GetDir('CLAP_64') + ' (CLAP 64-bit)' + NewLine;
 
   if IsSelected('standalone') then
     S := S + Space +  GetDir('Standalone') + ' (Standalone)' + NewLine;
