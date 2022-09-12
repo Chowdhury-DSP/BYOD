@@ -5,6 +5,8 @@
 #include "state/ParamForwardManager.h"
 #include "state/StateManager.h"
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wattributes", "-Woverloaded-virtual")
+
 class BYOD : public chowdsp::PluginBase<BYOD>
 {
 public:
@@ -54,3 +56,5 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BYOD)
 };
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
