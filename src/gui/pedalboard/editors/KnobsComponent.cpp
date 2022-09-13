@@ -53,7 +53,9 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         addAndMakeVisible (newButton.get());
         newButton->setButtonText (param->name);
         newButton->setClickingTogglesState (true);
-        newButton->setColour (TextButton::buttonOnColourId, Colours::red);
+        newButton->setColour (TextButton::buttonColourId, contrastColour.withAlpha (0.4f));
+        newButton->setColour (TextButton::buttonOnColourId, accentColour);
+        newButton->setColour (TextButton::textColourOnId, contrastColour);
 
         newButton->attachment = std::make_unique<ButtonAttachment> (vts, param->paramID, *newButton);
 
