@@ -15,6 +15,8 @@
 
 #include "SurgeWaveshapers.h"
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wstrict-aliasing")
+
 namespace SurgeWaveshapers
 {
 StringArray wst_names = {
@@ -793,3 +795,5 @@ void initializeWaveshaperRegister (int /*type*/, float R[n_waveshaper_registers]
         R[i] = 0.f;
 }
 } // namespace SurgeWaveshapers
+
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
