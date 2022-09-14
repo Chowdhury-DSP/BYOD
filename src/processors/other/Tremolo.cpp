@@ -19,7 +19,7 @@ static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& bl
 }
 } // namespace
 
-Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLayout(), um)
+Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLayout(), um, 2, 2)
 {
     rateParam = vts.getRawParameterValue ("rate");
     waveParam = vts.getRawParameterValue ("wave");
@@ -29,6 +29,8 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.powerColour = Colours::cyan.brighter();
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+    
+    routeExternalModulation();
 }
 
 ParamLayout Tremolo::createParameterLayout()

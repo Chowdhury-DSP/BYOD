@@ -51,16 +51,36 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
 
     for (int i = 0; i < baseProc.getNumInputs(); ++i)
     {
-        auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour));
-        newPort->setInputOutput (true);
-        addAndMakeVisible (newPort);
+        if(baseProc.hasModulationPorts() && i == baseProc.getNumInputs() - 1)
+        {
+            auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour, modulation));
+            newPort->setInputOutput (true);
+            addAndMakeVisible (newPort);
+        }
+        else
+        {
+            auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour, regular));
+            newPort->setInputOutput (true);
+            addAndMakeVisible (newPort);
+        }
+
     }
 
     for (int i = 0; i < baseProc.getNumOutputs(); ++i)
     {
-        auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour));
-        newPort->setInputOutput (false);
-        addAndMakeVisible (newPort);
+        if(baseProc.hasModulationPorts() && i == baseProc.getNumInputs() - 1)
+        {
+            auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour, modulation));
+            newPort->setInputOutput (false);
+            addAndMakeVisible (newPort);
+        }
+        else
+        {
+            auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour, regular));
+            newPort->setInputOutput (false);
+            addAndMakeVisible (newPort);
+        }
+
     }
 }
 

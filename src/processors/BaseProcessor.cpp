@@ -10,7 +10,7 @@ BaseProcessor::BaseProcessor (const String& name,
                                               numOutputs (nOutputs)
 {
     onOffParam = vts.getRawParameterValue ("on_off");
-
+ 
     outputBuffers.resize (jmax (1, numOutputs));
     outputBuffers.fill (nullptr);
     outputConnections.resize (numOutputs);
@@ -240,4 +240,14 @@ void BaseProcessor::setPosition (juce::Point<int> pos, Rectangle<int> parentBoun
 juce::Point<int> BaseProcessor::getPosition (Rectangle<int> parentBounds)
 {
     return (editorPosition * juce::Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() }).toInt();
+}
+
+bool BaseProcessor::hasModulationPorts()
+{
+    return modulationPorts;
+}
+
+void BaseProcessor::routeExternalModulation()
+{
+    modulationPorts = true;
 }
