@@ -2,7 +2,11 @@
 
 #include <pch.h>
 
-enum PortType {regular, modulation};
+enum PortType
+{
+    regular,
+    modulation
+};
 
 class Port : public Component
 {
@@ -13,10 +17,10 @@ public:
     void setConnectionStatus (bool connectionStatus);
 
     void paint (Graphics& g) override;
-    
+
 private:
     Colour getPortColour();
-    
+
     bool isInput = false;
     bool isConnected = false;
 

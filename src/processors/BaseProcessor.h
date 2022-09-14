@@ -105,7 +105,7 @@ public:
     juce::Point<int> getPosition (Rectangle<int> parentBounds);
 
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
-    
+
     bool hasModulationPorts();
 
 protected:
@@ -114,7 +114,7 @@ protected:
     virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) {}
 
     void addPopupMenuParameter (const String& paramID);
-    
+
     virtual void routeExternalModulation(); // for now take 1st Input and second input and assign them to modulation signal
 
     AudioProcessorValueTreeState vts;
@@ -164,7 +164,7 @@ private:
 
     StringArray popupMenuParameterIDs;
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
-    
+
     bool modulationPorts = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)

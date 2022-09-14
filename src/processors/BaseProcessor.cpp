@@ -10,7 +10,7 @@ BaseProcessor::BaseProcessor (const String& name,
                                               numOutputs (nOutputs)
 {
     onOffParam = vts.getRawParameterValue ("on_off");
- 
+
     outputBuffers.resize (jmax (1, numOutputs));
     outputBuffers.fill (nullptr);
     outputConnections.resize (numOutputs);

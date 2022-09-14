@@ -29,7 +29,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.powerColour = Colours::cyan.brighter();
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
-    
+
     routeExternalModulation();
 }
 

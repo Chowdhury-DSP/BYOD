@@ -51,7 +51,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
 
     for (int i = 0; i < baseProc.getNumInputs(); ++i)
     {
-        if(baseProc.hasModulationPorts() && i == baseProc.getNumInputs() - 1)
+        if (baseProc.hasModulationPorts() && i == baseProc.getNumInputs() - 1)
         {
             auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour, modulation));
             newPort->setInputOutput (true);
@@ -63,12 +63,11 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
             newPort->setInputOutput (true);
             addAndMakeVisible (newPort);
         }
-
     }
 
     for (int i = 0; i < baseProc.getNumOutputs(); ++i)
     {
-        if(baseProc.hasModulationPorts() && i == baseProc.getNumInputs() - 1)
+        if (baseProc.hasModulationPorts() && i == baseProc.getNumInputs() - 1)
         {
             auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour, modulation));
             newPort->setInputOutput (false);
@@ -80,7 +79,6 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
             newPort->setInputOutput (false);
             addAndMakeVisible (newPort);
         }
-
     }
 }
 

@@ -1,18 +1,17 @@
 #include "Port.h"
 #include "../cables/CableDrawingHelpers.h"
 
-Port::Port (const Colour& processorColour, const PortType type) : procColour (processorColour), portType(type)
+Port::Port (const Colour& processorColour, const PortType type) : procColour (processorColour), portType (type)
 {
 }
 
-
 Colour Port::getPortColour()
 {
-    if(portType == modulation)
+    if (portType == modulation)
     {
         return Colours::rebeccapurple;
     }
-    else if(isInput)
+    else if (isInput)
     {
         return Colours::black;
     }
@@ -20,7 +19,6 @@ Colour Port::getPortColour()
     {
         return Colours::darkgrey;
     }
-    
 }
 
 void Port::paint (Graphics& g)

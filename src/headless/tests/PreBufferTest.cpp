@@ -45,15 +45,9 @@ public:
                 buffer.clear();
                 proc->processAudioBlock (buffer);
 
-                const auto steadyStateMax = [] (const auto& name)
-                {
-                    if (name == "Kiwi Bass Drive" || name == "Waterfall Drive")
-                        return 1.0e-4f;
-                    return 1.0e-5f;
-                }(proc->getName());
-                testBuffer (buffer.getReadPointer (0), steadyStateMax);
+                testBuffer (buffer.getReadPointer (0));
             },
-            StringArray { "Muff Drive" });
+            StringArray { "Muff Drive", "Kiwi Bass Drive" });
     }
 };
 
