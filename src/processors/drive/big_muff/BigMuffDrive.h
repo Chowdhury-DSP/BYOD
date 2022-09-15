@@ -22,6 +22,7 @@ private:
     std::atomic<float>* harmParam = nullptr;
     std::atomic<float>* levelParam = nullptr;
     std::atomic<float>* nStagesParam = nullptr;
+    std::atomic<float>* hiQParam = nullptr;
 
     chowdsp::FirstOrderLPF<float> inputFilter[2];
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> cutoffSmooth;

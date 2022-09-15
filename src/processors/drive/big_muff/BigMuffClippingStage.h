@@ -10,6 +10,7 @@ public:
     void prepare (double sampleRate);
     void reset();
 
+    template <bool highQuality>
     void processBlock (AudioBuffer<float>& buffer) noexcept;
 
 private:

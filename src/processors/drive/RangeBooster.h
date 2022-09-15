@@ -17,6 +17,7 @@ public:
 private:
     std::atomic<float>* rangeParam = nullptr;
     std::atomic<float>* boostParam = nullptr;
+    std::atomic<float>* hiQParam = nullptr;
 
     float fs = 48000.0f;
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> freqSmooth[2];
