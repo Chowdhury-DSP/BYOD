@@ -19,6 +19,9 @@ BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Muff Drive", crea
     harmParam = vts.getRawParameterValue ("harmonics");
     levelParam = vts.getRawParameterValue ("level");
     nStagesParam = vts.getRawParameterValue ("n_stages");
+    hiQParam = vts.getRawParameterValue ("high_q");
+
+    addPopupMenuParameter ("high_q");
 
     uiOptions.backgroundColour = Colours::darkgrey.brighter (0.3f).withRotatedHue (0.2f);
     uiOptions.powerColour = Colours::red.brighter (0.15f);
@@ -37,6 +40,7 @@ ParamLayout BigMuffDrive::createParameterLayout()
     createPercentParameter (params, "level", "Level", 0.65f);
 
     emplace_param<AudioParameterChoice> (params, "n_stages", "Stages", StringArray { "1 Stage", "2 Stages", "3 Stages", "4 Stages" }, 1);
+    emplace_param<AudioParameterBool> (params, "high_q", "High Quality", false);
 
     return { params.begin(), params.end() };
 }
@@ -146,8 +150,17 @@ void BigMuffDrive::processAudio (AudioBuffer<float>& buffer)
 
     processInputStage (buffer);
 
-    for (int i = 0; i < numStages; ++i)
-        stages[i].processBlock (buffer);
+    const auto useHighQualityMode = hiQParam->load() == 1.0f;
+    if (useHighQualityMode)
+    {
+        for (int i = 0; i < numStages; ++i)
+            stages[i].processBlock<true> (buffer);
+    }
+    else
+    {
+        for (int i = 0; i < numStages; ++i)
+            stages[i].processBlock<false> (buffer);
+    }
 
     for (int ch = 0; ch < numChannels; ++ch)
         dcBlocker[ch].processBlock (buffer.getWritePointer (ch), numSamples);

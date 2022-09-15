@@ -17,8 +17,6 @@ constexpr float twoIs_over_Vt = twoIs / Vt;
 constexpr float A = -10000.0f / 150.0f; // BJT Common-Emitter amp gain
 constexpr float VbiasA = 0.7f; // bias point after input filter
 
-constexpr int numIters = 4; // max number of Newton-Raphson iterations
-
 // compute sinh and cosh at the same time so it's faster...
 inline auto sinh_cosh (float x) noexcept
 {
@@ -37,6 +35,7 @@ inline auto sinh_cosh (float x) noexcept
     return std::make_pair (sinh, cosh);
 }
 
+template <int numIters>
 inline float newton_raphson (float x, float y, float C_12_state, float G_C_12) noexcept
 {
     for (int k = 0; k < numIters; ++k)
@@ -88,6 +87,7 @@ void BigMuffClippingStage::reset()
     }
 }
 
+template <bool highQuality>
 void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer) noexcept
 {
     const auto numChannels = buffer.getNumChannels();
@@ -103,7 +103,7 @@ void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer) noexcept
             auto u_n = inputFilter[ch].processSample (x[n]);
 
             // newton-raphson
-            float y_k = newton_raphson (u_n, y_1[ch], C_12_1[ch], G_C_12);
+            float y_k = newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12);
 
             // update state
             C_12_1[ch] = 2.0f * (y_k - VbiasA) * G_C_12 - C_12_1[ch];
@@ -113,3 +113,6 @@ void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer) noexcept
         }
     }
 }
+
+template void BigMuffClippingStage::processBlock<true> (AudioBuffer<float>& buffer) noexcept;
+template void BigMuffClippingStage::processBlock<false> (AudioBuffer<float>& buffer) noexcept;

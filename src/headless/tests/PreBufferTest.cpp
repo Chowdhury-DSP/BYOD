@@ -44,7 +44,8 @@ public:
                 buffer.clear();
                 proc->processAudioBlock (buffer);
 
-                testBuffer (buffer.getReadPointer (0)); },
+                testBuffer (buffer.getReadPointer (0));
+            },
             StringArray { "Muff Drive", "Kiwi Bass Drive" });
     }
 };
