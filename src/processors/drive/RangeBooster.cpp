@@ -15,6 +15,7 @@ static constexpr double I_s = 10.0e-15;
 static constexpr double Beta_F = 200.0;
 static constexpr double Beta_R = 2.0;
 
+template <int numIters = 5>
 inline double processSamplePNP (double x, double& veState, double& c3State, double c3Coef_b0, double c3Coef_b1)
 {
     const double v_b = x + R_bias * V_plus;
@@ -28,7 +29,7 @@ inline double processSamplePNP (double x, double& veState, double& c3State, doub
 
     double v_bc = Vt * std::log (((i_b / I_s) - (1.0 / Beta_F) * (exp_v_be - 1.0)) * Beta_R + 1.0);
     double i_c = 0.0;
-    for (int k = 0; k < 5; ++k)
+    for (int k = 0; k < numIters; ++k)
     {
         const double exp_v_bc = std::exp (v_bc / Vt);
         i_c = I_s * ((exp_v_be - exp_v_bc) - (1.0 / Beta_R) * (exp_v_bc - 1.0));
@@ -50,6 +51,9 @@ RangeBooster::RangeBooster (UndoManager* um) : BaseProcessor ("Range Booster", c
 {
     rangeParam = vts.getRawParameterValue ("range");
     boostParam = vts.getRawParameterValue ("boost");
+    hiQParam = vts.getRawParameterValue ("high_q");
+
+    addPopupMenuParameter ("high_q");
 
     uiOptions.backgroundColour = Colours::grey.brighter (0.7f);
     uiOptions.powerColour = Colours::orangered.brighter (0.1f);
@@ -64,6 +68,7 @@ ParamLayout RangeBooster::createParameterLayout()
 
     createFreqParameter (params, "range", "Range", 250.0f, 5000.0f, 2600.0f, 2600.0f);
     createGainDBParameter (params, "boost", "Boost", -30.0f, 12.0f, 0.0f);
+    emplace_param<AudioParameterBool> (params, "high_q", "High  Quality", false);
 
     return { params.begin(), params.end() };
 }
@@ -136,14 +141,24 @@ void RangeBooster::processAudio (AudioBuffer<float>& buffer)
     }
 
     // process PNP nonlinearity
+    const auto useHighQualityMode = hiQParam->load() == 1.0f;
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* x = buffer.getWritePointer (ch);
 
         chowdsp::ScopedValue ve_z { veState[ch] };
         chowdsp::ScopedValue c3_z { c3State[ch] };
-        for (int n = 0; n < numSamples; ++n)
-            x[n] = (float) PNPHelper::processSamplePNP ((double) x[n], ve_z.get(), c3_z.get(), c3Coefs[0], c3Coefs[1]);
+
+        if (useHighQualityMode)
+        {
+            for (int n = 0; n < numSamples; ++n)
+                x[n] = (float) PNPHelper::processSamplePNP<15> ((double) x[n], ve_z.get(), c3_z.get(), c3Coefs[0], c3Coefs[1]);
+        }
+        else
+        {
+            for (int n = 0; n < numSamples; ++n)
+                x[n] = (float) PNPHelper::processSamplePNP ((double) x[n], ve_z.get(), c3_z.get(), c3Coefs[0], c3Coefs[1]);
+        }
     }
 
     dcBlocker.processAudio (buffer);
