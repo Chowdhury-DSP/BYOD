@@ -181,7 +181,7 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
             if (! addOnProcessorStore->isModuleAvailable (procName))
                 continue;
 #endif
-            
+
             PopupMenu::Item item;
             item.itemID = ++menuID;
             item.text = procName;
