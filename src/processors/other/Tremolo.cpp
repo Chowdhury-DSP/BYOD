@@ -123,10 +123,9 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
-    
     if (inputsConnected.contains (1))
     {
-        waveBuffer.copyFrom(0, 0, getInputBuffer (1).getReadPointer(0), numSamples);
+        waveBuffer.copyFrom (0, 0, getInputBuffer (1).getReadPointer (0), numSamples);
     }
     else
     {
