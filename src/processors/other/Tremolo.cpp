@@ -123,27 +123,35 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
-    // fill wave buffer (-1, 1)
-    dsp::AudioBlock<float> waveBlock { waveBuffer };
-    dsp::ProcessContextReplacing<float> waveCtx { waveBlock };
-    fillWaveBuffer (waveBlock.getChannelPointer (0), numSamples, phase);
-
-    // shrink range to (0, 1)
-    waveBlock *= 0.5f;
-    waveBlock += 0.5f;
-
-    // apply depth parameter
-    auto depthVal = std::pow (depthParam->load(), 0.33f);
-    depthGainSmooth.setTargetValue (depthVal);
-    waveBlock.multiplyBy (depthGainSmooth);
-    depthAddSmooth.setTargetValue (1.0f - depthVal);
-    addSmoothed (waveBlock, depthAddSmooth);
-    filter.process (waveCtx);
-
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+    
+    if (inputsConnected.contains (1))
     {
-        auto* x = buffer.getWritePointer (ch);
-        FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
+        waveBuffer.copyFrom(0, 0, getInputBuffer (1).getReadPointer(0), numSamples);
+    }
+    else
+    {
+        // fill wave buffer (-1, 1)
+        dsp::AudioBlock<float> waveBlock { waveBuffer };
+        dsp::ProcessContextReplacing<float> waveCtx { waveBlock };
+        fillWaveBuffer (waveBlock.getChannelPointer (0), numSamples, phase);
+
+        // shrink range to (0, 1)
+        waveBlock *= 0.5f;
+        waveBlock += 0.5f;
+
+        // apply depth parameter
+        auto depthVal = std::pow (depthParam->load(), 0.33f);
+        depthGainSmooth.setTargetValue (depthVal);
+        waveBlock.multiplyBy (depthGainSmooth);
+        depthAddSmooth.setTargetValue (1.0f - depthVal);
+        addSmoothed (waveBlock, depthAddSmooth);
+        filter.process (waveCtx);
+
+        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        {
+            auto* x = buffer.getWritePointer (ch);
+            FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
+        }
     }
 
     outputBuffers.getReference (0) = &buffer;
