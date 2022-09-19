@@ -244,10 +244,17 @@ juce::Point<int> BaseProcessor::getPosition (Rectangle<int> parentBounds)
 
 bool BaseProcessor::hasModulationPorts()
 {
+    
+    
     return modulationPorts;
 }
 
 void BaseProcessor::routeExternalModulation()
 {
+    jassert(numInputs >= 2 && numOutputs >= 2);
+    // If we're making modulation ports make sure there is actually a port for them
+    
+    
+    
     modulationPorts = true;
 }

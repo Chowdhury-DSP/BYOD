@@ -139,10 +139,16 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     depthAddSmooth.setTargetValue (1.0f - depthVal);
     addSmoothed (waveBlock, depthAddSmooth);
     filter.process (waveCtx);
+    
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
         auto* x = buffer.getWritePointer (ch);
         FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
     }
+    
+    outputBuffers.getReference (0) = &buffer;
+    outputBuffers.getReference (1) = &waveBuffer;
+    
+    
 }
