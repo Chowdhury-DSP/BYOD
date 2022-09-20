@@ -107,6 +107,9 @@ public:
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
 
     bool hasModulationPorts();
+    int getInputModulationPort();
+    int getOutputModulationPort();
+    
 
 protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
@@ -115,7 +118,7 @@ protected:
 
     void addPopupMenuParameter (const String& paramID);
 
-    virtual void routeExternalModulation(); // for now take 1st Input and second input and assign them to modulation signal
+    virtual void routeExternalModulation(int inputPort, int outputPort);
 
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
@@ -166,6 +169,8 @@ private:
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
 
     bool modulationPorts = false;
+    int inputModulationPort;
+    int outputModulationPort;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };

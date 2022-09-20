@@ -30,7 +30,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation();
+    routeExternalModulation(1, 1);
 }
 
 ParamLayout Tremolo::createParameterLayout()
@@ -125,7 +125,12 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 
     if (inputsConnected.contains (1))
     {
-        waveBuffer.copyFrom (0, 0, getInputBuffer (1).getReadPointer (0), numSamples);
+        waveBuffer.copyFrom (0, 0, getInputBuffer (1), 0, 0, numSamples);
+        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        {
+            auto* x = getInputBuffer (0).getWritePointer (0);
+            FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
+        }
     }
     else
     {
@@ -148,11 +153,19 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 
         for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
         {
-            auto* x = buffer.getWritePointer (ch);
+            auto* x = getInputBuffer (0).getWritePointer (0);
             FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
         }
     }
+    
+    if(!inputsConnected.contains (0))//If normal input is connected no sounds goes through, only modulation signal
+    {
+        buffer.clear();
+    }
+   
 
-    outputBuffers.getReference (0) = &buffer;
+    outputBuffers.getReference (0) = &getInputBuffer (0);
     outputBuffers.getReference (1) = &waveBuffer;
+    
+    
 }

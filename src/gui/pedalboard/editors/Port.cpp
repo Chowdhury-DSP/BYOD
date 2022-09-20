@@ -15,7 +15,7 @@ Colour Port::getPortColour()
     {
         return Colours::black;
     }
-    else
+    else // Output Port
     {
         return Colours::darkgrey;
     }

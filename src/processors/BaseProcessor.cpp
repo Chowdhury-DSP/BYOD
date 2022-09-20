@@ -247,10 +247,24 @@ bool BaseProcessor::hasModulationPorts()
     return modulationPorts;
 }
 
-void BaseProcessor::routeExternalModulation()
+void BaseProcessor::routeExternalModulation(int inputPort, int outputPort)
 {
     jassert (numInputs >= 2 && numOutputs >= 2);
     // If we're making modulation ports make sure there is actually a port for them
 
+    inputModulationPort = inputPorts;
+    outputModulationPort = inputPorts;
+    
     modulationPorts = true;
 }
+
+int BaseProcessor::getInputModulationPort()
+{
+    return inputModulationPort;
+}
+
+int BaseProcessor::getOutputModulationPort()
+{
+    return outputModulationPort;
+}
+
