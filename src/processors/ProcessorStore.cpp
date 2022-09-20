@@ -51,6 +51,7 @@
 #include "utility/Tuner.h"
 
 #if BYOD_ENABLE_ADD_ON_MODULES
+#include <AddOnProcessors.h>
 #include <AddOnProcessorStore.h>
 #endif
 
@@ -129,8 +130,7 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());
 
-                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
-                                               }));
+                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() }); }));
     }
 
     for (auto& f : futureProcInfos)
@@ -138,6 +138,11 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
         const auto& [name, info] = f.get();
         procTypeStore[name] = info;
     }
+
+#if BYOD_ENABLE_ADD_ON_MODULES
+    const auto addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
+    addOnProcessorStore->validateModules (store);
+#endif
 }
 
 BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
@@ -161,7 +166,7 @@ template <typename FilterType>
 void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, FilterType&& filter, BaseProcessor* procToReplace, ConnectionInfo* connectionInfo)
 {
 #if BYOD_ENABLE_ADD_ON_MODULES
-    auto addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
+    const auto addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
 #endif
 
     for (auto type : { Drive, Tone, Utility, Other })
