@@ -1,15 +1,18 @@
 #include "UnitTests.h"
+
 namespace
 {
 constexpr double testSampleRate = 48000.0;
 constexpr int testBlockSize = 4096;
 } // namespace
+
 class PreBufferTest : public UnitTest
 {
 public:
     PreBufferTest() : UnitTest ("Pre-Buffer Test")
     {
     }
+
     static float getSampleAverage (const float* buffer, const int numSamples, const int startSample = 0)
     {
         float avgSample = 0.0f;
