@@ -21,7 +21,7 @@ public:
         return std::abs (avgSample / float (numSamples));
     }
 
-    void testBuffer (const float* buffer)
+    void testBuffer (const float* buffer, float steadyStateMax)
     {
         auto steadyState = getSampleAverage (buffer, 512, testBlockSize - 512);
         auto start = getSampleAverage (buffer, 10);
@@ -29,14 +29,15 @@ public:
         if (start < 1.0e-10f)
             return;
 
-        expectLessThan (steadyState, 1.0e-5f, "Steady state level is too large!");
+        expectLessThan (steadyState, steadyStateMax, "Steady state level is too large!");
         expectLessThan (start, steadyState * 200.0f, "DC offset present at beginning of signal!");
     }
 
     void runTest() override
     {
         runTestForAllProcessors (
-            this, [=] (BaseProcessor* proc)
+            this,
+            [=] (BaseProcessor* proc)
             {
                 proc->prepareProcessing (testSampleRate, testBlockSize);
 
@@ -44,9 +45,15 @@ public:
                 buffer.clear();
                 proc->processAudioBlock (buffer);
 
-                testBuffer (buffer.getReadPointer (0));
+                const auto steadyStateMax = [] (const auto& name)
+                {
+                    if (name == "Kiwi Bass Drive" || name == "Waterfall Drive")
+                        return 1.0e-4f;
+                    return 1.0e-5f;
+                }(proc->getName());
+                testBuffer (buffer.getReadPointer (0), steadyStateMax);
             },
-            StringArray { "Muff Drive", "Kiwi Bass Drive" });
+            StringArray { "Muff Drive" });
     }
 };
 
