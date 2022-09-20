@@ -252,8 +252,8 @@ void BaseProcessor::routeExternalModulation (int inputPort, int outputPort)
     jassert (numInputs >= 2 && numOutputs >= 2);
     // If we're making modulation ports make sure there is actually a port for them
 
-    inputModulationPort = inputPorts;
-    outputModulationPort = inputPorts;
+    inputModulationPort = inputPort;
+    outputModulationPort = outputPort;
 
     modulationPorts = true;
 }
