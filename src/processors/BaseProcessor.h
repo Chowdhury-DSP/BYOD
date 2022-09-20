@@ -109,7 +109,6 @@ public:
     bool hasModulationPorts();
     int getInputModulationPort();
     int getOutputModulationPort();
-    
 
 protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
@@ -118,7 +117,7 @@ protected:
 
     void addPopupMenuParameter (const String& paramID);
 
-    virtual void routeExternalModulation(int inputPort, int outputPort);
+    virtual void routeExternalModulation (int inputPort, int outputPort);
 
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;

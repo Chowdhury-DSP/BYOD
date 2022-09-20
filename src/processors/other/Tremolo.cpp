@@ -30,7 +30,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation(1, 1);
+    routeExternalModulation (1, 1);
 }
 
 ParamLayout Tremolo::createParameterLayout()
@@ -157,15 +157,12 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
             FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
         }
     }
-    
-    if(!inputsConnected.contains (0))//If normal input is connected no sounds goes through, only modulation signal
+
+    if (! inputsConnected.contains (0)) //If normal input is connected no sounds goes through, only modulation signal
     {
         buffer.clear();
     }
-   
 
     outputBuffers.getReference (0) = &getInputBuffer (0);
     outputBuffers.getReference (1) = &waveBuffer;
-    
-    
 }
