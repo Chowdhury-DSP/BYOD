@@ -51,8 +51,9 @@
 #include "utility/Tuner.h"
 
 #if BYOD_ENABLE_ADD_ON_MODULES
-#include <AddOnProcessors.h>
 #include <AddOnProcessorStore.h>
+#include <AddOnProcessors.h>
+
 #endif
 
 template <typename ProcType>
