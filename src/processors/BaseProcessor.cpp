@@ -241,3 +241,29 @@ juce::Point<int> BaseProcessor::getPosition (Rectangle<int> parentBounds)
 {
     return (editorPosition * juce::Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() }).toInt();
 }
+
+bool BaseProcessor::hasModulationPorts()
+{
+    return modulationPorts;
+}
+
+void BaseProcessor::routeExternalModulation (int inputPort, int outputPort)
+{
+    jassert (numInputs >= 2 && numOutputs >= 2);
+    // If we're making modulation ports make sure there is actually a port for them
+
+    inputModulationPort = inputPort;
+    outputModulationPort = outputPort;
+
+    modulationPorts = true;
+}
+
+int BaseProcessor::getInputModulationPort()
+{
+    return inputModulationPort;
+}
+
+int BaseProcessor::getOutputModulationPort()
+{
+    return outputModulationPort;
+}
