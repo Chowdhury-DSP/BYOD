@@ -116,6 +116,7 @@ void PresetManager::loadBYODFactoryPresets()
     factoryPresets.emplace_back (BinaryData::Nirvana_chowpreset, BinaryData::Nirvana_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Pete_Townshend_chowpreset, BinaryData::Pete_Townshend_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::The_Strokes_chowpreset, BinaryData::The_Strokes_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Black_Sabbath_chowpreset, BinaryData::Black_Sabbath_chowpresetSize);
 
     addPresets (factoryPresets);
 

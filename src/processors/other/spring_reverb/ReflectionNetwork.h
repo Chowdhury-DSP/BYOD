@@ -52,10 +52,10 @@ public:
 
         // householder matrix
         constexpr auto householderFactor = -2.0f / (float) VecType::size;
-        outVec += xsimd::hadd (outVec) * householderFactor;
+        outVec += xsimd::reduce_add (outVec) * householderFactor;
 
         outVec *= feedback;
-        return shelfFilter.processSample (xsimd::hadd (outVec) / (float) VecType::size);
+        return shelfFilter.processSample (xsimd::reduce_add (outVec) / (float) VecType::size);
     }
 
     inline void pushSample (int ch, float x) noexcept
