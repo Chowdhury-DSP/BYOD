@@ -128,6 +128,7 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     {
         // get modulation buffer from input (-1, 1)
         modBuffer.copyFrom (0, 0, getInputBuffer (ModulationInput), 0, 0, numSamples);
+        makeBufferMono(modBuffer);
     }
     else
     {

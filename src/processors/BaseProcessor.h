@@ -133,6 +133,8 @@ protected:
      * for each instance.
      */
     auto& getSharedConvolutionMessageQueue() { return convolutionMessageQueue.get(); }
+    
+    void makeBufferMono(AudioBuffer<float>& buffer);
 
 private:
     std::atomic<float>* onOffParam = nullptr;
@@ -168,8 +170,8 @@ private:
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
 
     bool modulationPorts = false;
-    int inputModulationPort;
-    int outputModulationPort;
+    int inputModulationPort = 1;
+    int outputModulationPort = 1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };
