@@ -4,8 +4,8 @@
 
 enum PortType
 {
-    regular,
-    modulation
+    audio = 0,
+    modulation,
 };
 
 class Port : public Component
@@ -25,7 +25,7 @@ private:
     bool isConnected = false;
 
     const Colour& procColour;
-    const PortType portType = regular;
+    const PortType portType = audio;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Port)
 };
