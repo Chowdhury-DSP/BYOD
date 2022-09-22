@@ -25,6 +25,7 @@ private:
     chowdsp::SineWave<float> sine;
 
     AudioBuffer<float> waveBuffer;
+    AudioBuffer<float> modBuffer;
     SmoothedValue<float, ValueSmoothingTypes::Linear> phaseSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> waveSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> depthGainSmooth;

@@ -120,24 +120,25 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     waveBuffer.setSize (1, numSamples, false, false, true);
+    modBuffer.setSize (1, numSamples, false, false, true);
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
     if (inputsConnected.contains (ModulationInput))
     {
-        waveBuffer.copyFrom (0, 0, getInputBuffer (ModulationInput), 0, 0, numSamples);
-        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
-        {
-            auto* x = getInputBuffer (AudioInput).getWritePointer (0);
-            FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
-        }
+        // get modulation buffer from input (-1, 1)
+        modBuffer.copyFrom (0, 0, getInputBuffer (ModulationInput), 0, 0, numSamples);
     }
     else
     {
-        // fill wave buffer (-1, 1)
+        // fill modulation buffer (-1, 1)
+        fillWaveBuffer (modBuffer.getWritePointer (0), numSamples, phase);
+    }
+
+        // copy modulation buffer to wave buffer (-1, 1)
+        waveBuffer.makeCopyOf (modBuffer, true);
         dsp::AudioBlock<float> waveBlock { waveBuffer };
         dsp::ProcessContextReplacing<float> waveCtx { waveBlock };
-        fillWaveBuffer (waveBlock.getChannelPointer (0), numSamples, phase);
 
         // shrink range to (0, 1)
         waveBlock *= 0.5f;
@@ -156,7 +157,7 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
             auto* x = getInputBuffer (AudioInput).getWritePointer (0);
             FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
         }
-    }
+    
 
     if (! inputsConnected.contains (AudioInput)) // If normal input is connected no sounds goes through, only modulation signal
     {
@@ -164,5 +165,5 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     }
 
     outputBuffers.getReference (AudioOutput) = &getInputBuffer (AudioInput);
-    outputBuffers.getReference (ModulationOutput) = &waveBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modBuffer;
 }
