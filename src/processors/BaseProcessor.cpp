@@ -256,25 +256,21 @@ void BaseProcessor::makeBufferMono(AudioBuffer<float>& buffer)
     buffer.applyGain (1.0f / (float) nChannels);
 }
 
-bool BaseProcessor::hasModulationPorts()
+void BaseProcessor::routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts)
 {
-    return modulationPorts;
-}
-
-void BaseProcessor::routeExternalModulation (int inputPort, int outputPort)
-{
-    inputModulationPort = inputPort;
-    outputModulationPort = outputPort;
+    inputModulationPorts = inputPorts;
+    outputModulationPorts = outputPorts;
 
     modulationPorts = true;
 }
 
-int BaseProcessor::getInputModulationPort()
+bool BaseProcessor::isInputModulationPort (int portIndex)
 {
-    return inputModulationPort;
+    return inputModulationPorts.contains (portIndex);
 }
 
-int BaseProcessor::getOutputModulationPort()
+bool BaseProcessor::isOutputModulationPort (int portIndex)
 {
-    return outputModulationPort;
+    return outputModulationPorts.contains (portIndex);
 }
+

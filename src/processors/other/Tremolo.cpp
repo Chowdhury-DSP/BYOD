@@ -30,7 +30,8 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation (ModulationInput, ModulationOutput);
+    routeExternalModulation ({ModulationInput}, {ModulationOutput});
+    
 }
 
 ParamLayout Tremolo::createParameterLayout()
