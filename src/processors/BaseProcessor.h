@@ -116,7 +116,8 @@ protected:
 
     void addPopupMenuParameter (const String& paramID);
 
-    /* All modulation signals should be in the range of [-1,1],
+    /** 
+     * All modulation signals should be in the range of [-1,1],
      * they can then be modified as needed by the individual module
      */
     virtual void routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts);
