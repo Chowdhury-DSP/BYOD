@@ -30,7 +30,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation (1, 1);
+    routeExternalModulation (ModulationInput, ModulationOutput);
 }
 
 ParamLayout Tremolo::createParameterLayout()
@@ -123,12 +123,12 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
-    if (inputsConnected.contains (1))
+    if (inputsConnected.contains (ModulationInput))
     {
-        waveBuffer.copyFrom (0, 0, getInputBuffer (1), 0, 0, numSamples);
+        waveBuffer.copyFrom (0, 0, getInputBuffer (ModulationInput), 0, 0, numSamples);
         for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
         {
-            auto* x = getInputBuffer (0).getWritePointer (0);
+            auto* x = getInputBuffer (AudioInput).getWritePointer (0);
             FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
         }
     }
@@ -153,16 +153,16 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 
         for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
         {
-            auto* x = getInputBuffer (0).getWritePointer (0);
+            auto* x = getInputBuffer (AudioInput).getWritePointer (0);
             FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
         }
     }
 
-    if (! inputsConnected.contains (0)) //If normal input is connected no sounds goes through, only modulation signal
+    if (! inputsConnected.contains (AudioInput)) // If normal input is connected no sounds goes through, only modulation signal
     {
         buffer.clear();
     }
 
-    outputBuffers.getReference (0) = &getInputBuffer (0);
-    outputBuffers.getReference (1) = &waveBuffer;
+    outputBuffers.getReference (AudioOutput) = &getInputBuffer (AudioInput);
+    outputBuffers.getReference (ModulationOutput) = &waveBuffer;
 }

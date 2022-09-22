@@ -32,6 +32,18 @@ private:
 
     float fs = 48000.0f;
     float phase = 0.0f;
+    
+    enum InputPortIndexes
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPortIndexes
+    {
+        AudioOutput = 0,
+        ModulationOutput,
+    };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Tremolo)
 };
