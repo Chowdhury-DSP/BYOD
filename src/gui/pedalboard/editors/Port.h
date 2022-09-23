@@ -2,7 +2,7 @@
 
 #include <pch.h>
 
-enum PortType
+enum class PortType
 {
     audio = 0,
     modulation,
@@ -25,7 +25,7 @@ private:
     bool isConnected = false;
 
     const Colour& procColour;
-    const PortType portType = audio;
+    const PortType portType = PortType::audio;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Port)
 };

@@ -7,7 +7,7 @@ Port::Port (const Colour& processorColour, const PortType type) : procColour (pr
 
 const Colour Port::getPortColour()
 {
-    if (portType == modulation)
+    if (portType == PortType::modulation)
     {
         return Colours::rebeccapurple;
     }
