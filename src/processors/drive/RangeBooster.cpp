@@ -49,8 +49,9 @@ inline double processSamplePNP (double x, double& veState, double& c3State, doub
 
 RangeBooster::RangeBooster (UndoManager* um) : BaseProcessor ("Range Booster", createParameterLayout(), um)
 {
-    rangeParam = vts.getRawParameterValue ("range");
-    boostParam = vts.getRawParameterValue ("boost");
+    using namespace ParameterHelpers;
+    loadParameterPointer (rangeParam, vts, "range");
+    loadParameterPointer (boostParam, vts, "boost");
     hiQParam = vts.getRawParameterValue ("high_q");
 
     addPopupMenuParameter ("high_q");

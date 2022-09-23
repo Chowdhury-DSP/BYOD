@@ -3,9 +3,10 @@
 
 TubeScreamer::TubeScreamer (UndoManager* um) : BaseProcessor ("Tube Screamer", createParameterLayout(), um)
 {
-    gainParam = vts.getRawParameterValue ("gain");
+    using namespace ParameterHelpers;
+    loadParameterPointer (gainParam, vts, "gain");
     diodeTypeParam = vts.getRawParameterValue ("diode");
-    nDiodesParam = vts.getRawParameterValue ("num_diodes");
+    loadParameterPointer (nDiodesParam, vts, "num_diodes");
 
     uiOptions.backgroundColour = Colours::tomato.darker (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter (0.2f);

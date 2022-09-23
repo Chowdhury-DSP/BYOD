@@ -35,7 +35,7 @@ private:
     static constexpr float R4 = 3.3e3f;
     static constexpr float Rv1Value = 50.0e3f;
 
-    std::atomic<float>* cleanParam = nullptr;
+    chowdsp::FloatParameter* cleanParam = nullptr;
 
     float fs = 48000.0f;
     SmoothedValue<float, ValueSmoothingTypes::Linear> Rv1;

@@ -71,12 +71,13 @@ private:
 
 Compressor::Compressor (UndoManager* um) : BaseProcessor ("Compressor", createParameterLayout(), um)
 {
-    threshDBParam = vts.getRawParameterValue ("thresh");
-    ratioParam = vts.getRawParameterValue ("ratio");
-    kneeDBParam = vts.getRawParameterValue ("knee");
-    attackMsParam = vts.getRawParameterValue ("attack");
-    releaseMsParam = vts.getRawParameterValue ("release");
-    makeupDBParam = vts.getRawParameterValue ("makeup");
+    using namespace ParameterHelpers;
+    loadParameterPointer (threshDBParam, vts, "thresh");
+    loadParameterPointer (ratioParam, vts, "ratio");
+    loadParameterPointer (kneeDBParam, vts, "knee");
+    loadParameterPointer (attackMsParam, vts, "attack");
+    loadParameterPointer (releaseMsParam, vts, "release");
+    loadParameterPointer (makeupDBParam, vts, "makeup");
 
     gainComputer = std::make_unique<GainComputer>();
 

@@ -15,8 +15,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* rangeParam = nullptr;
-    std::atomic<float>* boostParam = nullptr;
+    chowdsp::FloatParameter* rangeParam = nullptr;
+    chowdsp::FloatParameter* boostParam = nullptr;
     std::atomic<float>* hiQParam = nullptr;
 
     float fs = 48000.0f;

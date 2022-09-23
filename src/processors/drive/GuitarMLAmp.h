@@ -16,7 +16,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* gainParam = nullptr;
+    chowdsp::FloatParameter* gainParam = nullptr;
     dsp::Gain<float> inGain;
 
     std::atomic<float>* modelParam = nullptr;

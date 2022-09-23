@@ -3,9 +3,9 @@
 
 Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary", createParameterLayout(), um)
 {
-    rateHzParam = vts.getRawParameterValue ("rate");
+    chowdsp::ParamUtils::loadParameterPointer (rateHzParam, vts, "rate");
 
-    auto* depthParamHandle = vts.getRawParameterValue ("depth");
+    auto* depthParamHandle = dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter ("depth"));
     spectralDepthSmoothed.setParameterHandle (depthParamHandle);
     tremDepthSmoothed.setParameterHandle (depthParamHandle);
     chorusDepthSmoothed.setParameterHandle (depthParamHandle);

@@ -14,8 +14,8 @@ const auto levelSkew = ParameterHelpers::createNormalisableRange (-60.0f, 0.0f, 
 
 MXRDistortion::MXRDistortion (UndoManager* um) : BaseProcessor ("Distortion Plus", createParameterLayout(), um)
 {
-    distParam = vts.getRawParameterValue ("dist");
-    levelParam = vts.getRawParameterValue ("level");
+    loadParameterPointer (distParam, vts, "dist");
+    loadParameterPointer (levelParam, vts, "level");
 
     uiOptions.backgroundColour = Colours::teal;
     uiOptions.info.description = "Virtual analog emulation of the MXR Distortion+ overdrive pedal.";

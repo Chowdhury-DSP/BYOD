@@ -17,9 +17,9 @@ public:
 private:
     auto cookParameters() const;
 
-    std::atomic<float>* bassParam = nullptr;
-    std::atomic<float>* midParam = nullptr;
-    std::atomic<float>* trebleParam = nullptr;
+    chowdsp::FloatParameter* bassParam = nullptr;
+    chowdsp::FloatParameter* midParam = nullptr;
+    chowdsp::FloatParameter* trebleParam = nullptr;
 
     BassmanToneStack wdf[2];
 

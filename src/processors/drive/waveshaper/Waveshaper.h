@@ -17,7 +17,7 @@ public:
     bool getCustomComponents (OwnedArray<Component>& customComps) override;
 
 private:
-    std::atomic<float>* driveParam = nullptr;
+    chowdsp::FloatParameter* driveParam = nullptr;
     std::atomic<float>* shapeParam = nullptr;
 
     int lastShape = 0;

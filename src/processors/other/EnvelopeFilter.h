@@ -18,11 +18,11 @@ public:
 private:
     void fillLevelBuffer (AudioBuffer<float>& buffer, bool directControlOn);
 
-    std::atomic<float>* freqParam = nullptr;
-    std::atomic<float>* resParam = nullptr;
-    std::atomic<float>* senseParam = nullptr;
-    std::atomic<float>* speedParam = nullptr;
-    std::atomic<float>* freqModParam = nullptr;
+    chowdsp::FloatParameter* freqParam = nullptr;
+    chowdsp::FloatParameter* resParam = nullptr;
+    chowdsp::FloatParameter* senseParam = nullptr;
+    chowdsp::FloatParameter* speedParam = nullptr;
+    chowdsp::FloatParameter* freqModParam = nullptr;
     std::atomic<float>* filterTypeParam = nullptr;
     std::atomic<float>* directControlParam = nullptr;
 

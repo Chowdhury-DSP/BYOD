@@ -21,9 +21,10 @@ static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& bl
 
 Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLayout(), um)
 {
-    rateParam = vts.getRawParameterValue ("rate");
-    waveParam = vts.getRawParameterValue ("wave");
-    depthParam = vts.getRawParameterValue ("depth");
+    using namespace ParameterHelpers;
+    loadParameterPointer (rateParam, vts, "rate");
+    loadParameterPointer (waveParam, vts, "wave");
+    loadParameterPointer (depthParam, vts, "depth");
 
     uiOptions.backgroundColour = Colours::orange.darker (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter();
@@ -131,7 +132,7 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     waveBlock += 0.5f;
 
     // apply depth parameter
-    auto depthVal = std::pow (depthParam->load(), 0.33f);
+    auto depthVal = std::pow (depthParam->getCurrentValue(), 0.33f);
     depthGainSmooth.setTargetValue (depthVal);
     waveBlock.multiplyBy (depthGainSmooth);
     depthAddSmooth.setTargetValue (1.0f - depthVal);

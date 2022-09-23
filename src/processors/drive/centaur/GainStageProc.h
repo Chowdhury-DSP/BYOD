@@ -16,7 +16,7 @@ public:
     void processBlock (AudioBuffer<float>& buffer);
 
 private:
-    std::atomic<float>* gainParam = nullptr;
+    chowdsp::FloatParameter* gainParam = nullptr;
 
     AudioBuffer<float> ff1Buff;
     AudioBuffer<float> ff2Buff;

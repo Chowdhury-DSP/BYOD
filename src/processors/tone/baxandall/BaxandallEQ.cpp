@@ -12,8 +12,9 @@ float skewParam (float val)
 
 BaxandallEQ::BaxandallEQ (UndoManager* um) : BaseProcessor ("Baxandall EQ", createParameterLayout(), um)
 {
-    bassParam = vts.getRawParameterValue ("bass");
-    trebleParam = vts.getRawParameterValue ("treble");
+    using namespace ParameterHelpers;
+    loadParameterPointer (bassParam, vts, "bass");
+    loadParameterPointer (trebleParam, vts, "treble");
 
     uiOptions.backgroundColour = Colours::seagreen;
     uiOptions.powerColour = Colours::cyan.brighter (0.1f);

@@ -10,7 +10,7 @@ using namespace SurgeWaveshapers;
 
 Waveshaper::Waveshaper (UndoManager* um) : BaseProcessor ("Waveshaper", createParameterLayout(), um)
 {
-    driveParam = vts.getRawParameterValue ("drive");
+    chowdsp::ParamUtils::loadParameterPointer (driveParam, vts, "drive");
     shapeParam = vts.getRawParameterValue (shapeTag);
 
     // borrowed from: https://github.com/surge-synthesizer/surge/blob/main/src/surge-fx/SurgeLookAndFeel.h
@@ -39,7 +39,7 @@ ParamLayout Waveshaper::createParameterLayout()
 void Waveshaper::prepare (double sampleRate, int /*samplesPerBlock*/)
 {
     driveSmooth.reset (sampleRate, 0.05);
-    driveSmooth.setCurrentAndTargetValue (Decibels::decibelsToGain (driveParam->load()));
+    driveSmooth.setCurrentAndTargetValue (Decibels::decibelsToGain (driveParam->getCurrentValue()));
 }
 
 void Waveshaper::processAudio (AudioBuffer<float>& buffer)
@@ -47,7 +47,7 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    auto driveGain = Decibels::decibelsToGain (driveParam->load());
+    auto driveGain = Decibels::decibelsToGain (driveParam->getCurrentValue());
     driveSmooth.setTargetValue (driveGain);
 
     if ((int) *shapeParam != lastShape)

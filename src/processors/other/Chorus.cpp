@@ -15,10 +15,11 @@ const String delayTypeTag = "delay_type";
 
 Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus", createParameterLayout(), um)
 {
-    rateParam = vts.getRawParameterValue ("rate");
-    depthParam = vts.getRawParameterValue ("depth");
-    fbParam = vts.getRawParameterValue ("feedback");
-    mixParam = vts.getRawParameterValue ("mix");
+    using namespace ParameterHelpers;
+    loadParameterPointer (rateParam, vts, "rate");
+    loadParameterPointer (depthParam, vts, "depth");
+    loadParameterPointer (fbParam, vts, "feedback");
+    loadParameterPointer (mixParam, vts, "mix");
     delayTypeParam = vts.getRawParameterValue (delayTypeTag);
 
     addPopupMenuParameter (delayTypeTag);
@@ -105,7 +106,7 @@ void Chorus::processChorus (AudioBuffer<float>& buffer, DelayArrType& delay)
             delay[ch][i].setFilterFreq (10000.0f);
         }
 
-        auto fbAmount = std::sqrt (fbParam->load());
+        auto fbAmount = std::sqrt (fbParam->getCurrentValue());
         if constexpr (std::is_same_v<DelayArrType, decltype (lofiDelay)>)
             fbAmount *= 0.4f;
         else

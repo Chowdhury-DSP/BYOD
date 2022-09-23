@@ -16,8 +16,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* voiceParam = nullptr;
-    std::atomic<float>* gainParam = nullptr;
+    chowdsp::FloatParameter* voiceParam = nullptr;
+    chowdsp::FloatParameter* gainParam = nullptr;
 
     ZenDriveWDF wdf[2];
     DCBlocker dcBlocker;

@@ -16,7 +16,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* gainDBParam = nullptr;
+    chowdsp::FloatParameter* gainDBParam = nullptr;
 
     dsp::Gain<float> gain;
     ResampledRNN<28> rnn[2];

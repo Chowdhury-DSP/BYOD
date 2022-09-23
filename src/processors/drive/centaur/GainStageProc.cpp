@@ -9,7 +9,7 @@ GainStageProc::GainStageProc (AudioProcessorValueTreeState& vts, double sampleRa
                                                                                       ff2L (sampleRate),
                                                                                       ff2R (sampleRate)
 {
-    gainParam = vts.getRawParameterValue ("gain");
+    chowdsp::ParamUtils::loadParameterPointer (gainParam, vts, "gain");
 }
 
 void GainStageProc::reset (double sampleRate, int samplesPerBlock)

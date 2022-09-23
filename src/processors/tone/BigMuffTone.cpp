@@ -4,7 +4,7 @@
 namespace
 {
 // Component values taken from this blog post: https://www.coda-effects.com/p/big-muff-tonestack-dealing-with-mids.html
-const std::array<BigMuffTone::Components, 10> componentSets {
+constexpr std::array<BigMuffTone::Components, 10> componentSets {
     BigMuffTone::Components { .name = "Triangle", .R8 = 22.0e3f, .C8 = 10.0e-9f, .C9 = 4.0e-9f, .R5 = 22.0e3f },
     BigMuffTone::Components { .name = "Ram's Head '73", .R8 = 33.0e3f, .C8 = 10.0e-9f, .C9 = 4.0e-9f, .R5 = 33.0e3f },
     BigMuffTone::Components { .name = "Ram's Head '75", .R8 = 39.0e3f, .C8 = 10.0e-9f, .C9 = 4.0e-9f, .R5 = 22.0e3f },
@@ -21,8 +21,9 @@ const std::array<BigMuffTone::Components, 10> componentSets {
 BigMuffTone::BigMuffTone (UndoManager* um) : BaseProcessor ("Muff Tone", createParameterLayout(), um),
                                              comps (&componentSets[2])
 {
-    toneParam = vts.getRawParameterValue ("tone");
-    midsParam = vts.getRawParameterValue ("mids");
+    using namespace ParameterHelpers;
+    loadParameterPointer (toneParam, vts, "tone");
+    loadParameterPointer (midsParam, vts, "mids");
     typeParam = vts.getRawParameterValue ("type");
 
     uiOptions.backgroundColour = Colours::darkred.brighter (0.3f);
@@ -41,7 +42,7 @@ ParamLayout BigMuffTone::createParameterLayout()
 
     StringArray types;
     for (auto& set : componentSets)
-        types.add (set.name);
+        types.add (set.name.data());
     emplace_param<AudioParameterChoice> (params, "type", "Type", types, 2);
 
     return { params.begin(), params.end() };

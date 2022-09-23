@@ -15,14 +15,14 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* sizeParam = nullptr;
-    std::atomic<float>* decayParam = nullptr;
-    std::atomic<float>* reflectParam = nullptr;
-    std::atomic<float>* spinParam = nullptr;
-    std::atomic<float>* dampParam = nullptr;
-    std::atomic<float>* chaosParam = nullptr;
-    std::atomic<float>* shakeParam = nullptr;
-    std::atomic<float>* mixParam = nullptr;
+    chowdsp::FloatParameter* sizeParam = nullptr;
+    chowdsp::FloatParameter* decayParam = nullptr;
+    chowdsp::FloatParameter* reflectParam = nullptr;
+    chowdsp::FloatParameter* spinParam = nullptr;
+    chowdsp::FloatParameter* dampParam = nullptr;
+    chowdsp::FloatParameter* chaosParam = nullptr;
+    chowdsp::FloatParameter* shakeParam = nullptr;
+    chowdsp::FloatParameter* mixParam = nullptr;
 
     SpringReverb reverb;
 

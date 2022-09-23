@@ -99,6 +99,8 @@ if(NOT IOS AND BYOD_BUILD_CLAP)
         TARGET BYOD
         CLAP_ID "org.chowdsp.byod"
         CLAP_FEATURES audio-effect distortion
+        CLAP_PROCESS_EVENTS_RESOLUTION_SAMPLES 64
+        CLAP_USE_JUCE_PARAMETER_RANGES DISCRETE
     )
 endif()
 

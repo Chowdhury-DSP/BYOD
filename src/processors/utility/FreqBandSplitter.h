@@ -17,8 +17,8 @@ public:
 private:
     static constexpr int numOuts = 3;
 
-    std::atomic<float>* crossLowParam = nullptr;
-    std::atomic<float>* crossHighParam = nullptr;
+    chowdsp::FloatParameter* crossLowParam = nullptr;
+    chowdsp::FloatParameter* crossHighParam = nullptr;
 
     chowdsp::SVFLowpass<float> lowCrossLPF1;
     chowdsp::SVFLowpass<float> lowCrossLPF2;

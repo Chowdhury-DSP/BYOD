@@ -3,7 +3,7 @@
 
 TubeScreamerTone::TubeScreamerTone (UndoManager* um) : BaseProcessor ("TS-Tone", createParameterLayout(), um)
 {
-    toneParam = vts.getRawParameterValue ("tone");
+    chowdsp::ParamUtils::loadParameterPointer (toneParam, vts, "tone");
 
     uiOptions.backgroundColour = Colours::limegreen.darker (0.1f);
     uiOptions.powerColour = Colours::silver.brighter (0.5f);

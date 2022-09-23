@@ -16,7 +16,7 @@ public:
 
 private:
     static constexpr int numIns = 4;
-    std::array<std::atomic<float>*, numIns> gainDBParams { nullptr };
+    std::array<chowdsp::FloatParameter*, numIns> gainDBParams { nullptr };
     std::array<dsp::Gain<float>, numIns> gains;
 
     AudioBuffer<float> monoBuffer;
