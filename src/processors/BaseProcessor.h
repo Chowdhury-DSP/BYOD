@@ -136,8 +136,6 @@ protected:
      * for each instance.
      */
     auto& getSharedConvolutionMessageQueue() { return convolutionMessageQueue.get(); }
-    
-    void makeBufferMono(AudioBuffer<float>& buffer);
 
 private:
     std::atomic<float>* onOffParam = nullptr;

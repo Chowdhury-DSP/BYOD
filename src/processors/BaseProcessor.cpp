@@ -242,26 +242,11 @@ juce::Point<int> BaseProcessor::getPosition (Rectangle<int> parentBounds)
     return (editorPosition * juce::Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() }).toInt();
 }
 
-void BaseProcessor::makeBufferMono(AudioBuffer<float>& buffer)
-{
-    const auto nChannels = buffer.getNumChannels();
-    const auto numSamples = buffer.getNumSamples();
-
-    if (nChannels == 1)
-        return;
-
-    for (int ch = 1; ch < nChannels; ++ch)
-        buffer.addFrom (0, 0, buffer, ch, 0, numSamples);
-
-    buffer.applyGain (1.0f / (float) nChannels);
-}
 
 void BaseProcessor::routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts)
 {
     inputModulationPorts = inputPorts;
     outputModulationPorts = outputPorts;
-
-    modulationPorts = true;
 }
 
 bool BaseProcessor::isInputModulationPort (int portIndex)

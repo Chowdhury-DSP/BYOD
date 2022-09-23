@@ -54,6 +54,7 @@ void Tremolo::prepare (double sampleRate, int samplesPerBlock)
     filter.setCutoffFrequency (250.0f);
 
     waveBuffer.setSize (1, samplesPerBlock);
+    modBuffer.setSize (1, samplesPerBlock);
     phaseSmooth.reset (sampleRate, 0.01);
     waveSmooth.reset (sampleRate, 0.01);
     depthGainSmooth.reset (sampleRate, 0.01);
@@ -125,18 +126,28 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
-    if (inputsConnected.contains (ModulationInput))
+    if (inputsConnected.contains (ModulationInput))// make mono and pass samples through
     {
         // get modulation buffer from input (-1, 1)
-        modBuffer.copyFrom (0, 0, getInputBuffer (ModulationInput), 0, 0, numSamples);
-        makeBufferMono(modBuffer);
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        modBuffer.copyFrom (0, 0, modInputBuffer, 0, 0, numSamples);
+
+        if (const auto modInputNumChannels = modInputBuffer.getNumChannels(); modInputNumChannels > 1)
+        {
+            for (int ch = 1; ch < modInputNumChannels; ++ch)
+                modBuffer.addFrom (0, 0, modInputBuffer, ch, 0, numSamples);
+
+            modBuffer.applyGain (1.0f / (float) modInputNumChannels);
+        }
     }
-    else
+    else// create our own modulation signal
     {
         // fill modulation buffer (-1, 1)
         fillWaveBuffer (modBuffer.getWritePointer (0), numSamples, phase);
     }
 
+    if (inputsConnected.contains (AudioInput))
+    {
         // copy modulation buffer to wave buffer (-1, 1)
         waveBuffer.makeCopyOf (modBuffer, true);
         dsp::AudioBlock<float> waveBlock { waveBuffer };
@@ -159,11 +170,6 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
             auto* x = getInputBuffer (AudioInput).getWritePointer (0);
             FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
         }
-    
-
-    if (! inputsConnected.contains (AudioInput)) // If normal input is connected no sounds goes through, only modulation signal
-    {
-        buffer.clear();
     }
 
     outputBuffers.getReference (AudioOutput) = &getInputBuffer (AudioInput);
