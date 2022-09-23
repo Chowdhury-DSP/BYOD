@@ -1,8 +1,24 @@
 #include "Port.h"
 #include "../cables/CableDrawingHelpers.h"
 
-Port::Port (const Colour& processorColour) : procColour (processorColour)
+Port::Port (const Colour& processorColour, const PortType type) : procColour (processorColour), portType (type)
 {
+}
+
+const Colour Port::getPortColour()
+{
+    if (portType == PortType::modulation)
+    {
+        return Colours::rebeccapurple;
+    }
+    else if (isInput)
+    {
+        return Colours::black;
+    }
+    else // Output Port
+    {
+        return Colours::darkgrey;
+    }
 }
 
 void Port::paint (Graphics& g)
@@ -29,7 +45,7 @@ void Port::paint (Graphics& g)
         arcPath.addArc (pb.getX(), pb.getY(), pb.getWidth(), pb.getHeight(), smallArcStart, smallArcEnd);
         arcPath.closeSubPath();
 
-        g.setColour (isInput ? Colours::black : Colours::darkgrey);
+        g.setColour (getPortColour());
         g.fillPath (arcPath);
 
         g.setColour (Colours::white);
@@ -37,7 +53,7 @@ void Port::paint (Graphics& g)
     }
     else
     {
-        g.setColour (isInput ? Colours::black : Colours::darkgrey);
+        g.setColour (getPortColour());
         g.fillEllipse (portBounds);
     }
 

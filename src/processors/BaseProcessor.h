@@ -106,12 +106,21 @@ public:
 
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
 
+    bool isInputModulationPort(int portIndex);
+    bool isOutputModulationPort(int portIndex);
+
 protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
     virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) {}
 
     void addPopupMenuParameter (const String& paramID);
+
+    /** 
+     * All modulation signals should be in the range of [-1,1],
+     * they can then be modified as needed by the individual module
+     */
+    virtual void routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts);
 
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
@@ -160,6 +169,9 @@ private:
 
     StringArray popupMenuParameterIDs;
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
+
+    juce::Array<int> inputModulationPorts {};
+    juce::Array<int> outputModulationPorts {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };
