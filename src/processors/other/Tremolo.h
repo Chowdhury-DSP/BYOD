@@ -33,7 +33,7 @@ private:
 
     float fs = 48000.0f;
     float phase = 0.0f;
-    
+
     enum InputPortIndexes
     {
         AudioInput = 0,

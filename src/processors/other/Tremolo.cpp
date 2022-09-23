@@ -31,8 +31,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation ({ModulationInput}, {ModulationOutput});
-    
+    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
 }
 
 ParamLayout Tremolo::createParameterLayout()
@@ -127,7 +126,7 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
-    if (inputsConnected.contains (ModulationInput))// make mono and pass samples through
+    if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
     {
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
@@ -140,7 +139,7 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
             modBuffer.applyGain (1.0f / (float) modInputNumChannels);
         }
     }
-    else// create our own modulation signal
+    else // create our own modulation signal
     {
         // fill modulation buffer (-1, 1)
         fillWaveBuffer (modBuffer.getWritePointer (0), numSamples, phase);

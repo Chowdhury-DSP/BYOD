@@ -106,8 +106,8 @@ public:
 
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
 
-    bool isInputModulationPort(int portIndex);
-    bool isOutputModulationPort(int portIndex);
+    bool isInputModulationPort (int portIndex);
+    bool isOutputModulationPort (int portIndex);
 
 protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
