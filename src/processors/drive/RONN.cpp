@@ -96,7 +96,7 @@ Vec3 createRandomVec3<GlorotUniform> (std::default_random_engine& generator, Glo
 
 RONN::RONN (UndoManager* um) : BaseProcessor ("RONN", createParameterLayout(), um)
 {
-    inGainDbParam = vts.getRawParameterValue ("gain_db");
+    chowdsp::ParamUtils::loadParameterPointer (inGainDbParam, vts, "gain_db");
     vts.addParameterListener ("seed", this);
     parameterChanged ("seed", vts.getRawParameterValue ("seed")->load());
 
@@ -230,7 +230,7 @@ void RONN::processAudio (AudioBuffer<float>& buffer)
     dsp::AudioBlock<float> block (buffer);
     dsp::ProcessContextReplacing<float> context (block);
 
-    inputGain.setGainDecibels (inGainDbParam->load() + 25.0f);
+    inputGain.setGainDecibels (inGainDbParam->getCurrentValue() + 25.0f);
     inputGain.process (context);
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)

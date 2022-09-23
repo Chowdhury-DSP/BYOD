@@ -2,8 +2,9 @@
 
 ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Yen Drive", createParameterLayout(), um)
 {
-    voiceParam = vts.getRawParameterValue ("voice");
-    gainParam = vts.getRawParameterValue ("gain");
+    using namespace ParameterHelpers;
+    loadParameterPointer (voiceParam, vts, "voice");
+    loadParameterPointer (gainParam, vts, "gain");
 
     uiOptions.backgroundColour = Colours::cornsilk;
     uiOptions.info.description = "Virtual analog emulation of the ZenDrive overdrive pedal by Hermida Audio.";

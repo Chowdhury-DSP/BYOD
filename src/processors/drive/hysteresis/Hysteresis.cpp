@@ -3,9 +3,10 @@
 
 Hysteresis::Hysteresis (UndoManager* um) : BaseProcessor ("Hysteresis", createParameterLayout(), um)
 {
-    satParam = vts.getRawParameterValue ("sat");
-    driveParam = vts.getRawParameterValue ("drive");
-    widthParam = vts.getRawParameterValue ("width");
+    using namespace ParameterHelpers;
+    loadParameterPointer (satParam, vts, "sat");
+    loadParameterPointer (driveParam, vts, "drive");
+    loadParameterPointer (widthParam, vts, "width");
 
     uiOptions.backgroundColour = Colour (0xFF8B3232);
     uiOptions.powerColour = Colour (0xFFEAA92C);
@@ -42,7 +43,7 @@ void Hysteresis::processAudio (AudioBuffer<float>& buffer)
     auto* leftPtr = doubleBuffer.getWritePointer (0);
     auto* rightPtr = doubleBuffer.getNumChannels() > 1 ? doubleBuffer.getWritePointer (1) : leftPtr;
 
-    hysteresisProc.setParameters (driveParam->load(), widthParam->load(), satParam->load());
+    hysteresisProc.setParameters (*driveParam, *widthParam, *satParam);
     hysteresisProc.processBlock (leftPtr, rightPtr, buffer.getNumSamples());
 
     buffer.makeCopyOf (doubleBuffer, true);

@@ -25,7 +25,7 @@ private:
     void reloadModel (int randomSeed);
 
     // input gain
-    std::atomic<float>* inGainDbParam = nullptr;
+    chowdsp::FloatParameter* inGainDbParam = nullptr;
     dsp::Gain<float> inputGain;
     dsp::Gain<float> outputGain;
     float makeupGain = 1.0f;

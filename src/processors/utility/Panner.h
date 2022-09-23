@@ -25,12 +25,12 @@ private:
 
     bool getCustomComponents (OwnedArray<Component>& customComps) override;
 
-    std::atomic<float>* mainPan = nullptr;
-    std::atomic<float>* leftPan = nullptr;
-    std::atomic<float>* rightPan = nullptr;
-    std::atomic<float>* stereoWidth = nullptr;
-    std::atomic<float>* modDepth = nullptr;
-    std::atomic<float>* modRateHz = nullptr;
+    chowdsp::FloatParameter* mainPan = nullptr;
+    chowdsp::FloatParameter* leftPan = nullptr;
+    chowdsp::FloatParameter* rightPan = nullptr;
+    chowdsp::FloatParameter* stereoWidth = nullptr;
+    chowdsp::FloatParameter* modDepth = nullptr;
+    chowdsp::FloatParameter* modRateHz = nullptr;
     std::atomic<float>* panMode = nullptr;
     std::atomic<float>* stereoMode = nullptr;
 

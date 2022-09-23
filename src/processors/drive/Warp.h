@@ -15,9 +15,9 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* freqHzParam = nullptr;
-    std::atomic<float>* gainDBParam = nullptr;
-    std::atomic<float>* fbParam = nullptr;
+    chowdsp::FloatParameter* freqHzParam = nullptr;
+    chowdsp::FloatParameter* gainDBParam = nullptr;
+    chowdsp::FloatParameter* fbParam = nullptr;
 
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> freqHzSmooth[2];
     SmoothedValue<float, ValueSmoothingTypes::Linear> gainDBSmooth[2];

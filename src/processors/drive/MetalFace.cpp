@@ -3,7 +3,7 @@
 
 MetalFace::MetalFace (UndoManager* um) : BaseProcessor ("Metal Face", createParameterLayout(), um)
 {
-    gainDBParam = vts.getRawParameterValue ("gain");
+    chowdsp::ParamUtils::loadParameterPointer (gainDBParam, vts, "gain");
 
     uiOptions.backgroundColour = Colours::darkred.brighter (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter (0.1f);
@@ -47,7 +47,7 @@ void MetalFace::processAudio (AudioBuffer<float>& buffer)
 {
     auto&& block = dsp::AudioBlock<float> { buffer };
 
-    const auto gainDB = gainDBParam->load();
+    const auto gainDB = gainDBParam->getCurrentValue();
     gain.setGainDecibels (gainDB);
     gain.process (dsp::ProcessContextReplacing<float> { block });
 

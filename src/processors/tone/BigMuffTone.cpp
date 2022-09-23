@@ -21,8 +21,9 @@ const std::array<BigMuffTone::Components, 10> componentSets {
 BigMuffTone::BigMuffTone (UndoManager* um) : BaseProcessor ("Muff Tone", createParameterLayout(), um),
                                              comps (&componentSets[2])
 {
-    toneParam = vts.getRawParameterValue ("tone");
-    midsParam = vts.getRawParameterValue ("mids");
+    using namespace ParameterHelpers;
+    loadParameterPointer (toneParam, vts, "tone");
+    loadParameterPointer (midsParam, vts, "mids");
     typeParam = vts.getRawParameterValue ("type");
 
     uiOptions.backgroundColour = Colours::darkred.brighter (0.3f);
@@ -41,7 +42,7 @@ ParamLayout BigMuffTone::createParameterLayout()
 
     StringArray types;
     for (auto& set : componentSets)
-        types.add (set.name);
+        types.add (set.name.data());
     emplace_param<AudioParameterChoice> (params, "type", "Type", types, 2);
 
     return { params.begin(), params.end() };

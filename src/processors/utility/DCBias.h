@@ -8,7 +8,7 @@ class DCBias : public BaseProcessor
 public:
     explicit DCBias (UndoManager* um = nullptr) : BaseProcessor ("DC Bias", createParameterLayout(), um)
     {
-        biasParam = vts.getRawParameterValue ("bias");
+        chowdsp::ParamUtils::loadParameterPointer (biasParam, vts, "bias");
 
         uiOptions.backgroundColour = Colours::slategrey;
         uiOptions.powerColour = Colours::yellow;
@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    std::atomic<float>* biasParam = nullptr;
+    chowdsp::FloatParameter* biasParam = nullptr;
     dsp::Bias<float> bias;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DCBias)

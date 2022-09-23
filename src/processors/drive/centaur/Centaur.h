@@ -18,7 +18,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* levelParam = nullptr;
+    chowdsp::FloatParameter* levelParam = nullptr;
     std::atomic<float>* modeParam = nullptr;
 
     InputBufferProcessor inProc[2];

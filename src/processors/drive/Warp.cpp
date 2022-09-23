@@ -52,10 +52,11 @@ constexpr float calcQ (float gainDB)
 
 Warp::Warp (UndoManager* um) : BaseProcessor ("Warp", createParameterLayout(), um)
 {
-    freqHzParam = vts.getRawParameterValue ("freq");
-    gainDBParam = vts.getRawParameterValue ("gain");
-    fbParam = vts.getRawParameterValue ("fb");
-    fbDriveSmooth.setParameterHandle (vts.getRawParameterValue ("fb_drive"));
+    using namespace ParameterHelpers;
+    loadParameterPointer (freqHzParam, vts, "freq");
+    loadParameterPointer (gainDBParam, vts, "gain");
+    loadParameterPointer (fbParam, vts, "fb");
+    fbDriveSmooth.setParameterHandle (dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter ("fb_drive")));
 
     uiOptions.backgroundColour = Colour (0xffa713e2);
     uiOptions.powerColour = Colours::cyan;

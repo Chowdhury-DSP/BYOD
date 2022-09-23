@@ -16,10 +16,10 @@ public:
     void setGains (float driveValue);
 
 private:
-    std::atomic<float>* cutoffParam = nullptr;
-    std::atomic<float>* driveParam = nullptr;
+    chowdsp::FloatParameter* cutoffParam = nullptr;
+    chowdsp::FloatParameter* driveParam = nullptr;
     std::atomic<float>* diodeTypeParam = nullptr;
-    std::atomic<float>* nDiodesParam = nullptr;
+    chowdsp::FloatParameter* nDiodesParam = nullptr;
 
     dsp::Gain<float> inGain, outGain;
     using DiodeRectifierWDF = DiodeClipperWDF<wdft::DiodeT>;

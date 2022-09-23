@@ -8,7 +8,7 @@ class CleanGain : public BaseProcessor
 public:
     explicit CleanGain (UndoManager* um = nullptr) : BaseProcessor ("Clean Gain", createParameterLayout(), um)
     {
-        gainDBParam = vts.getRawParameterValue ("gain");
+        chowdsp::ParamUtils::loadParameterPointer (gainDBParam, vts, "gain");
 
         uiOptions.backgroundColour = Colours::darkgrey.brighter (0.35f).withRotatedHue (0.25f);
         uiOptions.powerColour = Colours::yellow;
@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    std::atomic<float>* gainDBParam = nullptr;
+    chowdsp::FloatParameter* gainDBParam = nullptr;
     dsp::Gain<float> gain;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CleanGain)

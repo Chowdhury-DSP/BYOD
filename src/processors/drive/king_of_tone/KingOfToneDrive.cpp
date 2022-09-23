@@ -72,7 +72,7 @@ void calcDriveaStageBypassedCoefs (FilterType& filter, float fs)
 
 KingOfToneDrive::KingOfToneDrive (UndoManager* um) : BaseProcessor ("Tone King", createParameterLayout(), um)
 {
-    driveParam = vts.getRawParameterValue ("drive");
+    chowdsp::ParamUtils::loadParameterPointer (driveParam, vts, "drive");
     modeParam = vts.getRawParameterValue ("mode");
 
     uiOptions.backgroundColour = Colour (0xFFAA659B);

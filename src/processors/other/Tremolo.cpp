@@ -21,9 +21,10 @@ static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& bl
 
 Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLayout(), um, 2, 2)
 {
-    rateParam = vts.getRawParameterValue ("rate");
-    waveParam = vts.getRawParameterValue ("wave");
-    depthParam = vts.getRawParameterValue ("depth");
+    using namespace ParameterHelpers;
+    loadParameterPointer (rateParam, vts, "rate");
+    loadParameterPointer (waveParam, vts, "wave");
+    loadParameterPointer (depthParam, vts, "depth");
 
     uiOptions.backgroundColour = Colours::orange.darker (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter();
@@ -136,7 +137,6 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         {
             for (int ch = 1; ch < modInputNumChannels; ++ch)
                 modBuffer.addFrom (0, 0, modInputBuffer, ch, 0, numSamples);
-
             modBuffer.applyGain (1.0f / (float) modInputNumChannels);
         }
     }

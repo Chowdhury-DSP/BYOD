@@ -17,9 +17,9 @@ public:
 private:
     void fillWaveBuffer (float* waveBuff, const int numSamples, float& p);
 
-    std::atomic<float>* rateParam = nullptr;
-    std::atomic<float>* waveParam = nullptr;
-    std::atomic<float>* depthParam = nullptr;
+    chowdsp::FloatParameter* rateParam = nullptr;
+    chowdsp::FloatParameter* waveParam = nullptr;
+    chowdsp::FloatParameter* depthParam = nullptr;
 
     chowdsp::SVFLowpass<float> filter;
     chowdsp::SineWave<float> sine;

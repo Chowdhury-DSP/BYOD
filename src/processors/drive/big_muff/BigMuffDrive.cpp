@@ -15,9 +15,10 @@ const auto levelRange = ParameterHelpers::createNormalisableRange (-60.0f, 0.0f,
 
 BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Muff Drive", createParameterLayout(), um)
 {
-    sustainParam = vts.getRawParameterValue ("sustain");
-    harmParam = vts.getRawParameterValue ("harmonics");
-    levelParam = vts.getRawParameterValue ("level");
+    using namespace ParameterHelpers;
+    loadParameterPointer (sustainParam, vts, "sustain");
+    loadParameterPointer (harmParam, vts, "harmonics");
+    loadParameterPointer (levelParam, vts, "level");
     nStagesParam = vts.getRawParameterValue ("n_stages");
     hiQParam = vts.getRawParameterValue ("high_q");
 

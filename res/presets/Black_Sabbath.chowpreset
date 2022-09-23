@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Black Sabbath" plugin="BYOD" vendor="CHOW" category="Players"
+        version="1.0.2">
+  <proc_chain>
+    <Muff_Tone>
+      <Parameters x_pos="0.3733062446117401" y_pos="0.08387096971273422">
+        <PARAM id="mids" value="0.5801359415054321"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="1.0"/>
+        <PARAM id="type" value="4.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Muff_Tone>
+    <Amp_IRs>
+      <Parameters x_pos="0.6327913403511047" y_pos="0.5290322303771973" ir_file="">
+        <PARAM id="gain" value="1.846080780029297"/>
+        <PARAM id="ir" value="1.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Amp_IRs>
+    <Treble_Booster>
+      <Parameters x_pos="0.1422764211893082" y_pos="0.5403226017951965">
+        <PARAM id="boost" value="0.6215273141860962"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Treble_Booster>
+    <Muff_Drive>
+      <Parameters x_pos="0.1402439028024673" y_pos="0.08709677308797836">
+        <PARAM id="harmonics" value="0.7371519804000854"/>
+        <PARAM id="level" value="0.7309594750404358"/>
+        <PARAM id="n_stages" value="2.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="sustain" value="0.7945812344551086"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Muff_Drive>
+    <Baxandall_EQ>
+      <Parameters x_pos="0.401761531829834" y_pos="0.5290322303771973">
+        <PARAM id="bass" value="0.2442800253629684"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.6162429451942444"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Baxandall_EQ>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.2845849692821503">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8817034959793091" y_pos="0.2846715450286865">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

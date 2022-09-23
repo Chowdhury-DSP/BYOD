@@ -3,9 +3,10 @@
 
 BassmanTone::BassmanTone (UndoManager* um) : BaseProcessor ("Bassman Tone", createParameterLayout(), um)
 {
-    bassParam = vts.getRawParameterValue ("bass");
-    midParam = vts.getRawParameterValue ("mid");
-    trebleParam = vts.getRawParameterValue ("treble");
+    using namespace ParameterHelpers;
+    loadParameterPointer (bassParam, vts, "bass");
+    loadParameterPointer (midParam, vts, "mid");
+    loadParameterPointer (trebleParam, vts, "treble");
 
     uiOptions.backgroundColour = Colours::forestgreen;
     uiOptions.powerColour = Colours::yellow.brighter();

@@ -20,10 +20,10 @@ private:
     template <typename DelayType>
     void processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLine);
 
-    std::atomic<float>* delayTimeMsParam = nullptr;
-    std::atomic<float>* freqParam = nullptr;
-    std::atomic<float>* feedbackParam = nullptr;
-    std::atomic<float>* mixParam = nullptr;
+    chowdsp::FloatParameter* delayTimeMsParam = nullptr;
+    chowdsp::FloatParameter* freqParam = nullptr;
+    chowdsp::FloatParameter* feedbackParam = nullptr;
+    chowdsp::FloatParameter* mixParam = nullptr;
     std::atomic<float>* delayTypeParam = nullptr;
     std::atomic<float>* pingPongParam = nullptr;
 

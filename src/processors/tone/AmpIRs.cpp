@@ -27,9 +27,10 @@ AmpIRs::AmpIRs (UndoManager* um) : BaseProcessor ("Amp IRs", createParameterLayo
         irMap.insert (std::make_pair (irName, std::make_pair ((void*) irData, (size_t) binarySize)));
     }
 
+    using namespace ParameterHelpers;
     vts.addParameterListener (irTag, this);
-    mixParam = vts.getRawParameterValue (mixTag);
-    gainParam = vts.getRawParameterValue (gainTag);
+    loadParameterPointer (mixParam, vts, mixTag);
+    loadParameterPointer (gainParam, vts, gainTag);
 
     parameterChanged (irTag, vts.getRawParameterValue (irTag)->load());
 
@@ -160,8 +161,8 @@ void AmpIRs::processAudio (AudioBuffer<float>& buffer)
     dsp::AudioBlock<float> block (buffer);
     dsp::ProcessContextReplacing<float> context (block);
 
-    dryWet.setWetMixProportion (mixParam->load());
-    gain.setGainDecibels (gainParam->load() + makeupGainDB.load());
+    dryWet.setWetMixProportion (mixParam->getCurrentValue());
+    gain.setGainDecibels (gainParam->getCurrentValue() + makeupGainDB.load());
 
     dryWet.pushDrySamples (block);
     convolution.process (context);

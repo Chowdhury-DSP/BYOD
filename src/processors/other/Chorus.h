@@ -19,10 +19,10 @@ private:
     template <typename DelayArrType>
     void processChorus (AudioBuffer<float>& buffer, DelayArrType& delay);
 
-    std::atomic<float>* rateParam = nullptr;
-    std::atomic<float>* depthParam = nullptr;
-    std::atomic<float>* fbParam = nullptr;
-    std::atomic<float>* mixParam = nullptr;
+    chowdsp::FloatParameter* rateParam = nullptr;
+    chowdsp::FloatParameter* depthParam = nullptr;
+    chowdsp::FloatParameter* fbParam = nullptr;
+    chowdsp::FloatParameter* mixParam = nullptr;
     std::atomic<float>* delayTypeParam = nullptr;
 
     dsp::DryWetMixer<float> dryWetMixer;

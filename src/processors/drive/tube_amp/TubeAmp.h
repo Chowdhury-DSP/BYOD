@@ -16,7 +16,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* driveParam = nullptr;
+    chowdsp::FloatParameter* driveParam = nullptr;
 
     dsp::Gain<float> gainIn, gainOut;
     AudioBuffer<double> doubleBuffer;

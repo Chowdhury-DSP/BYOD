@@ -43,7 +43,7 @@ private:
     static constexpr float G1 = 1.0f / 100e3f;
     static constexpr float G4 = 1.0f / 100e3f;
 
-    std::atomic<float>* trebleParam = nullptr;
+    chowdsp::FloatParameter* trebleParam = nullptr;
 
     float fs = 48000.0f;
     SmoothedValue<float, ValueSmoothingTypes::Linear> trebleSmooth;

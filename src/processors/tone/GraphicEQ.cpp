@@ -19,7 +19,7 @@ constexpr float calcQ (float gainDB)
 GraphicEQ::GraphicEQ (UndoManager* um) : BaseProcessor ("Graphic EQ", createParameterLayout(), um)
 {
     for (int i = 0; i < nBands; ++i)
-        gainDBParams[i] = vts.getRawParameterValue ("gain_" + String (i));
+        chowdsp::ParamUtils::loadParameterPointer (gainDBParams[i], vts, "gain_" + String (i));
 
     uiOptions.backgroundColour = Colours::burlywood.brighter (0.1f);
     uiOptions.powerColour = Colours::red.darker (0.1f);

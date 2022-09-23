@@ -15,7 +15,7 @@ public:
 
     struct Components
     {
-        const String name;
+        const std::string_view name;
 
         // default values: Ram's Head '75
         const float R8 = 39.0e3f;
@@ -58,8 +58,8 @@ private:
             filt.setCoefs (b, a);
     }
 
-    std::atomic<float>* toneParam = nullptr;
-    std::atomic<float>* midsParam = nullptr;
+    chowdsp::FloatParameter* toneParam = nullptr;
+    chowdsp::FloatParameter* midsParam = nullptr;
     std::atomic<float>* typeParam = nullptr;
 
     float fs = 48000.0f;

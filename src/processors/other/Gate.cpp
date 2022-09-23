@@ -95,11 +95,12 @@ private:
 
 Gate::Gate (UndoManager* um) : BaseProcessor ("Gate", createParameterLayout(), um)
 {
-    threshDBParam = vts.getRawParameterValue ("thresh");
-    attackMsParam = vts.getRawParameterValue ("attack");
-    holdMsParam = vts.getRawParameterValue ("hold");
-    releaseMsParam = vts.getRawParameterValue ("release");
-    makeupDBParam = vts.getRawParameterValue ("makeup");
+    using namespace ParameterHelpers;
+    loadParameterPointer (threshDBParam, vts, "thresh");
+    loadParameterPointer (attackMsParam, vts, "attack");
+    loadParameterPointer (holdMsParam, vts, "hold");
+    loadParameterPointer (releaseMsParam, vts, "release");
+    loadParameterPointer (makeupDBParam, vts, "makeup");
 
     gateEnvelope = std::make_unique<GateEnvelope>();
 

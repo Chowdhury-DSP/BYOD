@@ -17,8 +17,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* mixParam = nullptr;
-    std::atomic<float>* gainParam = nullptr;
+    chowdsp::FloatParameter* mixParam = nullptr;
+    chowdsp::FloatParameter* gainParam = nullptr;
 
     using IRType = std::pair<void*, size_t>;
     std::unordered_map<String, IRType> irMap;
