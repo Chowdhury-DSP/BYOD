@@ -9,7 +9,7 @@ const String modeTag = "mode";
 Centaur::Centaur (UndoManager* um) : BaseProcessor ("Centaur", createParameterLayout(), um),
                                      gainStageML (vts)
 {
-    levelParam = vts.getRawParameterValue (levelTag);
+    chowdsp::ParamUtils::loadParameterPointer (levelParam, vts, levelTag);
     modeParam = vts.getRawParameterValue (modeTag);
     addPopupMenuParameter (modeTag);
 

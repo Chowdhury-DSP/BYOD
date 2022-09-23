@@ -3,14 +3,15 @@
 
 SpringReverbProcessor::SpringReverbProcessor (UndoManager* um) : BaseProcessor ("Spring Reverb", createParameterLayout(), um)
 {
-    sizeParam = vts.getRawParameterValue ("size");
-    decayParam = vts.getRawParameterValue ("decay");
-    reflectParam = vts.getRawParameterValue ("reflect");
-    spinParam = vts.getRawParameterValue ("spin");
-    dampParam = vts.getRawParameterValue ("damping");
-    chaosParam = vts.getRawParameterValue ("chaos");
-    shakeParam = vts.getRawParameterValue ("shake");
-    mixParam = vts.getRawParameterValue ("mix");
+    using namespace ParameterHelpers;
+    loadParameterPointer (sizeParam, vts, "size");
+    loadParameterPointer (decayParam, vts, "decay");
+    loadParameterPointer (reflectParam, vts, "reflect");
+    loadParameterPointer (spinParam, vts, "spin");
+    loadParameterPointer (dampParam, vts, "damping");
+    loadParameterPointer (chaosParam, vts, "chaos");
+    loadParameterPointer (shakeParam, vts, "shake");
+    loadParameterPointer (mixParam, vts, "mix");
 
     uiOptions.backgroundColour = Colours::orange.darker (0.2f);
     uiOptions.powerColour = Colours::cyan.brighter (0.1f);
@@ -55,13 +56,13 @@ void SpringReverbProcessor::processAudio (AudioBuffer<float>& buffer)
     }
 
     reverb.setParams ({
-        sizeParam->load(),
-        decayParam->load(),
-        reflectParam->load(),
-        spinParam->load(),
-        dampParam->load(),
-        chaosParam->load(),
-        shakeParam->load() > 0.5f,
+        sizeParam->getCurrentValue(),
+        decayParam->getCurrentValue(),
+        reflectParam->getCurrentValue(),
+        spinParam->getCurrentValue(),
+        dampParam->getCurrentValue(),
+        chaosParam->getCurrentValue(),
+        shakeParam->getCurrentValue() > 0.5f,
     });
 
     dryBuffer.makeCopyOf (buffer);
@@ -72,7 +73,7 @@ void SpringReverbProcessor::processAudio (AudioBuffer<float>& buffer)
     dsp::AudioBlock<float> block (buffer);
     dsp::ProcessContextReplacing<float> context (block);
 
-    wetGain.setGainLinear (mixParam->load());
+    wetGain.setGainLinear (mixParam->getCurrentValue());
     wetGain.process (context);
 
     block += dryBlock;

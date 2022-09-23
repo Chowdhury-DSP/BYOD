@@ -20,11 +20,11 @@ public:
 private:
     bool getCustomComponents (OwnedArray<Component>& customComps) override;
 
-    std::atomic<float>* freqParam = nullptr;
-    std::atomic<float>* qParam = nullptr;
+    chowdsp::FloatParameter* freqParam = nullptr;
+    chowdsp::FloatParameter* qParam = nullptr;
     std::atomic<float>* modeParam = nullptr;
     std::atomic<float>* multiModeOnOffParam = nullptr;
-    std::atomic<float>* multiModeParam = nullptr;
+    chowdsp::FloatParameter* multiModeParam = nullptr;
 
     FreqSmooth freqSmooth;
     chowdsp::SVFMultiMode<float> svf;

@@ -10,7 +10,7 @@ const std::map<String, String> guitarMLModels {
 
 GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createParameterLayout(), um)
 {
-    gainParam = vts.getRawParameterValue ("gain");
+    chowdsp::ParamUtils::loadParameterPointer (gainParam, vts, "gain");
     modelParam = vts.getRawParameterValue ("model");
 
     for (const auto& modelConfig : guitarMLModels)
@@ -82,7 +82,7 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
     dsp::AudioBlock<float> block (buffer);
     dsp::ProcessContextReplacing<float> context (block);
 
-    inGain.setGainDecibels (gainParam->load() - 12.0f);
+    inGain.setGainDecibels (gainParam->getCurrentValue() - 12.0f);
     inGain.process (context);
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)

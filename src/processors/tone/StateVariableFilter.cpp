@@ -10,11 +10,12 @@ const String multiModeTypeTag = "multi_mode_type";
 
 StateVariableFilter::StateVariableFilter (UndoManager* um) : BaseProcessor ("SVF", createParameterLayout(), um)
 {
-    freqParam = vts.getRawParameterValue ("freq");
-    qParam = vts.getRawParameterValue ("q_value");
+    using namespace ParameterHelpers;
+    loadParameterPointer (freqParam, vts, "freq");
+    loadParameterPointer (qParam, vts, "q_value");
     modeParam = vts.getRawParameterValue (modeTag);
     multiModeOnOffParam = vts.getRawParameterValue (multiModeTag);
-    multiModeParam = vts.getRawParameterValue (multiModeTypeTag);
+    loadParameterPointer (multiModeParam, vts, multiModeTypeTag);
 
     addPopupMenuParameter (multiModeTag);
 
@@ -74,7 +75,7 @@ void StateVariableFilter::processAudio (AudioBuffer<float>& buffer)
     float modeValue = 0.0f;
     if (*multiModeOnOffParam == 1.0f)
     {
-        modeValue = multiModeParam->load();
+        modeValue = multiModeParam->getCurrentValue();
     }
     else
     {

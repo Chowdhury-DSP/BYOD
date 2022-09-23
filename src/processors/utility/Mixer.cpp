@@ -4,7 +4,7 @@
 Mixer::Mixer (UndoManager* um) : BaseProcessor ("Mixer", createParameterLayout(), um, numIns, 1)
 {
     for (int i = 0; i < numIns; ++i)
-        gainDBParams[i] = vts.getRawParameterValue ("gain" + String (i));
+        chowdsp::ParamUtils::loadParameterPointer (gainDBParams[i], vts, "gain" + String (i));
 
     uiOptions.backgroundColour = Colours::darkgrey.brighter (0.2f);
     uiOptions.powerColour = Colours::yellow;

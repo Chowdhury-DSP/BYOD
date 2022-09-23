@@ -15,7 +15,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* toneParam = nullptr;
+    chowdsp::FloatParameter* toneParam = nullptr;
 
     LinearSmoothedValue<float> toneSmooth[2];
     TubeScreamerToneWDF wdf[2];

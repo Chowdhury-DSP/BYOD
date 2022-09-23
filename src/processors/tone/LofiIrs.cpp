@@ -33,9 +33,10 @@ LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterL
         irMap.insert (std::make_pair (irName, std::make_pair ((void*) irData, (size_t) binarySize)));
     }
 
+    using namespace ParameterHelpers;
     vts.addParameterListener (irTag, this);
-    mixParam = vts.getRawParameterValue (mixTag);
-    gainParam = vts.getRawParameterValue (gainTag);
+    loadParameterPointer (mixParam, vts, mixTag);
+    loadParameterPointer (gainParam, vts, gainTag);
 
     uiOptions.backgroundColour = Colours::darkgrey.brighter (0.15f);
     uiOptions.powerColour = Colours::red.darker (0.1f);
@@ -97,8 +98,8 @@ void LofiIrs::processAudio (AudioBuffer<float>& buffer)
     dsp::AudioBlock<float> block (buffer);
     dsp::ProcessContextReplacing<float> context (block);
 
-    dryWet.setWetMixProportion (mixParam->load());
-    gain.setGainDecibels (gainParam->load() + makeupGainDB);
+    dryWet.setWetMixProportion (mixParam->getCurrentValue());
+    gain.setGainDecibels (gainParam->getCurrentValue() + makeupGainDB);
 
     dryWet.pushDrySamples (block);
     convolution.process (context);

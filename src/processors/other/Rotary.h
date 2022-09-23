@@ -14,7 +14,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* rateHzParam = nullptr;
+    chowdsp::FloatParameter* rateHzParam = nullptr;
 
     void processModulation (int numChannels, int numSamples);
     void processSpectralDelayFilters (int channel, float* data, const float* modData, const float* depthData, int numSamples);

@@ -9,10 +9,11 @@ const String pingPongTag = "ping_pong";
 
 DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
 {
-    delayTimeMsParam = vts.getRawParameterValue ("time_ms");
-    freqParam = vts.getRawParameterValue ("freq");
-    feedbackParam = vts.getRawParameterValue ("feedback");
-    mixParam = vts.getRawParameterValue ("mix");
+    using namespace ParameterHelpers;
+    loadParameterPointer (delayTimeMsParam, vts, "time_ms");
+    loadParameterPointer (freqParam, vts, "freq");
+    loadParameterPointer (feedbackParam, vts, "feedback");
+    loadParameterPointer (mixParam, vts, "mix");
     delayTypeParam = vts.getRawParameterValue (delayTypeTag);
     pingPongParam = vts.getRawParameterValue (pingPongTag);
 
@@ -210,7 +211,7 @@ void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& d
 
 void DelayModule::processAudio (AudioBuffer<float>& buffer)
 {
-    feedbackSmoothBuffer.process (std::pow (feedbackParam->load() * 0.67f, 0.9f), buffer.getNumSamples());
+    feedbackSmoothBuffer.process (std::pow (feedbackParam->getCurrentValue() * 0.67f, 0.9f), buffer.getNumSamples());
     delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f);
     freqSmooth.setTargetValue (*freqParam);
 

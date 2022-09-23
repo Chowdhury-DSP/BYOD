@@ -3,7 +3,7 @@
 
 TubeAmp::TubeAmp (UndoManager* um) : BaseProcessor ("Dirty Tube", createParameterLayout(), um)
 {
-    driveParam = vts.getRawParameterValue ("drive");
+    chowdsp::ParamUtils::loadParameterPointer (driveParam, vts, "drive");
 
     uiOptions.backgroundColour = Colours::cyan.interpolatedWith (Colours::navy, 0.5f);
     uiOptions.info.description = "Virtual analog model of an old tube amplifier.";
@@ -46,7 +46,7 @@ void TubeAmp::prepare (double sampleRate, int samplesPerBlock)
 
 void TubeAmp::processAudio (AudioBuffer<float>& buffer)
 {
-    auto driveAmtSkew = std::pow (driveParam->load(), 8.0f);
+    auto driveAmtSkew = std::pow (driveParam->getCurrentValue(), 8.0f);
     auto driveGain = 5.9f * driveAmtSkew + 0.1f;
     auto invDriveGain = 1.0f / (5.0f * driveAmtSkew + 1.0f);
 

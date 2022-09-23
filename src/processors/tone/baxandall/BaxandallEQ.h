@@ -15,8 +15,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* bassParam = nullptr;
-    std::atomic<float>* trebleParam = nullptr;
+    chowdsp::FloatParameter* bassParam = nullptr;
+    chowdsp::FloatParameter* trebleParam = nullptr;
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> bassSmooth[2];
     SmoothedValue<float, ValueSmoothingTypes::Linear> trebleSmooth[2];

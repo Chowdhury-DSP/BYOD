@@ -18,9 +18,9 @@ private:
     void doPrebuffering();
     void processInputStage (AudioBuffer<float>& buffer);
 
-    std::atomic<float>* sustainParam = nullptr;
-    std::atomic<float>* harmParam = nullptr;
-    std::atomic<float>* levelParam = nullptr;
+    chowdsp::FloatParameter* sustainParam = nullptr;
+    chowdsp::FloatParameter* harmParam = nullptr;
+    chowdsp::FloatParameter* levelParam = nullptr;
     std::atomic<float>* nStagesParam = nullptr;
     std::atomic<float>* hiQParam = nullptr;
 

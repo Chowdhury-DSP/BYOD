@@ -4,10 +4,11 @@
 
 DiodeClipper::DiodeClipper (UndoManager* um) : BaseProcessor ("Diode Clipper", createParameterLayout(), um)
 {
-    cutoffParam = vts.getRawParameterValue ("cutoff");
-    driveParam = vts.getRawParameterValue ("drive");
+    using namespace ParameterHelpers;
+    loadParameterPointer (cutoffParam, vts, "cutoff");
+    loadParameterPointer (driveParam, vts, "drive");
     diodeTypeParam = vts.getRawParameterValue ("diode");
-    nDiodesParam = vts.getRawParameterValue ("num_diodes");
+    loadParameterPointer (nDiodesParam, vts, "num_diodes");
 
     uiOptions.backgroundColour = Colours::white;
     uiOptions.info.description = "Emulation of a simple diode waveform clipper circuit with options for different configurations of diodes.";

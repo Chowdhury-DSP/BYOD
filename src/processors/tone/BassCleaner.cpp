@@ -3,7 +3,7 @@
 
 BassCleaner::BassCleaner (UndoManager* um) : BaseProcessor ("Bass Cleaner", createParameterLayout(), um)
 {
-    cleanParam = vts.getRawParameterValue ("clean");
+    chowdsp::ParamUtils::loadParameterPointer (cleanParam, vts, "clean");
 
     uiOptions.backgroundColour = Colours::dodgerblue.darker();
     uiOptions.powerColour = Colours::red.brighter (0.1f);

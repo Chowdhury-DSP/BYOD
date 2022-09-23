@@ -11,7 +11,7 @@ constexpr float freq2Rv2 (float cutoff, float C8, float R3)
 
 HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterLayout(), um)
 {
-    cutoffParam = vts.getRawParameterValue ("cutoff");
+    chowdsp::ParamUtils::loadParameterPointer (cutoffParam, vts, "cutoff");
 
     uiOptions.backgroundColour = Colour (0xFFFF8B3D);
     uiOptions.powerColour = Colours::blue;

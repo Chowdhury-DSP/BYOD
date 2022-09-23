@@ -8,7 +8,7 @@ GainStageML::GainStageML (AudioProcessorValueTreeState& vts)
     loadModel (gainStageML[3], BinaryData::centaur_75_json, BinaryData::centaur_75_jsonSize);
     loadModel (gainStageML[4], BinaryData::centaur_100_json, BinaryData::centaur_100_jsonSize);
 
-    gainParam = vts.getRawParameterValue ("gain");
+    chowdsp::ParamUtils::loadParameterPointer (gainParam, vts, "gain");
 }
 
 void GainStageML::loadModel (ModelPair& model, const char* data, int size)

@@ -3,7 +3,7 @@
 
 TrebleBooster::TrebleBooster (UndoManager* um) : BaseProcessor ("Treble Booster", createParameterLayout(), um)
 {
-    trebleParam = vts.getRawParameterValue ("boost");
+    chowdsp::ParamUtils::loadParameterPointer (trebleParam, vts, "boost");
 
     uiOptions.backgroundColour = Colours::cyan.darker (0.15f);
     uiOptions.powerColour = Colours::red.darker (0.1f);

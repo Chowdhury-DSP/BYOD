@@ -15,11 +15,11 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* threshDBParam = nullptr;
-    std::atomic<float>* attackMsParam = nullptr;
-    std::atomic<float>* holdMsParam = nullptr;
-    std::atomic<float>* releaseMsParam = nullptr;
-    std::atomic<float>* makeupDBParam = nullptr;
+    chowdsp::FloatParameter* threshDBParam = nullptr;
+    chowdsp::FloatParameter* attackMsParam = nullptr;
+    chowdsp::FloatParameter* holdMsParam = nullptr;
+    chowdsp::FloatParameter* releaseMsParam = nullptr;
+    chowdsp::FloatParameter* makeupDBParam = nullptr;
 
     AudioBuffer<float> levelBuffer;
 

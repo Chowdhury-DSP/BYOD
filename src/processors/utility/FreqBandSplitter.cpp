@@ -3,8 +3,9 @@
 
 FreqBandSplitter::FreqBandSplitter (UndoManager* um) : BaseProcessor ("Frequency Splitter", createParameterLayout(), um, 1, numOuts)
 {
-    crossLowParam = vts.getRawParameterValue ("cross_low");
-    crossHighParam = vts.getRawParameterValue ("cross_high");
+    using namespace ParameterHelpers;
+    loadParameterPointer (crossLowParam, vts, "cross_low");
+    loadParameterPointer (crossHighParam, vts, "cross_high");
 
     uiOptions.backgroundColour = Colours::slategrey;
     uiOptions.powerColour = Colours::cyan;

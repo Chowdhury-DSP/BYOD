@@ -15,9 +15,9 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* satParam = nullptr;
-    std::atomic<float>* driveParam = nullptr;
-    std::atomic<float>* widthParam = nullptr;
+    chowdsp::FloatParameter* satParam = nullptr;
+    chowdsp::FloatParameter* driveParam = nullptr;
+    chowdsp::FloatParameter* widthParam = nullptr;
 
     HysteresisProcessing hysteresisProc;
     AudioBuffer<double> doubleBuffer;

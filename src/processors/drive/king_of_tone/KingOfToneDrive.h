@@ -19,7 +19,7 @@ public:
 private:
     void doPreBuffering();
 
-    std::atomic<float>* driveParam = nullptr;
+    chowdsp::FloatParameter* driveParam = nullptr;
     std::atomic<float>* modeParam = nullptr;
 
     SmoothedValue<float> driveParamSmooth[2];

@@ -16,9 +16,9 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* gainParam = nullptr;
+    chowdsp::FloatParameter* gainParam = nullptr;
     std::atomic<float>* diodeTypeParam = nullptr;
-    std::atomic<float>* nDiodesParam = nullptr;
+    chowdsp::FloatParameter* nDiodesParam = nullptr;
 
     TubeScreamerWDF wdf[2];
     DCBlocker dcBlocker;

@@ -15,8 +15,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    std::atomic<float>* distParam = nullptr;
-    std::atomic<float>* levelParam = nullptr;
+    chowdsp::FloatParameter* distParam = nullptr;
+    chowdsp::FloatParameter* levelParam = nullptr;
 
     MXRDistWDF wdf[2];
 

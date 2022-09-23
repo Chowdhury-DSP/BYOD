@@ -21,11 +21,12 @@ const String freqModTag = "freq_mod";
 
 EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor ("Envelope Filter", createParameterLayout(), um)
 {
-    freqParam = vts.getRawParameterValue ("freq");
-    resParam = vts.getRawParameterValue ("res");
-    speedParam = vts.getRawParameterValue ("speed");
-    senseParam = vts.getRawParameterValue (senseTag);
-    freqModParam = vts.getRawParameterValue (freqModTag);
+    using namespace ParameterHelpers;
+    loadParameterPointer (freqParam, vts, "freq");
+    loadParameterPointer (resParam, vts, "res");
+    loadParameterPointer (speedParam, vts, "speed");
+    loadParameterPointer (senseParam, vts, senseTag);
+    loadParameterPointer (freqModParam, vts, freqModTag);
     filterTypeParam = vts.getRawParameterValue ("filter_type");
     directControlParam = vts.getRawParameterValue (directControlTag);
 
@@ -139,10 +140,10 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     bool directControlOn = *directControlParam == 1.0f;
     fillLevelBuffer (buffer, directControlOn);
 
-    auto filterFreqHz = freqParam->load();
-    filter.setQValue (getQ (resParam->load()));
+    auto filterFreqHz = freqParam->getCurrentValue();
+    filter.setQValue (getQ (resParam->getCurrentValue()));
 
-    auto freqModGain = directControlOn ? 10.0f : (20.0f * senseParam->load());
+    auto freqModGain = directControlOn ? 10.0f : (20.0f * senseParam->getCurrentValue());
     auto* levelPtr = levelBuffer.getReadPointer (0);
     FloatVectorOperations::clip (levelBuffer.getWritePointer (0), levelPtr, 0.0f, 2.0f, numSamples);
 

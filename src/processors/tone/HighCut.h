@@ -35,7 +35,7 @@ private:
     static constexpr float C8 = 10.0e-9f;
     static constexpr float R3 = 1.5e3f;
 
-    std::atomic<float>* cutoffParam = nullptr;
+    chowdsp::FloatParameter* cutoffParam = nullptr;
 
     float fs = 48000.0f;
     SmoothedValue<float, ValueSmoothingTypes::Linear> Rv2;

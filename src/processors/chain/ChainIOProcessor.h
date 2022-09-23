@@ -36,11 +36,11 @@ private:
     AudioBuffer<float> ioBuffer;
     dsp::AudioBlock<float> processBlock;
 
-    std::atomic<float>* inGainParam = nullptr;
-    std::atomic<float>* outGainParam = nullptr;
+    chowdsp::FloatParameter* inGainParam = nullptr;
+    chowdsp::FloatParameter* outGainParam = nullptr;
     dsp::Gain<float> inGain, outGain;
 
-    std::atomic<float>* dryWetParam = nullptr;
+    chowdsp::FloatParameter* dryWetParam = nullptr;
     DryWetProcessor dryWetMixer;
 
     bool isPrepared = false;

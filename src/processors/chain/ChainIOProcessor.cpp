@@ -6,10 +6,11 @@ using namespace GlobalParamTags;
 ChainIOProcessor::ChainIOProcessor (AudioProcessorValueTreeState& vts, std::function<void (int)>&& latencyChangedCallback) : latencyChangedCallbackFunc (std::move (latencyChangedCallback)),
                                                                                                                              oversampling (vts, true)
 {
+    using namespace ParameterHelpers;
     monoModeParam = vts.getRawParameterValue (monoModeTag);
-    inGainParam = vts.getRawParameterValue (inGainTag);
-    outGainParam = vts.getRawParameterValue (outGainTag);
-    dryWetParam = vts.getRawParameterValue (dryWetTag);
+    loadParameterPointer (inGainParam, vts, inGainTag);
+    loadParameterPointer (outGainParam, vts, outGainTag);
+    loadParameterPointer (dryWetParam, vts, dryWetTag);
 }
 
 void ChainIOProcessor::createParameters (Parameters& params)
@@ -117,10 +118,10 @@ dsp::AudioBlock<float> ChainIOProcessor::processAudioInput (const AudioBuffer<fl
     auto&& block = dsp::AudioBlock<float> { ioBuffer };
     auto&& context = dsp::ProcessContextReplacing<float> { block };
 
-    inGain.setGainDecibels (inGainParam->load());
+    inGain.setGainDecibels (inGainParam->getCurrentValue());
     inGain.process (context);
 
-    dryWetMixer.setDryWet (dryWetParam->load());
+    dryWetMixer.setDryWet (dryWetParam->getCurrentValue());
     dryWetMixer.copyDryBuffer (ioBuffer);
 
     processBlock = oversampling.processSamplesUp (block);
@@ -150,7 +151,7 @@ void ChainIOProcessor::processAudioOutput (const AudioBuffer<float>& processedBu
     const auto latencySamples = (int) oversampling.getLatencySamples();
     dryWetMixer.processBlock (ioBuffer, latencySamples);
 
-    outGain.setGainDecibels (outGainParam->load());
+    outGain.setGainDecibels (outGainParam->getCurrentValue());
     outGain.process (dsp::ProcessContextReplacing<float> { outputBlock });
 
     processChannelOutputs (outputBuffer, numProcessedChannels);

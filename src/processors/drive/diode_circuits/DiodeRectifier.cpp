@@ -3,10 +3,11 @@
 
 DiodeRectifier::DiodeRectifier (UndoManager* um) : BaseProcessor ("Diode Rectifier", createParameterLayout(), um)
 {
-    cutoffParam = vts.getRawParameterValue ("cutoff");
-    driveParam = vts.getRawParameterValue ("drive");
+    using namespace ParameterHelpers;
+    loadParameterPointer (cutoffParam, vts, "cutoff");
+    loadParameterPointer (driveParam, vts, "drive");
     diodeTypeParam = vts.getRawParameterValue ("diode");
-    nDiodesParam = vts.getRawParameterValue ("num_diodes");
+    loadParameterPointer (nDiodesParam, vts, "num_diodes");
 
     uiOptions.backgroundColour = Colours::goldenrod.brighter (0.25f);
     uiOptions.info.description = "Emulation of a simple diode rectifier circuit with options for different configurations of diodes.";

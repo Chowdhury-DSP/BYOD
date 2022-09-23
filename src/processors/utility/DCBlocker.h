@@ -8,7 +8,7 @@ class DCBlocker : public BaseProcessor
 public:
     explicit DCBlocker (UndoManager* um = nullptr) : BaseProcessor ("DC Blocker", createParameterLayout(), um)
     {
-        freqHzParam = vts.getRawParameterValue ("freq");
+        chowdsp::ParamUtils::loadParameterPointer (freqHzParam, vts, "freq");
 
         uiOptions.backgroundColour = Colours::darkgrey;
         uiOptions.powerColour = Colours::yellow;
@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    std::atomic<float>* freqHzParam = nullptr;
+    chowdsp::FloatParameter* freqHzParam = nullptr;
     chowdsp::SVFHighpass<float> filter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DCBlocker)

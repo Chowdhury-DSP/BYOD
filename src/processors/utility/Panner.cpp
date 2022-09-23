@@ -15,12 +15,13 @@ const String stereoModeTag = "stereo_mode";
 
 Panner::Panner (UndoManager* um) : BaseProcessor ("Panner", createParameterLayout(), um)
 {
-    mainPan = vts.getRawParameterValue (mainPanTag);
-    leftPan = vts.getRawParameterValue (leftPanTag);
-    rightPan = vts.getRawParameterValue (rightPanTag);
-    stereoWidth = vts.getRawParameterValue (stereoWidthTag);
-    modDepth = vts.getRawParameterValue (modDepthTag);
-    modRateHz = vts.getRawParameterValue (modRateHzTag);
+    using namespace ParameterHelpers;
+    loadParameterPointer (mainPan, vts, mainPanTag);
+    loadParameterPointer (leftPan, vts, leftPanTag);
+    loadParameterPointer (rightPan, vts, rightPanTag);
+    loadParameterPointer (stereoWidth, vts, stereoWidthTag);
+    loadParameterPointer (modDepth, vts, modDepthTag);
+    loadParameterPointer (modRateHz, vts, modRateHzTag);
     panMode = vts.getRawParameterValue (panModeTag);
     stereoMode = vts.getRawParameterValue (stereoModeTag);
 
@@ -166,12 +167,12 @@ void Panner::processStereoInput (const AudioBuffer<float>& buffer)
     tempStereoBuffer.setSize (2, numSamples, false, false, true);
     tempStereoBuffer.clear();
 
-    auto baseLeftPan = leftPan->load();
-    auto baseRightPan = rightPan->load();
+    auto baseLeftPan = leftPan->getCurrentValue();
+    auto baseRightPan = rightPan->getCurrentValue();
     if (*stereoMode == 0.0f) // stereo pan
     {
-        const auto currentMainPan = mainPan->load();
-        const auto widthMult = stereoWidth->load();
+        const auto currentMainPan = mainPan->getCurrentValue();
+        const auto widthMult = stereoWidth->getCurrentValue();
         baseLeftPan = jmax (currentMainPan * 2.0f - 1.0f, -1.0f) * widthMult;
         baseRightPan = jmin (currentMainPan * 2.0f + 1.0f, 1.0f) * widthMult;
     }
