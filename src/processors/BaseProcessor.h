@@ -172,7 +172,6 @@ private:
     StringArray popupMenuParameterIDs;
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
 
-    bool modulationPorts = false;
     juce::Array<int> inputModulationPorts {};
     juce::Array<int> outputModulationPorts {};
 
