@@ -40,6 +40,8 @@ void ChainIOProcessor::prepare (double sampleRate, int samplesPerBlock)
     oversampling.prepareToPlay (sampleRate, samplesPerBlock, 2);
 
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
+    inGain.setGainDecibels (inGainParam->getCurrentValue());
+    outGain.setGainDecibels (outGainParam->getCurrentValue());
     for (auto* gain : { &inGain, &outGain })
     {
         gain->prepare (spec);
