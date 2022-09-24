@@ -51,14 +51,16 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
 
     for (int i = 0; i < baseProc.getNumInputs(); ++i)
     {
-        auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour));
+        const auto portType = baseProc.isInputModulationPort (i) ? PortType::modulation : PortType::audio;
+        auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour, portType));
         newPort->setInputOutput (true);
         addAndMakeVisible (newPort);
     }
 
     for (int i = 0; i < baseProc.getNumOutputs(); ++i)
     {
-        auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour));
+        const auto portType = baseProc.isOutputModulationPort (i) ? PortType::modulation : PortType::audio;
+        auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour, portType));
         newPort->setInputOutput (false);
         addAndMakeVisible (newPort);
     }

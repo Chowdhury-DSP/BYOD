@@ -19,7 +19,7 @@ static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& bl
 }
 } // namespace
 
-Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLayout(), um)
+Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLayout(), um, 2, 2)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");
@@ -30,6 +30,8 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.powerColour = Colours::cyan.brighter();
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
 }
 
 ParamLayout Tremolo::createParameterLayout()
@@ -52,6 +54,7 @@ void Tremolo::prepare (double sampleRate, int samplesPerBlock)
     filter.setCutoffFrequency (250.0f);
 
     waveBuffer.setSize (1, samplesPerBlock);
+    modBuffer.setSize (1, samplesPerBlock);
     phaseSmooth.reset (sampleRate, 0.01);
     waveSmooth.reset (sampleRate, 0.01);
     depthGainSmooth.reset (sampleRate, 0.01);
@@ -119,29 +122,55 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     waveBuffer.setSize (1, numSamples, false, false, true);
+    modBuffer.setSize (1, numSamples, false, false, true);
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
-    // fill wave buffer (-1, 1)
-    dsp::AudioBlock<float> waveBlock { waveBuffer };
-    dsp::ProcessContextReplacing<float> waveCtx { waveBlock };
-    fillWaveBuffer (waveBlock.getChannelPointer (0), numSamples, phase);
-
-    // shrink range to (0, 1)
-    waveBlock *= 0.5f;
-    waveBlock += 0.5f;
-
-    // apply depth parameter
-    auto depthVal = std::pow (depthParam->getCurrentValue(), 0.33f);
-    depthGainSmooth.setTargetValue (depthVal);
-    waveBlock.multiplyBy (depthGainSmooth);
-    depthAddSmooth.setTargetValue (1.0f - depthVal);
-    addSmoothed (waveBlock, depthAddSmooth);
-    filter.process (waveCtx);
-
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+    if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
     {
-        auto* x = buffer.getWritePointer (ch);
-        FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
+        // get modulation buffer from input (-1, 1)
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        modBuffer.copyFrom (0, 0, modInputBuffer, 0, 0, numSamples);
+
+        if (const auto modInputNumChannels = modInputBuffer.getNumChannels(); modInputNumChannels > 1)
+        {
+            for (int ch = 1; ch < modInputNumChannels; ++ch)
+                modBuffer.addFrom (0, 0, modInputBuffer, ch, 0, numSamples);
+            modBuffer.applyGain (1.0f / (float) modInputNumChannels);
+        }
     }
+    else // create our own modulation signal
+    {
+        // fill modulation buffer (-1, 1)
+        fillWaveBuffer (modBuffer.getWritePointer (0), numSamples, phase);
+    }
+
+    if (inputsConnected.contains (AudioInput))
+    {
+        // copy modulation buffer to wave buffer (-1, 1)
+        waveBuffer.makeCopyOf (modBuffer, true);
+        dsp::AudioBlock<float> waveBlock { waveBuffer };
+        dsp::ProcessContextReplacing<float> waveCtx { waveBlock };
+
+        // shrink range to (0, 1)
+        waveBlock *= 0.5f;
+        waveBlock += 0.5f;
+
+        // apply depth parameter
+        auto depthVal = std::pow (depthParam->getCurrentValue(), 0.33f);
+        depthGainSmooth.setTargetValue (depthVal);
+        waveBlock.multiplyBy (depthGainSmooth);
+        depthAddSmooth.setTargetValue (1.0f - depthVal);
+        addSmoothed (waveBlock, depthAddSmooth);
+        filter.process (waveCtx);
+
+        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        {
+            auto* x = getInputBuffer (AudioInput).getWritePointer (0);
+            FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
+        }
+    }
+
+    outputBuffers.getReference (AudioOutput) = &getInputBuffer (AudioInput);
+    outputBuffers.getReference (ModulationOutput) = &modBuffer;
 }
