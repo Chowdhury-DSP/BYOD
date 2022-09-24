@@ -157,7 +157,7 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         waveBlock += 0.5f;
 
         // apply depth parameter
-        auto depthVal = std::pow (depthParam->load(), 0.33f);
+        auto depthVal = std::pow (depthParam->getCurrentValue(), 0.33f);
         depthGainSmooth.setTargetValue (depthVal);
         waveBlock.multiplyBy (depthGainSmooth);
         depthAddSmooth.setTargetValue (1.0f - depthVal);
