@@ -159,6 +159,19 @@ void BaseProcessor::removeConnection (const ConnectionInfo& info)
     }
 }
 
+const std::vector<String>* BaseProcessor::getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept
+{
+    if (auto iter = paramsToDisableWhenInputConnected.find (portIndex); iter != paramsToDisableWhenInputConnected.end())
+        return &(iter->second);
+
+    return nullptr;
+}
+
+void BaseProcessor::disableWhenInputConnected (const std::initializer_list<String>& paramIDs, int inputPortIndex)
+{
+    paramsToDisableWhenInputConnected[inputPortIndex] = paramIDs;
+}
+
 void BaseProcessor::addPopupMenuParameter (const String& paramID)
 {
     uiOptions.paramIDsToSkip.addIfNotAlreadyThere (paramID);
@@ -170,7 +183,7 @@ void BaseProcessor::addToPopupMenu (PopupMenu& menu)
     popupMenuParameterAttachments.clear();
     int itemID = 0;
 
-    auto addChoiceParam = [this, &menu, &itemID] (AudioParameterChoice* param)
+    auto addChoiceParam = [this, &menu, &itemID] (AudioParameterChoice* param, bool isEnabled)
     {
         menu.addSectionHeader (param->name);
 
@@ -187,12 +200,13 @@ void BaseProcessor::addToPopupMenu (PopupMenu& menu)
                 attachment->setValueAsCompleteGesture (newParamVal);
             };
             paramItem.colour = (param->getIndex() == (int) index) ? uiOptions.powerColour : Colours::white;
+            paramItem.isEnabled = isEnabled;
 
             menu.addItem (paramItem);
         }
     };
 
-    auto addBoolParam = [this, &itemID, &menu] (AudioParameterBool* param)
+    auto addBoolParam = [this, &itemID, &menu] (AudioParameterBool* param, bool isEnabled)
     {
         auto* attachment = popupMenuParameterAttachments.add (std::make_unique<ParameterAttachment> (
             *param, [] (float) {}, vts.undoManager));
@@ -203,18 +217,33 @@ void BaseProcessor::addToPopupMenu (PopupMenu& menu)
         paramItem.action = [attachment, param]
         { attachment->setValueAsCompleteGesture (param->get() ? 0.0f : 1.0f); };
         paramItem.colour = param->get() ? uiOptions.powerColour : Colours::white;
+        paramItem.isEnabled = isEnabled;
 
         menu.addItem (paramItem);
     };
 
     for (const auto& paramID : popupMenuParameterIDs)
     {
+        bool isEnabled = true;
+        for (int i = 0; i < getNumInputs(); ++i)
+        {
+            if (! inputsConnected.contains (i))
+                continue;
+
+            if (auto iter = paramsToDisableWhenInputConnected.find (i); iter != paramsToDisableWhenInputConnected.end())
+            {
+                auto& paramIDsToDisable = iter->second;
+                if (std::find (paramIDsToDisable.begin(), paramIDsToDisable.end(), paramID) != paramIDsToDisable.end())
+                    isEnabled = false;
+            }
+        }
+
         auto* param = vts.getParameter (paramID);
 
         if (auto* choiceParam = dynamic_cast<AudioParameterChoice*> (param))
-            addChoiceParam (choiceParam);
+            addChoiceParam (choiceParam, isEnabled);
         else if (auto* boolParam = dynamic_cast<AudioParameterBool*> (param))
-            addBoolParam (boolParam);
+            addBoolParam (boolParam, isEnabled);
         else
             jassertfalse; // popup menu items are not supported for this type of parameter by default!
 

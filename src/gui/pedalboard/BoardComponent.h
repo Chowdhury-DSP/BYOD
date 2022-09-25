@@ -22,6 +22,8 @@ public:
     void processorAdded (BaseProcessor* newProc);
     void processorRemoved (const BaseProcessor* proc);
     void refreshConnections() { resized(); }
+    void connectionAdded (const ConnectionInfo&) const;
+    void connectionRemoved (const ConnectionInfo&) const;
 
     const OwnedArray<ProcessorEditor>& getEditors() { return processorEditors; }
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
@@ -50,7 +52,6 @@ private:
     chowdsp::PopupMenuHelper popupMenu;
     juce::Point<int> nextEditorPosition {};
     bool addingFromNewProcButton = false;
-    bool addingFromRightClick = false;
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 

@@ -36,6 +36,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
     routeExternalModulation ({ ModulationInput }, { ModulationOutput });
+    disableWhenInputConnected ({ "rate", "wave" }, ModulationInput);
 }
 
 ParamLayout Tremolo::createParameterLayout()

@@ -25,6 +25,7 @@ public:
     juce::Point<int> getPortLocation (int portIndex, bool isInput) const;
     void setConnectionStatus (bool isConnected, int portIndex, bool isInput);
     Colour getColour() const noexcept { return procUI.backgroundColour; }
+    void toggleParamsEnabledOnInputConnectionChange (int inputPortIndex, bool isConnected);
 
 private:
     void processorSettingsCallback (PopupMenu& menu, PopupMenu::Options& options);

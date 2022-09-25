@@ -109,18 +109,33 @@ public:
     bool isInputModulationPort (int portIndex);
     bool isOutputModulationPort (int portIndex);
 
+    const std::vector<String>* getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept;
+
 protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
-    virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) {}
 
+    /** All multi-input or multi-output modules should override this method! */
+    virtual void processAudioBypassed (AudioBuffer<float>& /*buffer*/) { jassert (getNumInputs() <= 1 && getNumOutputs() <= 1); }
+
+    /**
+     * If a particular parameter should be shown in the module's popup menu
+     * rather than the knobs component, then call this method in the module's
+     * constructor with the appropriate parameter ID.
+     */
     void addPopupMenuParameter (const String& paramID);
+
+    /**
+     * If a parameter should be disabled when an input is connected, then
+     * call this method in the module's constructor with the appropriate paramIDs.
+     */
+    void disableWhenInputConnected (const std::initializer_list<String>& paramIDs, int inputPortIndex);
 
     /** 
      * All modulation signals should be in the range of [-1,1],
-     * they can then be modified as needed by the individual module
+     * they can then be modified as needed by the individual module.
      */
-    virtual void routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts);
+    void routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts);
 
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
@@ -172,6 +187,8 @@ private:
 
     juce::Array<int> inputModulationPorts {};
     juce::Array<int> outputModulationPorts {};
+
+    std::unordered_map<int, std::vector<String>> paramsToDisableWhenInputConnected {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };
