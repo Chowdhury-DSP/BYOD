@@ -13,6 +13,7 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+    void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
     void fillWaveBuffer (float* waveBuff, const int numSamples, float& p);
@@ -23,9 +24,9 @@ private:
 
     chowdsp::SVFLowpass<float> filter;
     chowdsp::SineWave<float> sine;
-
-    AudioBuffer<float> waveBuffer;
-    AudioBuffer<float> modBuffer;
+    
+    AudioBuffer<float> modOutBuffer;
+    AudioBuffer<float> audioOutBuffer;
     SmoothedValue<float, ValueSmoothingTypes::Linear> phaseSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> waveSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> depthGainSmooth;
@@ -34,13 +35,13 @@ private:
     float fs = 48000.0f;
     float phase = 0.0f;
 
-    enum InputPortIndexes
+    enum InputPort
     {
         AudioInput = 0,
         ModulationInput,
     };
 
-    enum OutputPortIndexes
+    enum OutputPort
     {
         AudioOutput = 0,
         ModulationOutput,

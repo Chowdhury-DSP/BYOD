@@ -9,6 +9,9 @@ public:
     explicit CleanGain (UndoManager* um = nullptr) : BaseProcessor ("Clean Gain", createParameterLayout(), um)
     {
         chowdsp::ParamUtils::loadParameterPointer (gainDBParam, vts, "gain");
+        chowdsp::ParamUtils::loadParameterPointer (invertParam, vts, "invert");
+
+        addPopupMenuParameter ("invert");
 
         uiOptions.backgroundColour = Colours::darkgrey.brighter (0.35f).withRotatedHue (0.25f);
         uiOptions.powerColour = Colours::yellow;
@@ -22,6 +25,7 @@ public:
         using namespace ParameterHelpers;
         auto params = createBaseParams();
         createGainDBParameter (params, "gain", "Gain", -18.0f, 18.0f, 0.0f);
+        emplace_param<chowdsp::BoolParameter> (params, "invert", "Invert", false);
 
         return { params.begin(), params.end() };
     }
@@ -35,7 +39,8 @@ public:
 
     void processAudio (AudioBuffer<float>& buffer) override
     {
-        gain.setGainDecibels (*gainDBParam);
+        const auto invertGain = invertParam->get() ? -1.0f : 1.0f;
+        gain.setGainLinear (Decibels::decibelsToGain (gainDBParam->getCurrentValue()) * invertGain);
 
         dsp::AudioBlock<float> block { buffer };
         dsp::ProcessContextReplacing<float> context { block };
@@ -44,6 +49,7 @@ public:
 
 private:
     chowdsp::FloatParameter* gainDBParam = nullptr;
+    chowdsp::BoolParameter* invertParam = nullptr;
     dsp::Gain<float> gain;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CleanGain)
