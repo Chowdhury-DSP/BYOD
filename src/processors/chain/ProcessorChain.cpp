@@ -128,7 +128,6 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
                 return; // not all the inputs are ready yet...
 
             runProcessor (nextProc, copyNextBuffer, outProcessed);
-            nextProc->clearNumInputsReady();
         }
     };
 
@@ -179,6 +178,9 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     // run processing chain
     bool outProcessed = false;
     runProcessor (&inputProcessor, inputBuffer, outProcessed);
+
+    for (auto* processor : procs)
+        processor->clearNumInputsReady();
 
     if (! outProcessed)
     {

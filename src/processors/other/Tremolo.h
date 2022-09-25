@@ -24,7 +24,7 @@ private:
 
     chowdsp::SVFLowpass<float> filter;
     chowdsp::SineWave<float> sine;
-    
+
     AudioBuffer<float> modOutBuffer;
     AudioBuffer<float> audioOutBuffer;
     SmoothedValue<float, ValueSmoothingTypes::Linear> phaseSmooth;
