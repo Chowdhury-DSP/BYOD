@@ -15,6 +15,12 @@ public:
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
+    enum InputPort
+    {
+        LeftChannel,
+        RightChannel,
+    };
+
     std::atomic<float>* modeParam = nullptr;
 
     AudioBuffer<float> stereoBuffer;

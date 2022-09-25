@@ -1,7 +1,11 @@
 #include "StereoMerger.h"
 #include "../ParameterHelpers.h"
 
-StereoMerger::StereoMerger (UndoManager* um) : BaseProcessor ("Stereo Merger", createParameterLayout(), um, 2, 1)
+StereoMerger::StereoMerger (UndoManager* um) : BaseProcessor ("Stereo Merger",
+                                                              createParameterLayout(),
+                                                              um,
+                                                              magic_enum::enum_count<InputPort>(),
+                                                              1)
 {
     modeParam = vts.getRawParameterValue ("mode");
 
@@ -38,7 +42,7 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
     stereoBuffer.setSize (2, numSamples, false, false, true);
     stereoBuffer.clear();
 
-    auto makeBufferMono = [=] (AudioBuffer<float>& b)
+    auto makeBufferMono = [numSamples] (AudioBuffer<float>& b)
     {
         const auto nChannels = b.getNumChannels();
 
@@ -51,8 +55,8 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
         b.applyGain (1.0f / (float) nChannels);
     };
 
-    bool isInput0Connected = inputsConnected.contains (0);
-    bool isInput1Connected = inputsConnected.contains (1);
+    bool isInput0Connected = inputsConnected.contains (LeftChannel);
+    bool isInput1Connected = inputsConnected.contains (RightChannel);
     bool isLeftRight = *modeParam == 0.0f;
 
     if (! isInput0Connected && ! isInput1Connected)
@@ -64,7 +68,7 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
 
     if (isInput0Connected)
     {
-        auto& inBuffer = getInputBuffer (0);
+        auto& inBuffer = getInputBuffer (LeftChannel);
         makeBufferMono (inBuffer);
 
         stereoBuffer.addFrom (0, 0, inBuffer, 0, 0, numSamples);
@@ -74,7 +78,7 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
 
     if (isInput1Connected)
     {
-        auto& inBuffer = getInputBuffer (1);
+        auto& inBuffer = getInputBuffer (RightChannel);
         makeBufferMono (inBuffer);
 
         if (isLeftRight)
@@ -102,8 +106,8 @@ void StereoMerger::processAudioBypassed (AudioBuffer<float>& buffer)
     stereoBuffer.setSize (2, numSamples, false, false, true);
     stereoBuffer.clear();
 
-    bool isInput0Connected = inputsConnected.contains (0);
-    bool isInput1Connected = inputsConnected.contains (1);
+    bool isInput0Connected = inputsConnected.contains (LeftChannel);
+    bool isInput1Connected = inputsConnected.contains (RightChannel);
 
     if (! isInput0Connected && ! isInput1Connected)
     {

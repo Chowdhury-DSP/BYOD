@@ -1,7 +1,7 @@
 #include "StereoSplitter.h"
 #include "../ParameterHelpers.h"
 
-StereoSplitter::StereoSplitter (UndoManager* um) : BaseProcessor ("Stereo Splitter", createParameterLayout(), um, 1, 2)
+StereoSplitter::StereoSplitter (UndoManager* um) : BaseProcessor ("Stereo Splitter", createParameterLayout(), um, 1, numOuts)
 {
     modeParam = vts.getRawParameterValue ("mode");
 
@@ -46,30 +46,30 @@ void StereoSplitter::processAudio (AudioBuffer<float>& buffer)
     {
         if (splitLeftRight)
         {
-            buffers[0].copyFrom (0, 0, buffer, 0, 0, numSamples);
-            buffers[1].copyFrom (0, 0, buffer, 0, 0, numSamples);
+            buffers[LeftChannel].copyFrom (0, 0, buffer, 0, 0, numSamples);
+            buffers[RightChannel].copyFrom (0, 0, buffer, 0, 0, numSamples);
         }
         else
         {
-            buffers[0].copyFrom (0, 0, buffer, 0, 0, numSamples);
-            buffers[1].clear (0, numSamples);
+            buffers[LeftChannel].copyFrom (0, 0, buffer, 0, 0, numSamples);
+            buffers[RightChannel].clear (0, numSamples);
         }
     }
     else if (numChannels == 2)
     {
         if (splitLeftRight)
         {
-            buffers[0].copyFrom (0, 0, buffer, 0, 0, numSamples);
-            buffers[1].copyFrom (0, 0, buffer, 1, 0, numSamples);
+            buffers[LeftChannel].copyFrom (0, 0, buffer, 0, 0, numSamples);
+            buffers[RightChannel].copyFrom (0, 0, buffer, 1, 0, numSamples);
         }
         else
         {
-            buffers[0].copyFrom (0, 0, buffer, 1, 0, numSamples);
-            buffers[1].copyFrom (0, 0, buffer, 1, 0, numSamples);
-            buffers[1].applyGain (-1.0f);
+            buffers[LeftChannel].copyFrom (0, 0, buffer, 1, 0, numSamples);
+            buffers[RightChannel].copyFrom (0, 0, buffer, 1, 0, numSamples);
+            buffers[RightChannel].applyGain (-1.0f);
 
-            buffers[0].addFrom (0, 0, buffer, 0, 0, numSamples);
-            buffers[1].addFrom (0, 0, buffer, 0, 0, numSamples);
+            buffers[LeftChannel].addFrom (0, 0, buffer, 0, 0, numSamples);
+            buffers[RightChannel].addFrom (0, 0, buffer, 0, 0, numSamples);
         }
     }
     else
@@ -77,8 +77,8 @@ void StereoSplitter::processAudio (AudioBuffer<float>& buffer)
         jassertfalse;
     }
 
-    outputBuffers.getReference (0) = &buffers[0];
-    outputBuffers.getReference (1) = &buffers[1];
+    outputBuffers.getReference (LeftChannel) = &buffers[LeftChannel];
+    outputBuffers.getReference (RightChannel) = &buffers[RightChannel];
 }
 
 void StereoSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -91,15 +91,15 @@ void StereoSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
 
     if (numChannels == 1)
     {
-        buffers[0].copyFrom (0, 0, buffer, 0, 0, numSamples);
-        buffers[1].copyFrom (0, 0, buffer, 0, 0, numSamples);
+        buffers[LeftChannel].copyFrom (0, 0, buffer, 0, 0, numSamples);
+        buffers[RightChannel].copyFrom (0, 0, buffer, 0, 0, numSamples);
     }
     else if (numChannels == 2)
     {
-        buffers[0].copyFrom (0, 0, buffer, 0, 0, numSamples);
-        buffers[1].copyFrom (0, 0, buffer, 1, 0, numSamples);
+        buffers[LeftChannel].copyFrom (0, 0, buffer, 0, 0, numSamples);
+        buffers[RightChannel].copyFrom (0, 0, buffer, 1, 0, numSamples);
     }
 
-    outputBuffers.getReference (0) = &buffers[0];
-    outputBuffers.getReference (1) = &buffers[1];
+    outputBuffers.getReference (LeftChannel) = &buffers[LeftChannel];
+    outputBuffers.getReference (RightChannel) = &buffers[RightChannel];
 }
