@@ -1,8 +1,8 @@
 #include "ProcessorStore.h"
 
+#include "drive/BassFace.h"
 #include "drive/GuitarMLAmp.h"
 #include "drive/MetalFace.h"
-#include "drive/BassFace.h"
 #include "drive/RONN.h"
 #include "drive/RangeBooster.h"
 #include "drive/Warp.h"
