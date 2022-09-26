@@ -15,32 +15,60 @@ CableView::CableView (BoardComponent* comp) : board (comp)
 
 CableView::~CableView() = default;
 
-void CableView::paint (Graphics& g)
+bool CableView::checkMouseOverInputPort()//rename these
 {
-    using namespace CableDrawingHelpers;
-
+    const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
+    nearestPort = portLocationHelper->getNearestPort (mousePos, board);
     if (nearestPort.editor != nullptr)
     {
         const bool isDraggingNearInputPort = nearestPort.isInput && isDraggingCable;
         const bool isNearConnectedInput = nearestPort.isInput && ! portLocationHelper->isInputPortConnected (nearestPort);
         if (! (isDraggingNearInputPort || isNearConnectedInput))
         {
-            auto startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
-            drawCablePortGlow (g, startPortLocation, scaleFactor);
-            cableGlowOn = true;
+            return true;
+
         }
     }
+    
+    return false;
+}
 
+bool CableView::checkMouseOverDraggingOutputPort()//rename these
+{
     if (cableMouse != nullptr)
     {
         auto mousePos = cableMouse->getPosition();
         const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->connectionInfo.startProc);
         if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
         {
-            auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
-            drawCablePortGlow (g, endPortLocation, scaleFactor);
-            cableGlowOn = true;
+            return true;
+
         }
+    }
+    
+    return false;   
+}
+
+void CableView::paint (Graphics& g)
+{
+    using namespace CableDrawingHelpers;
+    
+    
+    if(checkMouseOverInputPort())
+    {
+        auto startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
+        drawCablePortGlow (g, startPortLocation, scaleFactor);
+        portGlowOn = true;
+    }
+    else if(checkMouseOverDraggingOutputPort())
+    {
+        
+        auto mousePos = cableMouse->getPosition();
+        const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->connectionInfo.startProc);
+        auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
+        drawCablePortGlow (g, endPortLocation, scaleFactor);
+        portGlowOn = true;
+        
     }
 }
 
@@ -101,64 +129,28 @@ void CableView::mouseUp (const MouseEvent& e)
 
 void CableView::timerCallback()
 {
-    const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
-    nearestPort = portLocationHelper->getNearestPort (mousePos, board);
-    
-    if (nearestPort.editor != nullptr)
+
+    if(checkMouseOverInputPort())
     {
-        const bool isDraggingNearInputPort = nearestPort.isInput && isDraggingCable;
-        const bool isNearConnectedInput = nearestPort.isInput && ! portLocationHelper->isInputPortConnected (nearestPort);
-        if (! (isDraggingNearInputPort || isNearConnectedInput))
-        {
-            drawStartPortGlow = true;
-            repaint();
-            //auto startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
-            //drawCablePortGlow (g, startPortLocation, scaleFactor);
-        }
+        repaint();
     }
-//    if (cableMouse != nullptr)
-//    {
-//        auto mousePos = cableMouse->getPosition();
-//        const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->connectionInfo.startProc);
-//        if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
-//        {
-//            drawEndPortGlow = true;
-//            repaint();
-//        }
-//        
-//    }
+    
+    else if(checkMouseOverDraggingOutputPort())
+    {
+        repaint();
+    }
+    
+    else if(!checkMouseOverInputPort() && !checkMouseOverDraggingOutputPort() && portGlowOn)
+    {
+        repaint();
+        portGlowOn = false;
+    }
+
     if (cableMouse != nullptr)
     {
-        for (auto* cable : cables)
-        {
-            cable->repaint();
-        }
-    }
-    else
-    {
-        if(cableGlowOn)
-        {
-            repaint();
-            cableGlowOn = false;
-        }
-        
-        drawStartPortGlow = false;
-        drawEndPortGlow = false;
+        cables.getLast()->repaint();
     }
     
-//    if(isDraggingCable)
-//        repaint();
-//
-//    for (auto* cable : cables)
-//    {
-//        if(cable->dbLevelChanged)
-//        {
-//            cable->repaint();
-//            cable->dbLevelChanged = false;
-//        }
-//    }
-    
-    //repaint();
 }
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)
