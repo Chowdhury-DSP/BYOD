@@ -55,6 +55,7 @@ target_sources(BYOD PRIVATE
 
     processors/drive/GuitarMLAmp.cpp
     processors/drive/MetalFace.cpp
+    processors/drive/BassFace.cpp
     processors/drive/RangeBooster.cpp
     processors/drive/RONN.cpp
     processors/drive/Warp.cpp
