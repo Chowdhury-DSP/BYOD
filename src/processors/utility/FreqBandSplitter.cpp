@@ -57,7 +57,7 @@ void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
 
     // high band
     {
-        dsp::AudioBlock<float> block { buffers[0] };
+        dsp::AudioBlock<float> block { buffers[HighBand] };
         dsp::ProcessContextReplacing<float> ctx { block };
         highCrossHPF1.process (ctx);
         highCrossHPF2.process (ctx);
@@ -65,7 +65,7 @@ void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
 
     // mid band
     {
-        dsp::AudioBlock<float> block { buffers[1] };
+        dsp::AudioBlock<float> block { buffers[MidBand] };
         dsp::ProcessContextReplacing<float> ctx { block };
         lowCrossHPF1.process (ctx);
         lowCrossHPF2.process (ctx);
@@ -75,7 +75,7 @@ void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
 
     // low band
     {
-        dsp::AudioBlock<float> block { buffers[2] };
+        dsp::AudioBlock<float> block { buffers[LowBand] };
         dsp::ProcessContextReplacing<float> ctx { block };
         lowCrossLPF1.process (ctx);
         lowCrossLPF2.process (ctx);

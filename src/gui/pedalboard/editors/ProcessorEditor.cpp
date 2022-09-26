@@ -64,6 +64,9 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs
         newPort->setInputOutput (false);
         addAndMakeVisible (newPort);
     }
+
+    for (int i = 0; i < proc.getNumInputs(); ++i)
+        toggleParamsEnabledOnInputConnectionChange (i, false);
 }
 
 ProcessorEditor::~ProcessorEditor() = default;
@@ -225,7 +228,18 @@ juce::Point<int> ProcessorEditor::getPortLocation (int portIndex, bool isInput) 
 void ProcessorEditor::setConnectionStatus (bool isConnected, int portIndex, bool isInput)
 {
     if (isInput)
+    {
         inputPorts[portIndex]->setConnectionStatus (isConnected);
+        toggleParamsEnabledOnInputConnectionChange (portIndex, isConnected);
+    }
     else
+    {
         outputPorts[portIndex]->setConnectionStatus (isConnected);
+    }
+}
+
+void ProcessorEditor::toggleParamsEnabledOnInputConnectionChange (int inputPortIndex, bool isConnected)
+{
+    if (auto* toggleParamIDs = proc.getParametersToDisableWhenInputIsConnected (inputPortIndex))
+        knobs.toggleParamsEnabled (*toggleParamIDs, ! isConnected);
 }

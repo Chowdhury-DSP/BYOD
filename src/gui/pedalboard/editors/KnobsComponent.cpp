@@ -15,6 +15,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         addAndMakeVisible (newSlide.get());
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, *newSlide);
 
+        newSlide->setComponentID (param->paramID);
         newSlide->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         newSlide->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         newSlide->setName (param->name);
@@ -32,6 +33,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
     {
         auto newBox = std::make_unique<BoxWithAttachment>();
         addAndMakeVisible (newBox.get());
+        newBox->setComponentID (param->paramID);
         newBox->setName (param->name);
         newBox->addItemList (param->choices, 1);
         newBox->setSelectedItemIndex (0);
@@ -51,6 +53,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
 
         auto newButton = std::make_unique<ButtonWithAttachment>();
         addAndMakeVisible (newButton.get());
+        newButton->setComponentID (param->paramID);
         newButton->setButtonText (param->name);
         newButton->setClickingTogglesState (true);
         newButton->setColour (TextButton::buttonColourId, contrastColour.withAlpha (0.4f));
@@ -132,6 +135,15 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
     }
 
     setSize (getWidth(), 100);
+}
+
+void KnobsComponent::toggleParamsEnabled (const std::vector<String>& paramIDs, bool shouldEnable)
+{
+    for (auto* comp : getChildren())
+    {
+        if (std::find (paramIDs.begin(), paramIDs.end(), comp->getComponentID()) != paramIDs.end())
+            comp->setEnabled (shouldEnable);
+    }
 }
 
 void KnobsComponent::paint (Graphics& g)

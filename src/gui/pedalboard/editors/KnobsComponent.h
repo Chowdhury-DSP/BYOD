@@ -10,6 +10,8 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
+    void toggleParamsEnabled (const std::vector<String>& paramIDs, bool shouldEnable);
+
 private:
     using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
     using ComboBoxAttachment = AudioProcessorValueTreeState::ComboBoxAttachment;

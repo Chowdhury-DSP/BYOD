@@ -15,7 +15,13 @@ public:
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
-    static constexpr int numOuts = 3;
+    enum OutputPort
+    {
+        HighBand,
+        MidBand,
+        LowBand,
+    };
+    static constexpr int numOuts = magic_enum::enum_count<OutputPort>();
 
     chowdsp::FloatParameter* crossLowParam = nullptr;
     chowdsp::FloatParameter* crossHighParam = nullptr;

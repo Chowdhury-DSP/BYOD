@@ -15,9 +15,16 @@ public:
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
+    enum OutputPort
+    {
+        LeftChannel,
+        RightChannel,
+    };
+    static constexpr int numOuts = magic_enum::enum_count<OutputPort>();
+
     std::atomic<float>* modeParam = nullptr;
 
-    AudioBuffer<float> buffers[2];
+    AudioBuffer<float> buffers[numOuts];
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StereoSplitter)
 };

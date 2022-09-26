@@ -15,7 +15,15 @@ public:
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
-    static constexpr int numIns = 4;
+    enum InputPort
+    {
+        Channel1,
+        Channel2,
+        Channel3,
+        Channel4,
+    };
+
+    static constexpr int numIns = magic_enum::enum_count<InputPort>();
     std::array<chowdsp::FloatParameter*, numIns> gainDBParams { nullptr };
     std::array<dsp::Gain<float>, numIns> gains;
 

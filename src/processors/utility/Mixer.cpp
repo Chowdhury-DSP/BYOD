@@ -1,7 +1,11 @@
 #include "Mixer.h"
 #include "../ParameterHelpers.h"
 
-Mixer::Mixer (UndoManager* um) : BaseProcessor ("Mixer", createParameterLayout(), um, numIns, 1)
+Mixer::Mixer (UndoManager* um) : BaseProcessor ("Mixer",
+                                                createParameterLayout(),
+                                                um,
+                                                numIns,
+                                                1)
 {
     for (int i = 0; i < numIns; ++i)
         chowdsp::ParamUtils::loadParameterPointer (gainDBParams[i], vts, "gain" + String (i));

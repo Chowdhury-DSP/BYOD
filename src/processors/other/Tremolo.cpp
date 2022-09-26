@@ -19,7 +19,11 @@ static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& bl
 }
 } // namespace
 
-Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLayout(), um, 2, 2)
+Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
+                                                    createParameterLayout(),
+                                                    um,
+                                                    magic_enum::enum_count<InputPort>(),
+                                                    magic_enum::enum_count<OutputPort>())
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");
@@ -32,6 +36,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo", createParameterLa
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
     routeExternalModulation ({ ModulationInput }, { ModulationOutput });
+    disableWhenInputConnected ({ "rate", "wave" }, ModulationInput);
 }
 
 ParamLayout Tremolo::createParameterLayout()
@@ -53,8 +58,8 @@ void Tremolo::prepare (double sampleRate, int samplesPerBlock)
     filter.prepare (monoSpec);
     filter.setCutoffFrequency (250.0f);
 
-    waveBuffer.setSize (1, samplesPerBlock);
-    modBuffer.setSize (1, samplesPerBlock);
+    modOutBuffer.setSize (1, samplesPerBlock);
+    audioOutBuffer.setSize (2, samplesPerBlock);
     phaseSmooth.reset (sampleRate, 0.01);
     waveSmooth.reset (sampleRate, 0.01);
     depthGainSmooth.reset (sampleRate, 0.01);
@@ -121,8 +126,8 @@ void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
 void Tremolo::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
-    waveBuffer.setSize (1, numSamples, false, false, true);
-    modBuffer.setSize (1, numSamples, false, false, true);
+    modOutBuffer.setSize (1, numSamples, false, false, true);
+
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
@@ -130,47 +135,100 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     {
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
-        modBuffer.copyFrom (0, 0, modInputBuffer, 0, 0, numSamples);
+        modOutBuffer.copyFrom (0, 0, modInputBuffer, 0, 0, numSamples);
 
         if (const auto modInputNumChannels = modInputBuffer.getNumChannels(); modInputNumChannels > 1)
         {
             for (int ch = 1; ch < modInputNumChannels; ++ch)
-                modBuffer.addFrom (0, 0, modInputBuffer, ch, 0, numSamples);
-            modBuffer.applyGain (1.0f / (float) modInputNumChannels);
+                modOutBuffer.addFrom (0, 0, modInputBuffer, ch, 0, numSamples);
+            modOutBuffer.applyGain (1.0f / (float) modInputNumChannels);
         }
     }
     else // create our own modulation signal
     {
         // fill modulation buffer (-1, 1)
-        fillWaveBuffer (modBuffer.getWritePointer (0), numSamples, phase);
+        fillWaveBuffer (modOutBuffer.getWritePointer (0), numSamples, phase);
     }
 
     if (inputsConnected.contains (AudioInput))
     {
-        // copy modulation buffer to wave buffer (-1, 1)
-        waveBuffer.makeCopyOf (modBuffer, true);
-        dsp::AudioBlock<float> waveBlock { waveBuffer };
-        dsp::ProcessContextReplacing<float> waveCtx { waveBlock };
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
 
-        // shrink range to (0, 1)
-        waveBlock *= 0.5f;
-        waveBlock += 0.5f;
+        // copy modulation data into channel 0 of audio output buffer, and shrink range to (0, 1)
+        audioOutBuffer.copyFrom (0, 0, modOutBuffer.getReadPointer (0), numSamples, 0.5f);
+        FloatVectorOperations::add (audioOutBuffer.getWritePointer (0), 0.5f, numSamples);
 
         // apply depth parameter
-        auto depthVal = std::pow (depthParam->getCurrentValue(), 0.33f);
-        depthGainSmooth.setTargetValue (depthVal);
-        waveBlock.multiplyBy (depthGainSmooth);
-        depthAddSmooth.setTargetValue (1.0f - depthVal);
-        addSmoothed (waveBlock, depthAddSmooth);
-        filter.process (waveCtx);
-
-        for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
         {
-            auto* x = getInputBuffer (AudioInput).getWritePointer (0);
-            FloatVectorOperations::multiply (x, x, waveBuffer.getReadPointer (0), numSamples);
+            auto&& waveBlock = dsp::AudioBlock<float> { audioOutBuffer }.getSingleChannelBlock (0);
+            auto depthVal = std::pow (depthParam->getCurrentValue(), 0.33f);
+            depthGainSmooth.setTargetValue (depthVal);
+            waveBlock.multiplyBy (depthGainSmooth);
+            depthAddSmooth.setTargetValue (1.0f - depthVal);
+            addSmoothed (waveBlock, depthAddSmooth);
+            filter.process (dsp::ProcessContextReplacing<float> { waveBlock });
+        }
+
+        // copy modulation data into all the channels
+        for (int ch = 1; ch < numChannels; ++ch)
+            audioOutBuffer.copyFrom (ch, 0, audioOutBuffer, 0, 0, numSamples);
+
+        // multiply with incoming audio data
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            const auto* x = audioInBuffer.getReadPointer (ch);
+            auto* y = audioOutBuffer.getWritePointer (ch);
+            FloatVectorOperations::multiply (y, x, numSamples);
         }
     }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
 
-    outputBuffers.getReference (AudioOutput) = &getInputBuffer (AudioInput);
-    outputBuffers.getReference (ModulationOutput) = &modBuffer;
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+}
+
+void Tremolo::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+    modOutBuffer.setSize (1, numSamples, false, false, true);
+
+    if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
+    {
+        // get modulation buffer from input (-1, 1)
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        modOutBuffer.copyFrom (0, 0, modInputBuffer, 0, 0, numSamples);
+
+        if (const auto modInputNumChannels = modInputBuffer.getNumChannels(); modInputNumChannels > 1)
+        {
+            for (int ch = 1; ch < modInputNumChannels; ++ch)
+                modOutBuffer.addFrom (0, 0, modInputBuffer, ch, 0, numSamples);
+            modOutBuffer.applyGain (1.0f / (float) modInputNumChannels);
+        }
+    }
+    else
+    {
+        modOutBuffer.clear();
+    }
+
+    if (inputsConnected.contains (AudioInput))
+    {
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        audioOutBuffer.makeCopyOf (audioInBuffer, true);
+    }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
+
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
 }

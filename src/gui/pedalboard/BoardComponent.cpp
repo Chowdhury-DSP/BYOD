@@ -59,6 +59,8 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
         procChain.processorAddedBroadcaster.connect<&BoardComponent::processorAdded> (this),
         procChain.processorRemovedBroadcaster.connect<&BoardComponent::processorRemoved> (this),
         procChain.refreshConnectionsBroadcaster.connect<&BoardComponent::refreshConnections> (this),
+        procChain.connectionAddedBroadcaster.connect<&BoardComponent::connectionAdded> (this),
+        procChain.connectionRemovedBroadcaster.connect<&BoardComponent::connectionRemoved> (this),
     };
 
     cableView.getConnectionHelper()->connectToProcessorChain (procChain);
@@ -140,6 +142,18 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
         processorEditors.removeObject (editor);
     }
     repaint();
+}
+
+void BoardComponent::connectionAdded (const ConnectionInfo& info) const
+{
+    if (auto* editor = findEditorForProcessor (info.endProc))
+        editor->toggleParamsEnabledOnInputConnectionChange (info.endPort, true);
+}
+
+void BoardComponent::connectionRemoved (const ConnectionInfo& info) const
+{
+    if (auto* editor = findEditorForProcessor (info.endProc))
+        editor->toggleParamsEnabledOnInputConnectionChange (info.endPort, false);
 }
 
 void BoardComponent::showInfoComp (const BaseProcessor& proc)
