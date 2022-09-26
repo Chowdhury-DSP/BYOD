@@ -1,5 +1,6 @@
 #include "ProcessorStore.h"
 
+#include "drive/BassFace.h"
 #include "drive/GuitarMLAmp.h"
 #include "drive/MetalFace.h"
 #include "drive/RONN.h"
@@ -62,6 +63,7 @@ static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 }
 
 ProcessorStore::StoreMap ProcessorStore::store = {
+    { "Bass Face", &processorFactory<BassFace> },
     { "Centaur", &processorFactory<Centaur> },
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
