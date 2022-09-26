@@ -230,16 +230,11 @@ void BaseProcessor::addToPopupMenu (PopupMenu& menu)
             if (! inputsConnected.contains (i))
                 continue;
 
-            if (auto iter = paramsToDisableWhenInputConnected.find (i); iter != paramsToDisableWhenInputConnected.end())
-            {
-                auto& paramIDsToDisable = iter->second;
-                if (std::find (paramIDsToDisable.begin(), paramIDsToDisable.end(), paramID) != paramIDsToDisable.end())
-                    isEnabled = false;
-            }
+            if (auto* paramIDsToDisable = getParametersToDisableWhenInputIsConnected (i); std::find (paramIDsToDisable->begin(), paramIDsToDisable->end(), paramID) != paramIDsToDisable->end())
+                isEnabled = false;
         }
 
         auto* param = vts.getParameter (paramID);
-
         if (auto* choiceParam = dynamic_cast<AudioParameterChoice*> (param))
             addChoiceParam (choiceParam, isEnabled);
         else if (auto* boolParam = dynamic_cast<AudioParameterBool*> (param))
