@@ -244,6 +244,8 @@ int PresetsComp::addPresetShareOptions (PopupMenu* menu, int optionID)
 #if ! JUCE_IOS
     return addPresetMenuItem (menu, optionID, "Load Preset From File", [&]
                               { loadFromFileBrowser(); });
+#else
+    return optionID;
 #endif
 }
 
