@@ -69,12 +69,13 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
         -D"CMAKE_OSX_ARCHITECTURES=x86_64" \
         -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO \
         -DCMAKE_XCODE_ATTRIBUTE_OTHER_CODE_SIGN_FLAGS="--timestamp" \
+        -DBYOD_BUILD_ADD_ON_MODULES=ON \
         -DBUILD_RELEASE=ON
 
     cmake --build build-aax --config $build_config -j12 --target "${TARGET_NAME}_AAX" | xcpretty
 
 else # Windows
-    cmake -Bbuild-aax -G"Visual Studio 16 2019" -A x64
+    cmake -Bbuild-aax -G"Visual Studio 16 2019" -A x64 -DBYOD_BUILD_ADD_ON_MODULES=ON
     cmake --build build-aax --config $build_config --parallel $(nproc) --target "${TARGET_NAME}_AAX"
 fi
 
