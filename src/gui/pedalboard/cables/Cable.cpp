@@ -102,7 +102,13 @@ void Cable::paint (Graphics& g)
 
         endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, connectionInfo.endPort, true }).toFloat();
         endColour = endEditor->getColour();
-        levelDB = connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort);
+        auto updatedLevelDb = jlimit (floorDB, 0.0f, connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort));
+        if(std::abs(std::abs(updatedLevelDb) - std::abs(levelDB)) > 1.0f)
+        {
+            levelDB = updatedLevelDb;
+            dbLevelChanged = true;
+        }
+                                      
 
         drawCable (g, startPortLocation, endPortLocation);
     }

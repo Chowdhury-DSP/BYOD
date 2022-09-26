@@ -101,7 +101,18 @@ void CableView::timerCallback()
 {
     const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
     nearestPort = portLocationHelper->getNearestPort (mousePos, board);
-    repaint();
+    
+    if(isDraggingCable)
+        repaint();
+    
+    for (auto* cable : cables)
+    {
+        if(cable->dbLevelChanged)
+        {
+            cable->repaint();
+            cable->dbLevelChanged = false;
+        }
+    }
 }
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)
