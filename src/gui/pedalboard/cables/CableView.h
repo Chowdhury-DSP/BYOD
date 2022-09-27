@@ -51,6 +51,12 @@ private:
     std::unique_ptr<CableViewPortLocationHelper> portLocationHelper;
 
     EditorPort nearestPort {};
+    
+    bool cableGlowOn = false;
+    
+    bool drawStartPortGlow = false;
+    bool drawEndPortGlow = false;
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CableView)
 };
