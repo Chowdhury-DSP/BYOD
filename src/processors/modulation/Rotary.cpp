@@ -1,7 +1,12 @@
 #include "Rotary.h"
 #include "../ParameterHelpers.h"
+#include "../BufferHelpers.h"
 
-Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary", createParameterLayout(), um)
+Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary",
+                                                  createParameterLayout(),
+                                                  um,
+                                                  magic_enum::enum_count<InputPort>(),
+                                                  magic_enum::enum_count<OutputPort>())
 {
     chowdsp::ParamUtils::loadParameterPointer (rateHzParam, vts, "rate");
 
@@ -14,6 +19,9 @@ Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary", createParameterLayou
     uiOptions.powerColour = Colours::orange.brighter (0.1f);
     uiOptions.info.description = "A rotating speaker effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
+    disableWhenInputConnected ({ "rate" }, ModulationInput);
 }
 
 ParamLayout Rotary::createParameterLayout()
@@ -30,7 +38,10 @@ void Rotary::prepare (double sampleRate, int samplesPerBlock)
 {
     const auto&& monoSpec = dsp::ProcessSpec { sampleRate, (uint32) samplesPerBlock, 1 };
     modulator.prepare (monoSpec);
-    modulationBuffer.setSize (2, samplesPerBlock);
+    modulationBuffer.setSize (1, samplesPerBlock);
+    modulationBufferNegative.setSize (1, samplesPerBlock);
+
+    audioOutBuffer.setSize (2, samplesPerBlock);
 
     tremDepthSmoothed.prepare (sampleRate, samplesPerBlock);
     tremDepthSmoothed.mappingFunction = [] (float val)
@@ -65,17 +76,27 @@ void Rotary::prepare (double sampleRate, int samplesPerBlock)
     chorusDepthSamples = 0.6f * 0.001f * (float) sampleRate;
 }
 
-void Rotary::processModulation (int numChannels, int numSamples)
+void Rotary::processModulation (int numSamples)
 {
-    modulationBuffer.setSize (numChannels, numSamples, false, false, true);
+    modulationBuffer.setSize (1, numSamples, false, false, true);
     modulationBuffer.clear();
-    auto&& monoBlock = dsp::AudioBlock<float> { modulationBuffer }.getSingleChannelBlock (0);
 
-    modulator.setFrequency (*rateHzParam);
-    modulator.process (dsp::ProcessContextReplacing<float> { monoBlock });
+    if (inputsConnected.contains (ModulationInput))
+    {
+        // get modulation buffer from input (-1, 1)
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modulationBuffer);
+    }
+    else
+    {
+        auto&& monoBlock = dsp::AudioBlock<float> { modulationBuffer };
+        modulator.setFrequency (*rateHzParam);
+        modulator.process (dsp::ProcessContextReplacing<float> { monoBlock });
+    }
 
-    if (numChannels > 1)
-        FloatVectorOperations::negate (modulationBuffer.getWritePointer (1), modulationBuffer.getReadPointer (0), numSamples);
+    modulationBufferNegative.setSize (1, numSamples, false, false, true);
+    modulationBufferNegative.clear();
+    FloatVectorOperations::negate (modulationBufferNegative.getWritePointer (0), modulationBuffer.getReadPointer (0), numSamples);
 }
 
 void Rotary::processSpectralDelayFilters (int channel, float* data, const float* modData, const float* depthData, int numSamples)
@@ -125,31 +146,78 @@ void Rotary::processChorusing (int channel, float* data, const float* modData, c
 void Rotary::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
-    const auto numChannels = buffer.getNumChannels();
 
-    processModulation (numChannels, numSamples);
+    processModulation (numSamples);
     tremDepthSmoothed.process (numSamples);
     spectralDepthSmoothed.process (numSamples);
     chorusDepthSmoothed.process (numSamples);
 
-    for (int ch = 0; ch < numChannels; ++ch)
+    if (inputsConnected.contains (AudioInput))
     {
-        auto* x = buffer.getWritePointer (ch);
-        const auto* modData = modulationBuffer.getReadPointer (ch);
+        const auto& audioInputBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInputBuffer.getNumChannels();
+        audioOutBuffer.makeCopyOf (audioInputBuffer, true);
 
-        processSpectralDelayFilters (ch, x, modData, spectralDepthSmoothed.getSmoothedBuffer(), numSamples);
-        processChorusing (ch, x, modData, chorusDepthSmoothed.getSmoothedBuffer(), numSamples);
-
-        // tremolo
-        const auto* tremDepth = tremDepthSmoothed.getSmoothedBuffer();
-        FloatVectorOperations::multiply (tremModData.data(), modData, 0.5f, numSamples);
-        FloatVectorOperations::add (tremModData.data(), 0.5f, numSamples);
-
-        for (int n = 0; n < numSamples; ++n)
+        for (int ch = 0; ch < numChannels; ++ch)
         {
-            const auto modDepth = tremDepth[n];
-            const auto m = tremModData[n] * modDepth + (1.0f - modDepth);
-            x[n] *= m;
+            auto* x = audioOutBuffer.getWritePointer (ch);
+            const auto* modData = ch == 0 ? modulationBuffer.getReadPointer (0) : modulationBufferNegative.getReadPointer (0);
+
+            processSpectralDelayFilters (ch, x, modData, spectralDepthSmoothed.getSmoothedBuffer(), numSamples);
+            processChorusing (ch, x, modData, chorusDepthSmoothed.getSmoothedBuffer(), numSamples);
+
+            // tremolo
+            const auto* tremDepth = tremDepthSmoothed.getSmoothedBuffer();
+            FloatVectorOperations::multiply (tremModData.data(), modData, 0.5f, numSamples);
+            FloatVectorOperations::add (tremModData.data(), 0.5f, numSamples);
+
+            for (int n = 0; n < numSamples; ++n)
+            {
+                const auto modDepth = tremDepth[n];
+                const auto m = tremModData[n] * modDepth + (1.0f - modDepth);
+                x[n] *= m;
+            }
         }
     }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
+
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modulationBuffer;
+}
+
+void Rotary::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+
+    modulationBuffer.setSize (1, numSamples, false, false, true);
+    if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
+    {
+        // get modulation buffer from input (-1, 1)
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modulationBuffer);
+    }
+    else
+    {
+        modulationBuffer.clear();
+    }
+
+    if (inputsConnected.contains (AudioInput))
+    {
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        audioOutBuffer.makeCopyOf (audioInBuffer, true);
+    }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
+
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modulationBuffer;
 }

@@ -145,6 +145,10 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         fillWaveBuffer (modOutBuffer.getWritePointer (0), numSamples, phase);
     }
 
+    // smooth out modulation signal
+    auto&& modBlock = dsp::AudioBlock<float> { modOutBuffer };
+    filter.process (dsp::ProcessContextReplacing<float> { modBlock });
+
     if (inputsConnected.contains (AudioInput))
     {
         const auto& audioInBuffer = getInputBuffer (AudioInput);
@@ -163,7 +167,6 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
             waveBlock.multiplyBy (depthGainSmooth);
             depthAddSmooth.setTargetValue (1.0f - depthVal);
             addSmoothed (waveBlock, depthAddSmooth);
-            filter.process (dsp::ProcessContextReplacing<float> { waveBlock });
         }
 
         // copy modulation data into all the channels

@@ -12,17 +12,19 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+    void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
     chowdsp::FloatParameter* rateHzParam = nullptr;
 
-    void processModulation (int numChannels, int numSamples);
+    void processModulation (int numSamples);
     void processSpectralDelayFilters (int channel, float* data, const float* modData, const float* depthData, int numSamples);
     void processChorusing (int channel, float* data, const float* modData, const float* depthData, int numSamples);
 
     // modulation
     chowdsp::SineWave<float> modulator;
     AudioBuffer<float> modulationBuffer;
+    AudioBuffer<float> modulationBufferNegative;
 
     // tremolo
     std::vector<float> tremModData;
@@ -63,6 +65,20 @@ private:
     dsp::DryWetMixer<float> chorusMixer[2];
     float chorusDepthSamples = 0.0f;
     chowdsp::SmoothedBufferValue<float> chorusDepthSmoothed;
+
+    enum InputPort
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        ModulationOutput,
+    };
+
+    AudioBuffer<float> audioOutBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Rotary)
 };
