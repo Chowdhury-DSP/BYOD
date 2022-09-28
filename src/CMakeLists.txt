@@ -87,8 +87,8 @@ target_sources(BYOD PRIVATE
     processors/other/Delay.cpp
     processors/other/EnvelopeFilter.cpp
     processors/other/Gate.cpp
-    processors/other/Rotary.cpp
-    processors/other/Tremolo.cpp
+    processors/modulation/Rotary.cpp
+    processors/modulation/Tremolo.cpp
     processors/other/spring_reverb/SpringReverb.cpp
     processors/other/spring_reverb/SpringReverbProcessor.cpp
 
@@ -111,7 +111,7 @@ target_sources(BYOD PRIVATE
     processors/utility/Mixer.cpp
     processors/utility/Oscilloscope.cpp
     processors/utility/OutputProcessor.cpp
-    processors/utility/Panner.cpp
+    processors/modulation/Panner.cpp
     processors/utility/StereoMerger.cpp
     processors/utility/StereoSplitter.cpp
     processors/utility/Tuner.cpp

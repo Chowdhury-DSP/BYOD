@@ -19,13 +19,15 @@
 #include "drive/waveshaper/Waveshaper.h"
 #include "drive/zen_drive/ZenDrive.h"
 
+#include "modulation/Rotary.h"
+#include "modulation/Panner.h"
+#include "modulation/Tremolo.h"
+
 #include "other/Chorus.h"
 #include "other/Compressor.h"
 #include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
 #include "other/Gate.h"
-#include "other/Rotary.h"
-#include "other/Tremolo.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "tone/AmpIRs.h"
@@ -46,7 +48,6 @@
 #include "utility/FreqBandSplitter.h"
 #include "utility/Mixer.h"
 #include "utility/Oscilloscope.h"
-#include "utility/Panner.h"
 #include "utility/StereoMerger.h"
 #include "utility/StereoSplitter.h"
 #include "utility/Tuner.h"
@@ -94,13 +95,16 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Treble Booster", &processorFactory<TrebleBooster> },
     { "TS-Tone", &processorFactory<TubeScreamerTone> },
 
+    { "Panner", &processorFactory<Panner> },
+    { "Rotary", &processorFactory<Rotary> },
+    { "Tremolo", &processorFactory<Tremolo> },
+
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
     { "DC Blocker", &processorFactory<DCBlocker> },
     { "Frequency Splitter", &processorFactory<FreqBandSplitter> },
     { "Mixer", &processorFactory<Mixer> },
     { "Oscilloscope", &processorFactory<Oscilloscope> },
-    { "Panner", &processorFactory<Panner> },
     { "Stereo Merger", &processorFactory<StereoMerger> },
     { "Stereo Splitter", &processorFactory<StereoSplitter> },
     { "Tuner", &processorFactory<Tuner> },
@@ -110,8 +114,6 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Delay", &processorFactory<DelayModule> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Gate", &processorFactory<Gate> },
-    { "Rotary", &processorFactory<Rotary> },
-    { "Tremolo", &processorFactory<Tremolo> },
     { "Spring Reverb", &processorFactory<SpringReverbProcessor> },
 
 #if BYOD_ENABLE_ADD_ON_MODULES
@@ -172,7 +174,7 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
     const auto addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
 #endif
 
-    for (auto type : { Drive, Tone, Utility, Other })
+    for (auto type : { Drive, Tone, Modulation, Utility, Other })
     {
         PopupMenu subMenu;
         for (const auto& [procName, procCreator] : store.store)
