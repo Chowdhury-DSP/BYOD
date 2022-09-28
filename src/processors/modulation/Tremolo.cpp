@@ -1,4 +1,6 @@
 #include "Tremolo.h"
+#include "../ParameterHelpers.h"
+#include "../BufferHelpers.h"
 
 namespace
 {
@@ -135,14 +137,7 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     {
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
-        modOutBuffer.copyFrom (0, 0, modInputBuffer, 0, 0, numSamples);
-
-        if (const auto modInputNumChannels = modInputBuffer.getNumChannels(); modInputNumChannels > 1)
-        {
-            for (int ch = 1; ch < modInputNumChannels; ++ch)
-                modOutBuffer.addFrom (0, 0, modInputBuffer, ch, 0, numSamples);
-            modOutBuffer.applyGain (1.0f / (float) modInputNumChannels);
-        }
+        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modOutBuffer);
     }
     else // create our own modulation signal
     {
@@ -202,14 +197,7 @@ void Tremolo::processAudioBypassed (AudioBuffer<float>& buffer)
     {
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
-        modOutBuffer.copyFrom (0, 0, modInputBuffer, 0, 0, numSamples);
-
-        if (const auto modInputNumChannels = modInputBuffer.getNumChannels(); modInputNumChannels > 1)
-        {
-            for (int ch = 1; ch < modInputNumChannels; ++ch)
-                modOutBuffer.addFrom (0, 0, modInputBuffer, ch, 0, numSamples);
-            modOutBuffer.applyGain (1.0f / (float) modInputNumChannels);
-        }
+        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modOutBuffer);
     }
     else
     {

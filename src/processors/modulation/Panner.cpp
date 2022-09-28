@@ -1,5 +1,6 @@
 #include "Panner.h"
-#include "../ParameterHelpers.h"
+#include "processors/ParameterHelpers.h"
+#include "../BufferHelpers.h"
 
 namespace
 {
@@ -13,7 +14,11 @@ const String panModeTag = "pan_mode";
 const String stereoModeTag = "stereo_mode";
 } // namespace
 
-Panner::Panner (UndoManager* um) : BaseProcessor ("Panner", createParameterLayout(), um)
+Panner::Panner (UndoManager* um) : BaseProcessor ("Panner",
+                                                  createParameterLayout(),
+                                                  um,
+                                                  magic_enum::enum_count<InputPort>(),
+                                                  magic_enum::enum_count<OutputPort>())
 {
     using namespace ParameterHelpers;
     loadParameterPointer (mainPan, vts, mainPanTag);
@@ -33,6 +38,8 @@ Panner::Panner (UndoManager* um) : BaseProcessor ("Panner", createParameterLayou
 
     addPopupMenuParameter (panModeTag);
     addPopupMenuParameter (stereoModeTag);
+    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
+    disableWhenInputConnected ({ modRateHzTag }, ModulationInput);
 }
 
 ParamLayout Panner::createParameterLayout()
@@ -100,8 +107,17 @@ void Panner::generateModulationSignal (int numSamples)
     auto&& modBlock = dsp::AudioBlock<float> { modulationBuffer };
     auto&& modContext = dsp::ProcessContextReplacing<float> { modBlock };
 
-    modulator.setFrequency (*modRateHz);
-    modulator.process (modContext);
+    if (inputsConnected.contains (ModulationInput))
+    {
+        // get modulation buffer from input (-1, 1)
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modulationBuffer);
+    }
+    else
+    {
+        modulator.setFrequency (*modRateHz);
+        modulator.process (modContext);
+    }
 
     modulationGain.setGainLinear (*modDepth);
     modulationGain.process (modContext);
@@ -111,7 +127,6 @@ void Panner::generateModulationSignal (int numSamples)
 
 void Panner::processAudio (AudioBuffer<float>& buffer)
 {
-    const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
     setPanMode();
@@ -120,12 +135,19 @@ void Panner::processAudio (AudioBuffer<float>& buffer)
     stereoBuffer.setSize (2, numSamples, false, false, true);
     stereoBuffer.clear();
 
-    if (numChannels == 1)
-        processMonoInput (buffer);
-    else
-        processStereoInput (buffer);
+    if (inputsConnected.contains (AudioInput))
+    {
+        const auto& inputBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = inputBuffer.getNumChannels();
 
-    outputBuffers.getReference (0) = &stereoBuffer;
+        if (numChannels == 1)
+            processMonoInput (inputBuffer);
+        else
+            processStereoInput (inputBuffer);
+    }
+
+    outputBuffers.getReference (AudioOutput) = &stereoBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modulationBuffer;
 }
 
 void Panner::processSingleChannelPan (chowdsp::Panner<float>& panner, const AudioBuffer<float>& inBuffer, AudioBuffer<float>& outBuffer, float basePanValue, int inBufferChannel, float modMultiply)
@@ -186,15 +208,35 @@ void Panner::processStereoInput (const AudioBuffer<float>& buffer)
 
 void Panner::processAudioBypassed (AudioBuffer<float>& buffer)
 {
-    const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
+    modulationBuffer.setSize (1, numSamples, false, false, true);
+    if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
+    {
+        // get modulation buffer from input (-1, 1)
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modulationBuffer);
+    }
+    else
+    {
+        modulationBuffer.clear();
+    }
+
     stereoBuffer.setSize (2, numSamples, false, false, true);
+    if (inputsConnected.contains (AudioInput))
+    {
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        for (int ch = 0; ch < 2; ++ch)
+            stereoBuffer.copyFrom (ch, 0, audioInBuffer, ch % numChannels, 0, numSamples);
+    }
+    else
+    {
+        stereoBuffer.clear();
+    }
 
-    for (int ch = 0; ch < 2; ++ch)
-        stereoBuffer.copyFrom (ch, 0, buffer, ch % numChannels, 0, numSamples);
-
-    outputBuffers.getReference (0) = &stereoBuffer;
+    outputBuffers.getReference (AudioOutput) = &stereoBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modulationBuffer;
 }
 
 bool Panner::getCustomComponents (OwnedArray<Component>& customComps)

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../BaseProcessor.h"
+#include "processors/BaseProcessor.h"
 
 class Rotary : public BaseProcessor
 {
 public:
     explicit Rotary (UndoManager* um = nullptr);
 
-    ProcessorType getProcessorType() const override { return Other; }
+    ProcessorType getProcessorType() const override { return Modulation; }
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
