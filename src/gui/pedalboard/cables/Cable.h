@@ -19,6 +19,7 @@ public:
     ConnectionInfo connectionInfo;
 
     static constexpr std::string_view componentName = "BYOD_Cable";
+
 private:
     auto createCablePath (juce::Point<float> start, juce::Point<float> end);
     float getCableThickness();
