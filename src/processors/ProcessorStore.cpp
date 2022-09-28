@@ -19,8 +19,8 @@
 #include "drive/waveshaper/Waveshaper.h"
 #include "drive/zen_drive/ZenDrive.h"
 
-#include "modulation/Rotary.h"
 #include "modulation/Panner.h"
+#include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
 
 #include "other/Chorus.h"

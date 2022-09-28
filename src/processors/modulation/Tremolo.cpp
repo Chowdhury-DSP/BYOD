@@ -1,6 +1,6 @@
 #include "Tremolo.h"
-#include "../ParameterHelpers.h"
 #include "../BufferHelpers.h"
+#include "../ParameterHelpers.h"
 
 namespace
 {

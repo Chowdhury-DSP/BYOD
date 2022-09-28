@@ -1,6 +1,6 @@
 #include "Panner.h"
-#include "processors/ParameterHelpers.h"
 #include "../BufferHelpers.h"
+#include "processors/ParameterHelpers.h"
 
 namespace
 {

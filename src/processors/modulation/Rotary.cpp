@@ -1,6 +1,6 @@
 #include "Rotary.h"
-#include "../ParameterHelpers.h"
 #include "../BufferHelpers.h"
+#include "../ParameterHelpers.h"
 
 Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary",
                                                   createParameterLayout(),
