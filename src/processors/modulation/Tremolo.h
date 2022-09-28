@@ -1,14 +1,13 @@
 #pragma once
 
-#include "../BaseProcessor.h"
-#include "../ParameterHelpers.h"
+#include "processors/BaseProcessor.h"
 
 class Tremolo : public BaseProcessor
 {
 public:
     explicit Tremolo (UndoManager* um = nullptr);
 
-    ProcessorType getProcessorType() const override { return Other; }
+    ProcessorType getProcessorType() const override { return Modulation; }
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;

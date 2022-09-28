@@ -7,6 +7,7 @@ enum ProcessorType
 {
     Drive,
     Tone,
+    Modulation,
     Utility,
     Other,
 };

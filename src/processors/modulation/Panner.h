@@ -1,13 +1,13 @@
 #pragma once
 
-#include "../BaseProcessor.h"
+#include "processors/BaseProcessor.h"
 
 class Panner : public BaseProcessor
 {
 public:
     explicit Panner (UndoManager* um = nullptr);
 
-    ProcessorType getProcessorType() const override { return Utility; }
+    ProcessorType getProcessorType() const override { return Modulation; }
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
@@ -41,6 +41,18 @@ private:
     dsp::Gain<float> modulationGain;
     AudioBuffer<float> modulationBuffer;
     bool isModulationOn = true;
+
+    enum InputPort
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        ModulationOutput,
+    };
 
     std::atomic_bool isStereoInput { true };
 

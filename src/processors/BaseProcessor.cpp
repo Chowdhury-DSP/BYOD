@@ -230,7 +230,10 @@ void BaseProcessor::addToPopupMenu (PopupMenu& menu)
             if (! inputsConnected.contains (i))
                 continue;
 
-            if (auto* paramIDsToDisable = getParametersToDisableWhenInputIsConnected (i); std::find (paramIDsToDisable->begin(), paramIDsToDisable->end(), paramID) != paramIDsToDisable->end())
+            if (auto* paramIDsToDisable = getParametersToDisableWhenInputIsConnected (i);
+                paramIDsToDisable != nullptr
+                && std::find (paramIDsToDisable->begin(), paramIDsToDisable->end(), paramID)
+                       != paramIDsToDisable->end())
                 isEnabled = false;
         }
 
