@@ -1,14 +1,13 @@
 #pragma once
 
-#include "../BaseProcessor.h"
-#include "../ParameterHelpers.h"
+#include "processors/BaseProcessor.h"
 
 class Chorus : public BaseProcessor
 {
 public:
     explicit Chorus (UndoManager* um = nullptr);
 
-    ProcessorType getProcessorType() const override { return Other; }
+    ProcessorType getProcessorType() const override { return Modulation; }
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
@@ -18,6 +17,7 @@ public:
 private:
     template <typename DelayArrType>
     void processChorus (AudioBuffer<float>& buffer, DelayArrType& delay);
+    void processModulation (int numSamples);
 
     chowdsp::FloatParameter* rateParam = nullptr;
     chowdsp::FloatParameter* depthParam = nullptr;
@@ -34,6 +34,10 @@ private:
 
     chowdsp::SineWave<float> slowLFOs[2][delaysPerChannel];
     chowdsp::SineWave<float> fastLFOs[2][delaysPerChannel];
+
+    std::vector<float> slowLFOData[2][delaysPerChannel];
+    std::vector<float> fastLFOData[2][delaysPerChannel];
+    chowdsp::HilbertFilter<float> hilbertFilter[2];
 
     struct CleanDelayType
     {
@@ -74,9 +78,22 @@ private:
     chowdsp::SVFHighpass<float> dcBlocker;
 
     float fs = 48000.0f;
-    AudioBuffer<float> stereoBuffer;
+    AudioBuffer<float> audioOutBuffer;
+    AudioBuffer<float> modOutBuffer;
 
     bool bypassNeedsReset = false;
+
+    enum InputPort
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        ModulationOutput,
+    };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Chorus)
 };

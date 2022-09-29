@@ -143,11 +143,11 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     {
         // fill modulation buffer (-1, 1)
         fillWaveBuffer (modOutBuffer.getWritePointer (0), numSamples, phase);
-    }
 
-    // smooth out modulation signal
-    auto&& modBlock = dsp::AudioBlock<float> { modOutBuffer };
-    filter.process (dsp::ProcessContextReplacing<float> { modBlock });
+        // smooth out modulation signal
+        auto&& modBlock = dsp::AudioBlock<float> { modOutBuffer };
+        filter.process (dsp::ProcessContextReplacing<float> { modBlock });
+    }
 
     if (inputsConnected.contains (AudioInput))
     {

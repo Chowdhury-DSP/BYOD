@@ -19,17 +19,6 @@
 #include "drive/waveshaper/Waveshaper.h"
 #include "drive/zen_drive/ZenDrive.h"
 
-#include "modulation/Panner.h"
-#include "modulation/Rotary.h"
-#include "modulation/Tremolo.h"
-
-#include "other/Chorus.h"
-#include "other/Compressor.h"
-#include "other/Delay.h"
-#include "other/EnvelopeFilter.h"
-#include "other/Gate.h"
-#include "other/spring_reverb/SpringReverbProcessor.h"
-
 #include "tone/AmpIRs.h"
 #include "tone/BassCleaner.h"
 #include "tone/BigMuffTone.h"
@@ -41,6 +30,17 @@
 #include "tone/bassman/BassmanTone.h"
 #include "tone/baxandall/BaxandallEQ.h"
 #include "tone/tube_screamer_tone/TubeScreamerTone.h"
+
+#include "modulation/Chorus.h"
+#include "modulation/Panner.h"
+#include "modulation/Rotary.h"
+#include "modulation/Tremolo.h"
+
+#include "other/Compressor.h"
+#include "other/Delay.h"
+#include "other/EnvelopeFilter.h"
+#include "other/Gate.h"
+#include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
@@ -95,6 +95,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Treble Booster", &processorFactory<TrebleBooster> },
     { "TS-Tone", &processorFactory<TubeScreamerTone> },
 
+    { "Chorus", &processorFactory<Chorus> },
     { "Panner", &processorFactory<Panner> },
     { "Rotary", &processorFactory<Rotary> },
     { "Tremolo", &processorFactory<Tremolo> },
@@ -109,7 +110,6 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Stereo Splitter", &processorFactory<StereoSplitter> },
     { "Tuner", &processorFactory<Tuner> },
 
-    { "Chorus", &processorFactory<Chorus> },
     { "Compressor", &processorFactory<Compressor> },
     { "Delay", &processorFactory<DelayModule> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
