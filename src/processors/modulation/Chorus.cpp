@@ -1,6 +1,6 @@
 #include "Chorus.h"
-#include "../ParameterHelpers.h"
 #include "../BufferHelpers.h"
+#include "../ParameterHelpers.h"
 
 namespace
 {
