@@ -52,7 +52,7 @@ private:
 
     EditorPort nearestPort {};
 
-    bool MouseOverInputPort();
+    bool MouseOverClickablePort();
 
     bool MouseDraggingOverOutputPort();
 
