@@ -147,7 +147,7 @@ void CableView::timerCallback()
         portGlowOn = false;
     }
 
-    if (cableMouse != nullptr)
+    if (cableBeingDragged())
     {
         cables.getLast()->repaint();
     }
