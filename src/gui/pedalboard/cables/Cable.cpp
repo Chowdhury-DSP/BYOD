@@ -108,9 +108,9 @@ void Cable::paint (Graphics& g)
         {
             levelDB = updatedLevelDb;
             auto pathBounds = cablePath.getBounds().toNearestInt();
-            pathBounds.setY(pathBounds.getY() - roundToInt(std::ceil(cableThickness)));
-            pathBounds.setHeight(pathBounds.getHeight() + roundToInt(std::ceil(2.0f * cableThickness)));
-            repaint(pathBounds);
+            pathBounds.setY (pathBounds.getY() - roundToInt (std::ceil (cableThickness)));
+            pathBounds.setHeight (pathBounds.getHeight() + roundToInt (std::ceil (2.0f * cableThickness)));
+            repaint (pathBounds);
         }
 
         drawCable (g, startPortLocation, endPortLocation);
