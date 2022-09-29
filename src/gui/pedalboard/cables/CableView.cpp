@@ -134,7 +134,7 @@ void CableView::timerCallback()
         repaint();
     }
 
-    else if (! MouseOverClickablePort() && ! MouseDraggingOverOutputPort() && portGlowOn)
+    else if (! MouseOverClickablePort() && portGlowOn)
     {
         repaint();
         portGlowOn = false;
