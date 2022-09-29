@@ -82,16 +82,6 @@ target_sources(BYOD PRIVATE
     processors/drive/waveshaper/Waveshaper.cpp
     processors/drive/zen_drive/ZenDrive.cpp
 
-    processors/other/Chorus.cpp
-    processors/other/Compressor.cpp
-    processors/other/Delay.cpp
-    processors/other/EnvelopeFilter.cpp
-    processors/other/Gate.cpp
-    processors/modulation/Rotary.cpp
-    processors/modulation/Tremolo.cpp
-    processors/other/spring_reverb/SpringReverb.cpp
-    processors/other/spring_reverb/SpringReverbProcessor.cpp
-
     processors/tone/AmpIRs.cpp
     processors/tone/BassCleaner.cpp
     processors/tone/BigMuffTone.cpp
@@ -106,12 +96,23 @@ target_sources(BYOD PRIVATE
     processors/tone/baxandall/BaxandallWDF.cpp
     processors/tone/tube_screamer_tone/TubeScreamerTone.cpp
 
+    processors/modulation/Chorus.cpp
+    processors/modulation/Panner.cpp
+    processors/modulation/Rotary.cpp
+    processors/modulation/Tremolo.cpp
+
+    processors/other/Compressor.cpp
+    processors/other/Delay.cpp
+    processors/other/EnvelopeFilter.cpp
+    processors/other/Gate.cpp
+    processors/other/spring_reverb/SpringReverb.cpp
+    processors/other/spring_reverb/SpringReverbProcessor.cpp
+
     processors/utility/FreqBandSplitter.cpp
     processors/utility/InputProcessor.cpp
     processors/utility/Mixer.cpp
     processors/utility/Oscilloscope.cpp
     processors/utility/OutputProcessor.cpp
-    processors/modulation/Panner.cpp
     processors/utility/StereoMerger.cpp
     processors/utility/StereoSplitter.cpp
     processors/utility/Tuner.cpp
