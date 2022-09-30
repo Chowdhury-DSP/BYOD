@@ -1,6 +1,5 @@
 #include "Cable.h"
 #include "../BoardComponent.h"
-#include "CableDrawingHelpers.h"
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
@@ -37,11 +36,11 @@ void Cable::checkNeedsRepaint()
 {
     if(connectionInfo.endProc != nullptr)
     {
-        auto updatedLevelDb = jlimit (floorDB, 0.0f, connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort));
-        auto levelDifference = std::abs (updatedLevelDb) - std::abs (levelDB);
-        if (std::abs (levelDifference) > 1.0f)
+        auto updatedLevelDB = connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort);
+        auto levelDifference = std::abs (updatedLevelDB - levelDB);
+        if (std::abs (levelDifference) > 2.0f && levelRange.contains(floorDB))
         {
-            levelDB = updatedLevelDb;
+            levelDB = jlimit (floorDB, 0.0f, updatedLevelDB);
             auto pathBounds = cablePath.getBounds().toNearestInt();
             pathBounds.setY (pathBounds.getY() - roundToInt (std::ceil (cableThickness)));
             pathBounds.setHeight (pathBounds.getHeight() + roundToInt (std::ceil (2.0f * cableThickness)));
@@ -52,7 +51,6 @@ void Cable::checkNeedsRepaint()
 
 float Cable::getCableThickness()
 {
-    levelDB = jlimit (floorDB, 0.0f, levelDB);
     auto levelMult = std::pow (jmap (levelDB, floorDB, 0.0f, 0.0f, 1.0f), 0.9f);
     return cableThickness * (1.0f + 0.9f * levelMult);
 }

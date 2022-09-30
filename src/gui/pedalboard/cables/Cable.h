@@ -3,6 +3,7 @@
 #include "../editors/ProcessorEditor.h"
 #include "CubicBezier.h"
 #include "processors/BaseProcessor.h"
+#include "CableDrawingHelpers.h"
 #include <pch.h>
 
 class BoardComponent;
@@ -43,7 +44,9 @@ private:
     Colour endColour;
     juce::Point<float> endPortLocation;
     float scaleFactor = 1.0f;
-    float levelDB = -100.0f;
+    juce::Range<float> levelRange = {CableConstants::floorDB, 0.0f};
+    float levelDB = levelRange.getStart();
+
     
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
