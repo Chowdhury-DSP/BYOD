@@ -45,21 +45,23 @@ private:
     float scaleFactor = 1.0f;
     juce::Range<float> levelRange = { CableConstants::floorDB, 0.0f };
     float levelDB = levelRange.getStart();
-    
-    
+
     struct pathGeneratorTask : chowdsp::TimeSliceAudioUIBackgroundTask
     {
         pathGeneratorTask() : chowdsp::TimeSliceAudioUIBackgroundTask ("Path Generating Background Task") {}
-        
+
         void prepareTask (double /*sampleRate*/, int /*samplesPerBlock*/, int& /*requestedBlockSize*/, int& /*waitMs*/) override
-        {}
+        {
+        }
         void resetTask() override
-        {}
+        {
+        }
         void runTask (const AudioBuffer<float>& /*data*/) override
-        {}
+        {
+        }
 
         Path createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
-        
+
     } pathTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)

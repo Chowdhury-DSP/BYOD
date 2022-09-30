@@ -76,7 +76,7 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
 void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
     cablethickness = getCableThickness();
-    cablePath = pathTask.createCablePath(start, end, scaleFactor);
+    cablePath = pathTask.createCablePath (start, end, scaleFactor);
     drawCableShadow (g, cablethickness);
 
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
