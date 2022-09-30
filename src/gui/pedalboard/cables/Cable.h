@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../editors/ProcessorEditor.h"
+#include "CableDrawingHelpers.h"
 #include "CubicBezier.h"
 #include "processors/BaseProcessor.h"
-#include "CableDrawingHelpers.h"
 #include <pch.h>
 
 class BoardComponent;
@@ -20,7 +20,7 @@ public:
     ConnectionInfo connectionInfo;
 
     static constexpr std::string_view componentName = "BYOD_Cable";
-    
+
     void checkNeedsRepaint();
 
 private:
@@ -44,10 +44,8 @@ private:
     Colour endColour;
     juce::Point<float> endPortLocation;
     float scaleFactor = 1.0f;
-    juce::Range<float> levelRange = {CableConstants::floorDB, 0.0f};
+    juce::Range<float> levelRange = { CableConstants::floorDB, 0.0f };
     float levelDB = levelRange.getStart();
-
-    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
 };

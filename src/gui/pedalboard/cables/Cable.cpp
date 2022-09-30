@@ -34,11 +34,11 @@ bool Cable::hitTest (int x, int y)
 
 void Cable::checkNeedsRepaint()
 {
-    if(connectionInfo.endProc != nullptr)
+    if (connectionInfo.endProc != nullptr)
     {
         auto updatedLevelDB = connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort);
         auto levelDifference = std::abs (updatedLevelDB - levelDB);
-        if (std::abs (levelDifference) > 2.0f && levelRange.contains(floorDB))
+        if (std::abs (levelDifference) > 2.0f && levelRange.contains (floorDB))
         {
             levelDB = jlimit (floorDB, 0.0f, updatedLevelDB);
             auto pathBounds = cablePath.getBounds().toNearestInt();

@@ -54,7 +54,7 @@ bool CableView::mouseDraggingOverOutputPort()
 void CableView::paint (Graphics& g)
 {
     using namespace CableDrawingHelpers;
-    
+
     if (portGlow)
     {
         drawCablePortGlow (g, portToPaint, scaleFactor);
@@ -117,18 +117,17 @@ void CableView::mouseUp (const MouseEvent& e)
 void CableView::timerCallback()
 {
     using namespace CableDrawingHelpers;
-    
+
     // repaint port glow
     if (mouseOverClickablePort() || mouseDraggingOverOutputPort())
     {
         portGlow = true;
-        repaint(getPortGlowBounds(portToPaint,scaleFactor).toNearestInt());
+        repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
     }
     else if (! mouseOverClickablePort() && portGlow)
     {
         portGlow = false;
-        repaint(getPortGlowBounds(portToPaint,scaleFactor).toNearestInt());
-        
+        repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
     }
 
     // repaint cable(s)
@@ -141,8 +140,6 @@ void CableView::timerCallback()
         for (auto* cable : cables)
             cable->checkNeedsRepaint();
     }
-    
-
 }
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)

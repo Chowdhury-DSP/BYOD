@@ -16,7 +16,7 @@ constexpr float floorDB = -60.0f;
 
 namespace CableDrawingHelpers
 {
-juce::Rectangle<float> getPortGlowBounds(juce::Point<int> location, float scaleFactor);
+juce::Rectangle<float> getPortGlowBounds (juce::Point<int> location, float scaleFactor);
 
 void drawCablePortGlow (Graphics& g, juce::Point<int> location, float scaleFactor);
 } // namespace CableDrawingHelpers
