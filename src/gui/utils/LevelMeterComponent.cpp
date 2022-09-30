@@ -13,9 +13,14 @@ LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsL
     startTimerHz (timerHz);
 }
 
+Rectangle<int> LevelMeterComponent::getMeterBounds() const
+{
+    return Rectangle { 35, getHeight() - 2 }.withCentre (getLocalBounds().getCentre());
+}
+
 void LevelMeterComponent::paint (Graphics& g)
 {
-    auto meterBounds = Rectangle { 35, getHeight() - 2 }.withCentre (getLocalBounds().getCentre());
+    auto meterBounds = getMeterBounds();
 
     g.setColour (Colours::black);
     g.fillRoundedRectangle (meterBounds.toFloat(), 4.0f);
@@ -59,8 +64,18 @@ void LevelMeterComponent::paint (Graphics& g)
 
 void LevelMeterComponent::timerCallback()
 {
+    bool needsRepaint = false;
     for (int ch = 0; ch < 2; ++ch)
+    {
         dbLevels[ch] = Decibels::gainToDecibels (levelDetector[ch].processSample (rmsLevels[ch]));
 
-    repaint();
+        if (std::abs (dbLevels[ch] - dbLevelsPrev[ch]) > 0.5f)
+        {
+            dbLevelsPrev[ch] = dbLevels[ch];
+            needsRepaint = true;
+        }
+    }
+
+    if (needsRepaint)
+        repaint (getMeterBounds());
 }
