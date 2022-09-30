@@ -55,20 +55,6 @@ float Cable::getCableThickness()
     return cableThickness * (1.0f + 0.9f * levelMult);
 }
 
-auto Cable::createCablePath (juce::Point<float> start, juce::Point<float> end)
-{
-    const auto pointOff = portOffset + scaleFactor;
-    bezier = CubicBezier (start, start.translated (pointOff, 0.0f), end.translated (-pointOff, 0.0f), end);
-    numPointsInPath = (int) start.getDistanceFrom (end) + 1;
-    Path bezierPath;
-    bezierPath.preallocateSpace (numPointsInPath * 3 / 2);
-    bezierPath.startNewSubPath (start);
-    for (int i = 1; i <= numPointsInPath; ++i)
-        bezierPath.lineTo (bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath));
-
-    return std::move (bezierPath);
-}
-
 void Cable::drawCableShadow (Graphics& g, float thickness)
 {
     auto cableShadow = Path (cablePath);
@@ -90,7 +76,7 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
 void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
     cablethickness = getCableThickness();
-    cablePath = createCablePath (start, end);
+    cablePath = pathTask.createCablePath(start, end, scaleFactor);
     drawCableShadow (g, cablethickness);
 
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
@@ -124,4 +110,18 @@ void Cable::paint (Graphics& g)
         endColour = startColour;
         drawCable (g, startPortLocation, cableView.getCableMousePosition());
     }
+}
+
+Path Cable::pathGeneratorTask::createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor)
+{
+    const auto pointOff = portOffset + scaleFactor;
+    auto bezier = CubicBezier (start, start.translated (pointOff, 0.0f), end.translated (-pointOff, 0.0f), end);
+    auto numPointsInPath = (int) start.getDistanceFrom (end) + 1;
+    Path bezierPath;
+    bezierPath.preallocateSpace (numPointsInPath * 3 / 2);
+    bezierPath.startNewSubPath (start);
+    for (int i = 1; i <= numPointsInPath; ++i)
+        bezierPath.lineTo (bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath));
+
+    return std::move (bezierPath);
 }
