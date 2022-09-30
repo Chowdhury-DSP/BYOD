@@ -15,7 +15,7 @@ CableView::CableView (BoardComponent* comp) : board (comp)
 
 CableView::~CableView() = default;
 
-bool CableView::MouseOverClickablePort()
+bool CableView::mouseOverClickablePort()
 {
     const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
     nearestPort = portLocationHelper->getNearestPort (mousePos, board);
@@ -32,7 +32,7 @@ bool CableView::MouseOverClickablePort()
     return false;
 }
 
-bool CableView::MouseDraggingOverOutputPort()
+bool CableView::mouseDraggingOverOutputPort()
 {
     if (cableMouse != nullptr)
     {
@@ -51,13 +51,13 @@ void CableView::paint (Graphics& g)
 {
     using namespace CableDrawingHelpers;
 
-    if (MouseOverClickablePort())
+    if (mouseOverClickablePort())
     {
         auto startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
         drawCablePortGlow (g, startPortLocation, scaleFactor);
         portGlowOn = true;
     }
-    else if (MouseDraggingOverOutputPort())
+    else if (mouseDraggingOverOutputPort())
     {
         auto mousePos = cableMouse->getPosition();
         const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->connectionInfo.startProc);
@@ -70,9 +70,7 @@ void CableView::paint (Graphics& g)
 void CableView::resized()
 {
     for (auto* cable : cables)
-    {
         cable->setBounds (getLocalBounds());
-    }
 }
 
 void CableView::mouseDown (const MouseEvent& e)
@@ -124,17 +122,17 @@ void CableView::mouseUp (const MouseEvent& e)
 
 void CableView::timerCallback()
 {
-    if (MouseOverClickablePort())
+    if (mouseOverClickablePort())
     {
         repaint();
     }
 
-    else if (MouseDraggingOverOutputPort())
+    else if (mouseDraggingOverOutputPort())
     {
         repaint();
     }
 
-    else if (! MouseOverClickablePort() && portGlowOn)
+    else if (! mouseOverClickablePort() && portGlowOn)
     {
         repaint();
         portGlowOn = false;
@@ -144,6 +142,9 @@ void CableView::timerCallback()
     {
         cables.getLast()->repaint();
     }
+    
+    for (auto* cable : cables)
+        cable->checkNeedsRepaint();
 }
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)

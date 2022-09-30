@@ -33,6 +33,23 @@ bool Cable::hitTest (int x, int y)
     return false;
 }
 
+void Cable::checkNeedsRepaint()
+{
+    if(connectionInfo.endProc != nullptr)
+    {
+        auto updatedLevelDb = jlimit (floorDB, 0.0f, connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort));
+        auto levelDifference = std::abs (updatedLevelDb) - std::abs (levelDB);
+        if (std::abs (levelDifference) > 1.0f)
+        {
+            levelDB = updatedLevelDb;
+            auto pathBounds = cablePath.getBounds().toNearestInt();
+            pathBounds.setY (pathBounds.getY() - roundToInt (std::ceil (cableThickness)));
+            pathBounds.setHeight (pathBounds.getHeight() + roundToInt (std::ceil (2.0f * cableThickness)));
+            repaint (pathBounds);
+        }
+    }
+}
+
 float Cable::getCableThickness()
 {
     levelDB = jlimit (floorDB, 0.0f, levelDB);
@@ -102,16 +119,17 @@ void Cable::paint (Graphics& g)
 
         endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, connectionInfo.endPort, true }).toFloat();
         endColour = endEditor->getColour();
-        auto updatedLevelDb = jlimit (floorDB, 0.0f, connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort));
-        auto levelDifference = std::abs (updatedLevelDb) - std::abs (levelDB);
-        if (std::abs (levelDifference) > 2.0f)
-        {
-            levelDB = updatedLevelDb;
-            auto pathBounds = cablePath.getBounds().toNearestInt();
-            pathBounds.setY (pathBounds.getY() - roundToInt (std::ceil (cableThickness)));
-            pathBounds.setHeight (pathBounds.getHeight() + roundToInt (std::ceil (2.0f * cableThickness)));
-            repaint (pathBounds);
-        }
+        //auto updatedLevelDb = jlimit (floorDB, 0.0f, connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort));
+//        auto levelDifference = std::abs (updatedLevelDb) - std::abs (levelDB);
+//        if (std::abs (levelDifference) > 1.0f)
+//        {
+//            levelDB = updatedLevelDb;
+//            auto pathBounds = cablePath.getBounds().toNearestInt();
+//            pathBounds.setY (pathBounds.getY() - roundToInt (std::ceil (cableThickness)));
+//            pathBounds.setHeight (pathBounds.getHeight() + roundToInt (std::ceil (2.0f * cableThickness)));
+//            repaint (pathBounds);
+//        }
+
 
         drawCable (g, startPortLocation, endPortLocation);
     }

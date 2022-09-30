@@ -19,6 +19,8 @@ public:
     ConnectionInfo connectionInfo;
 
     static constexpr std::string_view componentName = "BYOD_Cable";
+    
+    void checkNeedsRepaint();
 
 private:
     auto createCablePath (juce::Point<float> start, juce::Point<float> end);
@@ -42,6 +44,7 @@ private:
     juce::Point<float> endPortLocation;
     float scaleFactor = 1.0f;
     float levelDB = -100.0f;
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
 };
