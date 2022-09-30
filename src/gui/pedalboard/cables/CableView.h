@@ -55,8 +55,12 @@ private:
     bool mouseOverClickablePort();
 
     bool mouseDraggingOverOutputPort();
-
-    bool portGlowOn = false;
+    
+    bool portGlow = false;
+    
+    juce::Point<int> startPortLocation;
+    juce::Point<int> endPortLocation;
+    juce::Point<int> portToPaint;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CableView)
 };
