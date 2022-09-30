@@ -58,7 +58,6 @@ private:
 
     bool portGlow = false;
 
-    juce::Point<int> startPortLocation;
     juce::Point<int> endPortLocation;
     juce::Point<int> portToPaint;
 

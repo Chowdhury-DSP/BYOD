@@ -25,8 +25,7 @@ bool CableView::mouseOverClickablePort()
         const bool isNearConnectedInput = nearestPort.isInput && ! portLocationHelper->isInputPortConnected (nearestPort);
         if (! (isDraggingNearInputPort || isNearConnectedInput))
         {
-            startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
-            portToPaint = startPortLocation;
+            portToPaint = CableViewPortLocationHelper::getPortLocation (nearestPort);
             return true;
         }
     }
@@ -42,8 +41,7 @@ bool CableView::mouseDraggingOverOutputPort()
         const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->connectionInfo.startProc);
         if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
         {
-            endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
-            portToPaint = endPortLocation;
+            portToPaint = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
             return true;
         }
     }
