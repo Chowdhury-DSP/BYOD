@@ -116,16 +116,19 @@ void CableView::mouseUp (const MouseEvent& e)
 
 void CableView::timerCallback()
 {
+    using namespace CableDrawingHelpers;
+    
     // repaint port glow
     if (mouseOverClickablePort() || mouseDraggingOverOutputPort())
     {
         portGlow = true;
-        repaint();
+        repaint(getPortGlowBounds(portToPaint,scaleFactor).toNearestInt());
     }
     else if (! mouseOverClickablePort() && portGlow)
     {
-        repaint();
         portGlow = false;
+        repaint(getPortGlowBounds(portToPaint,scaleFactor).toNearestInt());
+        
     }
 
     // repaint cable(s)
