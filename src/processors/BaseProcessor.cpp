@@ -137,6 +137,8 @@ void BaseProcessor::addConnection (ConnectionInfo&& info)
     jassert (info.startProc == this);
     outputConnections[info.startPort].add (info);
 
+    // make sure the end processor actually has an input port available that we can connect to!
+    jassert (info.endProc->inputsConnected.size() + 1 <= info.endProc->numInputs);
     info.endProc->inputsConnected.addUsingDefaultSort (info.endPort);
     info.endProc->inputConnectionChanged (info.endPort, true);
 }

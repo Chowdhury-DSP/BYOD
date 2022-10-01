@@ -7,12 +7,12 @@ void removeOutputConnectionsFromProcessor (ProcessorChain& chain, BaseProcessor*
 {
     for (int portIndex = 0; portIndex < proc->getNumOutputs(); ++portIndex)
     {
-        auto numOutputConnections = proc->getNumOutputConnections (0);
+        auto numOutputConnections = proc->getNumOutputConnections (portIndex);
         while (numOutputConnections > 0)
         {
-            auto connection = proc->getOutputConnection (0, numOutputConnections - 1);
+            auto connection = proc->getOutputConnection (portIndex, numOutputConnections - 1);
             um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
-            numOutputConnections = proc->getNumOutputConnections (0);
+            numOutputConnections = proc->getNumOutputConnections (portIndex);
         }
     }
 }

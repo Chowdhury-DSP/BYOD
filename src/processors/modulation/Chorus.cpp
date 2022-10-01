@@ -174,6 +174,7 @@ void Chorus::processModulation (int numSamples)
         auto* modOutData = modOutBuffer.getWritePointer (0);
         FloatVectorOperations::copy (modOutData, slowLFOData[0][0].data(), numSamples);
         FloatVectorOperations::add (modOutData, fastLFOData[0][0].data(), numSamples);
+        FloatVectorOperations::multiply (modOutData, 0.5f, numSamples); // make sure the end result never goes larger than 1!
     }
 }
 
