@@ -129,6 +129,14 @@ void BlondeDrive::prepare (double sampleRate, int samplesPerBlock)
 
     dcBlocker.prepare (2);
     dcBlocker.calcCoefs (30.0f, (float) sampleRate);
+
+    // pre-buffering
+    AudioBuffer<float> buffer (2, samplesPerBlock);
+    for (int i = 0; i < 2000; i += samplesPerBlock)
+    {
+        buffer.clear();
+        processAudio (buffer);
+    }
 }
 
 void BlondeDrive::processAudio (AudioBuffer<float>& buffer)
