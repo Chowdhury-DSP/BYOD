@@ -1,6 +1,7 @@
 #include "ProcessorStore.h"
 
 #include "drive/BassFace.h"
+#include "drive/BlondeDrive.h"
 #include "drive/GuitarMLAmp.h"
 #include "drive/MetalFace.h"
 #include "drive/RONN.h"
@@ -22,6 +23,7 @@
 #include "tone/AmpIRs.h"
 #include "tone/BassCleaner.h"
 #include "tone/BigMuffTone.h"
+#include "tone/BlondeTone.h"
 #include "tone/GraphicEQ.h"
 #include "tone/HighCut.h"
 #include "tone/LofiIrs.h"
@@ -65,6 +67,7 @@ static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 
 ProcessorStore::StoreMap ProcessorStore::store = {
     { "Bass Face", &processorFactory<BassFace> },
+    { "Blonde Drive", &processorFactory<BlondeDrive> },
     { "Centaur", &processorFactory<Centaur> },
     { "Diode Clipper", &processorFactory<DiodeClipper> },
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
@@ -87,6 +90,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Bass Cleaner", &processorFactory<BassCleaner> },
     { "Bassman Tone", &processorFactory<BassmanTone> },
     { "Baxandall EQ", &processorFactory<BaxandallEQ> },
+    { "Blonde Tone", &processorFactory<BlondeTone> },
     { "Graphic EQ", &processorFactory<GraphicEQ> },
     { "High Cut", &processorFactory<HighCut> },
     { "LoFi IRs", &processorFactory<LofiIrs> },
