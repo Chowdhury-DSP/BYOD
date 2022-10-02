@@ -69,7 +69,7 @@ ParamLayout RangeBooster::createParameterLayout()
 
     createFreqParameter (params, "range", "Range", 250.0f, 5000.0f, 2600.0f, 2600.0f);
     createGainDBParameter (params, "boost", "Boost", -30.0f, 12.0f, 0.0f);
-    emplace_param<AudioParameterBool> (params, "high_q", "High  Quality", false);
+    emplace_param<AudioParameterBool> (params, "high_q", "High Quality", false);
 
     return { params.begin(), params.end() };
 }
