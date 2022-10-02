@@ -50,7 +50,7 @@ namespace Zener
 
         return std::make_tuple (y, y_p);
     }
-}
+} // namespace Zener
 
 template <int maxIter = 8>
 void processDrive (double* left, double* right, const double* A, xsimd::batch<double>& y0, const int numSamples) noexcept
