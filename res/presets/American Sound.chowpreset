@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="American Sound" plugin="BYOD" vendor="CHOW" category="Pedals"
+        version="1.0.2">
+  <proc_chain>
+    <Blonde_Tone>
+      <Parameters x_pos="0.5040000081062317" y_pos="0.300000011920929">
+        <PARAM id="bass" value="0.0"/>
+        <PARAM id="mid" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.25"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Blonde_Tone>
+    <Blonde_Drive>
+      <Parameters x_pos="0.1899999976158142" y_pos="0.2415094375610352">
+        <PARAM id="bias" value="0.5"/>
+        <PARAM id="char" value="0.0"/>
+        <PARAM id="drive" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="high_q" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Blonde_Drive>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

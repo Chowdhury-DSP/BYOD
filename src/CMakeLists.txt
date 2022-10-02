@@ -56,6 +56,7 @@ target_sources(BYOD PRIVATE
     processors/drive/GuitarMLAmp.cpp
     processors/drive/MetalFace.cpp
     processors/drive/BassFace.cpp
+    processors/drive/BlondeDrive.cpp
     processors/drive/RangeBooster.cpp
     processors/drive/RONN.cpp
     processors/drive/Warp.cpp
@@ -85,6 +86,7 @@ target_sources(BYOD PRIVATE
     processors/tone/AmpIRs.cpp
     processors/tone/BassCleaner.cpp
     processors/tone/BigMuffTone.cpp
+    processors/tone/BlondeTone.cpp
     processors/tone/GraphicEQ.cpp
     processors/tone/HighCut.cpp
     processors/tone/LofiIrs.cpp
