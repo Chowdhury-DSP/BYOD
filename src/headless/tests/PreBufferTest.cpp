@@ -53,7 +53,7 @@ public:
                 }(proc->getName());
                 testBuffer (buffer.getReadPointer (0), steadyStateMax);
             },
-            StringArray { "Muff Drive" });
+            StringArray { "Muff Drive", "Trumble Drive" });
     }
 };
 
