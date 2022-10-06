@@ -23,7 +23,7 @@ bool Cable::hitTest (int x, int y)
     for (int i = 1; i <= numPointsInPath; ++i)
     {
         auto pointOnPath = bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath);
-        if (clickedP.getDistanceFrom (pointOnPath) < cablethickness)
+        if (clickedP.getDistanceFrom (pointOnPath) < cableThickness)
         {
             return true;
         }
@@ -40,7 +40,7 @@ void Cable::updateStartPoint()
     startLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, connectionInfo.startPort, false }).toFloat();
     scaleFactor = board->getScaleFactor();
     startColour = startEditor->getColour();
-    cablethickness = getCableThickness();
+    cableThickness = getCableThickness();
 }
 
 void Cable::updateEndPoint()
@@ -88,8 +88,8 @@ void Cable::checkNeedsRepaint()
         {
             levelDB = updatedLevelDB;
             cableBounds = cablePath.getBounds().toNearestInt();
-            cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (cableThickness)));
-            cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (2.0f * cableThickness)));
+            cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (minCableThickness)));
+            cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (2.0f * minCableThickness)));
             MessageManager::callAsync ([&]
                                        { repaint (cableBounds); });
         }
@@ -99,7 +99,7 @@ void Cable::checkNeedsRepaint()
 float Cable::getCableThickness()
 {
     auto levelMult = std::pow (jmap (levelDB, floorDB, 0.0f, 0.0f, 1.0f), 0.9f);
-    return cableThickness * (1.0f + 0.9f * levelMult);
+    return minCableThickness * (1.0f + 0.9f * levelMult);
 }
 
 void Cable::drawCableShadow (Graphics& g, float thickness)
@@ -107,12 +107,12 @@ void Cable::drawCableShadow (Graphics& g, float thickness)
     auto cableShadow = Path (cablePath);
     cableShadow.applyTransform (AffineTransform::translation (0.0f, thickness * 0.6f));
     g.setColour (Colours::black.withAlpha (0.3f));
-    g.strokePath (cableShadow, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
+    g.strokePath (cableShadow, PathStrokeType (minCableThickness, PathStrokeType::JointStyle::curved));
 }
 
 void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour) const
 {
-    auto circle = (Rectangle { cableThickness, cableThickness } * 2.4f * scaleFactor.load()).withCentre (centre);
+    auto circle = (Rectangle { minCableThickness, minCableThickness } * 2.4f * scaleFactor.load()).withCentre (centre);
     g.setColour (colour);
     g.fillEllipse (circle);
 
@@ -122,12 +122,12 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
 
 void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
-    drawCableShadow (g, cablethickness);
+    drawCableShadow (g, cableThickness);
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
 
     {
         ScopedLock sl (pathCrit);
-        g.strokePath (cablePath, PathStrokeType (cablethickness, PathStrokeType::JointStyle::curved));
+        g.strokePath (cablePath, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
     }
 
     drawCableEndCircle (g, start, startColour);

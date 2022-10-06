@@ -39,7 +39,7 @@ private:
     Path cablePath {};
     int numPointsInPath = 0;
     CubicBezier bezier;
-    float cablethickness = 0.0f;
+    float cableThickness = 0.0f;
 
     std::atomic<juce::Point<float>> startLocation;
     std::atomic<juce::Point<float>> endLocation;
