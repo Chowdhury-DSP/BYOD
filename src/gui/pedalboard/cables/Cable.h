@@ -22,6 +22,9 @@ public:
     static constexpr std::string_view componentName = "BYOD_Cable";
 
     void checkNeedsRepaint();
+    
+    void updateStartPoint();
+    void updateEndPoint();
 
 private:
     float getCableThickness();
@@ -38,31 +41,18 @@ private:
     CubicBezier bezier;
     float cablethickness = 0.0f;
 
-    juce::Point<float> startPortLocation;
+    std::atomic<juce::Point<float>> startLocation;
+    std::atomic<juce::Point<float>> endLocation;
+    std::atomic<float> scaleFactor = 1.0f;
+    
+    juce::Rectangle<int> cableBounds;
     Colour startColour;
     Colour endColour;
-    juce::Point<float> endPortLocation;
-    float scaleFactor = 1.0f;
     juce::Range<float> levelRange = { CableConstants::floorDB, 0.0f };
     float levelDB = levelRange.getStart();
 
-    struct pathGeneratorTask : chowdsp::TimeSliceAudioUIBackgroundTask
-    {
-        pathGeneratorTask() : chowdsp::TimeSliceAudioUIBackgroundTask ("Path Generating Background Task") {}
-
-        void prepareTask (double /*sampleRate*/, int /*samplesPerBlock*/, int& /*requestedBlockSize*/, int& /*waitMs*/) override
-        {
-        }
-        void resetTask() override
-        {
-        }
-        void runTask (const AudioBuffer<float>& /*data*/) override
-        {
-        }
-
-        Path createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
-
-    } pathTask;
+    Path createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
+    CriticalSection pathCrit;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
 };

@@ -4,7 +4,7 @@
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
-CableView::CableView (BoardComponent* comp) : board (comp)
+CableView::CableView (BoardComponent* comp) : board (comp), pathTask(*this)
 {
     setInterceptsMouseClicks (false, true);
     startTimerHz (36);
@@ -108,6 +108,7 @@ void CableView::mouseUp (const MouseEvent& e)
     {
         cableMouse.reset();
         connectionHelper->releaseCable (e);
+        cables.getLast()->updateEndPoint();
         isDraggingCable = false;
     }
 }
@@ -115,7 +116,7 @@ void CableView::mouseUp (const MouseEvent& e)
 void CableView::timerCallback()
 {
     using namespace CableDrawingHelpers;
-
+    
     // repaint port glow
     if (mouseOverClickablePort() || mouseDraggingOverOutputPort())
     {
@@ -126,17 +127,6 @@ void CableView::timerCallback()
     {
         portGlow = false;
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
-    }
-
-    // repaint cable(s)
-    if (cableBeingDragged())
-    {
-        cables.getLast()->repaint();
-    }
-    else
-    {
-        for (auto* cable : cables)
-            cable->checkNeedsRepaint();
     }
 }
 
@@ -149,3 +139,22 @@ void CableView::processorBeingRemoved (const BaseProcessor* proc)
 {
     connectionHelper->processorBeingRemoved (proc);
 }
+
+int CableView::pathGeneratorTask::useTimeSlice()
+{
+    if (cableView.cableBeingDragged())
+    {
+        MessageManager::callAsync([&]
+        {
+            cableView.cables.getLast()->repaint();
+        });
+    }
+    
+    ScopedLock sl(cableView.cableMutex);
+    for (auto* cable : cableView.cables)
+        cable->checkNeedsRepaint();
+
+    return 0;
+}
+
+
