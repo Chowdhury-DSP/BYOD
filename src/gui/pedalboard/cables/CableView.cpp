@@ -4,7 +4,7 @@
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
-CableView::CableView (BoardComponent* comp) : board (comp)
+CableView::CableView (BoardComponent* comp) : board (comp), pathTask(*this)
 {
     setInterceptsMouseClicks (false, true);
     startTimerHz (36);
@@ -15,39 +15,54 @@ CableView::CableView (BoardComponent* comp) : board (comp)
 
 CableView::~CableView() = default;
 
-void CableView::paint (Graphics& g)
+bool CableView::mouseOverClickablePort()
 {
-    using namespace CableDrawingHelpers;
-
+    const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
+    nearestPort = portLocationHelper->getNearestPort (mousePos, board);
     if (nearestPort.editor != nullptr)
     {
         const bool isDraggingNearInputPort = nearestPort.isInput && isDraggingCable;
         const bool isNearConnectedInput = nearestPort.isInput && ! portLocationHelper->isInputPortConnected (nearestPort);
         if (! (isDraggingNearInputPort || isNearConnectedInput))
         {
-            auto startPortLocation = CableViewPortLocationHelper::getPortLocation (nearestPort);
-            drawCablePortGlow (g, startPortLocation, scaleFactor);
+            portToPaint = CableViewPortLocationHelper::getPortLocation (nearestPort);
+            return true;
         }
     }
 
+    return false;
+}
+
+bool CableView::mouseDraggingOverOutputPort()
+{
     if (cableMouse != nullptr)
     {
         auto mousePos = cableMouse->getPosition();
         const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->connectionInfo.startProc);
         if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
         {
-            auto endPortLocation = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
-            drawCablePortGlow (g, endPortLocation, scaleFactor);
+            portToPaint = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
+            return true;
         }
+    }
+
+    return false;
+}
+
+void CableView::paint (Graphics& g)
+{
+    using namespace CableDrawingHelpers;
+
+    if (portGlow)
+    {
+        drawCablePortGlow (g, portToPaint, scaleFactor);
     }
 }
 
 void CableView::resized()
 {
     for (auto* cable : cables)
-    {
         cable->setBounds (getLocalBounds());
-    }
 }
 
 void CableView::mouseDown (const MouseEvent& e)
@@ -93,15 +108,26 @@ void CableView::mouseUp (const MouseEvent& e)
     {
         cableMouse.reset();
         connectionHelper->releaseCable (e);
+        cables.getLast()->updateEndPoint();
         isDraggingCable = false;
     }
 }
 
 void CableView::timerCallback()
 {
-    const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
-    nearestPort = portLocationHelper->getNearestPort (mousePos, board);
-    repaint();
+    using namespace CableDrawingHelpers;
+    
+    // repaint port glow
+    if (mouseOverClickablePort() || mouseDraggingOverOutputPort())
+    {
+        portGlow = true;
+        repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
+    }
+    else if (! mouseOverClickablePort() && portGlow)
+    {
+        portGlow = false;
+        repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
+    }
 }
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)
@@ -113,3 +139,22 @@ void CableView::processorBeingRemoved (const BaseProcessor* proc)
 {
     connectionHelper->processorBeingRemoved (proc);
 }
+
+int CableView::pathGeneratorTask::useTimeSlice()
+{
+    if (cableView.cableBeingDragged())
+    {
+        MessageManager::callAsync([&]
+        {
+            cableView.cables.getLast()->repaint();
+        });
+    }
+    
+    ScopedLock sl(cableView.cableMutex);
+    for (auto* cable : cableView.cables)
+        cable->checkNeedsRepaint();
+
+    return 0;
+}
+
+

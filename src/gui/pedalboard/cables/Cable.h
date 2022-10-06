@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../editors/ProcessorEditor.h"
+#include "CableDrawingHelpers.h"
 #include "CubicBezier.h"
 #include "processors/BaseProcessor.h"
 #include <pch.h>
@@ -20,8 +21,12 @@ public:
 
     static constexpr std::string_view componentName = "BYOD_Cable";
 
+    void checkNeedsRepaint();
+    
+    void updateStartPoint();
+    void updateEndPoint();
+
 private:
-    auto createCablePath (juce::Point<float> start, juce::Point<float> end);
     float getCableThickness();
     void drawCableShadow (Graphics& g, float thickness);
     void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour) const;
@@ -36,12 +41,18 @@ private:
     CubicBezier bezier;
     float cablethickness = 0.0f;
 
-    juce::Point<float> startPortLocation;
+    std::atomic<juce::Point<float>> startLocation;
+    std::atomic<juce::Point<float>> endLocation;
+    std::atomic<float> scaleFactor = 1.0f;
+    
+    juce::Rectangle<int> cableBounds;
     Colour startColour;
     Colour endColour;
-    juce::Point<float> endPortLocation;
-    float scaleFactor = 1.0f;
-    float levelDB = -100.0f;
+    juce::Range<float> levelRange = { CableConstants::floorDB, 0.0f };
+    float levelDB = levelRange.getStart();
+
+    Path createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
+    CriticalSection pathCrit;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Cable)
 };
