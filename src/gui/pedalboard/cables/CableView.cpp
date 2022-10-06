@@ -4,7 +4,7 @@
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
-CableView::CableView (BoardComponent* comp) : board (comp), pathTask(*this)
+CableView::CableView (BoardComponent* comp) : board (comp), pathTask (*this)
 {
     setInterceptsMouseClicks (false, true);
     startTimerHz (36);
@@ -116,7 +116,7 @@ void CableView::mouseUp (const MouseEvent& e)
 void CableView::timerCallback()
 {
     using namespace CableDrawingHelpers;
-    
+
     // repaint port glow
     if (mouseOverClickablePort() || mouseDraggingOverOutputPort())
     {
@@ -144,17 +144,13 @@ int CableView::pathGeneratorTask::useTimeSlice()
 {
     if (cableView.cableBeingDragged())
     {
-        MessageManager::callAsync([&]
-        {
-            cableView.cables.getLast()->repaint();
-        });
+        MessageManager::callAsync ([&]
+                                   { cableView.cables.getLast()->repaint(); });
     }
-    
-    ScopedLock sl(cableView.cableMutex);
+
+    ScopedLock sl (cableView.cableMutex);
     for (auto* cable : cableView.cables)
         cable->checkNeedsRepaint();
 
     return 0;
 }
-
-

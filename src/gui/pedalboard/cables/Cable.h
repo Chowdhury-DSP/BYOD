@@ -22,7 +22,7 @@ public:
     static constexpr std::string_view componentName = "BYOD_Cable";
 
     void checkNeedsRepaint();
-    
+
     void updateStartPoint();
     void updateEndPoint();
 
@@ -44,7 +44,7 @@ private:
     std::atomic<juce::Point<float>> startLocation;
     std::atomic<juce::Point<float>> endLocation;
     std::atomic<float> scaleFactor = 1.0f;
-    
+
     juce::Rectangle<int> cableBounds;
     Colour startColour;
     Colour endColour;

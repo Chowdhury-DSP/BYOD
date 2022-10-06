@@ -3,7 +3,6 @@
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
-
 using namespace CableConstants;
 
 Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo connection) : Component (Cable::componentName.data()),
@@ -37,13 +36,12 @@ void Cable::updateStartPoint()
 {
     auto* startEditor = board->findEditorForProcessor (connectionInfo.startProc);
     jassert (startEditor != nullptr);
-    
+
     startLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, connectionInfo.startPort, false }).toFloat();
     scaleFactor = board->getScaleFactor();
     startColour = startEditor->getColour();
     cablethickness = getCableThickness();
 }
-
 
 void Cable::updateEndPoint()
 {
@@ -74,13 +72,12 @@ Path Cable::createCablePath (juce::Point<float> start, juce::Point<float> end, f
     return std::move (bezierPath);
 }
 
-
 void Cable::checkNeedsRepaint()
 {
     auto createdPath = createCablePath (startLocation, endLocation, scaleFactor);
     {
         ScopedLock sl (pathCrit);
-        cablePath = std::move(createdPath);
+        cablePath = std::move (createdPath);
     }
 
     if (connectionInfo.endProc != nullptr)
@@ -93,10 +90,8 @@ void Cable::checkNeedsRepaint()
             cableBounds = cablePath.getBounds().toNearestInt();
             cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (cableThickness)));
             cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (2.0f * cableThickness)));
-            MessageManager::callAsync([&]
-            {
-                repaint(cableBounds);
-            });
+            MessageManager::callAsync ([&]
+                                       { repaint (cableBounds); });
         }
     }
 }
@@ -129,7 +124,7 @@ void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float>
 {
     drawCableShadow (g, cablethickness);
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
-    
+
     {
         ScopedLock sl (pathCrit);
         g.strokePath (cablePath, PathStrokeType (cablethickness, PathStrokeType::JointStyle::curved));
@@ -142,11 +137,9 @@ void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float>
 void Cable::paint (Graphics& g)
 {
     g.setColour (cableColour.brighter (0.1f));
-    
+
     updateStartPoint();
     updateEndPoint();
-    
+
     drawCable (g, startLocation, endLocation);
 }
-
-

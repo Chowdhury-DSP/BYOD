@@ -153,7 +153,7 @@ void CableViewConnectionHelper::releaseCable (const MouseEvent& e)
 
     // not being connected... trash the latest cable
     {
-        ScopedLock sl(cableView.cableMutex);
+        ScopedLock sl (cableView.cableMutex);
         cables.removeObject (cables.getLast());
     }
 
@@ -168,7 +168,7 @@ void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex
         {
             const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
             board->procChain.getActionHelper().removeConnection (std::move (cable->connectionInfo));
-            ScopedLock sl(cableView.cableMutex);
+            ScopedLock sl (cableView.cableMutex);
             cables.removeObject (cable);
             break;
         }

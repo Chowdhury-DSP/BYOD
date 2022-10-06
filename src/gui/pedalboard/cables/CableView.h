@@ -33,10 +33,9 @@ public:
         int portIndex = 0;
         bool isInput = false;
     };
-    
+
     bool portGlow = false;
-    
-    
+
 private:
     void timerCallback() override;
 
@@ -58,25 +57,23 @@ private:
 
     bool mouseOverClickablePort();
     bool mouseDraggingOverOutputPort();
-    
+
     CriticalSection cableMutex;
-    
+
     struct pathGeneratorTask : juce::TimeSliceClient
     {
-        
     public:
-        
-        pathGeneratorTask(CableView& cv): cableView(cv)
+        pathGeneratorTask (CableView& cv) : cableView (cv)
         {
-            timeSliceThreadToUse->addTimeSliceClient(this);
-            
+            timeSliceThreadToUse->addTimeSliceClient (this);
+
             if (! timeSliceThreadToUse->isThreadRunning())
                 timeSliceThreadToUse->startThread();
         }
-        
+
         int useTimeSlice() override;
         Path createCablePath (juce::Point<float> start, juce::Point<float> end, float scaleFactor);
-        
+
     private:
         struct TimeSliceThread : juce::TimeSliceThread
         {
@@ -85,10 +82,8 @@ private:
 
         juce::SharedResourcePointer<TimeSliceThread> sharedTimeSliceThread;
         juce::TimeSliceThread* timeSliceThreadToUse = sharedTimeSliceThread;
-        
+
         CableView& cableView;
-        
-        
 
     } pathTask;
 
