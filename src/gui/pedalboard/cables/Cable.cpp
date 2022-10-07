@@ -46,7 +46,7 @@ void Cable::updateStartPoint (bool repaintIfMoved)
     {
         startPoint.store (newPortLocation);
         if (repaintIfMoved)
-            checkNeedsRepaint (true);
+            repaintIfNeeded (true);
     }
 }
 
@@ -62,7 +62,7 @@ void Cable::updateEndPoint (bool repaintIfMoved)
         {
             endPoint.store (newPortLocation);
             if (repaintIfMoved)
-                checkNeedsRepaint (true);
+                repaintIfNeeded (true);
         }
     }
     else if (cableView.cableBeingDragged())
@@ -92,7 +92,7 @@ Path Cable::createCablePath (juce::Point<float> start, juce::Point<float> end, f
     return std::move (bezierPath);
 }
 
-void Cable::checkNeedsRepaint (bool force)
+void Cable::repaintIfNeeded (bool force)
 {
     const auto regeneratePath = [this]
     {
@@ -101,8 +101,8 @@ void Cable::checkNeedsRepaint (bool force)
         cablePath = std::move (createdPath);
 
         auto cableBounds = cablePath.getBounds().toNearestInt();
-        cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (minCableThickness)));
-        cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (2.0f * minCableThickness)));
+        cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (2.0f * minCableThickness)));
+        cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (4.0f * minCableThickness) ));
 
         MessageManager::callAsync ([&, cableBounds]
                                    { repaint (cableBounds); });
@@ -176,5 +176,5 @@ void Cable::resized()
 {
     updateStartPoint (false);
     updateEndPoint (false);
-    checkNeedsRepaint (true);
+    repaintIfNeeded (true);
 }

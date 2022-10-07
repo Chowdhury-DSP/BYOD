@@ -22,7 +22,7 @@ public:
 
     static constexpr std::string_view componentName = "BYOD_Cable";
 
-    void checkNeedsRepaint (bool force = false);
+    void repaintIfNeeded (bool force = false);
 
     void updateStartPoint (bool repaintIfMoved = true);
     void updateEndPoint (bool repaintIfMoved = true);

@@ -34,7 +34,6 @@ public:
         bool isInput = false;
     };
 
-    bool portGlow = false;
 
 private:
     void timerCallback() override;
@@ -59,6 +58,8 @@ private:
     bool mouseDraggingOverOutputPort();
 
     CriticalSection cableMutex;
+    
+    bool portGlow = false;
 
     struct PathGeneratorTask : juce::TimeSliceClient
     {
@@ -69,6 +70,11 @@ private:
 
             if (! sharedTimeSliceThread->isThreadRunning())
                 sharedTimeSliceThread->startThread();
+        }
+        
+        ~PathGeneratorTask()
+        {
+            sharedTimeSliceThread->removeTimeSliceClient(this);
         }
 
         int useTimeSlice() override;

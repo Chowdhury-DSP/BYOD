@@ -117,13 +117,15 @@ void CableView::timerCallback()
 {
     using namespace CableDrawingHelpers;
 
+    auto overClickablePort = mouseOverClickablePort();
+    
     // repaint port glow
-    if (mouseOverClickablePort() || mouseDraggingOverOutputPort())
+    if (overClickablePort || mouseDraggingOverOutputPort())
     {
         portGlow = true;
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
     }
-    else if (! mouseOverClickablePort() && portGlow)
+    else if (! overClickablePort && portGlow)
     {
         portGlow = false;
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
@@ -161,7 +163,7 @@ int CableView::PathGeneratorTask::useTimeSlice()
 
     ScopedLock sl (cableView.cableMutex);
     for (auto* cable : cableView.cables)
-        cable->checkNeedsRepaint();
+        cable->repaintIfNeeded();
 
     return 28; // approx. 35 frames / second
 }
