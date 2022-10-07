@@ -65,7 +65,6 @@ target_compile_definitions(juce_plugin_modules
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
         JUCE_MODAL_LOOPS_PERMITTED=1
-        JUCE_ENABLE_REPAINT_DEBUGGING=1
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
 )

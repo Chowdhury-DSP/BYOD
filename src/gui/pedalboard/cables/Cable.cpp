@@ -121,6 +121,7 @@ void Cable::repaintIfNeeded (bool force)
         if (std::abs (levelDifference) > 2.0f && levelRange.contains (updatedLevelDB) && levelRange.contains (levelDB))
         {
             levelDB = updatedLevelDB;
+            cableThickness = getCableThickness();
             regeneratePath();
         }
     }
