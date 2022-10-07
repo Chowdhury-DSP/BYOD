@@ -16,20 +16,17 @@ const String delayTypeTag = "delay_type";
 } // namespace
 
 Flanger::Flanger (UndoManager* um) : BaseProcessor ("Flanger",
-                                                  createParameterLayout(),
-                                                  um,
-                                                  magic_enum::enum_count<InputPort>(),
-                                                  magic_enum::enum_count<OutputPort>())
+                                                    createParameterLayout(),
+                                                    um,
+                                                    magic_enum::enum_count<InputPort>(),
+                                                    magic_enum::enum_count<OutputPort>())
 {
-    
-//    chowdsp::FloatParameter* rateParam = nullptr;
-//    chowdsp::FloatParameter* fbParam = nullptr;
-//    chowdsp::FloatParameter* delayAmountParam = nullptr;
-//    chowdsp::FloatParameter* delayOffsetParam = nullptr;
-//    dsp::DryWetMixer<float> dryWetMixer;
-    
-    
-    
+    //    chowdsp::FloatParameter* rateParam = nullptr;
+    //    chowdsp::FloatParameter* fbParam = nullptr;
+    //    chowdsp::FloatParameter* delayAmountParam = nullptr;
+    //    chowdsp::FloatParameter* delayOffsetParam = nullptr;
+    //    dsp::DryWetMixer<float> dryWetMixer;
+
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");
     loadParameterPointer (delayAmountParam, vts, "delay amount");
@@ -40,8 +37,7 @@ Flanger::Flanger (UndoManager* um) : BaseProcessor ("Flanger",
 
     addPopupMenuParameter (delayTypeTag);
 
-
-    uiOptions.backgroundColour = Colour(48, 25, 188);
+    uiOptions.backgroundColour = Colour (48, 25, 188);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
     uiOptions.info.description = "A multi-phase chorus effect. Use the right-click menu to enable lo-fi mode.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
@@ -54,66 +50,66 @@ ParamLayout Flanger::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-//    createPercentParameter (params, "rate", "Rate", 0.5f);
-//    createPercentParameter (params, "depth", "Depth", 0.5f);
-//    createPercentParameter (params, "feedback", "Feedback", 0.0f);
-//    createPercentParameter (params, "mix", "Mix", 0.5f);
-//
-//    emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
+    //    createPercentParameter (params, "rate", "Rate", 0.5f);
+    //    createPercentParameter (params, "depth", "Depth", 0.5f);
+    //    createPercentParameter (params, "feedback", "Feedback", 0.0f);
+    //    createPercentParameter (params, "mix", "Mix", 0.5f);
+    //
+    //    emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
 
     return { params.begin(), params.end() };
 }
 
 void Flanger::prepare (double sampleRate, int samplesPerBlock)
 {
-//    dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
-//    dsp::ProcessSpec monoSpec { sampleRate, (uint32) samplesPerBlock, 1 };
-//    fs = (float) sampleRate;
-//
-//    for (int ch = 0; ch < 2; ++ch)
-//    {
-//        for (int i = 0; i < delaysPerChannel; ++i)
-//        {
-//            cleanDelay[ch][i].prepare (monoSpec);
-//            lofiDelay[ch][i].prepare (monoSpec);
-//
-//            slowLFOs[ch][i].prepare (monoSpec);
-//            fastLFOs[ch][i].prepare (monoSpec);
-//
-//            slowLFOData[ch][i].resize ((size_t) samplesPerBlock, 0.0f);
-//            fastLFOData[ch][i].resize ((size_t) samplesPerBlock, 0.0f);
-//        }
-//
-//        slowSmooth[ch].reset (sampleRate, 0.05);
-//        fastSmooth[ch].reset (sampleRate, 0.05);
-//
-//        feedbackState[ch] = 0.0f;
-//        fbSmooth[ch].reset (sampleRate, 0.01);
+    //    dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
+    //    dsp::ProcessSpec monoSpec { sampleRate, (uint32) samplesPerBlock, 1 };
+    //    fs = (float) sampleRate;
+    //
+    //    for (int ch = 0; ch < 2; ++ch)
+    //    {
+    //        for (int i = 0; i < delaysPerChannel; ++i)
+    //        {
+    //            cleanDelay[ch][i].prepare (monoSpec);
+    //            lofiDelay[ch][i].prepare (monoSpec);
+    //
+    //            slowLFOs[ch][i].prepare (monoSpec);
+    //            fastLFOs[ch][i].prepare (monoSpec);
+    //
+    //            slowLFOData[ch][i].resize ((size_t) samplesPerBlock, 0.0f);
+    //            fastLFOData[ch][i].resize ((size_t) samplesPerBlock, 0.0f);
+    //        }
+    //
+    //        slowSmooth[ch].reset (sampleRate, 0.05);
+    //        fastSmooth[ch].reset (sampleRate, 0.05);
+    //
+    //        feedbackState[ch] = 0.0f;
+    //        fbSmooth[ch].reset (sampleRate, 0.01);
     //}
 
-//    // set phase offsets
-//    constexpr float piOver3 = MathConstants<float>::pi / 3.0f;
-//    slowLFOs[0][0].reset (-piOver3);
-//    fastLFOs[0][0].reset (-piOver3);
-//    slowLFOs[1][1].reset (piOver3);
-//    fastLFOs[1][1].reset (piOver3);
-//
-//    aaFilter.prepare (spec);
-//    aaFilter.setCutoffFrequency (12000.0f);
-//
-//    dryWetMixer.prepare (spec);
-//    dryWetMixer.setMixingRule (dsp::DryWetMixingRule::sin3dB);
-//
-//    dcBlocker.prepare (spec);
-//    dcBlocker.setCutoffFrequency (60.0f);
-//
-//    audioOutBuffer.setSize (2, samplesPerBlock);
-//    modOutBuffer.setSize (1, samplesPerBlock);
-//
-//    for (auto& filt : hilbertFilter)
-//        filt.reset();
-//
-//    bypassNeedsReset = false;
+    //    // set phase offsets
+    //    constexpr float piOver3 = MathConstants<float>::pi / 3.0f;
+    //    slowLFOs[0][0].reset (-piOver3);
+    //    fastLFOs[0][0].reset (-piOver3);
+    //    slowLFOs[1][1].reset (piOver3);
+    //    fastLFOs[1][1].reset (piOver3);
+    //
+    //    aaFilter.prepare (spec);
+    //    aaFilter.setCutoffFrequency (12000.0f);
+    //
+    //    dryWetMixer.prepare (spec);
+    //    dryWetMixer.setMixingRule (dsp::DryWetMixingRule::sin3dB);
+    //
+    //    dcBlocker.prepare (spec);
+    //    dcBlocker.setCutoffFrequency (60.0f);
+    //
+    //    audioOutBuffer.setSize (2, samplesPerBlock);
+    //    modOutBuffer.setSize (1, samplesPerBlock);
+    //
+    //    for (auto& filt : hilbertFilter)
+    //        filt.reset();
+    //
+    //    bypassNeedsReset = false;
 }
 
 //void Flanger::processModulation (int numSamples)
@@ -239,14 +235,10 @@ void Flanger::prepare (double sampleRate, int samplesPerBlock)
 
 void Flanger::processAudio (AudioBuffer<float>& buffer)
 {
-    
 }
 
 void Flanger::processAudioBypassed (AudioBuffer<float>& buffer)
 {
-
-
-
 }
 //    const auto numSamples = buffer.getNumSamples();
 //    processModulation (numSamples);
@@ -344,4 +336,3 @@ void Flanger::processAudioBypassed (AudioBuffer<float>& buffer)
 //    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
 //    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
 //}
-

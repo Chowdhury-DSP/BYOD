@@ -34,6 +34,7 @@
 #include "tone/tube_screamer_tone/TubeScreamerTone.h"
 
 #include "modulation/Chorus.h"
+#include "modulation/Flanger.h"
 #include "modulation/Panner.h"
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
