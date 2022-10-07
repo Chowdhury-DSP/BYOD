@@ -15,19 +15,20 @@ public:
     ~Cable() override;
 
     void paint (Graphics& g) override;
+    void resized() override;
     bool hitTest (int x, int y) override;
 
     ConnectionInfo connectionInfo;
 
     static constexpr std::string_view componentName = "BYOD_Cable";
 
-    void checkNeedsRepaint();
+    void checkNeedsRepaint (bool force = false);
 
-    void updateStartPoint();
-    void updateEndPoint();
+    void updateStartPoint (bool repaintIfMoved = true);
+    void updateEndPoint (bool repaintIfMoved = true);
 
 private:
-    float getCableThickness();
+    float getCableThickness() const;
     void drawCableShadow (Graphics& g, float thickness);
     void drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour) const;
     void drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end);
@@ -41,11 +42,12 @@ private:
     CubicBezier bezier;
     float cableThickness = 0.0f;
 
-    std::atomic<juce::Point<float>> startPoint;
-    std::atomic<juce::Point<float>> endPoint;
+    using AtomicPoint = std::atomic<juce::Point<float>>;
+    static_assert (AtomicPoint::is_always_lock_free, "Atomic point needs to be lock free!");
+    AtomicPoint startPoint {};
+    AtomicPoint endPoint {};
     std::atomic<float> scaleFactor = 1.0f;
 
-    juce::Rectangle<int> cableBounds;
     Colour startColour;
     Colour endColour;
     juce::Range<float> levelRange = { CableConstants::floorDB, 0.0f };

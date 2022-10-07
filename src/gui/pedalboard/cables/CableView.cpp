@@ -107,8 +107,8 @@ void CableView::mouseUp (const MouseEvent& e)
     if (isDraggingCable)
     {
         cableMouse.reset();
-        connectionHelper->releaseCable (e);
-        cables.getLast()->updateEndPoint();
+        if (connectionHelper->releaseCable (e))
+            cables.getLast()->updateEndPoint();
         isDraggingCable = false;
     }
 }
@@ -128,6 +128,12 @@ void CableView::timerCallback()
         portGlow = false;
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
     }
+
+    for (auto* cable : cables)
+    {
+        cable->updateStartPoint();
+        cable->updateEndPoint();
+    }
 }
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)
@@ -140,17 +146,22 @@ void CableView::processorBeingRemoved (const BaseProcessor* proc)
     connectionHelper->processorBeingRemoved (proc);
 }
 
-int CableView::pathGeneratorTask::useTimeSlice()
+int CableView::PathGeneratorTask::useTimeSlice()
 {
     if (cableView.cableBeingDragged())
     {
-        MessageManager::callAsync ([&]
-                                   { cableView.cables.getLast()->repaint(); });
+        MessageManager::callAsync (
+            [&]
+            {
+                ScopedLock sl (cableView.cableMutex);
+                if (! cableView.cables.isEmpty())
+                    cableView.cables.getLast()->repaint();
+            });
     }
 
     ScopedLock sl (cableView.cableMutex);
     for (auto* cable : cableView.cables)
         cable->checkNeedsRepaint();
 
-    return 0;
+    return 28; // approx. 35 frames / second
 }
