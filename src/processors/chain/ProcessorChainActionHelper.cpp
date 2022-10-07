@@ -76,7 +76,64 @@ void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, B
 {
     if (newProc == nullptr)
     {
-        jassertfalse; // unable to create this processor!
+        // only 1-in/1-out modules can be replaced with nothing
+        jassert (procToReplace->getNumInputs() == 1);
+        jassert (procToReplace->getNumOutputs() == 1);
+
+        um->beginNewTransaction();
+
+        const auto removeIncomingConnection = [this, &procToReplace] (BaseProcessor* proc) -> std::pair<BaseProcessor*, int>
+        {
+            for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
+            {
+                int numConnections = proc->getNumOutputConnections (portIdx);
+                for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
+                {
+                    auto connection = proc->getOutputConnection (portIdx, cIdx);
+                    if (connection.endProc == procToReplace)
+                    {
+                        auto* startProc = connection.startProc;
+                        const auto startPort = connection.startPort;
+                        um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
+                        return std::make_pair (startProc, startPort);
+                    }
+                }
+            }
+            return {};
+        };
+
+        auto [startProc, startPort] = removeIncomingConnection (&chain.inputProcessor);
+        for (auto* proc : chain.procs)
+        {
+            if (startProc != nullptr)
+                break;
+
+            if (proc == procToReplace)
+                continue;
+
+            std::tie (startProc, startPort) = removeIncomingConnection (proc);
+        }
+
+        // swap all outgoing connections from proc to replace
+        for (int portIdx = 0; portIdx < procToReplace->getNumOutputs(); ++portIdx)
+        {
+            int numConnections = procToReplace->getNumOutputConnections (portIdx);
+            for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
+            {
+                auto connection = procToReplace->getOutputConnection (portIdx, cIdx);
+                auto newConnection = connection;
+                newConnection.startProc = startProc;
+                newConnection.startPort = startPort;
+
+                um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
+
+                if (startProc != nullptr)
+                    um->perform (new AddOrRemoveConnection (chain, std::move (newConnection)));
+            }
+        }
+
+        um->perform (new AddOrRemoveProcessor (chain, procToReplace));
+
         return;
     }
 
