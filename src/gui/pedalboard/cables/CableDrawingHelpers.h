@@ -5,7 +5,7 @@
 namespace CableConstants
 {
 const Colour cableColour (0xFFD0592C); // currently only used for "glow"
-constexpr float cableThickness = 5.0f;
+constexpr float minCableThickness = 5.0f;
 constexpr float portCircleThickness = 1.5f;
 
 constexpr int getPortDistanceLimit (float scaleFactor) { return int (20.0f * scaleFactor); }
@@ -16,5 +16,7 @@ constexpr float floorDB = -60.0f;
 
 namespace CableDrawingHelpers
 {
+juce::Rectangle<float> getPortGlowBounds (juce::Point<int> location, float scaleFactor);
+
 void drawCablePortGlow (Graphics& g, juce::Point<int> location, float scaleFactor);
 } // namespace CableDrawingHelpers

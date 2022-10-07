@@ -34,6 +34,7 @@ public:
         bool isInput = false;
     };
 
+
 private:
     void timerCallback() override;
 
@@ -51,6 +52,43 @@ private:
     std::unique_ptr<CableViewPortLocationHelper> portLocationHelper;
 
     EditorPort nearestPort {};
+    juce::Point<int> portToPaint;
+
+    bool mouseOverClickablePort();
+    bool mouseDraggingOverOutputPort();
+
+    CriticalSection cableMutex;
+    
+    bool portGlow = false;
+
+    struct PathGeneratorTask : juce::TimeSliceClient
+    {
+    public:
+        explicit PathGeneratorTask (CableView& cv) : cableView (cv)
+        {
+            sharedTimeSliceThread->addTimeSliceClient (this);
+
+            if (! sharedTimeSliceThread->isThreadRunning())
+                sharedTimeSliceThread->startThread();
+        }
+        
+        ~PathGeneratorTask()
+        {
+            sharedTimeSliceThread->removeTimeSliceClient(this);
+        }
+
+        int useTimeSlice() override;
+
+    private:
+        struct TimeSliceThread : juce::TimeSliceThread
+        {
+            TimeSliceThread() : juce::TimeSliceThread ("Cable Drawing Background Thread") {}
+        };
+
+        juce::SharedResourcePointer<TimeSliceThread> sharedTimeSliceThread;
+
+        CableView& cableView;
+    } pathTask;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CableView)
 };

@@ -4,20 +4,26 @@ namespace CableDrawingHelpers
 {
 using namespace CableConstants;
 
+#if JUCE_IOS
+constexpr float glowSizeFactor = 4.5f;
+#else
+constexpr float glowSizeFactor = 2.5f;
+#endif
+
+juce::Rectangle<float> getPortGlowBounds (juce::Point<int> location, float scaleFactor)
+{
+    const auto glowDim = (float) getPortDistanceLimit (scaleFactor) * glowSizeFactor;
+    auto glowBounds = (Rectangle (glowDim, glowDim)).withCentre (location.toFloat());
+
+    return glowBounds;
+}
+
 void drawCablePortGlow (Graphics& g, juce::Point<int> location, float scaleFactor)
 {
     Graphics::ScopedSaveState graphicsState (g);
     g.setColour (cableColour.darker (0.1f));
     g.setOpacity (0.65f);
 
-#if JUCE_IOS
-    constexpr float glowSizeFactor = 4.5f;
-#else
-    constexpr float glowSizeFactor = 2.5f;
-#endif
-
-    const auto glowDim = (float) getPortDistanceLimit (scaleFactor) * glowSizeFactor;
-    auto glowBounds = (Rectangle (glowDim, glowDim)).withCentre (location.toFloat());
-    g.fillEllipse (glowBounds);
+    g.fillEllipse (getPortGlowBounds (location, scaleFactor));
 }
 } // namespace CableDrawingHelpers
