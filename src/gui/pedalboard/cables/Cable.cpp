@@ -37,7 +37,7 @@ void Cable::updateStartPoint()
     auto* startEditor = board->findEditorForProcessor (connectionInfo.startProc);
     jassert (startEditor != nullptr);
 
-    startLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, connectionInfo.startPort, false }).toFloat();
+    startPoint = CableViewPortLocationHelper::getPortLocation ({ startEditor, connectionInfo.startPort, false }).toFloat();
     scaleFactor = board->getScaleFactor();
     startColour = startEditor->getColour();
     cableThickness = getCableThickness();
@@ -48,13 +48,13 @@ void Cable::updateEndPoint()
     if (connectionInfo.endProc != nullptr)
     {
         auto* endEditor = board->findEditorForProcessor (connectionInfo.endProc);
-        endLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, connectionInfo.endPort, true }).toFloat();
+        endPoint = CableViewPortLocationHelper::getPortLocation ({ endEditor, connectionInfo.endPort, true }).toFloat();
         endColour = endEditor->getColour();
     }
     else if (cableView.cableBeingDragged())
     {
         endColour = startColour;
-        endLocation = cableView.getCableMousePosition();
+        endPoint = cableView.getCableMousePosition();
     }
 }
 
@@ -74,7 +74,7 @@ Path Cable::createCablePath (juce::Point<float> start, juce::Point<float> end, f
 
 void Cable::checkNeedsRepaint()
 {
-    auto createdPath = createCablePath (startLocation, endLocation, scaleFactor);
+    auto createdPath = createCablePath (startPoint, endPoint, scaleFactor);
     {
         ScopedLock sl (pathCrit);
         cablePath = std::move (createdPath);
@@ -141,5 +141,5 @@ void Cable::paint (Graphics& g)
     updateStartPoint();
     updateEndPoint();
 
-    drawCable (g, startLocation, endLocation);
+    drawCable (g, startPoint, endPoint);
 }

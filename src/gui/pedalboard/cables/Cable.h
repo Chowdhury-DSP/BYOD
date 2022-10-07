@@ -41,8 +41,8 @@ private:
     CubicBezier bezier;
     float cableThickness = 0.0f;
 
-    std::atomic<juce::Point<float>> startLocation;
-    std::atomic<juce::Point<float>> endLocation;
+    std::atomic<juce::Point<float>> startPoint;
+    std::atomic<juce::Point<float>> endPoint;
     std::atomic<float> scaleFactor = 1.0f;
 
     juce::Rectangle<int> cableBounds;
