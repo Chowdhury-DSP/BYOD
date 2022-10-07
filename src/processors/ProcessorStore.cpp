@@ -38,6 +38,7 @@
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
 #include "modulation/scanner_vibrato/ScannerVibrato.h"
+#include "modulation/Flanger.h"
 
 #include "other/Compressor.h"
 #include "other/Delay.h"
@@ -105,6 +106,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Rotary", &processorFactory<Rotary> },
     { "Tremolo", &processorFactory<Tremolo> },
     { "Scanner Vibrato", &processorFactory<ScannerVibrato> },
+    { "Flanger", &processorFactory<Flanger> },
 
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
