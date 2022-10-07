@@ -178,6 +178,21 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
     const auto addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
 #endif
 
+    if (procToReplace != nullptr
+        && procToReplace->getNumInputs() == 1
+        && procToReplace->getNumOutputs() == 1)
+    {
+        PopupMenu::Item item;
+        item.itemID = ++menuID;
+        item.text = "Nothing";
+        item.action = [&store, procToReplace]
+        {
+            store.replaceProcessorCallback (nullptr, procToReplace);
+        };
+
+        menu.addItem (item);
+    }
+
     for (auto type : { Drive, Tone, Modulation, Utility, Other })
     {
         PopupMenu subMenu;
