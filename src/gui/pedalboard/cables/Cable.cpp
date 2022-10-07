@@ -102,7 +102,7 @@ void Cable::repaintIfNeeded (bool force)
 
         auto cableBounds = cablePath.getBounds().toNearestInt();
         cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (2.0f * minCableThickness)));
-        cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (4.0f * minCableThickness) ));
+        cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (4.0f * minCableThickness)));
 
         MessageManager::callAsync ([&, cableBounds]
                                    { repaint (cableBounds); });

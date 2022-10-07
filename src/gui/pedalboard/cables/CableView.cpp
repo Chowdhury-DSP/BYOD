@@ -118,7 +118,7 @@ void CableView::timerCallback()
     using namespace CableDrawingHelpers;
 
     auto overClickablePort = mouseOverClickablePort();
-    
+
     // repaint port glow
     if (overClickablePort || mouseDraggingOverOutputPort())
     {
