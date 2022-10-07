@@ -1,6 +1,5 @@
 #include "Cable.h"
 #include "../BoardComponent.h"
-#include "CableDrawingHelpers.h"
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
@@ -24,7 +23,7 @@ bool Cable::hitTest (int x, int y)
     for (int i = 1; i <= numPointsInPath; ++i)
     {
         auto pointOnPath = bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath);
-        if (clickedP.getDistanceFrom (pointOnPath) < cablethickness)
+        if (clickedP.getDistanceFrom (pointOnPath) < cableThickness)
         {
             return true;
         }
@@ -33,16 +32,55 @@ bool Cable::hitTest (int x, int y)
     return false;
 }
 
-float Cable::getCableThickness()
+void Cable::updateStartPoint (bool repaintIfMoved)
 {
-    levelDB = jlimit (floorDB, 0.0f, levelDB);
-    auto levelMult = std::pow (jmap (levelDB, floorDB, 0.0f, 0.0f, 1.0f), 0.9f);
-    return cableThickness * (1.0f + 0.9f * levelMult);
+    auto* startEditor = board->findEditorForProcessor (connectionInfo.startProc);
+    jassert (startEditor != nullptr);
+
+    scaleFactor = board->getScaleFactor();
+    startColour = startEditor->getColour();
+    cableThickness = getCableThickness();
+
+    const auto newPortLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, connectionInfo.startPort, false }).toFloat();
+    if (startPoint.load() != newPortLocation)
+    {
+        startPoint.store (newPortLocation);
+        if (repaintIfMoved)
+            repaintIfNeeded (true);
+    }
 }
 
-auto Cable::createCablePath (juce::Point<float> start, juce::Point<float> end)
+void Cable::updateEndPoint (bool repaintIfMoved)
 {
-    const auto pointOff = portOffset + scaleFactor;
+    if (connectionInfo.endProc != nullptr)
+    {
+        auto* endEditor = board->findEditorForProcessor (connectionInfo.endProc);
+        endColour = endEditor->getColour();
+
+        const auto newPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, connectionInfo.endPort, true }).toFloat();
+        if (endPoint.load() != newPortLocation)
+        {
+            endPoint.store (newPortLocation);
+            if (repaintIfMoved)
+                repaintIfNeeded (true);
+        }
+    }
+    else if (cableView.cableBeingDragged())
+    {
+        endColour = startColour;
+        endPoint = cableView.getCableMousePosition();
+    }
+    else
+    {
+        // when the cable has just been created, we don't have the mouse drag
+        // source yet, so let's just set the end point equal to the start point.
+        endPoint.store (startPoint);
+    }
+}
+
+Path Cable::createCablePath (juce::Point<float> start, juce::Point<float> end, float sf)
+{
+    const auto pointOff = portOffset + sf;
     bezier = CubicBezier (start, start.translated (pointOff, 0.0f), end.translated (-pointOff, 0.0f), end);
     numPointsInPath = (int) start.getDistanceFrom (end) + 1;
     Path bezierPath;
@@ -54,17 +92,63 @@ auto Cable::createCablePath (juce::Point<float> start, juce::Point<float> end)
     return std::move (bezierPath);
 }
 
+void Cable::repaintIfNeeded (bool force)
+{
+    const auto regeneratePath = [this]
+    {
+        auto createdPath = createCablePath (startPoint, endPoint, scaleFactor);
+        ScopedLock sl (pathCrit);
+        cablePath = std::move (createdPath);
+
+        auto cableBounds = cablePath.getBounds().toNearestInt();
+        cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (4.0f * minCableThickness)));
+        cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (8.0f * minCableThickness)));
+
+        MessageManager::callAsync (
+            [safeComp = Component::SafePointer (this), cableBounds]
+            {
+                if (auto* comp = safeComp.getComponent())
+                    comp->repaint (cableBounds);
+            });
+    };
+
+    if (force || connectionInfo.endProc == nullptr)
+    {
+        regeneratePath();
+        return;
+    }
+
+    if (connectionInfo.endProc != nullptr)
+    {
+        auto updatedLevelDB = jlimit (floorDB, 0.0f, connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort));
+        auto levelDifference = std::abs (updatedLevelDB - levelDB);
+        if (std::abs (levelDifference) > 2.0f && levelRange.contains (updatedLevelDB) && levelRange.contains (levelDB))
+        {
+            levelDB = updatedLevelDB;
+            cableThickness = getCableThickness();
+            regeneratePath();
+        }
+    }
+}
+
+float Cable::getCableThickness() const
+{
+    auto levelMult = std::pow (jmap (levelDB, floorDB, 0.0f, 0.0f, 1.0f), 0.9f);
+    return minCableThickness * (1.0f + 0.9f * levelMult);
+}
+
 void Cable::drawCableShadow (Graphics& g, float thickness)
 {
+    ScopedLock sl (pathCrit);
     auto cableShadow = Path (cablePath);
     cableShadow.applyTransform (AffineTransform::translation (0.0f, thickness * 0.6f));
     g.setColour (Colours::black.withAlpha (0.3f));
-    g.strokePath (cableShadow, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
+    g.strokePath (cableShadow, PathStrokeType (minCableThickness, PathStrokeType::JointStyle::curved));
 }
 
 void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour) const
 {
-    auto circle = (Rectangle { cableThickness, cableThickness } * 2.4f * scaleFactor).withCentre (centre);
+    auto circle = (Rectangle { minCableThickness, minCableThickness } * 2.4f * scaleFactor.load()).withCentre (centre);
     g.setColour (colour);
     g.fillEllipse (circle);
 
@@ -74,12 +158,13 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
 
 void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
-    cablethickness = getCableThickness();
-    cablePath = createCablePath (start, end);
-    drawCableShadow (g, cablethickness);
-
+    drawCableShadow (g, cableThickness);
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
-    g.strokePath (cablePath, PathStrokeType (cablethickness, PathStrokeType::JointStyle::curved));
+
+    {
+        ScopedLock sl (pathCrit);
+        g.strokePath (cablePath, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
+    }
 
     drawCableEndCircle (g, start, startColour);
     drawCableEndCircle (g, end, endColour);
@@ -88,27 +173,13 @@ void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float>
 void Cable::paint (Graphics& g)
 {
     g.setColour (cableColour.brighter (0.1f));
-    auto* startEditor = board->findEditorForProcessor (connectionInfo.startProc);
-    jassert (startEditor != nullptr);
 
-    startPortLocation = CableViewPortLocationHelper::getPortLocation ({ startEditor, connectionInfo.startPort, false }).toFloat();
-    scaleFactor = board->getScaleFactor();
-    startColour = startEditor->getColour();
+    drawCable (g, startPoint, endPoint);
+}
 
-    if (connectionInfo.endProc != nullptr)
-    {
-        auto* endEditor = board->findEditorForProcessor (connectionInfo.endProc);
-        jassert (endEditor != nullptr);
-
-        endPortLocation = CableViewPortLocationHelper::getPortLocation ({ endEditor, connectionInfo.endPort, true }).toFloat();
-        endColour = endEditor->getColour();
-        levelDB = connectionInfo.endProc->getInputLevelDB (connectionInfo.endPort);
-
-        drawCable (g, startPortLocation, endPortLocation);
-    }
-    else if (cableView.cableBeingDragged())
-    {
-        endColour = startColour;
-        drawCable (g, startPortLocation, cableView.getCableMousePosition());
-    }
+void Cable::resized()
+{
+    updateStartPoint (false);
+    updateEndPoint (false);
+    repaintIfNeeded (true);
 }

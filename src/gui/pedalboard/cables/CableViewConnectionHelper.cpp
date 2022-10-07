@@ -40,6 +40,7 @@ CableViewConnectionHelper::CableViewConnectionHelper (CableView& cv) : cableView
 
 void CableViewConnectionHelper::processorBeingAdded (BaseProcessor* newProc)
 {
+    ScopedLock sl (cableView.cableMutex);
     addConnectionsForProcessor (cables, newProc, board, cableView);
 }
 
@@ -50,6 +51,7 @@ void CableViewConnectionHelper::processorBeingRemoved (const BaseProcessor* proc
         if (cables[i]->connectionInfo.startProc == proc || cables[i]->connectionInfo.endProc == proc)
         {
             updateConnectionStatuses (board, cables[i]->connectionInfo, false);
+            ScopedLock sl (cableView.cableMutex);
             cables.remove (i);
         }
     }
@@ -68,7 +70,10 @@ void CableViewConnectionHelper::connectToProcessorChain (ProcessorChain& procCha
 
 void CableViewConnectionHelper::refreshConnections()
 {
-    cables.clear();
+    {
+        ScopedLock sl (cableView.cableMutex);
+        cables.clear();
+    }
 
     for (auto* proc : board->procChain.getProcessors())
         addConnectionsForProcessor (cables, proc, board, cableView);
@@ -108,6 +113,7 @@ void CableViewConnectionHelper::connectionRemoved (const ConnectionInfo& info)
                 && cable->connectionInfo.endProc == info.endProc
                 && cable->connectionInfo.endPort == info.endPort)
             {
+                ScopedLock sl (cableView.cableMutex);
                 cables.removeObject (cable);
                 break;
             }
@@ -125,11 +131,12 @@ void CableViewConnectionHelper::addCableToView (Cable* cable)
 
 void CableViewConnectionHelper::createCable (const ConnectionInfo& connection)
 {
+    ScopedLock sl (cableView.cableMutex);
     cables.add (std::make_unique<Cable> (board, cableView, connection));
     addCableToView (cables.getLast());
 }
 
-void CableViewConnectionHelper::releaseCable (const MouseEvent& e)
+bool CableViewConnectionHelper::releaseCable (const MouseEvent& e)
 {
     // check if we're releasing near an output port
     auto relMouse = e.getEventRelativeTo (&cableView);
@@ -148,13 +155,17 @@ void CableViewConnectionHelper::releaseCable (const MouseEvent& e)
         board->procChain.getActionHelper().addConnection (std::move (connection));
 
         cableView.repaint();
-        return;
+        return true;
     }
 
     // not being connected... trash the latest cable
-    cables.removeObject (cables.getLast());
+    {
+        ScopedLock sl (cableView.cableMutex);
+        cables.removeObject (cables.getLast());
+    }
 
     cableView.repaint();
+    return false;
 }
 
 void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex)
@@ -165,6 +176,7 @@ void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex
         {
             const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
             board->procChain.getActionHelper().removeConnection (std::move (cable->connectionInfo));
+            ScopedLock sl (cableView.cableMutex);
             cables.removeObject (cable);
             break;
         }

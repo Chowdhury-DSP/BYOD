@@ -14,7 +14,10 @@ public:
     void timerCallback() final;
 
 private:
+    Rectangle<int> getMeterBounds() const;
+
     const LevelDataType& rmsLevels;
     std::array<float, 2> dbLevels {};
+    std::array<float, 2> dbLevelsPrev {};
     chowdsp::LevelDetector<float> levelDetector[2];
 };

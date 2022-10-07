@@ -13,7 +13,7 @@ public:
 
     void addCableToView (Cable* cable);
     void createCable (const ConnectionInfo& connection);
-    void releaseCable (const MouseEvent& e);
+    bool releaseCable (const MouseEvent& e);
     void destroyCable (BaseProcessor* proc, int portIndex);
 
     void clickOnCable (PopupMenu& menu, PopupMenu::Options& options, Cable* clickedCable);
