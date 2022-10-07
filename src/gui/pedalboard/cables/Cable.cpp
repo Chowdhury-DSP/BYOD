@@ -104,8 +104,12 @@ void Cable::repaintIfNeeded (bool force)
         cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (4.0f * minCableThickness)));
         cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (8.0f * minCableThickness)));
 
-        MessageManager::callAsync ([&, cableBounds]
-                                   { repaint (cableBounds); });
+        MessageManager::callAsync (
+            [safeComp = Component::SafePointer (this), cableBounds]
+            {
+                if (auto* comp = safeComp.getComponent())
+                    comp->repaint (cableBounds);
+            });
     };
 
     if (force || connectionInfo.endProc == nullptr)

@@ -153,11 +153,14 @@ int CableView::PathGeneratorTask::useTimeSlice()
     if (cableView.cableBeingDragged())
     {
         MessageManager::callAsync (
-            [&]
+            [safeCableView = Component::SafePointer (&cableView)]
             {
-                ScopedLock sl (cableView.cableMutex);
-                if (! cableView.cables.isEmpty())
-                    cableView.cables.getLast()->repaint();
+                if (auto* cv = safeCableView.getComponent())
+                {
+                    ScopedLock sl (cv->cableMutex);
+                    if (! cv->cables.isEmpty())
+                        cv->cables.getLast()->repaint();
+                }
             });
     }
 
