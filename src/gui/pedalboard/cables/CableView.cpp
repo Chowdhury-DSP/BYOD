@@ -20,7 +20,7 @@ bool CableView::mouseOverClickablePort()
     if (! mousePosition.has_value())
         return false;
 
-    nearestPort = portLocationHelper->getNearestPort (mousePosition.value(), board);
+    nearestPort = portLocationHelper->getNearestPort (*mousePosition, board);
     if (nearestPort.editor != nullptr)
     {
         const bool isDraggingNearInputPort = nearestPort.isInput && isDraggingCable;
@@ -40,7 +40,7 @@ bool CableView::mouseDraggingOverOutputPort()
     if (! mousePosition.has_value() || cables.isEmpty())
         return false;
 
-    const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePosition.value(), cables.getLast()->connectionInfo.startProc);
+    const auto nearestInputPort = portLocationHelper->getNearestInputPort (*mousePosition, cables.getLast()->connectionInfo.startProc);
     if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
     {
         portToPaint = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
