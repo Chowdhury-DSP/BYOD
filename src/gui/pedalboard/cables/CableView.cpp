@@ -17,8 +17,10 @@ CableView::~CableView() = default;
 
 bool CableView::mouseOverClickablePort()
 {
-    const auto mousePos = Desktop::getMousePosition() - getScreenPosition();
-    nearestPort = portLocationHelper->getNearestPort (mousePos, board);
+    if (! mousePosition.has_value())
+        return false;
+
+    nearestPort = portLocationHelper->getNearestPort (mousePosition.value(), board);
     if (nearestPort.editor != nullptr)
     {
         const bool isDraggingNearInputPort = nearestPort.isInput && isDraggingCable;
@@ -35,15 +37,14 @@ bool CableView::mouseOverClickablePort()
 
 bool CableView::mouseDraggingOverOutputPort()
 {
-    if (cableMouse != nullptr)
+    if (! mousePosition.has_value() || cables.isEmpty())
+        return false;
+
+    const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePosition.value(), cables.getLast()->connectionInfo.startProc);
+    if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
     {
-        auto mousePos = cableMouse->getPosition();
-        const auto nearestInputPort = portLocationHelper->getNearestInputPort (mousePos, cables.getLast()->connectionInfo.startProc);
-        if (nearestInputPort.editor != nullptr && nearestInputPort.isInput && ! portLocationHelper->isInputPortConnected (nearestInputPort))
-        {
-            portToPaint = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
-            return true;
-        }
+        portToPaint = CableViewPortLocationHelper::getPortLocation (nearestInputPort);
+        return true;
     }
 
     return false;
@@ -65,6 +66,16 @@ void CableView::resized()
         cable->setBounds (getLocalBounds());
 }
 
+void CableView::mouseMove (const MouseEvent& e)
+{
+    mousePosition = e.getEventRelativeTo (this).getPosition();
+}
+
+void CableView::mouseExit (const MouseEvent&)
+{
+    mousePosition = std::nullopt;
+}
+
 void CableView::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || e.eventComponent == nullptr)
@@ -81,15 +92,13 @@ void CableView::mouseDown (const MouseEvent& e)
     else
     {
         connectionHelper->createCable ({ nearestPort.editor->getProcPtr(), nearestPort.portIndex, nullptr, 0 });
-        cableMouse = std::make_unique<MouseEvent> (e.getEventRelativeTo (this));
         isDraggingCable = true;
     }
 }
 
 void CableView::mouseDrag (const MouseEvent& e)
 {
-    if (isDraggingCable)
-        cableMouse = std::make_unique<MouseEvent> (e.getEventRelativeTo (this));
+    mousePosition = e.getEventRelativeTo (this).getPosition();
 }
 
 bool CableView::cableBeingDragged() const
@@ -99,14 +108,13 @@ bool CableView::cableBeingDragged() const
 
 juce::Point<float> CableView::getCableMousePosition() const
 {
-    return cableMouse->getPosition().toFloat();
+    return mousePosition.value_or (juce::Point<int> {}).toFloat();
 }
 
 void CableView::mouseUp (const MouseEvent& e)
 {
     if (isDraggingCable)
     {
-        cableMouse.reset();
         if (connectionHelper->releaseCable (e))
             cables.getLast()->updateEndPoint();
         isDraggingCable = false;
@@ -117,15 +125,13 @@ void CableView::timerCallback()
 {
     using namespace CableDrawingHelpers;
 
-    auto overClickablePort = mouseOverClickablePort();
-
     // repaint port glow
-    if (overClickablePort || mouseDraggingOverOutputPort())
+    if (mouseOverClickablePort() || mouseDraggingOverOutputPort())
     {
         portGlow = true;
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
     }
-    else if (! overClickablePort && portGlow)
+    else if (portGlow)
     {
         portGlow = false;
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
@@ -146,6 +152,20 @@ void CableView::processorBeingAdded (BaseProcessor* newProc)
 void CableView::processorBeingRemoved (const BaseProcessor* proc)
 {
     connectionHelper->processorBeingRemoved (proc);
+}
+
+//================================================================
+CableView::PathGeneratorTask::PathGeneratorTask (CableView& cv) : cableView (cv)
+{
+    sharedTimeSliceThread->addTimeSliceClient (this);
+
+    if (! sharedTimeSliceThread->isThreadRunning())
+        sharedTimeSliceThread->startThread();
+}
+
+CableView::PathGeneratorTask::~PathGeneratorTask()
+{
+    sharedTimeSliceThread->removeTimeSliceClient (this);
 }
 
 int CableView::PathGeneratorTask::useTimeSlice()
