@@ -15,6 +15,9 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+
+    void mouseMove (const MouseEvent& e) override;
+    void mouseExit (const MouseEvent& e) override;
     void mouseDown (const MouseEvent& e) override;
     void mouseDrag (const MouseEvent& e) override;
     void mouseUp (const MouseEvent& e) override;
@@ -42,7 +45,7 @@ private:
 
     float scaleFactor = 1.0f;
     bool isDraggingCable = false;
-    std::unique_ptr<MouseEvent> cableMouse = nullptr;
+    std::optional<juce::Point<int>> mousePosition;
 
     friend class CableViewConnectionHelper;
     std::unique_ptr<CableViewConnectionHelper> connectionHelper;
@@ -63,18 +66,8 @@ private:
     struct PathGeneratorTask : juce::TimeSliceClient
     {
     public:
-        explicit PathGeneratorTask (CableView& cv) : cableView (cv)
-        {
-            sharedTimeSliceThread->addTimeSliceClient (this);
-
-            if (! sharedTimeSliceThread->isThreadRunning())
-                sharedTimeSliceThread->startThread();
-        }
-
-        ~PathGeneratorTask()
-        {
-            sharedTimeSliceThread->removeTimeSliceClient (this);
-        }
+        explicit PathGeneratorTask (CableView& cv);
+        ~PathGeneratorTask() override;
 
         int useTimeSlice() override;
 
