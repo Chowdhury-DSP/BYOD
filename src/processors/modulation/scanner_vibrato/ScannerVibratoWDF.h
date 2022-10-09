@@ -18,6 +18,7 @@
     wdft::WDFSeriesT<float, decltype (R##stage##p), decltype (R##stage##m)> SR##stage { R##stage##p, R##stage##m }; \
     wdft::WDFSeriesT<float, decltype (SR##stage), decltype (S##stage)> PR##stage { SR##stage, S##stage }
 
+// Reference: http://dafx16.vutbr.cz/dafxpapers/38-DAFx-16_paper_54-PN.pdf
 class ScannerVibratoWDF
 {
 public:
@@ -45,19 +46,43 @@ public:
         C4.prepare (fs_prime);
         C5.prepare (fs_prime);
         C6.prepare (fs_prime);
+        C7.prepare (fs_prime);
+        C8.prepare (fs_prime);
+        C9.prepare (fs_prime);
+        C10.prepare (fs_prime);
+        C11.prepare (fs_prime);
+        C12.prepare (fs_prime);
+        C13.prepare (fs_prime);
+        C14.prepare (fs_prime);
+        C15.prepare (fs_prime);
+        C16.prepare (fs_prime);
+        C17.prepare (fs_prime);
+        C18.prepare (fs_prime);
         L1.prepare (fs_prime);
         L2.prepare (fs_prime);
         L3.prepare (fs_prime);
         L4.prepare (fs_prime);
         L5.prepare (fs_prime);
         L6.prepare (fs_prime);
+        L7.prepare (fs_prime);
+        L8.prepare (fs_prime);
+        L9.prepare (fs_prime);
+        L10.prepare (fs_prime);
+        L11.prepare (fs_prime);
+        L12.prepare (fs_prime);
+        L13.prepare (fs_prime);
+        L14.prepare (fs_prime);
+        L15.prepare (fs_prime);
+        L16.prepare (fs_prime);
+        L17.prepare (fs_prime);
+        L18.prepare (fs_prime);
     }
 
     template <Mode mode>
     void processBlock (const float* inData, float** outData, int numSamples) noexcept
     {
         if constexpr (mode == Mode::V1 || mode == Mode::V2 || mode == Mode::V3)
-            Rc.setResistanceValue (1.0f);
+            Rc.setResistanceValue (0.0f);
         else if constexpr (mode == Mode::C1 || mode == Mode::C2 || mode == Mode::C3)
             Rc.setResistanceValue (RcVal);
 

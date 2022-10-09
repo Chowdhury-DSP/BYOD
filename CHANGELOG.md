@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Added modulation ports so modules with internal modulation can share modulation signals.
 - Added "Rotary" module.
 - Added "Panner" module.
+- Added "Scanner Vibrato" module.
 - Added "Junior B" module.
 - Added "Bass Face" module.
 - Added "Blonde" modules.

@@ -32,7 +32,13 @@ ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor ("Scanner Vibra
     loadParameterPointer (rateHzParam, vts, rateTag);
     loadParameterPointer (mixParam, vts, mixTag);
     loadParameterPointer (modeParam, vts, modeTag);
+
     depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, depthTag));
+    depthParam.setRampLength (0.05);
+    depthParam.mappingFunction = [] (float x)
+    {
+        return 0.5f * x;
+    };
 
     const auto initTable = [this] (int index, auto&& func)
     {
@@ -59,7 +65,7 @@ ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor ("Scanner Vibra
 
     uiOptions.backgroundColour = Colour { 0xff95756d };
     uiOptions.powerColour = Colour { 0xffe5e3dc };
-    uiOptions.info.description = "Virtual analog emulation of the scanner vibrato effect from the Hammond Organ.";
+    uiOptions.info.description = "Virtual analog emulation of the scanner vibrato/chorus effect from the Hammond Organ.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
     routeExternalModulation ({ ModulationInput }, { ModulationOutput });
@@ -70,7 +76,7 @@ ParamLayout ScannerVibrato::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    createFreqParameter (params, rateTag, "Rate", 0.1f, 25.0f, 6.0f, 6.0f);
+    createFreqParameter (params, rateTag, "Rate", 0.5f, 10.0f, 6.0f, 6.0f);
     createPercentParameter (params, depthTag, "Depth", 0.5f);
     createPercentParameter (params, mixTag, "Mix", 0.5f);
 
@@ -107,6 +113,7 @@ void ScannerVibrato::prepare (double sampleRate, int samplesPerBlock)
 void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
+    depthParam.process (numSamples);
 
     modOutBuffer.setSize (1, numSamples, false, false, true);
     if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
@@ -117,19 +124,21 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
     }
     else // create our own modulation signal
     {
+        modOutBuffer.clear();
         modSource.setFrequency (*rateHzParam);
         modSource.processBlock (modOutBuffer);
     }
 
-    // generate mod mix arrays
-    auto** modMixData = modsMixBuffer.getArrayOfWritePointers();
-    FloatVectorOperations::multiply (modMixData[0], modOutBuffer.getReadPointer (0), 0.5f, numSamples);
-    FloatVectorOperations::add (modMixData[0], 0.5f, numSamples);
-    for (int i = ScannerVibratoWDF::numTaps - 1; i >= 0; --i)
-        tapMixTable[i].process (modMixData[0], modMixData[i], numSamples);
-
     if (inputsConnected.contains (AudioInput))
     {
+        // generate mod mix arrays
+        auto** modMixData = modsMixBuffer.getArrayOfWritePointers();
+        FloatVectorOperations::add (modMixData[0], modOutBuffer.getReadPointer (0), 1.0f, numSamples);
+        FloatVectorOperations::multiply (modMixData[0], depthParam.getSmoothedBuffer(), numSamples); // this also multiplies the signal by 0.5
+        //        FloatVectorOperations::multiply (modMixData[0], depthParam.getSmoothedBuffer(), modOutBuffer.getReadPointer (0), numSamples); // this also multiplies the signal by 0.5
+        for (int i = ScannerVibratoWDF::numTaps - 1; i >= 0; --i)
+            tapMixTable[i].process (modMixData[0], modMixData[i], numSamples);
+
         const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numChannels = audioInBuffer.getNumChannels();
         audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
@@ -161,6 +170,7 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
                 FloatVectorOperations::addWithMultiply (outData, tapsOutData[i], modMixData[i], numSamples);
         }
 
+        audioOutBuffer.applyGain (-Decibels::decibelsToGain (3.0f));
         mixer.mixWetSamples (audioOutBuffer);
     }
     else
