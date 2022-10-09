@@ -1,0 +1,207 @@
+#include "ScannerVibrato.h"
+#include "processors/BufferHelpers.h"
+#include "processors/ParameterHelpers.h"
+
+namespace
+{
+const String rateTag = "rate";
+const String depthTag = "depth";
+const String mixTag = "mix";
+const String modeTag = "mode";
+
+constexpr auto o16 = 1.0f / 16.0f;
+float ramp_up (float x, int off)
+{
+    const auto y = 16.0f * (x - (float) off * o16);
+    return (y > 1.0f || y < 0.0f) ? 0.0f : y;
+}
+float ramp_down (float x, int off)
+{
+    const auto y = 1.0f - 16.0f * (x - (float) off * o16);
+    return (y > 1.0f || y < 0.0f) ? 0.0f : y;
+}
+} // namespace
+
+ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor ("Scanner Vibrato",
+                                                                  createParameterLayout(),
+                                                                  um,
+                                                                  magic_enum::enum_count<InputPort>(),
+                                                                  magic_enum::enum_count<OutputPort>())
+{
+    using namespace ParameterHelpers;
+    loadParameterPointer (rateHzParam, vts, rateTag);
+    loadParameterPointer (mixParam, vts, mixTag);
+    loadParameterPointer (modeParam, vts, modeTag);
+    depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, depthTag));
+
+    const auto initTable = [this] (int index, auto&& func)
+    {
+        tapMixTable[index].initialise (func, 0.0f, 1.0f, 1024);
+    };
+    initTable (0, [] (float x)
+               { return ramp_up (x, 0) + ramp_down (x, 1); });
+    initTable (1, [] (float x)
+               { return ramp_up (x, 1) + ramp_down (x, 2) + ramp_up (x, 15) + ramp_down (x, 0); });
+    initTable (2, [] (float x)
+               { return ramp_up (x, 2) + ramp_down (x, 3) + ramp_up (x, 14) + ramp_down (x, 15); });
+    initTable (3, [] (float x)
+               { return ramp_up (x, 3) + ramp_down (x, 4) + ramp_up (x, 13) + ramp_down (x, 14); });
+    initTable (4, [] (float x)
+               { return ramp_up (x, 4) + ramp_down (x, 5) + ramp_up (x, 12) + ramp_down (x, 13); });
+    initTable (5, [] (float x)
+               { return ramp_up (x, 5) + ramp_down (x, 6) + ramp_up (x, 11) + ramp_down (x, 12); });
+    initTable (6, [] (float x)
+               { return ramp_up (x, 6) + ramp_down (x, 7) + ramp_up (x, 10) + ramp_down (x, 11); });
+    initTable (7, [] (float x)
+               { return ramp_up (x, 7) + ramp_down (x, 8) + ramp_up (x, 9) + ramp_down (x, 10); });
+    initTable (8, [] (float x)
+               { return ramp_up (x, 8) + ramp_down (x, 9); });
+
+    uiOptions.backgroundColour = Colour { 0xff95756d };
+    uiOptions.powerColour = Colour { 0xffe5e3dc };
+    uiOptions.info.description = "Virtual analog emulation of the scanner vibrato effect from the Hammond Organ.";
+    uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
+    disableWhenInputConnected ({ rateTag }, ModulationInput);
+}
+
+ParamLayout ScannerVibrato::createParameterLayout()
+{
+    using namespace ParameterHelpers;
+    auto params = createBaseParams();
+    createFreqParameter (params, rateTag, "Rate", 0.1f, 25.0f, 6.0f, 6.0f);
+    createPercentParameter (params, depthTag, "Depth", 0.5f);
+    createPercentParameter (params, mixTag, "Mix", 0.5f);
+
+    StringArray modeChoices;
+    for (const auto& choice : magic_enum::enum_names<ScannerVibratoWDF::Mode>())
+        modeChoices.add (choice.data());
+    emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", modeChoices, 0);
+
+    return { params.begin(), params.end() };
+}
+
+void ScannerVibrato::prepare (double sampleRate, int samplesPerBlock)
+{
+    depthParam.prepare (sampleRate, samplesPerBlock);
+
+    const auto spec = dsp::ProcessSpec { sampleRate, (uint32_t) samplesPerBlock, 2 };
+    const auto monoSpec = dsp::ProcessSpec { sampleRate, (uint32_t) samplesPerBlock, 1 };
+
+    modSource.prepare (monoSpec);
+    mixer.prepare (spec);
+    mixer.setMixingRule (dsp::DryWetMixingRule::sin3dB);
+
+    modsMixBuffer.setMaxSize (ScannerVibratoWDF::numTaps, samplesPerBlock);
+    for (int ch = 0; ch < 2; ++ch)
+    {
+        wdf[ch].prepare ((float) sampleRate);
+        tapsOutBuffer[ch].setMaxSize (ScannerVibratoWDF::numTaps, samplesPerBlock);
+    }
+
+    modOutBuffer.setSize (1, samplesPerBlock);
+    audioOutBuffer.setSize (2, samplesPerBlock);
+}
+
+void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+
+    modOutBuffer.setSize (1, numSamples, false, false, true);
+    if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
+    {
+        // get modulation buffer from input (-1, 1)
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modOutBuffer);
+    }
+    else // create our own modulation signal
+    {
+        modSource.setFrequency (*rateHzParam);
+        modSource.processBlock (modOutBuffer);
+    }
+
+    // generate mod mix arrays
+    auto** modMixData = modsMixBuffer.getArrayOfWritePointers();
+    FloatVectorOperations::multiply (modMixData[0], modOutBuffer.getReadPointer (0), 0.5f, numSamples);
+    FloatVectorOperations::add (modMixData[0], 0.5f, numSamples);
+    for (int i = ScannerVibratoWDF::numTaps - 1; i >= 0; --i)
+        tapMixTable[i].process (modMixData[0], modMixData[i], numSamples);
+
+    if (inputsConnected.contains (AudioInput))
+    {
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+
+        mixer.setWetMixProportion (*mixParam);
+        mixer.pushDrySamples (audioInBuffer);
+
+        audioOutBuffer.clear();
+        const auto modeIndex = modeParam->getIndex();
+        using Mode = ScannerVibratoWDF::Mode;
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            tapsOutBuffer[ch].setCurrentSize (ScannerVibratoWDF::numTaps, numSamples);
+            auto** tapsOutData = tapsOutBuffer[ch].getArrayOfWritePointers();
+            magic_enum::enum_switch (
+                [this,
+                 ch,
+                 numSamples,
+                 tapsOutData,
+                 inData = audioInBuffer.getReadPointer (ch)] (auto mode)
+                {
+                    constexpr Mode mode_c = mode;
+                    wdf[ch].processBlock<mode_c> (inData, tapsOutData, numSamples);
+                },
+                static_cast<Mode> (modeIndex));
+
+            auto* outData = audioOutBuffer.getWritePointer (ch);
+            for (int i = 0; i < ScannerVibratoWDF::numTaps; ++i)
+                FloatVectorOperations::addWithMultiply (outData, tapsOutData[i], modMixData[i], numSamples);
+        }
+
+        mixer.mixWetSamples (audioOutBuffer);
+    }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
+
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+}
+
+void ScannerVibrato::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+
+    modOutBuffer.setSize (1, numSamples, false, false, true);
+    if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
+    {
+        // get modulation buffer from input (-1, 1)
+        const auto& modInputBuffer = getInputBuffer (ModulationInput);
+        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modOutBuffer);
+    }
+    else
+    {
+        modOutBuffer.clear();
+    }
+
+    if (inputsConnected.contains (AudioInput))
+    {
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        audioOutBuffer.makeCopyOf (audioInBuffer, true);
+    }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
+
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+}
