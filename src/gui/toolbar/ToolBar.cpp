@@ -4,11 +4,14 @@
 
 namespace GUIColours = GUIConstants::Colours;
 
-ToolBar::ToolBar (BYOD& plugin) : undoRedoComp (plugin.getUndoManager()),
-                                  globalParamControls (plugin.getVTS(), plugin.getOversampling()),
-                                  settingsButton (plugin, plugin.getOpenGLHelper()),
-                                  cpuMeter (plugin.getLoadMeasurer()),
-                                  presetsComp (reinterpret_cast<PresetManager&> (plugin.getPresetManager()))
+ToolBar::ToolBar (BYOD& plugin,
+                  const HostContextProvider& hostContextProvider) : undoRedoComp (plugin.getUndoManager()),
+                                                                    globalParamControls (plugin.getVTS(),
+                                                                                         hostContextProvider,
+                                                                                         plugin.getOversampling()),
+                                                                    settingsButton (plugin, plugin.getOpenGLHelper()),
+                                                                    cpuMeter (plugin.getLoadMeasurer()),
+                                                                    presetsComp (reinterpret_cast<PresetManager&> (plugin.getPresetManager()))
 {
     addAndMakeVisible (undoRedoComp);
     addAndMakeVisible (globalParamControls);
@@ -36,7 +39,7 @@ void ToolBar::resized()
     undoRedoComp.setBounds (bounds.removeFromLeft (undoRedoWidth));
 
     bounds.removeFromLeft (3);
-    globalParamControls.setBounds (bounds.removeFromLeft (proportionOfWidth (0.55f)));
+    globalParamControls.setBounds (bounds.removeFromLeft (proportionOfWidth (0.6f)));
     bounds.removeFromLeft (3);
 
     settingsButton.setBounds (bounds.removeFromRight (getHeight()).reduced (4));
