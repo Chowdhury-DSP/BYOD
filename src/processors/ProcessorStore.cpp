@@ -140,7 +140,8 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());
 
-                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() }); }));
+                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
+                                               }));
     }
 
     for (auto& f : futureProcInfos)
