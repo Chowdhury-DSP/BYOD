@@ -1,11 +1,13 @@
 #include "Port.h"
 #include "../cables/CableDrawingHelpers.h"
 
-Port::Port (const Colour& processorColour, const PortType type) : procColour (processorColour), portType (type)
+Port::Port (const Colour& processorColour, const PortType type) : Component ("Port"),
+                                                                  procColour (processorColour),
+                                                                  portType (type)
 {
 }
 
-const Colour Port::getPortColour()
+Colour Port::getPortColour() const
 {
     if (portType == PortType::modulation)
     {

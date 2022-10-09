@@ -98,7 +98,12 @@ void CableView::mouseDown (const MouseEvent& e)
 
 void CableView::mouseDrag (const MouseEvent& e)
 {
-    mousePosition = e.getEventRelativeTo (this).getPosition();
+    if (e.eventComponent == nullptr)
+        return;
+
+    const auto eventCompName = e.eventComponent->getName();
+    if (eventCompName == "Port" || eventCompName == "Board")
+        mousePosition = e.getEventRelativeTo (this).getPosition();
 }
 
 bool CableView::cableBeingDragged() const

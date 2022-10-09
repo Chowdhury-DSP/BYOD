@@ -13,7 +13,8 @@ public:
 
 private:
     void timerCallback() override;
-    void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float modSliderPos, float rotaryStartAngle, float rotaryEndAngle);
+    void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float modSliderPos);
+    void drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float modSliderPos);
 
     const chowdsp::FloatParameter& param;
     const HostContextProvider& hostContextProvider;

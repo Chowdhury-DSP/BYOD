@@ -19,7 +19,7 @@ public:
     void paint (Graphics& g) override;
 
 private:
-    const Colour getPortColour();
+    Colour getPortColour() const;
 
     bool isInput = false;
     bool isConnected = false;
