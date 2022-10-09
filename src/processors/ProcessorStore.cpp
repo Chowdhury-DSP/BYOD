@@ -37,6 +37,7 @@
 #include "modulation/Panner.h"
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
+#include "modulation/scanner_vibrato/ScannerVibrato.h"
 
 #include "other/Compressor.h"
 #include "other/Delay.h"
@@ -103,6 +104,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Panner", &processorFactory<Panner> },
     { "Rotary", &processorFactory<Rotary> },
     { "Tremolo", &processorFactory<Tremolo> },
+    { "Scanner Vibrato", &processorFactory<ScannerVibrato> },
 
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },
@@ -138,8 +140,7 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());
 
-                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
-                                               }));
+                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() }); }));
     }
 
     for (auto& f : futureProcInfos)
