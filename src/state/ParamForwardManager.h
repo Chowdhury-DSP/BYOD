@@ -12,7 +12,7 @@ public:
 
     void processorAdded (BaseProcessor* proc);
     void processorRemoved (const BaseProcessor* proc);
-    
+
     const RangedAudioParameter* getForwardedParameterFromInternal (const RangedAudioParameter& internalParameter) const;
 
 private:
