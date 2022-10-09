@@ -18,6 +18,7 @@ private:
     void setResizeBehaviour();
 
     BYOD& plugin;
+    const HostContextProvider hostContextProvider;
 
     ComponentBoundsConstrainer constrainer;
 

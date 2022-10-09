@@ -25,6 +25,8 @@ public:
 
     auto& getProcChain() { return *procs; }
     auto& getVTS() { return vts; }
+    const auto& getVTS() const { return vts; }
+    const auto& getParamForwarder() const { return *paramForwarder; }
     auto& getOversampling() { return procs->getOversampling(); }
     auto& getLoadMeasurer() { return loadMeasurer; }
     auto* getOpenGLHelper() { return openGLHelper.get(); }
