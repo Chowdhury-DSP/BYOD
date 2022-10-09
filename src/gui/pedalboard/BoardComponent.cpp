@@ -27,7 +27,9 @@ juce::Point<int> getRandomPosition (const Component& comp)
 }
 } // namespace
 
-BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cableView (this)
+BoardComponent::BoardComponent (ProcessorChain& procs, const HostContextProvider& hostCP) : procChain (procs),
+                                                                                            cableView (this),
+                                                                                            hostContextProvider (hostCP)
 {
     newProcButton.setButtonText ("+");
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
@@ -39,11 +41,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs) : procChain (procs), cabl
         popupMenu.showPopupMenu();
     };
 
-    inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain);
+    inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, hostContextProvider);
     addAndMakeVisible (inputEditor.get());
     inputEditor->addToBoard (this);
 
-    outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain);
+    outputEditor = std::make_unique<ProcessorEditor> (procs.getOutputProcessor(), procChain, hostContextProvider);
     addAndMakeVisible (outputEditor.get());
     outputEditor->addToBoard (this);
 
@@ -122,7 +124,7 @@ void BoardComponent::processorAdded (BaseProcessor* newProc)
         return;
     }
 
-    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain));
+    auto* newEditor = processorEditors.add (std::make_unique<ProcessorEditor> (*newProc, procChain, hostContextProvider));
     addAndMakeVisible (newEditor);
 
     cableView.processorBeingAdded (newProc);

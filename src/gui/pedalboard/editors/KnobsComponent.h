@@ -1,11 +1,16 @@
 #pragma once
 
+#include "gui/utils/ModulatableSlider.h"
 #include "processors/BaseProcessor.h"
 
 class KnobsComponent : public Component
 {
 public:
-    KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& contrastColour, const Colour& accentColour);
+    KnobsComponent (BaseProcessor& baseProc,
+                    AudioProcessorValueTreeState& vts,
+                    const Colour& contrastColour,
+                    const Colour& accentColour,
+                    const HostContextProvider& hostContextProvider);
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -17,8 +22,9 @@ private:
     using ComboBoxAttachment = AudioProcessorValueTreeState::ComboBoxAttachment;
     using ButtonAttachment = AudioProcessorValueTreeState::ButtonAttachment;
 
-    struct SliderWithAttachment : public Slider
+    struct SliderWithAttachment : public ModulatableSlider
     {
+        SliderWithAttachment (const chowdsp::FloatParameter& param, const HostContextProvider& hcp) : ModulatableSlider (param, hcp) {}
         std::unique_ptr<SliderAttachment> attachment;
     };
 

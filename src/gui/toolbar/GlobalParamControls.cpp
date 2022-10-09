@@ -5,6 +5,7 @@
 namespace GUIColours = GUIConstants::Colours;
 
 GlobalParamControls::GlobalParamControls (AudioProcessorValueTreeState& vts,
+                                          const HostContextProvider& hostContextProvider,
                                           chowdsp::VariableOversampling<float>& oversampling)
     : osMenu (oversampling, vts)
 {
@@ -35,9 +36,10 @@ GlobalParamControls::GlobalParamControls (AudioProcessorValueTreeState& vts,
 
     addComboBox (GlobalParamTags::monoModeTag);
 
-    auto addSlider = [this, &vts] (const String& paramTag, const String& name)
+    auto addSlider = [this, &vts, &hostContextProvider] (const String& paramTag, const String& name)
     {
-        auto newSlide = std::make_unique<SliderWithAttachment>();
+        const auto* param = chowdsp::ParamUtils::getParameterPointer<chowdsp::FloatParameter*> (vts, paramTag);
+        auto newSlide = std::make_unique<SliderWithAttachment> (param, hostContextProvider);
         addAndMakeVisible (newSlide.get());
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, paramTag, *newSlide);
         newSlide->setName (name);

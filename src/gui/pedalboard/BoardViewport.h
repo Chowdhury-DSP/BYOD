@@ -9,7 +9,7 @@ class BoardViewport : public Viewport,
 public:
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
-    explicit BoardViewport (ProcessorChain& procChain);
+    BoardViewport (ProcessorChain& procChain, const HostContextProvider& hostContextProvider);
 
     void resized() override;
 

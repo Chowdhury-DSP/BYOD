@@ -6,12 +6,19 @@ namespace
 constexpr float nameHeightScale = 0.115f;
 }
 
-KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTreeState& vts, const Colour& cc, const Colour& ac)
+KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
+                                AudioProcessorValueTreeState& vts,
+                                const Colour& cc,
+                                const Colour& ac,
+                                const HostContextProvider& hostContextProvider)
     : contrastColour (cc), accentColour (ac)
 {
-    auto addSlider = [=, &vts] (AudioParameterFloat* param)
+    const auto addSlider = [this,
+                            &vts,
+                            &hostContextProvider] (chowdsp::FloatParameter* param)
     {
-        auto newSlide = std::make_unique<SliderWithAttachment>();
+        auto newSlide = std::make_unique<SliderWithAttachment> (*param, hostContextProvider);
+
         addAndMakeVisible (newSlide.get());
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, *newSlide);
 
@@ -29,7 +36,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         sliders.add (std::move (newSlide));
     };
 
-    auto addBox = [=, &vts] (AudioParameterChoice* param)
+    const auto addBox = [this, &vts] (AudioParameterChoice* param)
     {
         auto newBox = std::make_unique<BoxWithAttachment>();
         addAndMakeVisible (newBox.get());
@@ -46,7 +53,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
         boxes.add (std::move (newBox));
     };
 
-    auto addButton = [=, &vts] (AudioParameterBool* param)
+    const auto addButton = [this, &vts] (AudioParameterBool* param)
     {
         if (param->paramID == "on_off")
             return;
@@ -88,14 +95,14 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc, AudioProcessorValueTree
                 continue;
         }
 
-        if (auto* paramFloat = dynamic_cast<AudioParameterFloat*> (param))
+        if (auto* paramFloat = dynamic_cast<chowdsp::FloatParameter*> (param))
             addSlider (paramFloat);
-
         else if (auto* paramChoice = dynamic_cast<AudioParameterChoice*> (param))
             addBox (paramChoice);
-
         else if (auto* paramBool = dynamic_cast<AudioParameterBool*> (param))
             addButton (paramBool);
+        else
+            jassertfalse; // unknown parameter type
     }
 
     for (int i = customComponents.size() - 1; i >= 0; --i)

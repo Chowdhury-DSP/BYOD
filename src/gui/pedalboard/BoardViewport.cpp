@@ -1,6 +1,6 @@
 #include "BoardViewport.h"
 
-BoardViewport::BoardViewport (ProcessorChain& procChain) : comp (procChain)
+BoardViewport::BoardViewport (ProcessorChain& procChain, const HostContextProvider& hostContextProvider) : comp (procChain, hostContextProvider)
 {
     pluginSettings->addProperties<&BoardViewport::globalSettingChanged> ({ { defaultZoomSettingID, 1.0 } }, *this);
     setScaleFactor ((float) pluginSettings->getProperty<double> (defaultZoomSettingID));

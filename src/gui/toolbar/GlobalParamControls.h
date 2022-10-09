@@ -1,11 +1,13 @@
 #pragma once
 
-#include "TextSlider.h"
+#include "gui/utils/TextSlider.h"
 
 class GlobalParamControls : public Component
 {
 public:
-    GlobalParamControls (AudioProcessorValueTreeState& vts, chowdsp::VariableOversampling<float>& oversampling);
+    GlobalParamControls (AudioProcessorValueTreeState& vts,
+                         const HostContextProvider& hostContextProvider,
+                         chowdsp::VariableOversampling<float>& oversampling);
 
     void resized() override;
 
@@ -15,6 +17,7 @@ private:
 
     struct SliderWithAttachment : public TextSlider
     {
+        SliderWithAttachment (const chowdsp::FloatParameter* param, const HostContextProvider& hcp) : TextSlider (param, hcp) {}
         std::unique_ptr<SliderAttachment> attachment;
     };
 

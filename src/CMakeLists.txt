@@ -31,8 +31,11 @@ target_sources(BYOD PRIVATE
     gui/toolbar/presets/PresetSearchWindow.cpp
     gui/toolbar/presets/PresetsSyncDialog.cpp
 
+    gui/utils/HostContextProvider.cpp
     gui/utils/LevelMeterComponent.cpp
     gui/utils/LookAndFeels.cpp
+    gui/utils/ModulatableSlider.cpp
+    gui/utils/TextSlider.cpp
 
     state/StateManager.cpp
     state/ParamForwardManager.cpp

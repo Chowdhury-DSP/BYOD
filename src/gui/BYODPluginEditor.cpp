@@ -4,9 +4,10 @@
 
 BYODPluginEditor::BYODPluginEditor (BYOD& p) : AudioProcessorEditor (p),
                                                plugin (p),
+                                               hostContextProvider (plugin, this),
                                                titleBar (plugin),
-                                               board (plugin.getProcChain()),
-                                               toolBar (plugin)
+                                               board (plugin.getProcChain(), hostContextProvider),
+                                               toolBar (plugin, hostContextProvider)
 {
     setLookAndFeel (lnfAllocator->addLookAndFeel<ByodLNF>());
 

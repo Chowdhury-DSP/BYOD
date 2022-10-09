@@ -7,11 +7,17 @@ namespace
 constexpr float cornerSize = 5.0f;
 }
 
-ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs) : proc (baseProc),
+ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
+                                  ProcessorChain& procs,
+                                  const HostContextProvider& hostContextProvider) : proc (baseProc),
                                                                                     procChain (procs),
                                                                                     procUI (proc.getUIOptions()),
                                                                                     contrastColour (procUI.backgroundColour.contrasting()),
-                                                                                    knobs (baseProc, proc.getVTS(), contrastColour, procUI.powerColour),
+                                                                                    knobs (baseProc,
+                                                                                           proc.getVTS(),
+                                                                                           contrastColour,
+                                                                                           procUI.powerColour,
+                                                                                           hostContextProvider),
                                                                                     powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);

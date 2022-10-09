@@ -18,6 +18,22 @@ juce::ParameterID ParamForwardManager::getForwardingParameterID (int paramNum)
     return { "forward_param_" + String (paramNum), 100 };
 }
 
+const RangedAudioParameter* ParamForwardManager::getForwardedParameterFromInternal (const RangedAudioParameter& internalParameter) const
+{
+    if (const auto paramIter = std::find_if (forwardedParams.begin(),
+                                             forwardedParams.end(),
+                                             [&internalParameter] (const auto* fParam)
+                                             {
+                                                 return fParam->getParam() == &internalParameter;
+                                             });
+        paramIter != forwardedParams.end())
+    {
+        return *paramIter;
+    }
+
+    return nullptr;
+}
+
 void ParamForwardManager::processorAdded (BaseProcessor* proc)
 {
     auto& procParams = proc->getParameters();
