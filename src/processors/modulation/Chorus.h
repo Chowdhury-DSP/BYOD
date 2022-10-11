@@ -1,7 +1,7 @@
 #pragma once
 
-#include "processors/BaseProcessor.h"
 #include "CleanDelayType.h"
+#include "processors/BaseProcessor.h"
 
 class Chorus : public BaseProcessor
 {

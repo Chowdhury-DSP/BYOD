@@ -1,7 +1,7 @@
 #pragma once
 
-#include "processors/BaseProcessor.h"
 #include "CleanDelayType.h"
+#include "processors/BaseProcessor.h"
 
 class Flanger : public BaseProcessor
 {
@@ -48,10 +48,10 @@ private:
 
     float feedbackState[2] { 0.0f, 0.0f };
     SmoothedValue<float, ValueSmoothingTypes::Linear> fbSmooth[2];
-    
+
     SmoothedValue<float, ValueSmoothingTypes::Linear> delaySmoothSamples[2];
     SmoothedValue<float, ValueSmoothingTypes::Linear> delayOffsetSmoothSamples[2];
-    
+
     chowdsp::SVFHighpass<float> dcBlocker;
 
     float fs = 48000.0f;

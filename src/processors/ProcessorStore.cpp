@@ -39,7 +39,6 @@
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
 #include "modulation/scanner_vibrato/ScannerVibrato.h"
-#include "modulation/Flanger.h"
 
 #include "other/Compressor.h"
 #include "other/Delay.h"

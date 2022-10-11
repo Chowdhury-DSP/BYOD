@@ -17,9 +17,6 @@ Flanger::Flanger (UndoManager* um) : BaseProcessor ("Flanger",
                                                     magic_enum::enum_count<InputPort>(),
                                                     magic_enum::enum_count<OutputPort>())
 {
-
-    
-    
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");
     loadParameterPointer (delayAmountParam, vts, "delayAmount");
@@ -43,13 +40,13 @@ ParamLayout Flanger::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    
+
     createPercentParameter (params, "rate", "Rate", 0.5f);
     createPercentParameter (params, "feedback", "Feedback", 0.0f);
-    createTimeMsParameter(params, "delayAmount", "Delay Amount", juce::NormalisableRange { 0.0f, 20.0f }, 2.0f);
-    createTimeMsParameter(params, "delayOffset", "Delay Offset", juce::NormalisableRange { 0.0f, 20.0f }, 1.0f);
+    createTimeMsParameter (params, "delayAmount", "Delay Amount", juce::NormalisableRange { 0.0f, 20.0f }, 2.0f);
+    createTimeMsParameter (params, "delayOffset", "Delay Offset", juce::NormalisableRange { 0.0f, 20.0f }, 1.0f);
     createPercentParameter (params, "mix", "Mix", 0.5f);
-    
+
     emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
 
     return { params.begin(), params.end() };
@@ -76,9 +73,9 @@ void Flanger::prepare (double sampleRate, int samplesPerBlock)
 
         feedbackState[ch] = 0.0f;
         fbSmooth[ch].reset (sampleRate, 0.01);
-        
-        delaySmoothSamples[ch].reset(sampleRate, 0.01);
-        delayOffsetSmoothSamples[ch].reset(sampleRate, 0.01);
+
+        delaySmoothSamples[ch].reset (sampleRate, 0.01);
+        delayOffsetSmoothSamples[ch].reset (sampleRate, 0.01);
     }
 
     // set phase offsets
@@ -132,7 +129,7 @@ void Flanger::processModulation (int numSamples)
     }
     else
     {
-        auto rate = rateLow * std::pow (rateHigh / rateLow, *rateParam);//do we need this or can we use ust normal rate param
+        auto rate = rateLow * std::pow (rateHigh / rateLow, *rateParam); //do we need this or can we use ust normal rate param
         for (int ch = 0; ch < 2; ++ch)
         {
             for (int i = 0; i < delaysPerChannel; ++i)
@@ -163,15 +160,15 @@ void Flanger::processFlanger (AudioBuffer<float>& buffer, DelayArrType& delay)
     {
         for (int i = 0; i < delaysPerChannel; ++i)
             delay[ch][i].setFilterFreq (10000.0f);
-        
+
         auto fbAmount = std::sqrt (fbParam->getCurrentValue());
         if constexpr (std::is_same_v<DelayArrType, decltype (lofiDelay)>)
             fbAmount *= 0.4f;
         else
             fbAmount *= 0.5f;
-        
+
         fbSmooth[ch].setTargetValue (fbAmount);
-        
+
         delaySmoothSamples[ch].setTargetValue (delayMs * fs * delayAmountParam->getCurrentValue());
         delayOffsetSmoothSamples[ch].setTargetValue (delayMs * fs * delayOffsetParam->getCurrentValue());
 
@@ -182,7 +179,7 @@ void Flanger::processFlanger (AudioBuffer<float>& buffer, DelayArrType& delay)
 
             auto delayValue = delaySmoothSamples[ch].getNextValue();
             auto delayOffsetValue = delayOffsetSmoothSamples[ch].getNextValue();
-            
+
             x[n] = 0.0f;
             for (int i = 0; i < delaysPerChannel; ++i)
             {
@@ -203,7 +200,6 @@ void Flanger::processFlanger (AudioBuffer<float>& buffer, DelayArrType& delay)
 
 void Flanger::processAudio (AudioBuffer<float>& buffer)
 {
-
     const auto numSamples = buffer.getNumSamples();
     processModulation (numSamples);
 
@@ -211,7 +207,7 @@ void Flanger::processAudio (AudioBuffer<float>& buffer)
     {
         const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numInChannels = audioInBuffer.getNumChannels();
-        
+
         // always have a stereo output!
         audioOutBuffer.setSize (2, numSamples, false, false, true);
         audioOutBuffer.copyFrom (0, 0, audioInBuffer, 0, 0, numSamples);

@@ -16,7 +16,7 @@ struct CleanDelayType
 
     void setDelay (float newDelayInSamples) { delay.setDelay (newDelayInSamples); }
     void setFilterFreq (float freqHz) { lpf.setCutoffFrequency (freqHz); }
-        
+
     inline void pushSample (int channel, float sample) { delay.pushSample (channel, sample); }
     inline float popSample (int channel) { return lpf.processSample (channel, delay.popSample (channel)); }
 
