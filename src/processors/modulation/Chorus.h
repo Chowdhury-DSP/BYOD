@@ -1,6 +1,7 @@
 #pragma once
 
 #include "processors/BaseProcessor.h"
+#include "CleanDelayType.h"
 
 class Chorus : public BaseProcessor
 {
@@ -38,30 +39,6 @@ private:
     std::vector<float> slowLFOData[2][delaysPerChannel];
     std::vector<float> fastLFOData[2][delaysPerChannel];
     chowdsp::HilbertFilter<float> hilbertFilter[2];
-
-    struct CleanDelayType
-    {
-        void prepare (const dsp::ProcessSpec& spec)
-        {
-            lpf.prepare (spec);
-            delay.prepare (spec);
-        }
-
-        void reset()
-        {
-            lpf.reset();
-            delay.reset();
-        }
-
-        void setDelay (float newDelayInSamples) { delay.setDelay (newDelayInSamples); }
-        void setFilterFreq (float freqHz) { lpf.setCutoffFrequency (freqHz); }
-
-        inline void pushSample (int channel, float sample) { delay.pushSample (channel, sample); }
-        inline float popSample (int channel) { return lpf.processSample (channel, delay.popSample (channel)); }
-
-        chowdsp::SVFLowpass<float> lpf;
-        chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th> delay { 1 << 18 };
-    };
 
     template <typename DelayType>
     using DelaySet = std::array<std::array<DelayType, delaysPerChannel>, 2>;
