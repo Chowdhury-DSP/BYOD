@@ -129,7 +129,7 @@ void Flanger::processModulation (int numSamples)
     }
     else
     {
-        auto rate = rateLow * std::pow (rateHigh / rateLow, *rateParam); //do we need this or can we use ust normal rate param
+        auto rate = rateLow * std::pow (rateHigh / rateLow, *rateParam);
         for (int ch = 0; ch < 2; ++ch)
         {
             for (int i = 0; i < delaysPerChannel; ++i)
