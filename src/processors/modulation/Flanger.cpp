@@ -42,9 +42,9 @@ ParamLayout Flanger::createParameterLayout()
     auto params = createBaseParams();
 
     createPercentParameter (params, "rate", "Rate", 0.5f);
+    createTimeMsParameter (params, "delayAmount", "Amount", juce::NormalisableRange { 0.0f, 20.0f }, 2.0f);
+    createTimeMsParameter (params, "delayOffset", "Offset", juce::NormalisableRange { 0.0f, 20.0f }, 1.0f);
     createPercentParameter (params, "feedback", "Feedback", 0.0f);
-    createTimeMsParameter (params, "delayAmount", "Delay Amount", juce::NormalisableRange { 0.0f, 20.0f }, 2.0f);
-    createTimeMsParameter (params, "delayOffset", "Delay Offset", juce::NormalisableRange { 0.0f, 20.0f }, 1.0f);
     createPercentParameter (params, "mix", "Mix", 0.5f);
 
     emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
