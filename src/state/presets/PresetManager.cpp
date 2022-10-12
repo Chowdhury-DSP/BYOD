@@ -118,6 +118,7 @@ void PresetManager::loadBYODFactoryPresets()
     factoryPresets.emplace_back (BinaryData::The_Strokes_chowpreset, BinaryData::The_Strokes_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Black_Sabbath_chowpreset, BinaryData::Black_Sabbath_chowpresetSize);
 
+    filterPresets (factoryPresets);
     addPresets (factoryPresets);
 
     loadDefaultPreset();
@@ -220,6 +221,17 @@ bool PresetManager::syncServerPresetsToLocal()
     return true;
 }
 #endif // BYOD_BUILD_PRESET_SERVER
+
+void PresetManager::filterPresets (std::vector<chowdsp::Preset>& presets)
+{
+    std::erase_if (presets,
+                   [this] (const chowdsp::Preset& preset)
+                   {
+                       const auto* presetXML = preset.getState();
+                       jassert (presetXML != nullptr);
+                       return ! procChain->getStateHelper().validateProcChainState (presetXML);
+                   });
+}
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
 {
@@ -330,6 +342,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     while (presetMap.find (presetID) != presetMap.end())
         presetMap.erase (presetID++);
 
+    filterPresets (presets);
     addPresets (presets);
 }
 

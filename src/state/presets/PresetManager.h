@@ -50,6 +50,7 @@ public:
 
 private:
     void loadBYODFactoryPresets();
+    void filterPresets (std::vector<chowdsp::Preset>& presets);
 
     ProcessorChain* procChain;
 

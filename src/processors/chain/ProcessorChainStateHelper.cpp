@@ -48,7 +48,7 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, const chow
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
 {
-    auto xml = std::make_unique<XmlElement> ("proc_chain");
+    auto xml = std::make_unique<XmlElement> (procChainStateTag);
 
     auto saveProcessor = [&] (BaseProcessor* proc)
     {
@@ -140,6 +140,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
     };
 
     std::unordered_map<int, ProcConnectionMap> connectionMaps;
+    StringArray unavailableProcessors;
     for (auto* procXml : xml->getChildIterator())
     {
         if (procXml == nullptr)
@@ -148,7 +149,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
             continue;
         }
 
-        auto procName = getProcessorName (procXml->getTagName());
+        const auto procName = getProcessorName (procXml->getTagName());
         if (procName == chain.inputProcessor.getName())
         {
             loadProcessorState (procXml, &chain.inputProcessor, connectionMaps, ! loadingPreset);
@@ -164,6 +165,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
         if (! chain.procStore.isModuleAvailable (procName))
         {
             Logger::writeToLog ("Skipping loading processor: " + procName + ", since it is currently locked!");
+            unavailableProcessors.addIfNotAlreadyThere (procName);
             continue;
         }
 
@@ -176,6 +178,16 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
 
         loadProcessorState (procXml, newProc.get(), connectionMaps);
         um->perform (new AddOrRemoveProcessor (chain, std::move (newProc)));
+    }
+
+    if (loadingPreset && ! unavailableProcessors.isEmpty())
+    {
+        std::stringstream warningStream;
+        warningStream << "Error loading preset! The following processors were unavailable:\n";
+        for (const auto& name : unavailableProcessors)
+            warningStream << name << '\n';
+        warningStream.seekp (-1, std::ios_base::end); // remove the trailing newline
+        NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Error Loading Preset", warningStream.str());
     }
 
     // wait until all the processors are created before connecting them
@@ -206,4 +218,28 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
     }
 
     chain.refreshConnectionsBroadcaster();
+}
+
+bool ProcessorChainStateHelper::validateProcChainState (const XmlElement* xml) const
+{
+    if (xml == nullptr)
+        return false;
+
+    if (xml->getTagName() != procChainStateTag)
+        return false;
+
+    for (auto* procXml : xml->getChildIterator())
+    {
+        const auto procName = getProcessorName (procXml->getTagName());
+        if (procName == chain.inputProcessor.getName() || procName == chain.outputProcessor.getName())
+            continue;
+
+        if (! chain.procStore.isModuleAvailable (procName))
+        {
+            Logger::writeToLog ("State contains processor: " + procName + ", since it is currently locked!");
+            return false;
+        }
+    }
+
+    return true;
 }
