@@ -161,6 +161,12 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
             continue;
         }
 
+        if (! chain.procStore.isModuleAvailable (procName))
+        {
+            Logger::writeToLog ("Skipping loading processor: " + procName + ", since it is currently locked!");
+            continue;
+        }
+
         auto newProc = chain.procStore.createProcByName (procName);
         if (newProc == nullptr)
         {
@@ -190,7 +196,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
             const auto& connections = connectionMap.at (portIdx);
             for (auto [cIdx, endPort] : connections)
             {
-                if (auto* procToConnect = cIdx >= 0 ? chain.procs[cIdx] : &chain.outputProcessor)
+                if (auto* procToConnect = cIdx >= 0 ? chain.procs[cIdx] : &chain.outputProcessor; procToConnect != nullptr && procToConnect != proc)
                 {
                     ConnectionInfo info { proc, portIdx, procToConnect, endPort };
                     um->perform (new AddOrRemoveConnection (chain, std::move (info)));

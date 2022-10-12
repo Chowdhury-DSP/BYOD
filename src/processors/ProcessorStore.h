@@ -2,6 +2,10 @@
 
 #include "BaseProcessor.h"
 
+#if BYOD_ENABLE_ADD_ON_MODULES
+class AddOnProcessorStore;
+#endif
+
 class ProcessorStore;
 template <typename FilterType>
 void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, FilterType&& filter, BaseProcessor* procToReplace = nullptr, ConnectionInfo* connectionInfo = nullptr);
@@ -12,6 +16,7 @@ public:
     using StoreMap = std::map<String, std::function<BaseProcessor::Ptr (UndoManager*)>>;
 
     explicit ProcessorStore (UndoManager* um = nullptr);
+    ~ProcessorStore();
 
     BaseProcessor::Ptr createProcByName (const String& name);
     void duplicateProcessor (BaseProcessor& procToDuplicate);
@@ -21,6 +26,8 @@ public:
     void createProcFromCableClickList (PopupMenu& menu, int& menuID, ConnectionInfo* connectionInfo) const;
 
     static StoreMap& getStoreMap() { return store; }
+
+    bool isModuleAvailable (const String& procName) const noexcept;
 
 private:
     friend class ProcessorChainActionHelper;
@@ -43,6 +50,10 @@ private:
 
     template <typename FilterType>
     friend void createProcListFiltered (const ProcessorStore&, PopupMenu&, int&, FilterType&&, BaseProcessor*, ConnectionInfo*);
+
+#if BYOD_ENABLE_ADD_ON_MODULES
+    std::unique_ptr<AddOnProcessorStore> addOnProcessorStore;
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorStore)
 };

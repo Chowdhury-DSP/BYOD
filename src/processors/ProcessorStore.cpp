@@ -151,10 +151,12 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
     }
 
 #if BYOD_ENABLE_ADD_ON_MODULES
-    const auto addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
+    addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
     addOnProcessorStore->validateModules (store);
 #endif
 }
+
+ProcessorStore::~ProcessorStore() = default;
 
 BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
 {
@@ -173,13 +175,18 @@ void ProcessorStore::duplicateProcessor (BaseProcessor& procToDuplicate)
     addProcessorCallback (std::move (newProc));
 }
 
+bool ProcessorStore::isModuleAvailable (const String& procName) const noexcept
+{
+#if BYOD_ENABLE_ADD_ON_MODULES
+    if (! addOnProcessorStore->isModuleAvailable (procName))
+        return false;
+#endif
+    return true;
+}
+
 template <typename FilterType>
 void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID, FilterType&& filter, BaseProcessor* procToReplace, ConnectionInfo* connectionInfo)
 {
-#if BYOD_ENABLE_ADD_ON_MODULES
-    const auto addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
-#endif
-
     if (procToReplace != nullptr
         && procToReplace->getNumInputs() == 1
         && procToReplace->getNumOutputs() == 1)
@@ -209,7 +216,7 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
                 continue;
 
 #if BYOD_ENABLE_ADD_ON_MODULES
-            if (! addOnProcessorStore->isModuleAvailable (procName))
+            if (! store.isModuleAvailable (procName))
                 continue;
 #endif
 
