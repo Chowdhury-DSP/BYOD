@@ -102,7 +102,7 @@ void CableView::mouseDrag (const MouseEvent& e)
         return;
 
     const auto eventCompName = e.eventComponent->getName();
-    if (eventCompName == "Port" || eventCompName == "Board")
+    if (eventCompName == "Port" || eventCompName == "Board" || eventCompName == Cable::componentName.data())
         mousePosition = e.getEventRelativeTo (this).getPosition();
 }
 
