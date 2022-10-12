@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+ This class wraps chowdsp::DelayLine so it has an equivalent
+ interface to chowdsp::BBBDelayWrapper
+ */
 struct CleanDelayType
 {
     void prepare (const dsp::ProcessSpec& spec)
