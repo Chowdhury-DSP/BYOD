@@ -26,7 +26,7 @@ jobs:
           - os: ubuntu-latest
             cmake_args: ""
             compiler: gcc
-            gcc: 9.4.0
+            gcc: 10.3.0
           - os: windows-2019
             cmake_args: ""
           - os: macos-latest
