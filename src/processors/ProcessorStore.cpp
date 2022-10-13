@@ -181,6 +181,8 @@ bool ProcessorStore::isModuleAvailable (const String& procName) const noexcept
     if (! addOnProcessorStore->isModuleAvailable (procName))
         return false;
 #endif
+
+    juce::ignoreUnused (procName);
     return true;
 }
 
