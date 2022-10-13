@@ -224,13 +224,13 @@ bool PresetManager::syncServerPresetsToLocal()
 
 void PresetManager::filterPresets (std::vector<chowdsp::Preset>& presets)
 {
-    std::erase_if (presets,
-                   [this] (const chowdsp::Preset& preset)
-                   {
-                       const auto* presetXML = preset.getState();
-                       jassert (presetXML != nullptr);
-                       return ! procChain->getStateHelper().validateProcChainState (presetXML);
-                   });
+    sst::cpputils::nodal_erase_if (presets,
+                                   [this] (const chowdsp::Preset& preset)
+                                   {
+                                       const auto* presetXML = preset.getState();
+                                       jassert (presetXML != nullptr);
+                                       return ! procChain->getStateHelper().validateProcChainState (presetXML);
+                                   });
 }
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()

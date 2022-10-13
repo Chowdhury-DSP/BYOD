@@ -236,7 +236,7 @@ bool ProcessorChainStateHelper::validateProcChainState (const XmlElement* xml) c
 
         if (! chain.procStore.isModuleAvailable (procName))
         {
-            Logger::writeToLog ("State contains processor: " + procName + ", since it is currently locked!");
+            Logger::writeToLog ("State contains processor: " + procName + ", which is currently locked!");
             return false;
         }
     }
