@@ -17,6 +17,8 @@ public:
 
     void toggleParamsEnabled (const std::vector<String>& paramIDs, bool shouldEnable);
 
+    void setColours (const Colour& contrastColour, const Colour& accentColour);
+
 private:
     using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
     using ComboBoxAttachment = AudioProcessorValueTreeState::ComboBoxAttachment;
@@ -43,8 +45,8 @@ private:
     OwnedArray<TextButton> buttons;
     OwnedArray<Component> customComponents;
 
-    const Colour& contrastColour;
-    const Colour& accentColour;
+    Colour contrastColour;
+    Colour accentColour;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KnobsComponent)
 };

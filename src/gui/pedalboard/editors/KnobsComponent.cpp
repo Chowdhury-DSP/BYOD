@@ -11,7 +11,6 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
                                 const Colour& cc,
                                 const Colour& ac,
                                 const HostContextProvider& hostContextProvider)
-    : contrastColour (cc), accentColour (ac)
 {
     const auto addSlider = [this,
                             &vts,
@@ -27,12 +26,6 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         newSlide->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
         newSlide->setName (param->name);
         newSlide->setTextBoxStyle (Slider::TextBoxBelow, false, 80, 20);
-        newSlide->setColour (Slider::textBoxOutlineColourId, contrastColour);
-        newSlide->setColour (Slider::textBoxTextColourId, contrastColour);
-        newSlide->setColour (Slider::textBoxBackgroundColourId, Colours::transparentWhite);
-        newSlide->setColour (Slider::textBoxHighlightColourId, accentColour.withAlpha (0.55f));
-        newSlide->setColour (Slider::thumbColourId, accentColour);
-
         sliders.add (std::move (newSlide));
     };
 
@@ -44,12 +37,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         newBox->setName (param->name);
         newBox->addItemList (param->choices, 1);
         newBox->setSelectedItemIndex (0);
-        newBox->setColour (ComboBox::outlineColourId, contrastColour);
-        newBox->setColour (ComboBox::textColourId, contrastColour);
-        newBox->setColour (ComboBox::arrowColourId, contrastColour);
-
         newBox->attachment = std::make_unique<ComboBoxAttachment> (vts, param->paramID, *newBox);
-
         boxes.add (std::move (newBox));
     };
 
@@ -63,12 +51,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         newButton->setComponentID (param->paramID);
         newButton->setButtonText (param->name);
         newButton->setClickingTogglesState (true);
-        newButton->setColour (TextButton::buttonColourId, contrastColour.withAlpha (0.4f));
-        newButton->setColour (TextButton::buttonOnColourId, accentColour);
-        newButton->setColour (TextButton::textColourOnId, contrastColour);
-
         newButton->attachment = std::make_unique<ButtonAttachment> (vts, param->paramID, *newButton);
-
         buttons.add (std::move (newButton));
     };
 
@@ -113,14 +96,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         if (auto* sliderComp = dynamic_cast<Slider*> (comp))
         {
             sliderComp->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
-            sliderComp->setColour (Slider::textBoxOutlineColourId, contrastColour);
-            sliderComp->setColour (Slider::textBoxTextColourId, contrastColour);
-            sliderComp->setColour (Slider::textBoxBackgroundColourId, Colours::transparentWhite);
-            sliderComp->setColour (Slider::textBoxHighlightColourId, accentColour.withAlpha (0.55f));
-            sliderComp->setColour (Slider::thumbColourId, accentColour);
-
             customComponents.removeObject (comp, false);
-
             if (customComponentsFirst)
                 sliders.insert (0, sliderComp);
             else
@@ -128,12 +104,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         }
         else if (auto* boxComp = dynamic_cast<ComboBox*> (comp))
         {
-            boxComp->setColour (ComboBox::outlineColourId, contrastColour);
-            boxComp->setColour (ComboBox::textColourId, contrastColour);
-            boxComp->setColour (ComboBox::arrowColourId, contrastColour);
-
             customComponents.removeObject (comp, false);
-
             if (customComponentsFirst)
                 boxes.insert (0, boxComp);
             else
@@ -141,7 +112,57 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         }
     }
 
+    setColours (cc, ac);
     setSize (getWidth(), 100);
+}
+
+void KnobsComponent::setColours (const Colour& cc, const Colour& ac)
+{
+    contrastColour = cc;
+    accentColour = ac;
+
+    for (auto* slider : sliders)
+    {
+        slider->setColour (Slider::textBoxOutlineColourId, contrastColour);
+        slider->setColour (Slider::textBoxTextColourId, contrastColour);
+        slider->setColour (Slider::textBoxBackgroundColourId, Colours::transparentWhite);
+        slider->setColour (Slider::textBoxHighlightColourId, accentColour.withAlpha (0.55f));
+        slider->setColour (Slider::thumbColourId, accentColour);
+    }
+
+    for (auto* box : boxes)
+    {
+        box->setColour (ComboBox::outlineColourId, contrastColour);
+        box->setColour (ComboBox::textColourId, contrastColour);
+        box->setColour (ComboBox::arrowColourId, contrastColour);
+    }
+
+    for (auto* button : buttons)
+    {
+        button->setColour (TextButton::buttonColourId, contrastColour.withAlpha (0.4f));
+        button->setColour (TextButton::buttonOnColourId, accentColour);
+        button->setColour (TextButton::textColourOnId, contrastColour);
+    }
+
+    for (auto* comp : customComponents)
+    {
+        if (auto* sliderComp = dynamic_cast<Slider*> (comp))
+        {
+            sliderComp->setColour (Slider::textBoxOutlineColourId, contrastColour);
+            sliderComp->setColour (Slider::textBoxTextColourId, contrastColour);
+            sliderComp->setColour (Slider::textBoxBackgroundColourId, Colours::transparentWhite);
+            sliderComp->setColour (Slider::textBoxHighlightColourId, accentColour.withAlpha (0.55f));
+            sliderComp->setColour (Slider::thumbColourId, accentColour);
+        }
+        else if (auto* boxComp = dynamic_cast<ComboBox*> (comp))
+        {
+            boxComp->setColour (ComboBox::outlineColourId, contrastColour);
+            boxComp->setColour (ComboBox::textColourId, contrastColour);
+            boxComp->setColour (ComboBox::arrowColourId, contrastColour);
+        }
+    }
+
+    repaint();
 }
 
 void KnobsComponent::toggleParamsEnabled (const std::vector<String>& paramIDs, bool shouldEnable)

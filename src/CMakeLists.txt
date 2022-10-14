@@ -114,6 +114,7 @@ target_sources(BYOD PRIVATE
     processors/other/spring_reverb/SpringReverb.cpp
     processors/other/spring_reverb/SpringReverbProcessor.cpp
 
+    processors/utility/CleanGain.cpp
     processors/utility/FreqBandSplitter.cpp
     processors/utility/InputProcessor.cpp
     processors/utility/Mixer.cpp

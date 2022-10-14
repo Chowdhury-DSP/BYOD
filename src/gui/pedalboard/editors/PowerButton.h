@@ -15,15 +15,20 @@ public:
         addAndMakeVisible (button);
         button.setClickingTogglesState (true);
 
+        button.onStateChange = [this]
+        { enableDisable(); };
+
+        setupPowerButton (powerColour);
+    }
+
+    void setupPowerButton (const Colour& powerColour)
+    {
         auto onImage = Drawable::createFromImageData (BinaryData::PowerButton_svg, BinaryData::PowerButton_svgSize);
         auto offImage = onImage->createCopy();
 
         onImage->replaceColour (Colours::black, powerColour);
         offImage->replaceColour (Colours::black, Colours::darkgrey);
         button.setImages (offImage.get(), offImage.get(), onImage.get(), offImage.get(), onImage.get(), onImage.get(), offImage.get());
-
-        button.onStateChange = [=]
-        { enableDisable(); };
     }
 
     void resized() override

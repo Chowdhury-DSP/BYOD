@@ -42,7 +42,7 @@ private:
     BaseProcessor& proc;
     ProcessorChain& procChain;
 
-    ProcessorUIOptions& procUI;
+    const ProcessorUIOptions& procUI;
     Colour contrastColour;
 
     KnobsComponent knobs;
@@ -55,6 +55,8 @@ private:
     juce::Point<int> mouseDownOffset;
 
     DrawableButton settingsButton { "Settings", DrawableButton::ImageFitted };
+
+    chowdsp::ScopedCallback uiOptionsChangedCallback;
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 

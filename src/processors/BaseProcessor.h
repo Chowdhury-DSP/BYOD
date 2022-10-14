@@ -70,6 +70,9 @@ public:
     ProcessorUIOptions& getUIOptions() { return uiOptions; }
     const ProcessorUIOptions& getUIOptions() const { return uiOptions; }
 
+    /** If a processor changes its UI options after construction it should call this to alert the editor. */
+    chowdsp::Broadcaster<void()> uiOptionsChanged;
+
     /**
      * If your processor has custom UI components, create them here!
      *
