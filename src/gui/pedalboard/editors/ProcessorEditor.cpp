@@ -73,6 +73,14 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
 
     for (int i = 0; i < proc.getNumInputs(); ++i)
         toggleParamsEnabledOnInputConnectionChange (i, false);
+
+    uiOptionsChangedCallback = proc.uiOptionsChanged.connect (
+        [this]
+        {
+            contrastColour = procUI.backgroundColour.contrasting();
+            knobs.setColours (contrastColour, procUI.powerColour);
+            powerButton.setupPowerButton (procUI.powerColour);
+        });
 }
 
 ProcessorEditor::~ProcessorEditor() = default;
