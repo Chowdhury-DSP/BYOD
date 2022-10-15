@@ -53,6 +53,8 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
 
     // real processing here!
     procs->processAudio (buffer);
+
+    chowdsp::BufferMath::sanitizeBuffer<AudioBuffer<float>, float> (buffer);
 }
 
 void BYOD::processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer&)
