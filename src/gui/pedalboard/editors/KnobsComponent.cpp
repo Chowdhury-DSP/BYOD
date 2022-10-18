@@ -311,8 +311,8 @@ void KnobsComponent::resized()
 
         return;
     }
-    
-    if(totalNumComponents == 5 && sliders.size() == 5)
+
+    if (totalNumComponents == 5 && sliders.size() == 5)
     {
         int compIdx = 0;
 
@@ -338,10 +338,10 @@ void KnobsComponent::resized()
             s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 10, proportionOfHeight (0.123f));
             s->setBounds (bounds[compIdx++]);
         }
-        
+
         return;
     }
-    
+
     if (totalNumComponents == 5)
     {
         int compIdx = 0;
@@ -379,8 +379,6 @@ void KnobsComponent::resized()
 
         return;
     }
-
-
 
     if (totalNumComponents > 5)
     {
