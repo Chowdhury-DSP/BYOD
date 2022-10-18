@@ -29,7 +29,7 @@ private:
 
     dsp::DryWetMixer<float> dryWetMixer;
 
-    static constexpr int delaysPerChannel = 2;
+    static constexpr int delaysPerChannel = 1;
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> smooth[2];
     chowdsp::SineWave<float> LFOs[2][delaysPerChannel];

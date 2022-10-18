@@ -27,10 +27,10 @@ Flanger::Flanger (UndoManager* um) : BaseProcessor ("Flanger",
 
     addPopupMenuParameter (delayTypeTag);
 
-    uiOptions.backgroundColour = uiOptions.backgroundColour = Colour (48, 25, 188);
+    uiOptions.backgroundColour = uiOptions.backgroundColour = Colour (126, 154, 186);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
     uiOptions.info.description = "A flanger effect. Use the right-click menu to enable lo-fi mode.";
-    uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+    uiOptions.info.authors = StringArray { "Jatin Chowdhury and Kai Mikkelsen" };
 
     routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ "rate" }, ModulationInput);
@@ -78,10 +78,9 @@ void Flanger::prepare (double sampleRate, int samplesPerBlock)
         delayOffsetSmoothSamples[ch].reset (sampleRate, 0.01);
     }
 
-    // set phase offsets
-    constexpr float piOver3 = MathConstants<float>::pi / 3.0f;
-    LFOs[0][0].reset (-piOver3);
-    LFOs[1][1].reset (piOver3);
+    // set phase offset
+    constexpr float piOver2 = MathConstants<float>::pi / 2.0f;
+    LFOs[1][0].reset (piOver2);
 
     aaFilter.prepare (spec);
     aaFilter.setCutoffFrequency (12000.0f);
