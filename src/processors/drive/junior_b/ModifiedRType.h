@@ -9,7 +9,7 @@ namespace rtype_detail
     /** Implementation for float/double. */
     template <typename T, int nRows, int nCols>
     inline typename std::enable_if<std::is_same<float, T>::value || std::is_same<double, T>::value, void>::type
-        VecMatMult (const Matrix<T, nRows, nCols>& S_, const Array<T, nCols>& a_, Array<T, nRows>& b_)
+        VecMatMult (const Matrix<T, nRows, nCols>& S_, const T (&a_)[nCols], T (&b_)[nRows])
     {
         // input matrix (S) of size nCols x nRows
         // input vector (a) of size 1 x nRows
