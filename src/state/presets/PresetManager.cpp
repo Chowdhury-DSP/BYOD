@@ -332,7 +332,11 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 {
     std::vector<chowdsp::Preset> presets;
     for (const auto& f : file.findChildFiles (juce::File::findFiles, true, "*" + PresetConstants::presetExt))
-        presets.push_back (loadUserPresetFromFile (f));
+    {
+        auto newPreset = loadUserPresetFromFile (f);
+        if (newPreset.isValid())
+            presets.push_back (std::move (newPreset));
+    }
 
     // delete old user presets
     sst::cpputils::nodal_erase_if (presetMap, [] (const auto& presetPair)
