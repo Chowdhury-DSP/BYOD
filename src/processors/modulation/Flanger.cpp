@@ -123,8 +123,6 @@ void Flanger::processModulation (int numSamples)
 
         FloatVectorOperations::copy (LFOData[0][0].data(), modOutData, numSamples);
         phaseShiftLFO (LFOData[0][0].data(), LFOData[0][1].data());
-        FloatVectorOperations::copy (LFOData[1][0].data(), LFOData[0][1].data(), numSamples);
-        phaseShiftLFO (LFOData[1][0].data(), LFOData[1][1].data());
     }
     else
     {
