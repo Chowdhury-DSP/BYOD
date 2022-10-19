@@ -30,7 +30,7 @@ Flanger::Flanger (UndoManager* um) : BaseProcessor ("Flanger",
     uiOptions.backgroundColour = uiOptions.backgroundColour = Colour (106, 102, 190);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
     uiOptions.info.description = "A flanger effect. Use the right-click menu to enable lo-fi mode.";
-    uiOptions.info.authors = StringArray { "Jatin Chowdhury and Kai Mikkelsen" };
+    uiOptions.info.authors = StringArray { "Kai Mikkelsen", "Jatin Chowdhury" };
 
     routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ "rate" }, ModulationInput);
