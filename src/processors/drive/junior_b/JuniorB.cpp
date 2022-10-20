@@ -56,7 +56,7 @@ void JuniorB::prepare (double sampleRate, int samplesPerBlock)
     // pre-buffering
     ScopedValueSetter svs { preBuffering, true };
     AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 10000; i += samplesPerBlock)
+    for (int i = 0; i < 50000; i += samplesPerBlock)
     {
         buffer.clear();
         processAudio (buffer);

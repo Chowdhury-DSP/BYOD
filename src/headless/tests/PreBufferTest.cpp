@@ -30,7 +30,7 @@ public:
             return;
 
         expectLessThan (steadyState, steadyStateMax, "Steady state level is too large!");
-        expectLessThan (start, steadyState * 200.0f, "DC offset present at beginning of signal!");
+        expectLessThan (start, juce::jmax (steadyState * 200.0f, 5.0e-5f), "DC offset present at beginning of signal!");
     }
 
     void runTest() override
@@ -47,7 +47,7 @@ public:
 
                 const auto steadyStateMax = [] (const auto& name)
                 {
-                    if (name == "Kiwi Bass Drive" || name == "Waterfall Drive")
+                    if (name == "Kiwi Bass Drive" || name == "Waterfall Drive" || name == "Tweed")
                         return 1.0e-4f;
                     return 1.0e-5f;
                 }(proc->getName());

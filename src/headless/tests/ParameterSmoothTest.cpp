@@ -62,7 +62,7 @@ public:
                                          testParameter (proc, floatParam);
                                      }
                                  },
-                                 { "Delay", "GuitarML" });
+                                 { "Delay", "GuitarML", "Junior B", "Tweed" });
     }
 };
 
