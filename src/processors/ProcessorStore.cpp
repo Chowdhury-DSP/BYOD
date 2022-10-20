@@ -34,6 +34,7 @@
 #include "tone/tube_screamer_tone/TubeScreamerTone.h"
 
 #include "modulation/Chorus.h"
+#include "modulation/Flanger.h"
 #include "modulation/Panner.h"
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
@@ -105,6 +106,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Rotary", &processorFactory<Rotary> },
     { "Tremolo", &processorFactory<Tremolo> },
     { "Scanner Vibrato", &processorFactory<ScannerVibrato> },
+    { "Flanger", &processorFactory<Flanger> },
 
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },

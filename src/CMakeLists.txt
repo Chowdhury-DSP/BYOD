@@ -106,6 +106,7 @@ target_sources(BYOD PRIVATE
     processors/modulation/Rotary.cpp
     processors/modulation/Tremolo.cpp
     processors/modulation/scanner_vibrato/ScannerVibrato.cpp
+    processors/modulation/Flanger.cpp
 
     processors/other/Compressor.cpp
     processors/other/Delay.cpp

@@ -3,10 +3,10 @@
 #include "CleanDelayType.h"
 #include "processors/BaseProcessor.h"
 
-class Chorus : public BaseProcessor
+class Flanger : public BaseProcessor
 {
 public:
-    explicit Chorus (UndoManager* um = nullptr);
+    explicit Flanger (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Modulation; }
     static ParamLayout createParameterLayout();
@@ -17,28 +17,24 @@ public:
 
 private:
     template <typename DelayArrType>
-    void processChorus (AudioBuffer<float>& buffer, DelayArrType& delay);
+    void processFlanger (AudioBuffer<float>& buffer, DelayArrType& delay);
     void processModulation (int numSamples);
 
     chowdsp::FloatParameter* rateParam = nullptr;
-    chowdsp::FloatParameter* depthParam = nullptr;
     chowdsp::FloatParameter* fbParam = nullptr;
+    chowdsp::FloatParameter* delayAmountParam = nullptr;
+    chowdsp::FloatParameter* delayOffsetParam = nullptr;
     chowdsp::FloatParameter* mixParam = nullptr;
     std::atomic<float>* delayTypeParam = nullptr;
 
     dsp::DryWetMixer<float> dryWetMixer;
 
-    static constexpr int delaysPerChannel = 2;
+    static constexpr int delaysPerChannel = 1;
 
-    SmoothedValue<float, ValueSmoothingTypes::Linear> slowSmooth[2];
-    SmoothedValue<float, ValueSmoothingTypes::Linear> fastSmooth[2];
-
-    chowdsp::SineWave<float> slowLFOs[2][delaysPerChannel];
-    chowdsp::SineWave<float> fastLFOs[2][delaysPerChannel];
-
-    std::vector<float> slowLFOData[2][delaysPerChannel];
-    std::vector<float> fastLFOData[2][delaysPerChannel];
-    chowdsp::HilbertFilter<float> hilbertFilter[2];
+    SmoothedValue<float, ValueSmoothingTypes::Linear> smooth[2];
+    chowdsp::SineWave<float> LFOs[2][delaysPerChannel];
+    std::vector<float> LFOData[2][delaysPerChannel];
+    chowdsp::HilbertFilter<float> hilbertFilter[1];
 
     template <typename DelayType>
     using DelaySet = std::array<std::array<DelayType, delaysPerChannel>, 2>;
@@ -52,6 +48,10 @@ private:
 
     float feedbackState[2] { 0.0f, 0.0f };
     SmoothedValue<float, ValueSmoothingTypes::Linear> fbSmooth[2];
+
+    SmoothedValue<float, ValueSmoothingTypes::Linear> delaySmoothSamples[2];
+    SmoothedValue<float, ValueSmoothingTypes::Linear> delayOffsetSmoothSamples[2];
+
     chowdsp::SVFHighpass<float> dcBlocker;
 
     float fs = 48000.0f;
@@ -72,5 +72,5 @@ private:
         ModulationOutput,
     };
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Chorus)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Flanger)
 };
