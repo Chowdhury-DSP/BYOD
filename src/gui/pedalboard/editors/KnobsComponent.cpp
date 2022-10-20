@@ -312,6 +312,36 @@ void KnobsComponent::resized()
         return;
     }
 
+    if (totalNumComponents == 5 && sliders.size() == 5)
+    {
+        int compIdx = 0;
+
+        Rectangle<int> bounds[5];
+        const int sWidth = proportionOfWidth (0.215f);
+        const int y1 = proportionOfHeight (0.25f);
+        const int y2 = proportionOfHeight (0.60f);
+        const int y3 = proportionOfHeight (0.11f);
+        const int x1 = proportionOfHeight (0.02f);
+        const int x2 = proportionOfWidth (0.21f);
+        const int x3 = proportionOfWidth (0.56f);
+        const int x4 = proportionOfWidth (0.75f);
+        const int x5 = proportionOfWidth (0.39f);
+
+        bounds[0] = Rectangle<int> { x1, y1, sWidth, sWidth };
+        bounds[1] = Rectangle<int> { x2, y2, sWidth, sWidth };
+        bounds[2] = Rectangle<int> { x3, y2, sWidth, sWidth };
+        bounds[3] = Rectangle<int> { x4, y1, sWidth, sWidth };
+        bounds[4] = Rectangle<int> { x5, y3, sWidth, sWidth };
+
+        for (auto* s : sliders)
+        {
+            s->setTextBoxStyle (Slider::TextBoxBelow, false, sWidth - 10, proportionOfHeight (0.123f));
+            s->setBounds (bounds[compIdx++]);
+        }
+
+        return;
+    }
+
     if (totalNumComponents == 5)
     {
         int compIdx = 0;
