@@ -34,7 +34,7 @@ private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> smooth[2];
     chowdsp::SineWave<float> LFOs[2][delaysPerChannel];
     std::vector<float> LFOData[2][delaysPerChannel];
-    chowdsp::HilbertFilter<float> hilbertFilter[2];
+    chowdsp::HilbertFilter<float> hilbertFilter[1];
 
     template <typename DelayType>
     using DelaySet = std::array<std::array<DelayType, delaysPerChannel>, 2>;
