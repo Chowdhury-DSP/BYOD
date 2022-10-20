@@ -40,12 +40,12 @@ ParamLayout Flanger::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    
+
     auto delayAmountRange = juce::NormalisableRange { 0.0f, 20.0f };
-    delayAmountRange.setSkewForCentre(4.5f);
+    delayAmountRange.setSkewForCentre (4.5f);
     auto delayOffsetRange = juce::NormalisableRange { 0.0f, 20.0f };
-    delayOffsetRange.setSkewForCentre(4.5f);
-    
+    delayOffsetRange.setSkewForCentre (4.5f);
+
     createPercentParameter (params, "rate", "Rate", 0.5f);
     createTimeMsParameter (params, "delayAmount", "Amount", delayAmountRange, 2.0f);
     createTimeMsParameter (params, "delayOffset", "Offset", delayOffsetRange, 1.0f);
