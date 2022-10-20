@@ -8,12 +8,14 @@ All notable changes to this project will be documented in this file.
 - Added "Rotary" module.
 - Added "Panner" module.
 - Added "Scanner Vibrato" module.
+- Added "Flanger" module.
 - Added "Junior B" module.
 - Added "Bass Face" module.
 - Added "Blonde" modules.
 - Added "Neural" mode to Centaur module.
 - Added "Multi-Mode" option to SVF module.
 - Added "High-Quality" options for RangeBooster and MuffDrive modules.
+- Added "Extend" and "Invert" options for Clean Gain module.
 - Added new factory presets.
 - Added UI control to replace a wire with a 1-input/1-output module.
 - Added UI control to replace a 1-input/1-output module with a wire.
