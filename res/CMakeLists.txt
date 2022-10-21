@@ -26,6 +26,7 @@ set(binary_data_files
     "amp_irs/Fender.wav"
     "amp_irs/Marshall.wav"
     "amp_irs/Bogner.wav"
+    "amp_irs/Bass.wav"
 
     "lofi_irs/Casio 1.wav"
     "lofi_irs/Casio 2.wav"

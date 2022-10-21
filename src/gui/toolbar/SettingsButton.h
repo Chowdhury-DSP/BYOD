@@ -12,7 +12,7 @@ class SettingsButton : public DrawableButton,
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
 public:
-    SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper* openGLHelper);
+    SettingsButton (BYOD& processor, chowdsp::OpenGLHelper* openGLHelper);
 
     void globalSettingChanged (SettingID settingID);
 
@@ -32,7 +32,7 @@ private:
     static constexpr SettingID openglID = "use_opengl";
 
 #if BYOD_ENABLE_ADD_ON_MODULES
-    chowdsp::WindowInPlugin<module_packs::gui::ModulePacksDialog> modulePacksDialog { *this };
+    chowdsp::WindowInPlugin<module_packs::gui::ModulePacksDialog> modulePacksDialog;
 #endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsButton)
