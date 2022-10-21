@@ -39,6 +39,7 @@ public:
     void loadUserPresetsFromFolder (const juce::File& file) final;
 
     void loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad);
+    void filterPresets (std::vector<chowdsp::Preset>& presets);
 
 #if BYOD_BUILD_PRESET_SERVER
     void presetLoginStatusChanged() override;
@@ -50,7 +51,6 @@ public:
 
 private:
     void loadBYODFactoryPresets();
-    void filterPresets (std::vector<chowdsp::Preset>& presets);
 
     ProcessorChain* procChain;
 

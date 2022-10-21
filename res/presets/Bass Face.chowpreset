@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Instant Metal" plugin="BYOD" vendor="CHOW" category="Amps"
-        version="0.5.3">
-  <proc_chain>
-    <Metal_Face>
-      <Parameters x_pos="0.1997991949319839" y_pos="0.3162055313587189">
-        <PARAM id="gain" value="-12.0"/>
+<Preset name="Bass Face" plugin="BYOD" vendor="CHOW" category="Amps"
+        version="1.0.2">
+  <proc_chain state_plugin_version="1.0.2">
+    <Bass_Face>
+      <Parameters x_pos="0.1943286061286926" y_pos="0.3414965867996216">
+        <PARAM id="gain" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="1" connection_end_0="0"/>
-    </Metal_Face>
+    </Bass_Face>
     <Amp_IRs>
-      <Parameters x_pos="0.5190762877464294" y_pos="0.3181818127632141" ir_file="">
-        <PARAM id="gain" value="11.0"/>
-        <PARAM id="ir" value="0.0"/>
+      <Parameters x_pos="0.5596330165863037" y_pos="0.3551020324230194" ir_file="">
+        <PARAM id="gain" value="0.0"/>
+        <PARAM id="ir" value="3.0"/>
         <PARAM id="mix" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
@@ -31,4 +31,5 @@
       </Parameters>
     </Output>
   </proc_chain>
+  <extra_info/>
 </Preset>

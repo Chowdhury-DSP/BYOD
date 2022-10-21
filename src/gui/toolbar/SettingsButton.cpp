@@ -9,9 +9,13 @@ const Colour onColour = Colours::yellow;
 const Colour offColour = Colours::white;
 } // namespace
 
-SettingsButton::SettingsButton (const BYOD& processor, chowdsp::OpenGLHelper* oglHelper) : DrawableButton ("Settings", DrawableButton::ImageFitted),
-                                                                                           proc (processor),
-                                                                                           openGLHelper (oglHelper)
+SettingsButton::SettingsButton (BYOD& processor, chowdsp::OpenGLHelper* oglHelper) : DrawableButton ("Settings", DrawableButton::ImageFitted),
+                                                                                     proc (processor),
+                                                                                     openGLHelper (oglHelper)
+#if BYOD_ENABLE_ADD_ON_MODULES
+                                                                                     ,
+                                                                                     modulePacksDialog (*this, processor.getPresetManager())
+#endif
 {
     Logger::writeToLog ("Checking OpenGL availability...");
     const auto shouldUseOpenGLByDefault = openGLHelper != nullptr && openGLHelper->isOpenGLAvailable();

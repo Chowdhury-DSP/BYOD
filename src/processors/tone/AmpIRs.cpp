@@ -7,6 +7,7 @@ const StringArray irNames {
     "Fender",
     "Marshall",
     "Bogner",
+    "Bass",
     "Custom",
 };
 

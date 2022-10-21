@@ -3,6 +3,10 @@
 #include "PresetInfoHelpers.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
 
+#if BYOD_ENABLE_ADD_ON_MODULES
+#include <AddOnPresets.h>
+#endif
+
 namespace
 {
 const String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
@@ -99,13 +103,17 @@ void PresetManager::loadBYODFactoryPresets()
 
     std::vector<chowdsp::Preset> factoryPresets;
     // pedals
+    factoryPresets.emplace_back (BinaryData::American_Sound_chowpreset, BinaryData::American_Sound_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Big_Muff_chowpreset, BinaryData::Big_Muff_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Centaur_chowpreset, BinaryData::Centaur_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Instant_Metal_chowpreset, BinaryData::Instant_Metal_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::King_Of_Tone_chowpreset, BinaryData::King_Of_Tone_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::ZenDrive_chowpreset, BinaryData::ZenDrive_chowpresetSize);
+
+    // amps
+    factoryPresets.emplace_back (BinaryData::Instant_Metal_chowpreset, BinaryData::Instant_Metal_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Bass_Face_chowpreset, BinaryData::Bass_Face_chowpresetSize);
 
     // players
     factoryPresets.emplace_back (BinaryData::J_Mascis_chowpreset, BinaryData::J_Mascis_chowpresetSize);
@@ -117,6 +125,10 @@ void PresetManager::loadBYODFactoryPresets()
     factoryPresets.emplace_back (BinaryData::Pete_Townshend_chowpreset, BinaryData::Pete_Townshend_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::The_Strokes_chowpreset, BinaryData::The_Strokes_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Black_Sabbath_chowpreset, BinaryData::Black_Sabbath_chowpresetSize);
+
+#if BYOD_ENABLE_ADD_ON_MODULES
+    AddOnPresets::addFactoryPresets (factoryPresets);
+#endif
 
     filterPresets (factoryPresets);
     addPresets (factoryPresets);
