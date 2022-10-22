@@ -44,6 +44,7 @@
 #include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
 #include "other/Gate.h"
+#include "other/SmoothReverb.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "utility/CleanGain.h"
@@ -122,6 +123,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Delay", &processorFactory<DelayModule> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Gate", &processorFactory<Gate> },
+    { "Smooth Reverb", &processorFactory<SmoothReverb> },
     { "Spring Reverb", &processorFactory<SpringReverbProcessor> },
 
 #if BYOD_ENABLE_ADD_ON_MODULES
