@@ -84,7 +84,7 @@ void SmoothReverb::processReverb (float* left, float* right, int numSamples)
 {
     float curLevel = 0.0f;
     for (int n = 0; n < numSamples; ++n)
-        curLevel = envelopeFollower.processSample (chowdsp::Power::ipow<2>(left[n] + right[n]));
+        curLevel = envelopeFollower.processSample (chowdsp::Power::ipow<2> (left[n] + right[n]));
 
     const auto curDecayParam = decayMsParam->getCurrentValue();
     const auto modFactor = 2.5f * std::pow (curDecayParam / 5000.0f, 1.25f);
