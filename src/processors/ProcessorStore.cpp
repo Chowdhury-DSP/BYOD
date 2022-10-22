@@ -44,6 +44,7 @@
 #include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
 #include "other/Gate.h"
+#include "other/SmoothReverb.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "utility/CleanGain.h"
@@ -122,6 +123,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Delay", &processorFactory<DelayModule> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Gate", &processorFactory<Gate> },
+    { "Smooth Reverb", &processorFactory<SmoothReverb> },
     { "Spring Reverb", &processorFactory<SpringReverbProcessor> },
 
 #if BYOD_ENABLE_ADD_ON_MODULES
@@ -142,8 +144,7 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());
 
-                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
-                                               }));
+                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() }); }));
     }
 
     for (auto& f : futureProcInfos)
