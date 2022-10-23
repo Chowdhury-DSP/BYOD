@@ -1,5 +1,6 @@
 #include "ProcessorChainStateHelper.h"
 #include "ProcessorChainActions.h"
+#include "state/presets/PresetManager.h"
 
 namespace
 {
@@ -187,7 +188,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
         for (const auto& name : unavailableProcessors)
             warningStream << name << '\n';
         warningStream.seekp (-1, std::ios_base::end); // remove the trailing newline
-        NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Error Loading Preset", warningStream.str());
+        PresetManager::showErrorMessage ("Error Loading Preset", warningStream.str());
     }
 
     // wait until all the processors are created before connecting them

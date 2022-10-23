@@ -41,6 +41,8 @@ public:
     void loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad);
     void filterPresets (std::vector<chowdsp::Preset>& presets);
 
+    static void showErrorMessage (const String& title, const String& message);
+
 #if BYOD_BUILD_PRESET_SERVER
     void presetLoginStatusChanged() override;
 

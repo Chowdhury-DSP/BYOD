@@ -11,19 +11,6 @@ namespace
 {
 const String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
 const String presetTag = "preset";
-
-void showFailureMessage (const String& title, const String& message)
-{
-    MessageManager::callAsync (
-        [title, message]
-        {
-            NativeMessageBox::show (MessageBoxOptions()
-                                        .withIconType (MessageBoxIconType::WarningIcon)
-                                        .withTitle (title)
-                                        .withMessage (message)
-                                        .withButton ("OK"));
-        });
-}
 } // namespace
 
 class ChangePresetAction : public UndoableAction
@@ -60,6 +47,19 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChangePresetAction)
 };
+
+void PresetManager::showErrorMessage (const String& title, const String& message)
+{
+    MessageManager::callAsync (
+        [title, message]
+        {
+            AlertWindow::show (MessageBoxOptions()
+                                   .withIconType (MessageBoxIconType::WarningIcon)
+                                   .withTitle (title)
+                                   .withMessage (message)
+                                   .withButton ("OK"));
+        });
+}
 
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
                                                                                               procChain (chain)
@@ -366,7 +366,7 @@ void PresetManager::loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoa
 {
     if (presetToLoad == nullptr || ! presetToLoad->isValid())
     {
-        showFailureMessage ("Preset Load Failure", "Unable to load preset!");
+        showErrorMessage ("Preset Load Failure", "Unable to load preset!");
         return;
     }
 
