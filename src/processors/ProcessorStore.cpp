@@ -38,6 +38,7 @@
 #include "modulation/Panner.h"
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
+#include "modulation/phaser/Phaser4.h"
 #include "modulation/scanner_vibrato/ScannerVibrato.h"
 
 #include "other/Compressor.h"
@@ -103,11 +104,12 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "TS-Tone", &processorFactory<TubeScreamerTone> },
 
     { "Chorus", &processorFactory<Chorus> },
-    { "Panner", &processorFactory<Panner> },
-    { "Rotary", &processorFactory<Rotary> },
-    { "Tremolo", &processorFactory<Tremolo> },
-    { "Scanner Vibrato", &processorFactory<ScannerVibrato> },
     { "Flanger", &processorFactory<Flanger> },
+    { "Panner", &processorFactory<Panner> },
+    { "Phaser4", &processorFactory<Phaser4> },
+    { "Rotary", &processorFactory<Rotary> },
+    { "Scanner Vibrato", &processorFactory<ScannerVibrato> },
+    { "Tremolo", &processorFactory<Tremolo> },
 
     { "Clean Gain", &processorFactory<CleanGain> },
     { "DC Bias", &processorFactory<DCBias> },

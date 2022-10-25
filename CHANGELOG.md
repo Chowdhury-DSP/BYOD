@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Added "Panner" module.
 - Added "Scanner Vibrato" module.
 - Added "Flanger" module.
+- Added "Phaser4" module.
 - Added "Junior B" module.
 - Added "Bass Face" module.
 - Added "Blonde" modules.
