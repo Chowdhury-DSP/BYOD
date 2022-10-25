@@ -34,7 +34,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
     loadParameterPointer (rateParam, vts, "rate");
     loadParameterPointer (waveParam, vts, "wave");
     loadParameterPointer (depthParam, vts, "depth");
-    loadParameterPointer (stereoParam, vts, "stereo");
+    loadParameterPointer (stereoParam, vts, stereoTag);
 
     addPopupMenuParameter (stereoTag);
 
