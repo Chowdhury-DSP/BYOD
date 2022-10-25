@@ -22,6 +22,7 @@ private:
     chowdsp::SmoothedBufferValue<float> depthParam;
     chowdsp::SmoothedBufferValue<float> feedbackParam;
     chowdsp::ChoiceParameter* fbStageParam = nullptr;
+    chowdsp::BoolParameter* stereoParam = nullptr;
 
     chowdsp::TriangleWave<float> triangleLfo;
     std::vector<float> modData {};

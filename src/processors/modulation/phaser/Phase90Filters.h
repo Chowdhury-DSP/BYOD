@@ -4,6 +4,36 @@
 
 namespace Phase90Filters
 {
+namespace detail
+{
+    inline float fastInvSqrt (float number)
+    {
+        union
+        {
+            float f;
+            uint32_t i;
+        } conv {};
+
+        float x2 {};
+        static constexpr float threehalfs = 1.5F;
+
+        x2 = number * 0.5F;
+        conv.f = number;
+        conv.i = 0x5f3759df - (conv.i >> 1);
+        conv.f = conv.f * (threehalfs - (x2 * conv.f * conv.f));
+        return conv.f;
+    }
+
+    inline float fastSigmoid (float x)
+    {
+        x *= 0.5f;
+        auto vtmp = x * x; // calculate in*in
+        const auto vtmp2 = vtmp + 1.0f; // in*in+1.f
+        vtmp = fastInvSqrt (vtmp2); // 1/sqrt(in*in+1.f)
+        return 2.0f * vtmp * x; // in*1/sqrt(in*in+1)
+    }
+} // namespace detail
+
 template <bool withFeedback = false>
 struct Phase90_1Stage : chowdsp::IIRFilter<1>
 {
@@ -30,6 +60,7 @@ struct Phase90_1Stage : chowdsp::IIRFilter<1>
                 chowdsp::LinearTransforms::transformFeedback<1> (b, a, feedback[n]);
 
             output[n] = processSample1stOrder (input[n], z1.get());
+            output[n] = detail::fastSigmoid (output[n]);
         }
     }
 
@@ -64,6 +95,7 @@ struct Phase90_2Stage : chowdsp::IIRFilter<2>
                 chowdsp::LinearTransforms::transformFeedback<2> (b, a, feedback[n]);
 
             output[n] = processSample2ndOrder (input[n], z1.get(), z2.get());
+            output[n] = detail::fastSigmoid (output[n]);
         }
     }
 
@@ -100,6 +132,7 @@ struct Phase90_3Stage : chowdsp::IIRFilter<3>
                 chowdsp::LinearTransforms::transformFeedback<3> (b, a, feedback[n]);
 
             output[n] = processSample (input[n]);
+            output[n] = detail::fastSigmoid (output[n]);
         }
     }
 

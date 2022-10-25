@@ -8,6 +8,7 @@ const String rateTag = "rate";
 const String depthTag = "depth";
 const String feedbackTag = "feedback";
 const String fbStageTag = "fb_stage";
+const String stereoTag = "stereo";
 } // namespace
 
 Phaser4::Phaser4 (UndoManager* um) : BaseProcessor ("Phaser4",
@@ -19,6 +20,7 @@ Phaser4::Phaser4 (UndoManager* um) : BaseProcessor ("Phaser4",
     using namespace ParameterHelpers;
     loadParameterPointer (rateHzParam, vts, rateTag);
     loadParameterPointer (fbStageParam, vts, fbStageTag);
+    loadParameterPointer (stereoParam, vts, stereoTag);
 
     depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, depthTag));
     depthParam.mappingFunction = [] (float x)
@@ -30,17 +32,18 @@ Phaser4::Phaser4 (UndoManager* um) : BaseProcessor ("Phaser4",
 
     lfoShaper.initialise ([] (float x)
                           {
-                              static constexpr auto skewFactor = gcem::pow (2.0f, 0.5f);
+                              static constexpr auto skewFactor = gcem::pow (2.0f, -0.5f);
                               return 2.0f * std::pow ((x + 1.0f) * 0.5f, skewFactor) - 1.0f; },
                           -1.0f,
                           1.0f,
                           2048);
 
+    addPopupMenuParameter (stereoTag);
     routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ rateTag }, ModulationInput);
 
-    uiOptions.backgroundColour = uiOptions.backgroundColour = Colours::orange.darker (0.2f);
-    uiOptions.powerColour = Colours::red.brighter (0.1f);
+    uiOptions.backgroundColour = Colour { 0xfffc7533 };
+    uiOptions.powerColour = Colours::cyan.brighter (0.1f);
     uiOptions.info.description = "A phaser effect based on a classic 4-stage phaser pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -51,13 +54,14 @@ ParamLayout Phaser4::createParameterLayout()
     auto params = createBaseParams();
 
     createFreqParameter (params, rateTag, "Rate", 0.1f, 10.0f, 1.0f, 1.0f);
-    createPercentParameter (params, depthTag, "Depth", 0.5f);
-    createBipolarPercentParameter (params, feedbackTag, "Feedback", 0.0f);
+    createPercentParameter (params, depthTag, "Depth", 1.0f);
+    createBipolarPercentParameter (params, feedbackTag, "Feedback", 0.6f);
     emplace_param<chowdsp::ChoiceParameter> (params,
                                              fbStageTag,
-                                             "FB. Stage",
+                                             "FB Stage",
                                              StringArray { "2nd Stage", "3rd Stage", "4th Stage" },
-                                             1);
+                                             0);
+    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
 }
@@ -122,16 +126,24 @@ void Phaser4::processAudio (AudioBuffer<float>& buffer)
     {
         const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numInChannels = audioInBuffer.getNumChannels();
-        audioOutBuffer.setSize (numInChannels, numSamples, false, false, true);
-        audioOutBuffer.clear();
 
-        const auto* modDataPtr = modData.data();
+        const auto stereoMode = stereoParam->get();
+        const auto numOutChannels = stereoMode ? 2 : numInChannels;
+        audioOutBuffer.setSize (numOutChannels, numSamples, false, false, true);
+
         const auto* fbData = feedbackParam.getSmoothedBuffer();
+        auto* modDataPtr = modData.data();
 
         const auto fbStage = fbStageParam->getIndex() + 2;
-        for (int ch = 0; ch < numInChannels; ++ch)
+        for (int ch = 0; ch < numOutChannels; ++ch)
         {
-            const auto* xIn = audioInBuffer.getReadPointer (ch);
+            if (stereoMode && ch == 1)
+            {
+                FloatVectorOperations::negate (modDataPtr, modDataPtr, numSamples);
+                FloatVectorOperations::add (modDataPtr, 1.0f, numSamples);
+            }
+
+            const auto* xIn = audioInBuffer.getReadPointer (ch % numInChannels);
             auto* xOut = audioOutBuffer.getWritePointer (ch);
 
             if (fbStage == 2)
