@@ -20,10 +20,9 @@ private:
     chowdsp::FloatParameter* rateParam = nullptr;
     chowdsp::FloatParameter* waveParam = nullptr;
     chowdsp::FloatParameter* depthParam = nullptr;
-    chowdsp::BoolParameter* stereoParam = nullptr; //this need to be atomic?
+    chowdsp::BoolParameter* stereoParam = nullptr;
 
     chowdsp::SVFLowpass<float> filter;
-    //chowdsp::SineWave<float> sine;//do we need this?
 
     AudioBuffer<float> modOutBuffer;
     AudioBuffer<float> audioOutBuffer;

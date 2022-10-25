@@ -63,7 +63,6 @@ ParamLayout Tremolo::createParameterLayout()
 void Tremolo::prepare (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec monoSpec { sampleRate, (uint32) samplesPerBlock, 1 };
-    //sine.prepare (monoSpec);
 
     filter.prepare (monoSpec);
     filter.setCutoffFrequency (250.0f);
@@ -161,7 +160,6 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         const auto stereoMode = stereoParam->get();
         const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numInChannels = audioInBuffer.getNumChannels();
-
         const auto numOutChannels = stereoMode ? 2 : numInChannels;
 
         audioOutBuffer.setSize (numOutChannels, numSamples, false, false, true);
