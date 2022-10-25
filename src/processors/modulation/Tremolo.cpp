@@ -135,6 +135,8 @@ void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
 void Tremolo::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
+    modOutBuffer.setSize (1, numSamples, false, false, true);
+    
 
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
@@ -180,19 +182,21 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 
         // copy modulation data into all the channels
         for (int ch = 1; ch < numOutChannels; ++ch)
-            audioOutBuffer.copyFrom (ch, 0, audioOutBuffer, 0, 0, numSamples);
+        {
+            if (stereoMode)
+            {
+                FloatVectorOperations::negate (audioOutBuffer.getWritePointer (ch), audioOutBuffer.getReadPointer (0), numSamples);
+                FloatVectorOperations::add (audioOutBuffer.getWritePointer (ch), 1.0f, numSamples);
+            }
+            else
+            {
+                audioOutBuffer.copyFrom (ch, 0, audioOutBuffer, 0, 0, numSamples);
+            }
+        }
 
         // multiply with incoming audio data
         for (int ch = 0; ch < numOutChannels; ++ch)
         {
-            if (stereoMode && ch == 1)
-            {
-                // Flip phase on right LFO
-                auto* xOut = audioOutBuffer.getWritePointer (ch);
-                FloatVectorOperations::negate (xOut, xOut, numSamples);
-                FloatVectorOperations::add (xOut, 1.0f, numSamples);
-            }
-
             const auto* x = audioInBuffer.getReadPointer (ch % numInChannels);
             auto* y = audioOutBuffer.getWritePointer (ch);
             FloatVectorOperations::multiply (y, x, numSamples);
