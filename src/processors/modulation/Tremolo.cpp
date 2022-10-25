@@ -35,7 +35,7 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
     loadParameterPointer (waveParam, vts, "wave");
     loadParameterPointer (depthParam, vts, "depth");
     loadParameterPointer (stereoParam, vts, "stereo");
-    
+
     addPopupMenuParameter (stereoTag);
 
     uiOptions.backgroundColour = Colours::orange.darker (0.1f);
@@ -54,7 +54,7 @@ ParamLayout Tremolo::createParameterLayout()
     createFreqParameter (params, "rate", "Rate", 2.0f, 20.0f, 10.0f, 10.0f);
     createPercentParameter (params, "wave", "Wave", 0.5f);
     createPercentParameter (params, "depth", "Depth", 0.5f);
-    
+
     emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
@@ -161,9 +161,9 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         const auto stereoMode = stereoParam->get();
         const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numInChannels = audioInBuffer.getNumChannels();
-        
+
         const auto numOutChannels = stereoMode ? 2 : numInChannels;
-        
+
         audioOutBuffer.setSize (numOutChannels, numSamples, false, false, true);
 
         // copy modulation data into channel 0 of audio output buffer, and shrink range to (0, 1)
@@ -184,19 +184,17 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         for (int ch = 1; ch < numOutChannels; ++ch)
             audioOutBuffer.copyFrom (ch, 0, audioOutBuffer, 0, 0, numSamples);
 
-        
         // multiply with incoming audio data
         for (int ch = 0; ch < numOutChannels; ++ch)
         {
-
             if (stereoMode && ch == 1)
             {
                 // Flip phase on right LFO
-                auto* xOut = audioOutBuffer.getWritePointer(ch);
+                auto* xOut = audioOutBuffer.getWritePointer (ch);
                 FloatVectorOperations::negate (xOut, xOut, numSamples);
                 FloatVectorOperations::add (xOut, 1.0f, numSamples);
             }
-            
+
             const auto* x = audioInBuffer.getReadPointer (ch % numInChannels);
             auto* y = audioOutBuffer.getWritePointer (ch);
             FloatVectorOperations::multiply (y, x, numSamples);
