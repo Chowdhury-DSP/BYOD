@@ -12,6 +12,7 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+    void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
     void processReverb (float* left, float* right, int numSamples);
@@ -28,9 +29,9 @@ private:
 
     chowdsp::NthOrderFilter<xsimd::batch<float>, 4> preDelayFilt;
 
-    static constexpr int nDiffuserChannels = 16;
+    static constexpr int nDiffuserChannels = 8;
     chowdsp::Reverb::DiffuserChain<4, chowdsp::Reverb::Diffuser<float, nDiffuserChannels>> diffuser;
-    static constexpr int nFDNChannels = 20;
+    static constexpr int nFDNChannels = 12;
     chowdsp::Reverb::FDN<chowdsp::Reverb::DefaultFDNConfig<float, nFDNChannels>> fdn;
 
     chowdsp::LevelDetector<float> envelopeFollower;

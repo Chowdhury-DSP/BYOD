@@ -179,3 +179,9 @@ void SmoothReverb::processAudio (AudioBuffer<float>& buffer)
 
     outputBuffers.getReference (0) = &outBuffer;
 }
+
+void SmoothReverb::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    outBuffer.makeCopyOf (buffer, true);
+    outputBuffers.getReference (0) = &outBuffer;
+}
