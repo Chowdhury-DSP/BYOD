@@ -20,14 +20,14 @@ private:
     chowdsp::FloatParameter* rateParam = nullptr;
     chowdsp::FloatParameter* waveParam = nullptr;
     chowdsp::FloatParameter* depthParam = nullptr;
-    std::atomic<float>* monoStereoParam = nullptr;//this need to be atomic?
+    chowdsp::BoolParameter* stereoParam = nullptr;//this need to be atomic?
 
     chowdsp::SVFLowpass<float> filter;
     //chowdsp::SineWave<float> sine;//do we need this?
 
     AudioBuffer<float> modOutBuffer;
     AudioBuffer<float> audioOutBuffer;
-    SmoothedValue<float, ValueSmoothingTypes::Linear> phaseSmooth[2];
+    SmoothedValue<float, ValueSmoothingTypes::Linear> phaseSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> waveSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> depthGainSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> depthAddSmooth;

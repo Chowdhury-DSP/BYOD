@@ -20,7 +20,7 @@ static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& bl
     return block;
 }
 
-const String monoStereoTag = "mono_stereo";
+const String stereoTag = "stereo";
 
 } // namespace
 
@@ -34,9 +34,9 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
     loadParameterPointer (rateParam, vts, "rate");
     loadParameterPointer (waveParam, vts, "wave");
     loadParameterPointer (depthParam, vts, "depth");
-    monoStereoParam = vts.getRawParameterValue (monoStereoTag);
+    loadParameterPointer (stereoParam, vts, "stereo");
     
-    addPopupMenuParameter (monoStereoTag);
+    addPopupMenuParameter (stereoTag);
 
     uiOptions.backgroundColour = Colours::orange.darker (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter();
@@ -55,7 +55,7 @@ ParamLayout Tremolo::createParameterLayout()
     createPercentParameter (params, "wave", "Wave", 0.5f);
     createPercentParameter (params, "depth", "Depth", 0.5f);
     
-    emplace_param<AudioParameterChoice> (params, monoStereoTag, "Mono or Stereo", StringArray { "Mono", "Stereo" }, 0);//could do better more desciptive?
+    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
 }
@@ -70,8 +70,7 @@ void Tremolo::prepare (double sampleRate, int samplesPerBlock)
 
     modOutBuffer.setSize (1, samplesPerBlock);
     audioOutBuffer.setSize (2, samplesPerBlock);
-    phaseSmooth[0].reset (sampleRate, 0.01);
-    phaseSmooth[1].reset (sampleRate, 0.01);
+    phaseSmooth.reset (sampleRate, 0.01);
     waveSmooth.reset (sampleRate, 0.01);
     depthGainSmooth.reset (sampleRate, 0.01);
     depthAddSmooth.reset (sampleRate, 0.01);
@@ -82,7 +81,7 @@ void Tremolo::prepare (double sampleRate, int samplesPerBlock)
 
 void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
 {
-    bool isSmoothing = phaseSmooth[0].isSmoothing() || waveSmooth.isSmoothing();
+    bool isSmoothing = phaseSmooth.isSmoothing() || waveSmooth.isSmoothing();
 
     if (isSmoothing)
     {
@@ -97,13 +96,13 @@ void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
             waveBuff[n] += triGain * p / MathConstants<float>::pi; // triangle
             waveBuff[n] += squareGain * (p > 0.0f ? 1.0f : -1.0f); // square
 
-            p += phaseSmooth[0].getNextValue();
+            p += phaseSmooth.getNextValue();
             p = p > MathConstants<float>::pi ? p - MathConstants<float>::twoPi : p;
         }
     }
     else
     {
-        auto phaseInc = phaseSmooth[0].getNextValue();
+        auto phaseInc = phaseSmooth.getNextValue();
         auto curWave = waveSmooth.getNextValue();
         if (curWave <= 0.5f)
         {
@@ -136,24 +135,9 @@ void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
 
 void Tremolo::processAudio (AudioBuffer<float>& buffer)
 {
-    
-    const auto monoStereoOption = (int) *monoStereoParam;
-
     const auto numSamples = buffer.getNumSamples();
-    if(monoStereoOption == 0)//mono
-    {
-        modOutBuffer.setSize (1, numSamples, false, false, true);
-    }
-    else//stereo
-    {
-        modOutBuffer.setSize (2, numSamples, false, false, true);
-    }
-    
-    
-//    modOutBuffer.setSize (1, numSamples, false, false, true);
 
-    phaseSmooth[0].setTargetValue (*rateParam * MathConstants<float>::pi / fs);
-    phaseSmooth[1].setTargetValue (*rateParam * (MathConstants<float>::pi * -1) / fs);
+    phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
 
     if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
@@ -174,9 +158,13 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 
     if (inputsConnected.contains (AudioInput))
     {
+        const auto stereoMode = stereoParam->get();
         const auto& audioInBuffer = getInputBuffer (AudioInput);
-        const auto numChannels = audioInBuffer.getNumChannels();
-        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        const auto numInChannels = audioInBuffer.getNumChannels();
+        
+        const auto numOutChannels = stereoMode ? 2 : numInChannels;
+        
+        audioOutBuffer.setSize (numOutChannels, numSamples, false, false, true);
 
         // copy modulation data into channel 0 of audio output buffer, and shrink range to (0, 1)
         audioOutBuffer.copyFrom (0, 0, modOutBuffer.getReadPointer (0), numSamples, 0.5f);
@@ -193,13 +181,23 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         }
 
         // copy modulation data into all the channels
-        for (int ch = 1; ch < numChannels; ++ch)
+        for (int ch = 1; ch < numOutChannels; ++ch)
             audioOutBuffer.copyFrom (ch, 0, audioOutBuffer, 0, 0, numSamples);
 
+        
         // multiply with incoming audio data
-        for (int ch = 0; ch < numChannels; ++ch)
+        for (int ch = 0; ch < numOutChannels; ++ch)
         {
-            const auto* x = audioInBuffer.getReadPointer (ch);
+
+            if (stereoMode && ch == 1)
+            {
+                // Flip phase on right LFO
+                auto* xOut = audioOutBuffer.getWritePointer(ch);
+                FloatVectorOperations::negate (xOut, xOut, numSamples);
+                FloatVectorOperations::add (xOut, 1.0f, numSamples);
+            }
+            
+            const auto* x = audioInBuffer.getReadPointer (ch % numInChannels);
             auto* y = audioOutBuffer.getWritePointer (ch);
             FloatVectorOperations::multiply (y, x, numSamples);
         }
