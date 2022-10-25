@@ -136,7 +136,6 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     modOutBuffer.setSize (1, numSamples, false, false, true);
-    
 
     phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
     waveSmooth.setTargetValue (*waveParam);
