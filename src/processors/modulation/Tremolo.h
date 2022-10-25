@@ -20,9 +20,9 @@ private:
     chowdsp::FloatParameter* rateParam = nullptr;
     chowdsp::FloatParameter* waveParam = nullptr;
     chowdsp::FloatParameter* depthParam = nullptr;
+    chowdsp::BoolParameter* stereoParam = nullptr;
 
     chowdsp::SVFLowpass<float> filter;
-    chowdsp::SineWave<float> sine;
 
     AudioBuffer<float> modOutBuffer;
     AudioBuffer<float> audioOutBuffer;

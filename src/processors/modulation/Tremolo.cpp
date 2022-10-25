@@ -19,6 +19,9 @@ static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& bl
 
     return block;
 }
+
+const String stereoTag = "stereo";
+
 } // namespace
 
 Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
@@ -31,6 +34,9 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
     loadParameterPointer (rateParam, vts, "rate");
     loadParameterPointer (waveParam, vts, "wave");
     loadParameterPointer (depthParam, vts, "depth");
+    loadParameterPointer (stereoParam, vts, stereoTag);
+
+    addPopupMenuParameter (stereoTag);
 
     uiOptions.backgroundColour = Colours::orange.darker (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter();
@@ -49,13 +55,14 @@ ParamLayout Tremolo::createParameterLayout()
     createPercentParameter (params, "wave", "Wave", 0.5f);
     createPercentParameter (params, "depth", "Depth", 0.5f);
 
+    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
+
     return { params.begin(), params.end() };
 }
 
 void Tremolo::prepare (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec monoSpec { sampleRate, (uint32) samplesPerBlock, 1 };
-    sine.prepare (monoSpec);
 
     filter.prepare (monoSpec);
     filter.setCutoffFrequency (250.0f);
@@ -151,9 +158,12 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
 
     if (inputsConnected.contains (AudioInput))
     {
+        const auto stereoMode = stereoParam->get();
         const auto& audioInBuffer = getInputBuffer (AudioInput);
-        const auto numChannels = audioInBuffer.getNumChannels();
-        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        const auto numInChannels = audioInBuffer.getNumChannels();
+        const auto numOutChannels = stereoMode ? 2 : numInChannels;
+
+        audioOutBuffer.setSize (numOutChannels, numSamples, false, false, true);
 
         // copy modulation data into channel 0 of audio output buffer, and shrink range to (0, 1)
         audioOutBuffer.copyFrom (0, 0, modOutBuffer.getReadPointer (0), numSamples, 0.5f);
@@ -170,13 +180,23 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         }
 
         // copy modulation data into all the channels
-        for (int ch = 1; ch < numChannels; ++ch)
-            audioOutBuffer.copyFrom (ch, 0, audioOutBuffer, 0, 0, numSamples);
+        for (int ch = 1; ch < numOutChannels; ++ch)
+        {
+            if (stereoMode)
+            {
+                FloatVectorOperations::negate (audioOutBuffer.getWritePointer (ch), audioOutBuffer.getReadPointer (0), numSamples);
+                FloatVectorOperations::add (audioOutBuffer.getWritePointer (ch), 1.0f, numSamples);
+            }
+            else
+            {
+                audioOutBuffer.copyFrom (ch, 0, audioOutBuffer, 0, 0, numSamples);
+            }
+        }
 
         // multiply with incoming audio data
-        for (int ch = 0; ch < numChannels; ++ch)
+        for (int ch = 0; ch < numOutChannels; ++ch)
         {
-            const auto* x = audioInBuffer.getReadPointer (ch);
+            const auto* x = audioInBuffer.getReadPointer (ch % numInChannels);
             auto* y = audioOutBuffer.getWritePointer (ch);
             FloatVectorOperations::multiply (y, x, numSamples);
         }
