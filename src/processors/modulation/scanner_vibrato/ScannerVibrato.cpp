@@ -149,13 +149,14 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
 
         
         auto& audioInBuffer = getInputBuffer (AudioInput);
-        const auto numInChannels = audioInBuffer.getNumChannels();
+        auto numInChannels = audioInBuffer.getNumChannels();
         const auto numOutChannels = stereoMode ? 2 : numInChannels;
         
         
         if(stereoMode && numInChannels == 1)
         {
-            audioInBuffer.setSize(numOutChannels, numSamples, true, false, false);
+            numInChannels = numOutChannels;
+            audioInBuffer.setSize(numInChannels, numSamples, true, false, false);
             audioInBuffer.copyFrom (1, 0, audioInBuffer.getReadPointer (0), numSamples);
         }
         
