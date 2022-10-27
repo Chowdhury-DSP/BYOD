@@ -99,7 +99,6 @@ void BoardComponent::resized()
     const auto width = getWidth();
     const auto height = getHeight();
 
-    cableView.setBounds (getLocalBounds());
 
     const auto thisEditorWidth = getScaleDim (editorWidth, scaleFactor);
     const auto thisEditorHeight = getScaleDim (editorHeight, scaleFactor);
@@ -110,6 +109,8 @@ void BoardComponent::resized()
 
     for (auto* editor : processorEditors)
         setEditorPosition (editor);
+    
+    cableView.setBounds (getLocalBounds());
 
     newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
