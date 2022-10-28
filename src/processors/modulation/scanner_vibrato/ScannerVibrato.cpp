@@ -103,7 +103,7 @@ void ScannerVibrato::prepare (double sampleRate, int samplesPerBlock)
     modSource.prepare (monoSpec);
     mixer.prepare (spec);
     mixer.setMixingRule (dsp::DryWetMixingRule::sin3dB);
-    
+
     for (int ch = 0; ch < 2; ++ch)
     {
         wdf[ch].prepare ((float) sampleRate);
@@ -137,17 +137,16 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
     if (inputsConnected.contains (AudioInput))
     {
         const auto stereoMode = stereoParam->get();
-        
+
         // generate mod mix arrays
         auto** modMixDataCh0 = modsMixBuffer[0].getArrayOfWritePointers();
         FloatVectorOperations::add (modMixDataCh0[0], modOutBuffer.getReadPointer (0), 1.0f, numSamples);
         FloatVectorOperations::multiply (modMixDataCh0[0], depthParam.getSmoothedBuffer(), numSamples); // this also multiplies the signal by 0.5
-        
-        
+
         auto** modMixDataCh1 = modsMixBuffer[1].getArrayOfWritePointers();
         FloatVectorOperations::add (modMixDataCh1[0], modOutBuffer.getReadPointer (0), 1.0f, numSamples);
         FloatVectorOperations::multiply (modMixDataCh1[0], depthParam.getSmoothedBuffer(), numSamples); // this also multiplies the signal by 0.5
-        
+
         if (! stereoMode)
         {
             for (int i = ScannerVibratoWDF::numTaps - 1; i >= 0; --i)
@@ -168,7 +167,7 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
         }
         else
         {
-             mixer.pushDrySamples (audioInBuffer);
+            mixer.pushDrySamples (audioInBuffer);
         }
 
         audioOutBuffer.clear();
@@ -191,14 +190,14 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
                 static_cast<Mode> (modeIndex));
 
             auto* outData = audioOutBuffer.getWritePointer (ch);
-            if(stereoMode)
+            if (stereoMode)
             {
-                if(ch == 1)
+                if (ch == 1)
                 {
                     // invert right phase
                     FloatVectorOperations::negate (modMixDataCh1[0], modMixDataCh1[0], numSamples);
                     FloatVectorOperations::add (modMixDataCh1[0], 1.0f, numSamples);
-                        
+
                     // process right and add to output
                     for (int i = ScannerVibratoWDF::numTaps - 1; i >= 0; --i)
                     {
@@ -206,7 +205,7 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
                         FloatVectorOperations::addWithMultiply (outData, tapsOutData[i], modMixDataCh1[i], numSamples);
                     }
                 }
-                
+
                 else
                 {
                     // process left and add to output
@@ -219,12 +218,11 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
             }
             else
             {
-                
                 for (int i = ScannerVibratoWDF::numTaps - 1; i >= 0; --i)
                     FloatVectorOperations::addWithMultiply (outData, tapsOutData[i], modMixDataCh0[i], numSamples);
             }
         }
-        
+
         audioOutBuffer.applyGain (-Decibels::decibelsToGain (3.0f));
         mixer.mixWetSamples (audioOutBuffer);
     }
