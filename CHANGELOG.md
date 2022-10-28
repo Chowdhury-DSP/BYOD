@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Added "Bass Face" module.
 - Added "Blonde" modules.
 - Added "Smooth Reverb" module.
+- Added "Octaver" module.
 - Added "Neural" mode to Centaur module.
 - Added "Multi-Mode" option to SVF module.
 - Added "High-Quality" options for RangeBooster and MuffDrive modules.

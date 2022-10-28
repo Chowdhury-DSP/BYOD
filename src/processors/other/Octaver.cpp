@@ -18,7 +18,7 @@ Octaver::Octaver (UndoManager* um) : BaseProcessor ("Octaver", createParameterLa
 
     uiOptions.backgroundColour = Colour { 0xff5c96ac };
     uiOptions.powerColour = Colour { 0xffd8d737 };
-    uiOptions.info.description = "A smooth sub-octave effect.";
+    uiOptions.info.description = "A \"U-Boat\" style sub-octave effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
