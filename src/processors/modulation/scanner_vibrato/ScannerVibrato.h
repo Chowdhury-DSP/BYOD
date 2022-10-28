@@ -26,7 +26,7 @@ private:
     ScannerVibratoWDF wdf[2];
     dsp::DryWetMixer<float> mixer;
 
-    chowdsp::Buffer<float> modsMixBuffer;
+    chowdsp::Buffer<float> modsMixBuffer[2];
     chowdsp::Buffer<float> tapsOutBuffer[2];
 
     chowdsp::LookupTableTransform<float> tapMixTable[ScannerVibratoWDF::numTaps];
