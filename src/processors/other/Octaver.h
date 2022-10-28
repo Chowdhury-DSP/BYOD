@@ -18,7 +18,6 @@ private:
     chowdsp::FloatParameter* trackingParam = nullptr;
     chowdsp::FloatParameter* cutoffParam = nullptr;
     chowdsp::FloatParameter* mixParam = nullptr;
-    chowdsp::ChoiceParameter* modeParam = nullptr;
 
     AudioBuffer<float> dryBuffer;
     AudioBuffer<float> envelopeBuffer;
