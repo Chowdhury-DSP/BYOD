@@ -45,6 +45,7 @@
 #include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
 #include "other/Gate.h"
+#include "other/Octaver.h"
 #include "other/SmoothReverb.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
@@ -125,6 +126,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Delay", &processorFactory<DelayModule> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Gate", &processorFactory<Gate> },
+    { "Octaver", &processorFactory<Octaver> },
     { "Smooth Reverb", &processorFactory<SmoothReverb> },
     { "Spring Reverb", &processorFactory<SpringReverbProcessor> },
 

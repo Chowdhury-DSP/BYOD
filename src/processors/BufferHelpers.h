@@ -4,7 +4,7 @@
 
 namespace BufferHelpers
 {
-/** Merges the signal from all the channels ofd the srcBuiffer into the first channel of the destBuffer */
+/** Merges the signal from all the channels of the srcBuffer into the first channel of the destBuffer */
 inline void collapseToMonoBuffer (const AudioBuffer<float>& srcBuffer, AudioBuffer<float>& destBuffer)
 {
     jassert (srcBuffer.getNumSamples() == destBuffer.getNumSamples());
