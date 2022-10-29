@@ -5,19 +5,22 @@ namespace
 const juce::StringArray guitarMLModelResources {
     "BluesJrAmp_VolKnob_json",
     "TS9_DriveKnob_json",
+    "MesaRecMini_ModernChannel_GainKnob_json",
 };
 
 const juce::StringArray guitarMLModelNames {
     "Blues Jr.",
     "TS9",
-    "Custom",
+    "Mesa Mini Rectifier (Modern)",
 };
 
 const auto numBuiltInModels = (int) guitarMLModelResources.size();
 
 const String modelTag = "model";
 const String gainTag = "gain";
+const String conditionTag = "condition";
 const String customModelTag = "custom_model";
+constexpr std::string_view modelNameTag = "byod_guitarml_model_name";
 
 using Vec2d = std::vector<std::vector<float>>;
 auto transpose = [] (const Vec2d& x) -> Vec2d
@@ -38,22 +41,20 @@ auto transpose = [] (const Vec2d& x) -> Vec2d
 
 GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createParameterLayout(), um)
 {
-    chowdsp::ParamUtils::loadParameterPointer (gainParam, vts, gainTag);
-    modelParam = vts.getRawParameterValue (modelTag);
+    using namespace ParameterHelpers;
+    loadParameterPointer (gainParam, vts, gainTag);
+    conditionParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, conditionTag));
 
-    vts.addParameterListener (modelTag, this);
+    loadModel (0); // load Blues Jr. model by default
 
     uiOptions.backgroundColour = Colours::cornsilk.darker();
     uiOptions.powerColour = Colours::cyan;
-    uiOptions.info.description = "An implementation of the neural LSTM guitar amp modeller used by the GuitarML project.";
+    uiOptions.info.description = "An implementation of the neural LSTM guitar amp modeller used by the GuitarML project. Supports loading custom models that are compatible with the GuitarML Protues plugin";
     uiOptions.info.authors = StringArray { "Keith Bloemer", "Jatin Chowdhury" };
     uiOptions.info.infoLink = "https://guitarml.com";
 }
 
-GuitarMLAmp::~GuitarMLAmp()
-{
-    vts.removeParameterListener (modelTag, this);
-}
+GuitarMLAmp::~GuitarMLAmp() = default;
 
 ParamLayout GuitarMLAmp::createParameterLayout()
 {
@@ -61,16 +62,12 @@ ParamLayout GuitarMLAmp::createParameterLayout()
     auto params = createBaseParams();
 
     createGainDBParameter (params, gainTag, "Gain", -18.0f, 18.0f, 0.0f);
-
-    params.push_back (std::make_unique<AudioParameterChoice> (modelTag,
-                                                              "Model",
-                                                              guitarMLModelNames,
-                                                              0));
+    createPercentParameter (params, conditionTag, "Condition", 0.5f);
 
     return { params.begin(), params.end() };
 }
 
-void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson)
+void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const String& newModelName)
 {
     const auto setModelWeights = [] (const chowdsp::json& weights_json, auto& model, int hiddenSize)
     {
@@ -96,13 +93,10 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson)
         dense.setBias (dense_bias.data());
     };
 
-    if (! modelJson.contains ("model_data"))
-        return;
-
     const auto& modelDataJson = modelJson["model_data"];
-    const auto numInputs = modelDataJson.value ("num_inputs", 1);
+    const auto numInputs = modelDataJson.value ("input_size", 1);
     const auto hiddenSize = modelDataJson.value ("hidden_size", 0);
-    const auto modelSampleRate = modelDataJson.value ("sample_rate", 44100.0); // @TODO: sync with Keith for the correct JSON key
+    const auto modelSampleRate = modelDataJson.value ("sample_rate", 44100.0);
     const auto rnnDelaySamples = jmax (1.0, processSampleRate / modelSampleRate);
 
     if (numInputs == 1 && hiddenSize == 40) // non-conditioned LSMT40
@@ -114,7 +108,7 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson)
         for (auto& model : lstm40NoCondModels)
             model.get<0>().prepare ((float) rnnDelaySamples);
 
-        modelConfig = ModelConfig { ModelConfig::LSTM40NoCond, modelSampleRate };
+        modelArch = ModelArch::LSTM40NoCond;
     }
     else if (numInputs == 2 && hiddenSize == 40) // conditioned LSMT40
     {
@@ -125,13 +119,20 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson)
         for (auto& model : lstm40CondModels)
             model.get<0>().prepare ((float) rnnDelaySamples);
 
-        modelConfig = ModelConfig { ModelConfig::LSTM40Cond, modelSampleRate };
+        modelArch = ModelArch::LSTM40Cond;
+        conditionParam.reset();
     }
     else
     {
         // unsupported number of inputs!
-        jassertfalse;
+        throw std::exception();
     }
+
+    cachedModel = modelJson;
+    if (newModelName.isNotEmpty())
+        cachedModel[modelNameTag] = newModelName;
+
+    modelChangeBroadcaster();
 }
 
 void GuitarMLAmp::loadModel (int modelIndex)
@@ -143,48 +144,37 @@ void GuitarMLAmp::loadModel (int modelIndex)
         jassert (modelData != nullptr);
 
         const auto modelJson = chowdsp::JSONUtils::fromBinaryData (modelData, modelDataSize);
-        loadModelFromJson (modelJson);
+        loadModelFromJson (modelJson, guitarMLModelNames[modelIndex]);
     }
     else if (modelIndex == numBuiltInModels)
     {
-        if (loadCachedCustomModel)
-        {
-            if (cachedCustomModel.empty())
-            {
-                // trying to load a cached custom model, but none had been set!
-                jassertfalse;
-                return;
-            }
-
-            loadModelFromJson (cachedCustomModel);
-        }
-        else
-        {
-            customModelChooser = std::make_shared<FileChooser> ("GuitarML Model", File {}, "*.json");
-            customModelChooser->launchAsync (FileBrowserComponent::FileChooserFlags::canSelectFiles,
-                                             [this] (const FileChooser& modelChooser)
+        customModelChooser = std::make_shared<FileChooser> ("GuitarML Model", File {}, "*.json");
+        customModelChooser->launchAsync (FileBrowserComponent::FileChooserFlags::canSelectFiles,
+                                         [this] (const FileChooser& modelChooser)
+                                         {
+                                             const auto chosenFile = modelChooser.getResult();
+                                             if (chosenFile == File {})
                                              {
-                                                 const auto chosenFile = modelChooser.getResult();
-                                                 if (chosenFile == File {})
-                                                     return;
+                                                 modelChangeBroadcaster();
+                                                 return;
+                                             }
 
-                                                 try
-                                                 {
-                                                     const auto& modelJson = chowdsp::JSONUtils::fromFile (chosenFile);
-                                                     loadModelFromJson (modelJson);
-                                                     cachedCustomModel = modelJson;
-                                                 }
-                                                 catch (...)
-                                                 {
-                                                     NativeMessageBox::showAsync (MessageBoxOptions()
-                                                                                      .withButton ("Ok")
-                                                                                      .withIconType (MessageBoxIconType::WarningIcon)
-                                                                                      .withTitle ("GuitarML Error")
-                                                                                      .withMessage ("Unable to load GuitarML model from file!"),
-                                                                                  nullptr);
-                                                 }
-                                             });
-        }
+                                             try
+                                             {
+                                                 const auto& modelJson = chowdsp::JSONUtils::fromFile (chosenFile);
+                                                 loadModelFromJson (modelJson, chosenFile.getFileNameWithoutExtension());
+                                             }
+                                             catch (...)
+                                             {
+                                                 loadModel (0);
+                                                 NativeMessageBox::showAsync (MessageBoxOptions()
+                                                                                  .withButton ("Ok")
+                                                                                  .withIconType (MessageBoxIconType::WarningIcon)
+                                                                                  .withTitle ("GuitarML Error")
+                                                                                  .withMessage ("Unable to load GuitarML model from file!"),
+                                                                              nullptr);
+                                             }
+                                         });
     }
     else
     {
@@ -194,16 +184,9 @@ void GuitarMLAmp::loadModel (int modelIndex)
     }
 }
 
-void GuitarMLAmp::parameterChanged (const String& paramID, float newValue)
+String GuitarMLAmp::getCurrentModelName() const
 {
-    if (paramID != modelTag)
-    {
-        // Why are we listening to this parameter??
-        jassertfalse;
-        return;
-    }
-
-    loadModel ((int) newValue);
+    return cachedModel.value (modelNameTag, "");
 }
 
 void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
@@ -212,14 +195,13 @@ void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
     inGain.prepare (spec);
     inGain.setRampDurationSeconds (0.1);
 
+    conditionParam.prepare (sampleRate, samplesPerBlock);
+
     for (auto& model : lstm40NoCondModels)
         model.get<0>().prepare (1.0f);
 
     processSampleRate = sampleRate;
-    {
-        ScopedValueSetter scopedLoadCachedCustomModel { loadCachedCustomModel, true };
-        loadModel ((int) modelParam->load());
-    }
+    loadModelFromJson (cachedModel);
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
 
@@ -241,7 +223,7 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    if (modelConfig.modelType == ModelConfig::LSTM40NoCond)
+    if (modelArch == ModelArch::LSTM40NoCond)
     {
         inGain.setGainDecibels (gainParam->getCurrentValue() - 12.0f);
         inGain.process (buffer);
@@ -253,16 +235,19 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
                 x[n] += lstm40NoCondModels[ch].forward (&x[n]);
         }
     }
-    else if (modelConfig.modelType == ModelConfig::LSTM40Cond)
+    else if (modelArch == ModelArch::LSTM40Cond)
     {
+        conditionParam.process (numSamples);
+        const auto* conditionData = conditionParam.getSmoothedBuffer();
+
         alignas (RTNEURAL_DEFAULT_ALIGNMENT) float inputVec[4] {};
-        inputVec[1] = gainParam->getCurrentValue() / 36.0f + 0.5f; // @TODO: Some parameter smoothing?
         for (int ch = 0; ch < numChannels; ++ch)
         {
             auto* x = buffer.getWritePointer (ch);
             for (int n = 0; n < numSamples; ++n)
             {
                 inputVec[0] = x[n];
+                inputVec[1] = conditionData[n];
                 x[n] += lstm40CondModels[ch].forward (inputVec);
             }
         }
@@ -274,23 +259,140 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
 std::unique_ptr<XmlElement> GuitarMLAmp::toXML()
 {
     auto xml = BaseProcessor::toXML();
-    xml->setAttribute (customModelTag, cachedCustomModel.dump());
+    xml->setAttribute (customModelTag, cachedModel.dump());
 
     return std::move (xml);
 }
 
 void GuitarMLAmp::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)
 {
-    const auto cachedModelJsonString = xml->getStringAttribute (customModelTag, {});
+    const auto modelJsonString = xml->getStringAttribute (customModelTag, {});
     try
     {
-        cachedCustomModel = chowdsp::json::parse (cachedModelJsonString.toStdString());
+        const auto& modelJson = chowdsp::json::parse (modelJsonString.toStdString());
+        loadModelFromJson (modelJson);
     }
     catch (...)
     {
-        cachedCustomModel = {};
+        loadModel (0); // go back to Blues Jr. model
     }
 
-    ScopedValueSetter scopedLoadCachedCustomModel { loadCachedCustomModel, true };
     BaseProcessor::fromXML (xml, version, loadPosition);
+}
+
+bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps)
+{
+    class MainParamSlider : public Slider
+    {
+    public:
+        MainParamSlider (const ModelArch& modelArch, AudioProcessorValueTreeState& vts, ModelChangeBroadcaster& modelChangeBroadcaster) : currentModelArch (modelArch)
+        {
+            for (auto* s : { &gainSlider, &conditionSlider })
+                addChildComponent (s);
+
+            gainAttach = std::make_unique<SliderAttachment> (vts, gainTag, gainSlider);
+            conditionAttach = std::make_unique<SliderAttachment> (vts, conditionTag, conditionSlider);
+
+            modelChangeCallback = modelChangeBroadcaster.connect<&MainParamSlider::updateSliderVisibility> (this);
+
+            this->setName (conditionTag + "__" + gainTag + "__");
+        }
+
+        void colourChanged() override
+        {
+            for (auto* s : { &gainSlider, &conditionSlider })
+            {
+                for (auto colourID : { Slider::textBoxOutlineColourId,
+                                       Slider::textBoxTextColourId,
+                                       Slider::textBoxBackgroundColourId,
+                                       Slider::textBoxHighlightColourId,
+                                       Slider::thumbColourId })
+                {
+                    s->setColour (colourID, findColour (colourID, false));
+                }
+            }
+        }
+
+        void updateSliderVisibility()
+        {
+            const auto usingConditionedModel = currentModelArch == ModelArch::LSTM40Cond;
+
+            conditionSlider.setVisible (usingConditionedModel);
+            gainSlider.setVisible (! usingConditionedModel);
+
+            setName (usingConditionedModel ? "Condition" : "Gain");
+        }
+
+        void visibilityChanged() override
+        {
+            updateSliderVisibility();
+        }
+
+        void resized() override
+        {
+            for (auto* s : { &gainSlider, &conditionSlider })
+            {
+                s->setSliderStyle (getSliderStyle());
+                s->setTextBoxStyle (getTextBoxPosition(), false, getTextBoxWidth(), getTextBoxHeight());
+            }
+
+            conditionSlider.setBounds (getLocalBounds());
+            gainSlider.setBounds (getLocalBounds());
+        }
+
+    private:
+        using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
+
+        const ModelArch& currentModelArch;
+        Slider gainSlider, conditionSlider;
+        std::unique_ptr<SliderAttachment> gainAttach, conditionAttach;
+
+        chowdsp::ScopedCallback modelChangeCallback;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainParamSlider)
+    };
+
+    class ModelChoiceBox : public ComboBox
+    {
+    public:
+        explicit ModelChoiceBox (GuitarMLAmp& processor, ModelChangeBroadcaster& modelChangeBroadcaster)
+        {
+            addItemList (guitarMLModelNames, 1);
+            addSeparator();
+            addItem ("Custom", guitarMLModelNames.size() + 1);
+            setText (processor.getCurrentModelName(), dontSendNotification);
+
+            modelChangeCallback = modelChangeBroadcaster.connect ([this, &processor]
+                                                                  { setText (processor.getCurrentModelName(), dontSendNotification); });
+
+            onChange = [this, &processor]
+            {
+                processor.loadModel (getSelectedItemIndex());
+            };
+
+            this->setName (modelTag + "__box");
+        }
+
+        void visibilityChanged() override
+        {
+            setName ("Model");
+        }
+
+    private:
+        chowdsp::ScopedCallback modelChangeCallback;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModelChoiceBox)
+    };
+
+    customComps.add (std::make_unique<MainParamSlider> (modelArch, vts, modelChangeBroadcaster));
+    customComps.add (std::make_unique<ModelChoiceBox> (*this, modelChangeBroadcaster));
+
+    return false;
+}
+
+void GuitarMLAmp::addToPopupMenu (PopupMenu& menu)
+{
+    menu.addItem ("Download more models", []
+                  { URL { "https://guitarml.com/tonelibrary/tonelib-pro.html" }.launchInDefaultBrowser(); });
+    menu.addSeparator();
 }

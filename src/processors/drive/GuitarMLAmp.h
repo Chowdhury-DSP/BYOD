@@ -4,8 +4,7 @@
 #include "../utility/DCBlocker.h"
 #include "neural_utils/ResampledRNN.h"
 
-class GuitarMLAmp : public BaseProcessor,
-                    private AudioProcessorValueTreeState::Listener
+class GuitarMLAmp : public BaseProcessor
 {
 public:
     explicit GuitarMLAmp (UndoManager* um = nullptr);
@@ -20,18 +19,23 @@ public:
     std::unique_ptr<XmlElement> toXML() override;
     void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
 
-private:
-    void parameterChanged (const String& paramID, float newValue) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps) override;
+    void addToPopupMenu (PopupMenu& menu) override;
+
     void loadModel (int modelIndex);
-    void loadModelFromJson (const chowdsp::json& modelJson);
+    String getCurrentModelName() const;
+
+private:
+    void loadModelFromJson (const chowdsp::json& modelJson, const String& newModelName = {});
+    using ModelChangeBroadcaster = chowdsp::Broadcaster<void()>;
+    ModelChangeBroadcaster modelChangeBroadcaster;
 
     chowdsp::FloatParameter* gainParam = nullptr;
+    chowdsp::SmoothedBufferValue<float> conditionParam;
     chowdsp::Gain<float> inGain;
 
-    std::atomic<float>* modelParam = nullptr;
     SpinLock modelChangingMutex;
     double processSampleRate = 96000.0;
-    bool loadCachedCustomModel = false;
     std::shared_ptr<FileChooser> customModelChooser;
 
     template <int numIns, int hiddenSize>
@@ -43,19 +47,15 @@ private:
     std::array<LSTM40Cond, 2> lstm40CondModels;
     std::array<LSTM40NoCond, 2> lstm40NoCondModels;
 
-    struct ModelConfig
+    enum class ModelArch
     {
-        enum ModelType
-        {
-            LSTM40Cond,
-            LSTM40NoCond,
-        };
+        LSTM40Cond,
+        LSTM40NoCond,
+    };
 
-        ModelType modelType = LSTM40NoCond;
-        double trainingSampleRate = 44100.0;
-    } modelConfig {};
+    ModelArch modelArch = ModelArch::LSTM40NoCond;
 
-    chowdsp::json cachedCustomModel {};
+    chowdsp::json cachedModel {};
 
     DCBlocker dcBlocker;
 

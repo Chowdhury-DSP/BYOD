@@ -12,6 +12,7 @@ set(binary_data_files
     ui_assets/magnifying-glass-plus-solid.svg
 
     guitar_ml_models/BluesJrAmp_VolKnob.json
+    guitar_ml_models/MesaRecMini_ModernChannel_GainKnob.json
     guitar_ml_models/TS9_DriveKnob.json
     guitar_ml_models/metal_face_model.json
     guitar_ml_models/junior_1_stage.json
