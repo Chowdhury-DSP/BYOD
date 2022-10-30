@@ -27,25 +27,14 @@ Phaser8::Phaser8 (UndoManager* um) : BaseProcessor ("Phaser8",
     feedbackParam.mappingFunction = [] (float x)
     { return 0.95f * x; };
 
-    modLeftSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, modulationTag));
-    modLeftSmooth.mappingFunction = [] (float x)
-    { return x > 0.0f ? x : 0.0f; };
-
-    noModLeftSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, modulationTag));
-    noModLeftSmooth.mappingFunction = [] (float x)
-    { return x > 0.0f ? 1.0f - x : 1.0f; };
-
-    modRightSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, modulationTag));
-    modRightSmooth.mappingFunction = [] (float x)
-    { return x < 0.0f ? -x : 0.0f; };
-
-    noModRightSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, modulationTag));
-    noModRightSmooth.mappingFunction = [] (float x)
-    { return x < 0.0f ? 1.0f + x : 1.0f; };
+    modSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, modulationTag));
+    noModSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, modulationTag));
+    noModSmooth.mappingFunction = [] (float x)
+    { return 1.0f - x; };
 
     lfoShaper.initialise ([] (float x)
                           {
-                              static constexpr auto skewFactor = gcem::pow (2.0f, -0.85f);
+                              static constexpr auto skewFactor = gcem::pow (2.0f, -0.25f);
                               return 2.0f * std::pow ((x + 1.0f) * 0.5f, skewFactor) - 1.0f; },
                           -1.0f,
                           1.0f,
@@ -65,10 +54,10 @@ ParamLayout Phaser8::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createFreqParameter (params, rateTag, "Rate", 0.05f, 20.0f, 0.5f, 0.5f);
+    createFreqParameter (params, rateTag, "Rate", 0.1f, 20.0f, 1.0f, 1.0f);
     createPercentParameter (params, depthTag, "Depth", 1.0f);
-    createBipolarPercentParameter (params, feedbackTag, "Feedback", 0.5f);
-    createBipolarPercentParameter (params, modulationTag, "Modulation", 1.0f);
+    createPercentParameter (params, feedbackTag, "Feedback", 0.75f);
+    createPercentParameter (params, modulationTag, "Modulation", 0.75f);
 
     return { params.begin(), params.end() };
 }
@@ -79,14 +68,10 @@ void Phaser8::prepare (double sampleRate, int samplesPerBlock)
     depthParam.setRampLength (0.05);
     feedbackParam.prepare (sampleRate, samplesPerBlock);
     feedbackParam.setRampLength (0.05);
-    modLeftSmooth.prepare (sampleRate, samplesPerBlock);
-    modLeftSmooth.setRampLength (0.05);
-    noModLeftSmooth.prepare (sampleRate, samplesPerBlock);
-    noModLeftSmooth.setRampLength (0.05);
-    modRightSmooth.prepare (sampleRate, samplesPerBlock);
-    modRightSmooth.setRampLength (0.05);
-    noModRightSmooth.prepare (sampleRate, samplesPerBlock);
-    noModRightSmooth.setRampLength (0.05);
+    modSmooth.prepare (sampleRate, samplesPerBlock);
+    modSmooth.setRampLength (0.05);
+    noModSmooth.prepare (sampleRate, samplesPerBlock);
+    noModSmooth.setRampLength (0.05);
 
     fbStage.prepare ((float) sampleRate);
     fbStageNoMod.prepare ((float) sampleRate);
@@ -97,8 +82,6 @@ void Phaser8::prepare (double sampleRate, int samplesPerBlock)
 
     modulatedOutBuffer.setSize (1, samplesPerBlock);
     nonModulatedOutBuffer.setSize (1, samplesPerBlock);
-
-    audioOutBuffer.setSize (2, samplesPerBlock);
     modOutBuffer.setSize (1, samplesPerBlock);
 }
 
@@ -135,18 +118,15 @@ void Phaser8::processAudio (AudioBuffer<float>& buffer)
 
     depthParam.process (numSamples);
     feedbackParam.process (numSamples);
-    modLeftSmooth.process (numSamples);
-    noModLeftSmooth.process (numSamples);
-    modRightSmooth.process (numSamples);
-    noModRightSmooth.process (numSamples);
+    modSmooth.process (numSamples);
+    noModSmooth.process (numSamples);
     processModulation (numSamples);
 
     if (inputsConnected.contains (AudioInput))
     {
         const auto& audioInBuffer = getInputBuffer (AudioInput);
-        modulatedOutBuffer.setSize (2, numSamples, false, false, true); // always stereo out
-        nonModulatedOutBuffer.setSize (2, numSamples, false, false, true); // always stereo out
-        audioOutBuffer.setSize (2, numSamples, false, false, true); // always stereo out
+        modulatedOutBuffer.setSize (1, numSamples, false, false, true);
+        nonModulatedOutBuffer.setSize (1, numSamples, false, false, true);
 
         BufferHelpers::collapseToMonoBuffer (audioInBuffer, nonModulatedOutBuffer);
 
@@ -160,22 +140,19 @@ void Phaser8::processAudio (AudioBuffer<float>& buffer)
         modStages.processStage (modOutData, modOutData, modDataPtr, fbData, numSamples);
         fbStageNoMod.processStage (noModOutData, noModOutData, modDataPtr, fbData, numSamples);
 
-        for (int ch = 0; ch < 2; ++ch)
-        {
-            const auto* modMultiply = ch == 0 ? modLeftSmooth.getSmoothedBuffer() : modRightSmooth.getSmoothedBuffer();
-            const auto* nonModMultiply = ch == 0 ? noModLeftSmooth.getSmoothedBuffer() : noModRightSmooth.getSmoothedBuffer();
-
-            FloatVectorOperations::multiply (audioOutBuffer.getWritePointer (ch), modOutData, modMultiply, numSamples);
-            FloatVectorOperations::addWithMultiply (audioOutBuffer.getWritePointer (ch), noModOutData, nonModMultiply, numSamples);
-        }
+        FloatVectorOperations::multiply (modOutData, modSmooth.getSmoothedBuffer(), numSamples);
+        FloatVectorOperations::addWithMultiply (modOutData, noModOutData, noModSmooth.getSmoothedBuffer(), numSamples);
     }
     else
     {
-        audioOutBuffer.setSize (1, numSamples, false, false, true);
-        audioOutBuffer.clear();
+        modulatedOutBuffer.setSize (1, numSamples, false, false, true);
+        modulatedOutBuffer.clear();
+        nonModulatedOutBuffer.setSize (1, numSamples, false, false, true);
+        nonModulatedOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (AudioOutput) = &modulatedOutBuffer;
+    outputBuffers.getReference (Stage1Output) = &nonModulatedOutBuffer;
     outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
 }
 
@@ -198,16 +175,22 @@ void Phaser8::processAudioBypassed (AudioBuffer<float>& buffer)
     if (inputsConnected.contains (AudioInput))
     {
         const auto& audioInBuffer = getInputBuffer (AudioInput);
-        const auto numChannels = audioInBuffer.getNumChannels();
-        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
-        audioOutBuffer.makeCopyOf (audioInBuffer, true);
+
+        modulatedOutBuffer.setSize (1, numSamples, false, false, true);
+        nonModulatedOutBuffer.setSize (1, numSamples, false, false, true);
+
+        BufferHelpers::collapseToMonoBuffer (audioInBuffer, nonModulatedOutBuffer);
+        chowdsp::BufferMath::copyBufferData (nonModulatedOutBuffer, modulatedOutBuffer);
     }
     else
     {
-        audioOutBuffer.setSize (1, numSamples, false, false, true);
-        audioOutBuffer.clear();
+        modulatedOutBuffer.setSize (1, numSamples, false, false, true);
+        modulatedOutBuffer.clear();
+        nonModulatedOutBuffer.setSize (1, numSamples, false, false, true);
+        nonModulatedOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (AudioOutput) = &modulatedOutBuffer;
+    outputBuffers.getReference (Stage1Output) = &nonModulatedOutBuffer;
     outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
 }

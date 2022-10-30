@@ -21,10 +21,8 @@ private:
     chowdsp::FloatParameter* rateHzParam = nullptr;
     chowdsp::SmoothedBufferValue<float> depthParam;
     chowdsp::SmoothedBufferValue<float> feedbackParam;
-    chowdsp::SmoothedBufferValue<float> modLeftSmooth;
-    chowdsp::SmoothedBufferValue<float> noModLeftSmooth;
-    chowdsp::SmoothedBufferValue<float> modRightSmooth;
-    chowdsp::SmoothedBufferValue<float> noModRightSmooth;
+    chowdsp::SmoothedBufferValue<float> modSmooth;
+    chowdsp::SmoothedBufferValue<float> noModSmooth;
 
     SchultePhaserFilters::FeedbackStage fbStage;
     SchultePhaserFilters::FeedbackStageNoMod fbStageNoMod;
@@ -45,10 +43,10 @@ private:
     enum OutputPort
     {
         AudioOutput = 0,
+        Stage1Output,
         ModulationOutput,
     };
 
-    AudioBuffer<float> audioOutBuffer;
     AudioBuffer<float> modOutBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Phaser8)

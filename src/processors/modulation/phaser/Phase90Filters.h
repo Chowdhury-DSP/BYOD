@@ -22,6 +22,7 @@ struct Phase90_1Stage : chowdsp::IIRFilter<1>
     void prepare (float sampleRate)
     {
         K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        reset();
     }
 
     void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
@@ -56,6 +57,7 @@ struct Phase90_2Stage : chowdsp::IIRFilter<2>
     void prepare (float sampleRate)
     {
         K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        reset();
     }
 
     void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
@@ -91,6 +93,7 @@ struct Phase90_3Stage : chowdsp::IIRFilter<3>
     void prepare (float sampleRate)
     {
         K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        reset();
     }
 
     void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept

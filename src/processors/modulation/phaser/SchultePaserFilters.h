@@ -4,15 +4,16 @@
 
 namespace SchultePhaserFilters
 {
-static constexpr float Cval = 15.0e-9f;
-static constexpr float Rval = 100.0e3f;
-static constexpr auto wc = 1.0f / (Cval * Rval);
-
 struct FeedbackStage : chowdsp::IIRFilter<2>
 {
+    static constexpr float Cval = 33.0e-9f;
+    static constexpr float Rval = 100.0e3f;
+    static constexpr auto wc = 1.0f / (Cval * Rval);
+
     void prepare (float sampleRate)
     {
         K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        reset();
     }
 
     void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
@@ -27,7 +28,7 @@ struct FeedbackStage : chowdsp::IIRFilter<2>
             chowdsp::ConformalMaps::Transform<float, 2>::bilinear (b, a, { k * k, -2 * k, 1.0f }, { k * k, 2 * k, 1.0f }, K);
             chowdsp::LinearTransforms::transformFeedback<2> (b, a, feedback[n]);
 
-            output[n] = processSample2ndOrder (input[n], z1.get(), z2.get());
+            output[n] = chowdsp::Math::algebraicSigmoid (processSample2ndOrder (input[n], z1.get(), z2.get()));
         }
     }
 
@@ -37,9 +38,14 @@ private:
 
 struct FeedbackStageNoMod : chowdsp::IIRFilter<2>
 {
+    static constexpr float Cval = 33.0e-9f;
+    static constexpr float Rval = 100.0e3f;
+    static constexpr auto wc = 1.0f / (Cval * Rval);
+
     void prepare (float sampleRate)
     {
         K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        reset();
     }
 
     void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
@@ -58,7 +64,7 @@ struct FeedbackStageNoMod : chowdsp::IIRFilter<2>
                                                                    { k * k * (1.0f + G), 2 * k * (1.0f - G), 1.0f + G },
                                                                    K);
 
-            output[n] = processSample2ndOrder (input[n], z1.get(), z2.get());
+            output[n] = chowdsp::Math::algebraicSigmoid (processSample2ndOrder (input[n], z1.get(), z2.get()));
         }
     }
 
@@ -68,9 +74,16 @@ private:
 
 struct ModStages : chowdsp::IIRFilter<2>
 {
+    static constexpr float Cval = 15.0e-9f;
+    static constexpr float Rval = 100.0e3f;
+    static constexpr auto wc = 1.0f / (Cval * Rval);
+
     void prepare (float sampleRate)
     {
         K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        reset();
+
+        std::fill (std::begin (z_custom), std::end (z_custom), 0.0f);
     }
 
     void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
