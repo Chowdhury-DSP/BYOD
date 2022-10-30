@@ -35,7 +35,8 @@ Phaser8::Phaser8 (UndoManager* um) : BaseProcessor ("Phaser8",
     lfoShaper.initialise ([] (float x)
                           {
                               static constexpr auto skewFactor = gcem::pow (2.0f, -0.25f);
-                              return 2.0f * std::pow ((x + 1.0f) * 0.5f, skewFactor) - 1.0f; },
+                              return 2.0f * std::pow ((x + 1.0f) * 0.5f, skewFactor) - 1.0f;
+                          },
                           -1.0f,
                           1.0f,
                           2048);
