@@ -6,31 +6,9 @@ namespace Phase90Filters
 {
 namespace detail
 {
-    inline float fastInvSqrt (float number)
-    {
-        union
-        {
-            float f;
-            uint32_t i;
-        } conv {};
-
-        float x2 {};
-        static constexpr float threehalfs = 1.5F;
-
-        x2 = number * 0.5F;
-        conv.f = number;
-        conv.i = 0x5f3759df - (conv.i >> 1);
-        conv.f = conv.f * (threehalfs - (x2 * conv.f * conv.f));
-        return conv.f;
-    }
-
     inline float fastSigmoid (float x)
     {
-        x *= 0.5f;
-        auto vtmp = x * x; // calculate in*in
-        const auto vtmp2 = vtmp + 1.0f; // in*in+1.f
-        vtmp = fastInvSqrt (vtmp2); // 1/sqrt(in*in+1.f)
-        return 2.0f * vtmp * x; // in*1/sqrt(in*in+1)
+        return 2.0f * chowdsp::Math::algebraicSigmoid (0.5f * x);
     }
 } // namespace detail
 
