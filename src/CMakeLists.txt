@@ -107,6 +107,7 @@ target_sources(BYOD PRIVATE
     processors/modulation/Tremolo.cpp
     processors/modulation/Flanger.cpp
     processors/modulation/phaser/Phaser4.cpp
+    processors/modulation/phaser/Phaser8.cpp
     processors/modulation/scanner_vibrato/ScannerVibrato.cpp
 
     processors/other/Compressor.cpp

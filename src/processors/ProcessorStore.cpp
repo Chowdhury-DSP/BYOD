@@ -39,6 +39,7 @@
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
 #include "modulation/phaser/Phaser4.h"
+#include "modulation/phaser/Phaser8.h"
 #include "modulation/scanner_vibrato/ScannerVibrato.h"
 
 #include "other/Compressor.h"
@@ -108,6 +109,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Flanger", &processorFactory<Flanger> },
     { "Panner", &processorFactory<Panner> },
     { "Phaser4", &processorFactory<Phaser4> },
+    { "Phaser8", &processorFactory<Phaser8> },
     { "Rotary", &processorFactory<Rotary> },
     { "Scanner Vibrato", &processorFactory<ScannerVibrato> },
     { "Tremolo", &processorFactory<Tremolo> },
