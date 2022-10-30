@@ -85,7 +85,7 @@ void Phaser4::prepare (double sampleRate, int samplesPerBlock)
     }
 
     audioOutBuffer.setSize (2, samplesPerBlock);
-    modOutBuffer.setSize (2, samplesPerBlock);
+    modOutBuffer.setSize (1, samplesPerBlock);
 }
 
 void Phaser4::processModulation (int numSamples)
