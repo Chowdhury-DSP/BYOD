@@ -196,6 +196,7 @@ void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
     inGain.setRampDurationSeconds (0.1);
 
     conditionParam.prepare (sampleRate, samplesPerBlock);
+    conditionParam.setRampLength (0.05);
 
     for (auto& model : lstm40NoCondModels)
         model.get<0>().prepare (1.0f);
