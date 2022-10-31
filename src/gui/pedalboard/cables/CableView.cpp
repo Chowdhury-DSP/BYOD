@@ -193,5 +193,5 @@ int CableView::PathGeneratorTask::useTimeSlice()
     for (auto* cable : cableView.cables)
         cable->repaintIfNeeded();
 
-    return 28; // approx. 35 frames / second
+    return 18; // a little less than 60 frames / second
 }
