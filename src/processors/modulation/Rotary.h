@@ -16,6 +16,7 @@ public:
 
 private:
     chowdsp::FloatParameter* rateHzParam = nullptr;
+    chowdsp::BoolParameter* stereoParam = nullptr;
 
     void processModulation (int numSamples);
     void processSpectralDelayFilters (int channel, float* data, const float* modData, const float* depthData, int numSamples);

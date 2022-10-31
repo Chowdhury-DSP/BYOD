@@ -2,6 +2,12 @@
 #include "../BufferHelpers.h"
 #include "../ParameterHelpers.h"
 
+namespace
+{
+    const String stereoTag = "stereo";
+}
+
+
 Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary",
                                                   createParameterLayout(),
                                                   um,
