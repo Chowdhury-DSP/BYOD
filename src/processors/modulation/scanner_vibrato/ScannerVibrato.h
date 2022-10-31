@@ -20,11 +20,13 @@ private:
     chowdsp::SmoothedBufferValue<float> depthParam;
     chowdsp::FloatParameter* mixParam = nullptr;
     chowdsp::ChoiceParameter* modeParam = nullptr;
+    chowdsp::BoolParameter* stereoParam = nullptr;
 
     chowdsp::SineWave<float> modSource;
     ScannerVibratoWDF wdf[2];
     dsp::DryWetMixer<float> mixer;
 
+    chowdsp::Buffer<float> mod01Buffer;
     chowdsp::Buffer<float> modsMixBuffer;
     chowdsp::Buffer<float> tapsOutBuffer[2];
 

@@ -8,6 +8,7 @@ const String rateTag = "rate";
 const String depthTag = "depth";
 const String mixTag = "mix";
 const String modeTag = "mode";
+const String stereoTag = "stereo";
 
 constexpr auto o16 = 1.0f / 16.0f;
 float ramp_up (float x, int off)
@@ -32,6 +33,9 @@ ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor ("Scanner Vibra
     loadParameterPointer (rateHzParam, vts, rateTag);
     loadParameterPointer (mixParam, vts, mixTag);
     loadParameterPointer (modeParam, vts, modeTag);
+    loadParameterPointer (stereoParam, vts, stereoTag);
+
+    addPopupMenuParameter (stereoTag);
 
     depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, depthTag));
     depthParam.setRampLength (0.05);
@@ -84,6 +88,7 @@ ParamLayout ScannerVibrato::createParameterLayout()
     for (const auto& choice : magic_enum::enum_names<ScannerVibratoWDF::Mode>())
         modeChoices.add (choice.data());
     emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", modeChoices, 0);
+    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
 }
@@ -99,6 +104,7 @@ void ScannerVibrato::prepare (double sampleRate, int samplesPerBlock)
     mixer.prepare (spec);
     mixer.setMixingRule (dsp::DryWetMixingRule::sin3dB);
 
+    mod01Buffer.setMaxSize (1, samplesPerBlock);
     modsMixBuffer.setMaxSize (ScannerVibratoWDF::numTaps, samplesPerBlock);
     for (int ch = 0; ch < 2; ++ch)
     {
@@ -131,26 +137,44 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
 
     if (inputsConnected.contains (AudioInput))
     {
+        const auto stereoMode = stereoParam->get();
+
+        // get modulation data in [0, 1] range
+        auto* modData01 = mod01Buffer.getWritePointer (0);
+        FloatVectorOperations::multiply (modData01, modOutBuffer.getReadPointer (0), depthParam.getSmoothedBuffer(), numSamples); // this also multiplies the signal by 0.5
+        FloatVectorOperations::add (modData01, 0.5f, numSamples);
+
         // generate mod mix arrays
         auto** modMixData = modsMixBuffer.getArrayOfWritePointers();
-        FloatVectorOperations::add (modMixData[0], modOutBuffer.getReadPointer (0), 1.0f, numSamples);
-        FloatVectorOperations::multiply (modMixData[0], depthParam.getSmoothedBuffer(), numSamples); // this also multiplies the signal by 0.5
-        //        FloatVectorOperations::multiply (modMixData[0], depthParam.getSmoothedBuffer(), modOutBuffer.getReadPointer (0), numSamples); // this also multiplies the signal by 0.5
-        for (int i = ScannerVibratoWDF::numTaps - 1; i >= 0; --i)
-            tapMixTable[i].process (modMixData[0], modMixData[i], numSamples);
+        for (int i = 0; i < ScannerVibratoWDF::numTaps; ++i)
+            tapMixTable[i].process (modData01, modMixData[i], numSamples);
 
+        // handle input num channels
         const auto& audioInBuffer = getInputBuffer (AudioInput);
-        const auto numChannels = audioInBuffer.getNumChannels();
-        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        const auto numInChannels = audioInBuffer.getNumChannels();
+        const auto numOutChannels = stereoMode ? 2 : numInChannels;
+        audioOutBuffer.setSize (numOutChannels, numSamples, false, false, true);
 
+        // push dry signal into mixer
         mixer.setWetMixProportion (*mixParam);
-        mixer.pushDrySamples (audioInBuffer);
+        if (stereoMode && numInChannels == 1)
+        {
+            for (int ch = 0; ch < numOutChannels; ++ch)
+                audioOutBuffer.copyFrom (ch, 0, audioInBuffer, ch % numInChannels, 0, numSamples);
+
+            mixer.pushDrySamples (audioOutBuffer);
+        }
+        else
+        {
+            mixer.pushDrySamples (audioInBuffer);
+        }
 
         audioOutBuffer.clear();
         const auto modeIndex = modeParam->getIndex();
         using Mode = ScannerVibratoWDF::Mode;
-        for (int ch = 0; ch < numChannels; ++ch)
+        for (int ch = 0; ch < numOutChannels; ++ch)
         {
+            // process tap outs
             tapsOutBuffer[ch].setCurrentSize (ScannerVibratoWDF::numTaps, numSamples);
             auto** tapsOutData = tapsOutBuffer[ch].getArrayOfWritePointers();
             magic_enum::enum_switch (
@@ -158,15 +182,27 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
                  ch,
                  numSamples,
                  tapsOutData,
-                 inData = audioInBuffer.getReadPointer (ch)] (auto mode)
+                 inData = audioInBuffer.getReadPointer (ch % numInChannels)] (auto mode)
                 {
                     constexpr Mode mode_c = mode;
                     wdf[ch].processBlock<mode_c> (inData, tapsOutData, numSamples);
                 },
                 static_cast<Mode> (modeIndex));
 
+            // process with modulation
             auto* outData = audioOutBuffer.getWritePointer (ch);
-            for (int i = 0; i < ScannerVibratoWDF::numTaps; ++i)
+            if (stereoMode && ch == 1)
+            {
+                // invert right phase
+                FloatVectorOperations::negate (modData01, modData01, numSamples);
+                FloatVectorOperations::add (modData01, 1.0f, numSamples);
+
+                // recompute mod mix data
+                for (int i = 0; i < ScannerVibratoWDF::numTaps; ++i)
+                    tapMixTable[i].process (modData01, modMixData[i], numSamples);
+            }
+
+            for (int i = ScannerVibratoWDF::numTaps - 1; i >= 0; --i)
                 FloatVectorOperations::addWithMultiply (outData, tapsOutData[i], modMixData[i], numSamples);
         }
 
