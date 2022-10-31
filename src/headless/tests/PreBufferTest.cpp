@@ -47,7 +47,7 @@ public:
 
                 const auto steadyStateMax = [] (const auto& name)
                 {
-                    if (name == "Kiwi Bass Drive" || name == "Waterfall Drive" || name == "Tweed")
+                    if (name == "Kiwi Bass Drive" || name == "Waterfall Drive" || name == "Tweed" || name == "Swinger Pre")
                         return 1.0e-4f;
                     return 1.0e-5f;
                 }(proc->getName());
