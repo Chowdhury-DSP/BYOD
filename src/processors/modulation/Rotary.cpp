@@ -2,6 +2,12 @@
 #include "../BufferHelpers.h"
 #include "../ParameterHelpers.h"
 
+namespace
+{
+    const String stereoTag = "stereo";
+}
+
+
 Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary",
                                                   createParameterLayout(),
                                                   um,
@@ -9,6 +15,9 @@ Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary",
                                                   magic_enum::enum_count<OutputPort>())
 {
     chowdsp::ParamUtils::loadParameterPointer (rateHzParam, vts, "rate");
+    chowdsp::ParamUtils::loadParameterPointer (stereoParam, vts, stereoTag);
+    
+    addPopupMenuParameter (stereoTag);
 
     auto* depthParamHandle = dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter ("depth"));
     spectralDepthSmoothed.setParameterHandle (depthParamHandle);
@@ -30,6 +39,8 @@ ParamLayout Rotary::createParameterLayout()
     auto params = createBaseParams();
     createFreqParameter (params, "rate", "Rate", 0.25f, 8.0f, 1.0f, 1.0f);
     createPercentParameter (params, "depth", "Depth", 0.5f);
+    
+    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
 }
@@ -154,12 +165,16 @@ void Rotary::processAudio (AudioBuffer<float>& buffer)
 
     if (inputsConnected.contains (AudioInput))
     {
-        const auto& audioInputBuffer = getInputBuffer (AudioInput);
-        const auto numChannels = audioInputBuffer.getNumChannels();
-        audioOutBuffer.makeCopyOf (audioInputBuffer, true);
+        const auto stereoMode = stereoParam->get();
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numInChannels = audioInBuffer.getNumChannels();
+        const auto numOutChannels = stereoMode ? 2 : numInChannels;
+        
+        audioOutBuffer.setSize (numOutChannels, numSamples, false, false, true);
 
-        for (int ch = 0; ch < numChannels; ++ch)
+        for (int ch = 0; ch < numOutChannels; ++ch)
         {
+            audioOutBuffer.copyFrom (ch, 0, audioInBuffer, ch % numInChannels, 0, numSamples);
             auto* x = audioOutBuffer.getWritePointer (ch);
             const auto* modData = ch == 0 ? modulationBuffer.getReadPointer (0) : modulationBufferNegative.getReadPointer (0);
 
