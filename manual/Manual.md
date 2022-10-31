@@ -37,6 +37,9 @@ To remove an existing processor, click the "x" button on the top
 right of the processor's editor. Note that the "Undo" button can
 be used to bring back any previously removed processor.
 
+### Replace cable with Processor
+To Replace a cable with a processor, right-click on a cable and select the desired processor from the menu that appears.
+
 ### Connecting Two Processors
 To create a connection between two processors click on an output
 port from the first processor, and drag to create a cable. Release
