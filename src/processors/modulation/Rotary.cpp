@@ -4,9 +4,8 @@
 
 namespace
 {
-    const String stereoTag = "stereo";
+const String stereoTag = "stereo";
 }
-
 
 Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary",
                                                   createParameterLayout(),
@@ -16,7 +15,7 @@ Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary",
 {
     chowdsp::ParamUtils::loadParameterPointer (rateHzParam, vts, "rate");
     chowdsp::ParamUtils::loadParameterPointer (stereoParam, vts, stereoTag);
-    
+
     addPopupMenuParameter (stereoTag);
 
     auto* depthParamHandle = dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter ("depth"));
@@ -39,7 +38,7 @@ ParamLayout Rotary::createParameterLayout()
     auto params = createBaseParams();
     createFreqParameter (params, "rate", "Rate", 0.25f, 8.0f, 1.0f, 1.0f);
     createPercentParameter (params, "depth", "Depth", 0.5f);
-    
+
     emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
@@ -169,7 +168,7 @@ void Rotary::processAudio (AudioBuffer<float>& buffer)
         const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numInChannels = audioInBuffer.getNumChannels();
         const auto numOutChannels = stereoMode ? 2 : numInChannels;
-        
+
         audioOutBuffer.setSize (numOutChannels, numSamples, false, false, true);
 
         for (int ch = 0; ch < numOutChannels; ++ch)
