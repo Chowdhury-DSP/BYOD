@@ -141,8 +141,8 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
 
         // get modulation data in [0, 1] range
         auto* modData01 = mod01Buffer.getWritePointer (0);
-        FloatVectorOperations::add (modData01, modOutBuffer.getReadPointer (0), 1.0f, numSamples);
-        FloatVectorOperations::multiply (modData01, depthParam.getSmoothedBuffer(), numSamples); // this also multiplies the signal by 0.5
+        FloatVectorOperations::multiply (modData01, modOutBuffer.getReadPointer (0), depthParam.getSmoothedBuffer(), numSamples); // this also multiplies the signal by 0.5
+        FloatVectorOperations::add (modData01, 0.5f, numSamples);
 
         // generate mod mix arrays
         auto** modMixData = modsMixBuffer.getArrayOfWritePointers();
