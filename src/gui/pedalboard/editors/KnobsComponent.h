@@ -44,6 +44,8 @@ private:
     OwnedArray<ComboBox> boxes;
     OwnedArray<TextButton> buttons;
     OwnedArray<Component> customComponents;
+    std::unordered_set<String> sliderNames;
+    std::unordered_set<String> boxNames;
 
     Colour contrastColour;
     Colour accentColour;

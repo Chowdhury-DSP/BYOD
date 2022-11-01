@@ -195,11 +195,33 @@ void KnobsComponent::paint (Graphics& g)
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
 
+    auto needsRepaint = [](std::unordered_set<String> &names, std::unordered_set<String> tempNames)
+    {
+        if(names != tempNames)
+        {
+            names = tempNames;
+            return true;
+        }
+        
+        return false;
+    };
+    
+    std::unordered_set<String> currentSliders;
     for (auto* s : sliders)
+    {
         makeName (*s, s->getName(), 6);
-
+        currentSliders.insert(s->getName());
+    }
+    
+    std::unordered_set<String> currentBoxes;
     for (auto* b : boxes)
+    {
         makeName (*b, b->getName());
+        currentBoxes.insert(b->getName());
+    }
+    
+    if(needsRepaint(sliderNames, currentSliders) || needsRepaint(boxNames, currentBoxes))
+        repaint();    
 }
 
 void KnobsComponent::resized()
