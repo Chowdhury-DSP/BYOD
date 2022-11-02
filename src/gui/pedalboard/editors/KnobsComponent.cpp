@@ -196,14 +196,10 @@ void KnobsComponent::paint (Graphics& g)
     };
 
     for (auto* s : sliders)
-    {
         makeName (*s, s->getName(), 6);
-    }
 
     for (auto* b : boxes)
-    {
         makeName (*b, b->getName());
-    }
 }
 
 void KnobsComponent::resized()
