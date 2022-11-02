@@ -17,6 +17,7 @@ LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsL
         levelDetector[ch].setParameters (80.0f, 300.0f);
     }
 
+    timerCallback();
     startTimerHz (timerHz);
 }
 
