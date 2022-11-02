@@ -295,7 +295,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
 
             mainPanSlider.setVisible (! dualPanOn);
             leftPanSlider.setVisible (dualPanOn);
-            
+
             setName (vts.getParameter (dualPanOn ? leftPanTag : mainPanTag)->name);
             if (auto* parent = getParentComponent())
                 getParentComponent()->repaint();
