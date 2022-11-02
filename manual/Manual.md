@@ -84,7 +84,7 @@ to the processor chain. In order to save computing resources (CPU),
 it is recommended to avoid using "Stereo" mode except when the
 input is a stereo signal.
 
-## Input/Output Gain
+### Input/Output Gain
 These controls can be used to affect the gain staging before or
 after the processor chain.
 
@@ -99,6 +99,20 @@ The "cog" icon on the far right of the global controls opens a "Settings"
 menu. Note that the settings provided in this menu are shared across all
 instances of the plugin. There are additional options for viewing the plugin
 source code, and copying the plugin's diagnostic info.
+
+## Add-On Packs
+
+Add-on packs are available in BYOD version 1.1.0 and later. To view the
+available add-on packs, open the settings menu, and select "Purchase Add-On
+Modules".
+
+<img src="https://user-images.githubusercontent.com/13724188/199623330-0a6d83cc-474a-4b78-81c5-93aa3e778506.gif" alt="Add-On Packs" height="400">
+
+For the desktop plugin, add-on packs can be purchased from the
+[ChowDSP website](https://chowdsp.com/products/byod-add-ons/store.html);
+after purchase, an activation code will be sent via email, which can
+then be used to activate the pack inside the plugin. For the iOS plugin,
+add-on packs can be purchased in the plugin via an in-app purchase.
 
 ## Presets
 
