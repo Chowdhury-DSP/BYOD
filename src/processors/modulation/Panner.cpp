@@ -243,8 +243,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
 {
     /** Main pan or left pan */
     class PanSlider1 : public Slider,
-                       private AudioProcessorValueTreeState::Listener,
-                       private Timer
+                       private AudioProcessorValueTreeState::Listener
     {
     public:
         explicit PanSlider1 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo) : vts (vtState),
@@ -259,18 +258,11 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
             setName (mainPanTag + "__" + leftPanTag + "__");
 
             vts.addParameterListener (stereoModeTag, this);
-
-            startTimerHz (10);
         }
 
         ~PanSlider1() override
         {
             vts.removeParameterListener (stereoModeTag, this);
-        }
-
-        void timerCallback() override
-        {
-            updateSliderVisibility (vts.getRawParameterValue (stereoModeTag)->load() == 1.0f);
         }
 
         void parameterChanged (const String& paramID, float newValue) override
@@ -303,14 +295,10 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
 
             mainPanSlider.setVisible (! dualPanOn);
             leftPanSlider.setVisible (dualPanOn);
-
-            auto newName = vts.getParameter (dualPanOn ? leftPanTag : mainPanTag)->name;
-            if (newName != getName())
-            {
-                setName (newName);
-                if (auto* parent = getParentComponent())
-                    getParentComponent()->repaint();
-            }
+            
+            setName (vts.getParameter (dualPanOn ? leftPanTag : mainPanTag)->name);
+            if (auto* parent = getParentComponent())
+                getParentComponent()->repaint();
         }
 
         void visibilityChanged() override
