@@ -10,6 +10,8 @@ struct JuniorBWDF
 
     void prepare (Float sampleRate)
     {
+        R.prepare (sampleRate);
+
         C24.prepare (sampleRate);
         C22.prepare (sampleRate);
         C2.prepare (sampleRate);
@@ -62,9 +64,13 @@ struct JuniorBWDF
         template <typename RType>
         static void calcImpedance (RType& R)
         {
-            // always use 1k for the upward facin=g ports
-            static constexpr auto Rg = (Float) 1000;
-            static constexpr auto Rp = (Float) 1000;
+            const auto fs = R.getSampleRate();
+            const auto sampleRateFactor = fs / (Float) 96000;
+            const auto Rcomp = (Float) 1000 / std::pow (sampleRateFactor, sampleRateFactor <= (Float) 1 ? (Float) 0.2 : (Float) 0.29);
+
+            // always use 1k for the upward facing ports
+            const auto Rg = Rcomp;
+            const auto Rp = Rcomp;
 
             // set port resistances
             const auto [Ri, Rk, Ro] = R.getPortImpedances();
