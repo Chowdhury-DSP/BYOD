@@ -37,6 +37,11 @@ To remove an existing processor, click the "x" button on the top
 right of the processor's editor. Note that the "Undo" button can
 be used to bring back any previously removed processor.
 
+### Replace Cable With Processor
+To replace a cable with a processor, right-click on a cable and select the desired processor from the menu that appears.
+
+<img src="./screenshots/Replace_Processor.gif" alt="Replace Processor" height="400">
+
 ### Connecting Two Processors
 To create a connection between two processors click on an output
 port from the first processor, and drag to create a cable. Release
@@ -49,6 +54,9 @@ the connection.
 To destroy a cable, click on the input port at the end of the
 connection. Again, the "Undo" button can be used to bring back
 any previously destroyed cables.
+
+### Modulation Ports
+Purple modulation ports are available on all modulation processors. When connected, these ports allow for one processor's modulation signal to be passed to another. A processor with a connected modulation input will use the modulation signal from that input instead of generating its own. This feature allows multiple modulation processors to be synced to the same modulation signal, creating unique effects possibilities.
 
 ## Processor Controls
 
