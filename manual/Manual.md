@@ -40,6 +40,8 @@ be used to bring back any previously removed processor.
 ### Replace Cable With Processor
 To replace a cable with a processor, right-click on a cable and select the desired processor from the menu that appears.
 
+<img src="./screenshots/Replace_Processor.gif" alt="Replace Processor" height="400">
+
 ### Connecting Two Processors
 To create a connection between two processors click on an output
 port from the first processor, and drag to create a cable. Release
