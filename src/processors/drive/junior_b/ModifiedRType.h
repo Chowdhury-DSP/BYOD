@@ -50,6 +50,9 @@ public:
                                       downPorts);
     }
 
+    void prepare (T sampleRate) { fs = sampleRate; }
+    T getSampleRate() const noexcept { return fs; }
+
     /** Re-computes the port impedance at the adapted upward-facing port */
     void calcImpedance() override
     {
@@ -118,5 +121,7 @@ private:
     T a_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPorts] {}; // vector of inputs to Rport from down the tree
     T b_down_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numDownPortsPad] {}; // vector of outputs from Rport to down the tree
     T b_up_vec alignas (CHOWDSP_WDF_DEFAULT_SIMD_ALIGNMENT)[numUpPortsPad] {}; // vector of outputs from Rport to down the tree
+
+    T fs = (T) 48000;
 };
 } // namespace chowdsp::wdft
