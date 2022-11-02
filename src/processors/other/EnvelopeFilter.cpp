@@ -228,7 +228,7 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
             freqModSlider.setVisible (directControlOn);
 
             setName (vts.getParameter (directControlOn ? freqModTag : senseTag)->name);
-            if(auto* parent = getParentComponent())
+            if (auto* parent = getParentComponent())
                 getParentComponent()->repaint();
         }
 

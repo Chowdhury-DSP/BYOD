@@ -305,10 +305,10 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
             leftPanSlider.setVisible (dualPanOn);
 
             auto newName = vts.getParameter (dualPanOn ? leftPanTag : mainPanTag)->name;
-            if(newName != getName())
+            if (newName != getName())
             {
-                setName(newName);
-                if(auto* parent = getParentComponent())
+                setName (newName);
+                if (auto* parent = getParentComponent())
                     getParentComponent()->repaint();
             }
         }
@@ -402,7 +402,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
             rightPanSlider.setVisible (dualPanOn);
 
             setName (vts.getParameter (dualPanOn ? rightPanTag : stereoWidthTag)->name);
-            if(auto* parent = getParentComponent())
+            if (auto* parent = getParentComponent())
                 getParentComponent()->repaint();
         }
 
