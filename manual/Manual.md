@@ -54,7 +54,7 @@ connection. Again, the "Undo" button can be used to bring back
 any previously destroyed cables.
 
 ### Modulation Ports
-Purple modulation ports are available on all modulation processors. When connected, these ports allow for one processors modulation signal to be passed to another. A processor with a connected modulation input will use that input instead of it's own Rate parameter. This allows two modulation processors to be synced to the same rate, creating unique effects possibilities.
+Purple modulation ports are available on all modulation processors. When connected, these ports allow for one processors modulation signal to be passed to another. A processor with a connected modulation input will use that input instead of it's own Rate parameter. This allows multiple modulation processors to be synced to the same rate, creating unique effects possibilities.
 
 ## Processor Controls
 
