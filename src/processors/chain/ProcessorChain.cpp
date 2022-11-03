@@ -174,18 +174,18 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
         for (int ch = 0; ch < inputNumChannels; ++ch)
             inputBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
     }
-    
+
     // process standalone modulation ports
     bool outProcessed = false;
     for (auto* processor : procs)
     {
         auto numImputs = processor->getNumInputConnections();
-        
+
         auto isModProcessor = processor->getProcessorType() == Modulation;
         auto noInputsConnected = processor->getNumInputConnections() == 0;
         auto modOutputConnected = processor->isOutputModulationPortConnected();
-        if(isModProcessor && noInputsConnected && modOutputConnected)
-                runProcessor (processor, inputBuffer, outProcessed);
+        if (isModProcessor && noInputsConnected && modOutputConnected)
+            runProcessor (processor, inputBuffer, outProcessed);
     }
 
     // run processing chain

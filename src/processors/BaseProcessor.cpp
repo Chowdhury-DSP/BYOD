@@ -289,14 +289,13 @@ bool BaseProcessor::isOutputModulationPort (int portIndex)
 
 bool BaseProcessor::isOutputModulationPortConnected()
 {
-    for(auto connections : outputConnections)
+    for (auto connections : outputConnections)
     {
-        for(auto info : connections)
+        for (auto info : connections)
         {
-            if(isOutputModulationPort(info.startPort))
+            if (isOutputModulationPort (info.startPort))
                 return true;
         }
-        
     }
     return false;
 }
