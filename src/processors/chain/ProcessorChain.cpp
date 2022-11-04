@@ -179,10 +179,9 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     bool outProcessed = false;
     for (auto* processor : procs)
     {
-        auto isModProcessor = processor->getProcessorType() == Modulation;
         auto noInputsConnected = processor->getNumInputConnections() == 0;
         auto modOutputConnected = processor->isOutputModulationPortConnected();
-        if (isModProcessor && noInputsConnected && modOutputConnected)
+        if (noInputsConnected && modOutputConnected)
             runProcessor (processor, inputBuffer, outProcessed);
     }
 

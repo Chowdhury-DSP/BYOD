@@ -289,6 +289,9 @@ bool BaseProcessor::isOutputModulationPort (int portIndex)
 
 bool BaseProcessor::isOutputModulationPortConnected()
 {
+    if(getProcessorType() != Modulation)
+        return false;
+    
     for (auto connections : outputConnections)
     {
         for (auto info : connections)
