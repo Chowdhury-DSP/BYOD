@@ -286,3 +286,19 @@ bool BaseProcessor::isOutputModulationPort (int portIndex)
 {
     return outputModulationPorts.contains (portIndex);
 }
+
+bool BaseProcessor::isOutputModulationPortConnected()
+{
+    if (getProcessorType() != Modulation)
+        return false;
+
+    for (auto connections : outputConnections)
+    {
+        for (auto info : connections)
+        {
+            if (isOutputModulationPort (info.startPort))
+                return true;
+        }
+    }
+    return false;
+}

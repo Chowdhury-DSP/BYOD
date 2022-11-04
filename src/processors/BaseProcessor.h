@@ -112,6 +112,7 @@ public:
 
     bool isInputModulationPort (int portIndex);
     bool isOutputModulationPort (int portIndex);
+    bool isOutputModulationPortConnected();
 
     const std::vector<String>* getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept;
 
