@@ -47,6 +47,7 @@
 #include "other/EnvelopeFilter.h"
 #include "other/Gate.h"
 #include "other/Octaver.h"
+#include "other/ShimmerReverb.h"
 #include "other/SmoothReverb.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
@@ -129,6 +130,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Gate", &processorFactory<Gate> },
     { "Octaver", &processorFactory<Octaver> },
+    { "Shimmer Reverb", &processorFactory<ShimmerReverb> },
     { "Smooth Reverb", &processorFactory<SmoothReverb> },
     { "Spring Reverb", &processorFactory<SpringReverbProcessor> },
 
@@ -150,8 +152,7 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());
 
-                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
-                                               }));
+                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() }); }));
     }
 
     for (auto& f : futureProcInfos)
