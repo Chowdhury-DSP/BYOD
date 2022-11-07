@@ -141,7 +141,7 @@ void CableView::timerCallback()
         portGlow = false;
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
     }
-    
+
     if (isDraggingCable)
         updateCablePositions();
 }
