@@ -142,11 +142,8 @@ void CableView::timerCallback()
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());
     }
 
-    for (auto* cable : cables)
-    {
-        cable->updateStartPoint();
-        cable->updateEndPoint();
-    }
+    if (isDraggingCable)
+        updateCablePositions();
 }
 
 void CableView::processorBeingAdded (BaseProcessor* newProc)
@@ -171,6 +168,15 @@ CableView::PathGeneratorTask::PathGeneratorTask (CableView& cv) : cableView (cv)
 CableView::PathGeneratorTask::~PathGeneratorTask()
 {
     sharedTimeSliceThread->removeTimeSliceClient (this);
+}
+
+void CableView::updateCablePositions()
+{
+    for (auto* cable : cables)
+    {
+        cable->updateStartPoint();
+        cable->updateEndPoint();
+    }
 }
 
 int CableView::PathGeneratorTask::useTimeSlice()

@@ -29,6 +29,7 @@ public:
 
     bool cableBeingDragged() const;
     juce::Point<float> getCableMousePosition() const;
+    void updateCablePositions();
 
     struct EditorPort
     {

@@ -174,6 +174,7 @@ void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e
     auto* proc = editor.getProcPtr();
     proc->setPosition (relE.getPosition() - mouseOffset, bounds);
     editor.setTopLeftPosition (proc->getPosition (bounds));
+    cableView.updateCablePositions();
     repaint();
 }
 
