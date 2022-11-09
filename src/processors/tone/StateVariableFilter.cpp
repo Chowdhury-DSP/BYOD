@@ -139,11 +139,15 @@ void StateVariableFilter::fromXML (XmlElement* xml, const chowdsp::Version& vers
 
 bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComps)
 {
-    class ModeControl : public Slider,
-                        private AudioProcessorValueTreeState::Listener
+    class ModeControl : public Slider
     {
     public:
-        explicit ModeControl (AudioProcessorValueTreeState& vtState) : vts (vtState)
+        explicit ModeControl (AudioProcessorValueTreeState& vtState) : vts (vtState),
+                                                                       multiModeOnOffAttach (
+                                                                           *vts.getParameter (multiModeTag),
+                                                                           [this] (float newValue)
+                                                                           { updateControlVisibility (newValue == 1.0f); },
+                                                                           vts.undoManager)
         {
             addChildComponent (modeSelector);
             addChildComponent (multiModeSlider);
@@ -154,22 +158,7 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
             modeSelectorAttach = std::make_unique<BoxAttachment> (vts, modeTag, modeSelector);
             multiModeAttach = std::make_unique<SliderAttachment> (vts, multiModeTypeTag, multiModeSlider);
 
-            setName (modeTag + "__" + multiModeTypeTag + "__");
-
-            vts.addParameterListener (multiModeTag, this);
-        }
-
-        ~ModeControl() override
-        {
-            vts.removeParameterListener (multiModeTag, this);
-        }
-
-        void parameterChanged (const String& paramID, float newValue) override
-        {
-            if (paramID != multiModeTag)
-                return;
-
-            updateControlVisibility (newValue == 1.0f);
+            this->setName (modeTag + "__" + multiModeTypeTag + "__");
         }
 
         void colourChanged() override
@@ -225,6 +214,8 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
 
         Slider multiModeSlider;
         std::unique_ptr<SliderAttachment> multiModeAttach;
+
+        ParameterAttachment multiModeOnOffAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModeControl)
     };

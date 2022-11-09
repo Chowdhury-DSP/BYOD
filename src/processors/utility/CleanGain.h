@@ -2,8 +2,7 @@
 
 #include "../BaseProcessor.h"
 
-class CleanGain : public BaseProcessor,
-                  private AudioProcessorValueTreeState::Listener
+class CleanGain : public BaseProcessor
 {
 public:
     explicit CleanGain (UndoManager* um = nullptr);
@@ -17,14 +16,14 @@ public:
     bool getCustomComponents (OwnedArray<Component>& customComps) override;
 
 private:
-    void parameterChanged (const String& paramID, float newValue) override;
-
     chowdsp::FloatParameter* gainDBParam = nullptr;
     chowdsp::FloatParameter* extGainDBParam = nullptr;
     chowdsp::BoolParameter* invertParam = nullptr;
     chowdsp::BoolParameter* extendParam = nullptr;
 
     dsp::Gain<float> gain;
+
+    ParameterAttachment invertAttach;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CleanGain)
 };
