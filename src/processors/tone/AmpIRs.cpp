@@ -100,7 +100,7 @@ void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream)
     {
         if (auto* fileStream = dynamic_cast<FileInputStream*> (stream.get()))
             return fileStream->getFile();
-        return File{};
+        return File {};
     }();
 
     AudioFormatManager manager;
