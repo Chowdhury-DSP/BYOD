@@ -135,7 +135,7 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
     modelChangeBroadcaster();
 }
 
-void GuitarMLAmp::loadModel (int modelIndex)
+void GuitarMLAmp::loadModel (int modelIndex, Component* parentComponent)
 {
     if (juce::isPositiveAndBelow (modelIndex, numBuiltInModels))
     {
@@ -148,12 +148,13 @@ void GuitarMLAmp::loadModel (int modelIndex)
     }
     else if (modelIndex == numBuiltInModels)
     {
-        customModelChooser = std::make_shared<FileChooser> ("GuitarML Model", File {}, "*.json");
+        customModelChooser = std::make_shared<FileChooser> ("GuitarML Model", File {}, "*.json", true, false, parentComponent);
         customModelChooser->launchAsync (FileBrowserComponent::FileChooserFlags::canSelectFiles,
                                          [this] (const FileChooser& modelChooser)
                                          {
-                                             const auto chosenFile = modelChooser.getResult();
-                                             if (chosenFile == File {})
+#if JUCE_IOS
+                                             const auto chosenFile = modelChooser.getURLResult();
+                                             if (chosenFile == URL {})
                                              {
                                                  modelChangeBroadcaster();
                                                  return;
@@ -161,18 +162,33 @@ void GuitarMLAmp::loadModel (int modelIndex)
 
                                              try
                                              {
-                                                 const auto& modelJson = chowdsp::JSONUtils::fromFile (chosenFile);
-                                                 loadModelFromJson (modelJson, chosenFile.getFileNameWithoutExtension());
+                                                 auto chosenFileStream = chosenFile.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress));
+                                                 const auto& modelJson = chowdsp::JSONUtils::fromInputStream (*chosenFileStream);
+                                                 loadModelFromJson (modelJson, chosenFile.getLocalFile().getFileNameWithoutExtension());
                                              }
+#else
+                const auto chosenFile = modelChooser.getResult();
+                if (chosenFile == File {})
+                {
+                    modelChangeBroadcaster();
+                    return;
+                }
+
+                try
+                {
+                    const auto& modelJson = chowdsp::JSONUtils::fromFile (chosenFile);
+                    loadModelFromJson (modelJson, chosenFile.getFileNameWithoutExtension());
+                }
+#endif
                                              catch (...)
                                              {
                                                  loadModel (0);
-                                                 NativeMessageBox::showAsync (MessageBoxOptions()
-                                                                                  .withButton ("Ok")
-                                                                                  .withIconType (MessageBoxIconType::WarningIcon)
-                                                                                  .withTitle ("GuitarML Error")
-                                                                                  .withMessage ("Unable to load GuitarML model from file!"),
-                                                                              nullptr);
+                                                 AlertWindow::showAsync (MessageBoxOptions()
+                                                                             .withButton ("Ok")
+                                                                             .withIconType (MessageBoxIconType::WarningIcon)
+                                                                             .withTitle ("GuitarML Error")
+                                                                             .withMessage ("Unable to load GuitarML model from file!"),
+                                                                         nullptr);
                                              }
                                          });
     }
@@ -368,7 +384,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps)
 
             onChange = [this, &processor]
             {
-                processor.loadModel (getSelectedItemIndex());
+                processor.loadModel (getSelectedItemIndex(), getTopLevelComponent());
             };
 
             this->setName (modelTag + "__box");

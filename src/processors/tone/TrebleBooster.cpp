@@ -39,7 +39,7 @@ void TrebleBooster::processAudio (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
 
     trebleSmooth.setTargetValue (*trebleParam);
-    auto** x = buffer.getArrayOfWritePointers();
+    auto x = buffer.getArrayOfWritePointers();
 
     if (trebleSmooth.isSmoothing())
     {
