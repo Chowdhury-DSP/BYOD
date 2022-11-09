@@ -242,12 +242,16 @@ void Panner::processAudioBypassed (AudioBuffer<float>& buffer)
 bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
 {
     /** Main pan or left pan */
-    class PanSlider1 : public Slider,
-                       private AudioProcessorValueTreeState::Listener
+    class PanSlider1 : public Slider
     {
     public:
         explicit PanSlider1 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo) : vts (vtState),
-                                                                                                  isStereoInput (isStereo)
+                                                                                                  isStereoInput (isStereo),
+                                                                                                  stereoAttach (
+                                                                                                      *vts.getParameter (stereoModeTag),
+                                                                                                      [this] (float newValue)
+                                                                                                      { updateSliderVisibility (newValue == 1.0f); },
+                                                                                                      vts.undoManager)
         {
             for (auto* s : { &mainPanSlider, &leftPanSlider })
                 addChildComponent (s);
@@ -255,22 +259,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
             mainPanAttach = std::make_unique<SliderAttachment> (vts, mainPanTag, mainPanSlider);
             leftPanAttach = std::make_unique<SliderAttachment> (vts, leftPanTag, leftPanSlider);
 
-            setName (mainPanTag + "__" + leftPanTag + "__");
-
-            vts.addParameterListener (stereoModeTag, this);
-        }
-
-        ~PanSlider1() override
-        {
-            vts.removeParameterListener (stereoModeTag, this);
-        }
-
-        void parameterChanged (const String& paramID, float newValue) override
-        {
-            if (paramID != stereoModeTag)
-                return;
-
-            updateSliderVisibility (newValue == 1.0f);
+            this->setName (mainPanTag + "__" + leftPanTag + "__");
         }
 
         void colourChanged() override
@@ -325,18 +314,23 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
         Slider mainPanSlider, leftPanSlider;
         std::unique_ptr<SliderAttachment> mainPanAttach, leftPanAttach;
         std::atomic_bool& isStereoInput;
+        ParameterAttachment stereoAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PanSlider1)
     };
 
     /** Width or right pan */
     class PanSlider2 : public Slider,
-                       private AudioProcessorValueTreeState::Listener,
                        private Timer
     {
     public:
         explicit PanSlider2 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo) : vts (vtState),
-                                                                                                  isStereoInput (isStereo)
+                                                                                                  isStereoInput (isStereo),
+                                                                                                  stereoAttach (
+                                                                                                      *vts.getParameter (stereoModeTag),
+                                                                                                      [this] (float newValue)
+                                                                                                      { updateSliderVisibility (newValue == 1.0f); },
+                                                                                                      vts.undoManager)
         {
             for (auto* s : { &widthSlider, &rightPanSlider })
                 addChildComponent (s);
@@ -344,29 +338,14 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
             widthAttach = std::make_unique<SliderAttachment> (vts, stereoWidthTag, widthSlider);
             rightPanAttach = std::make_unique<SliderAttachment> (vts, rightPanTag, rightPanSlider);
 
-            setName (stereoWidthTag + "__" + rightPanTag + "__");
-
-            vts.addParameterListener (stereoModeTag, this);
+            this->setName (stereoWidthTag + "__" + rightPanTag + "__");
 
             startTimerHz (10);
-        }
-
-        ~PanSlider2() override
-        {
-            vts.removeParameterListener (stereoModeTag, this);
         }
 
         void timerCallback() override
         {
             setEnabled (isStereoInput);
-        }
-
-        void parameterChanged (const String& paramID, float newValue) override
-        {
-            if (paramID != stereoModeTag)
-                return;
-
-            updateSliderVisibility (newValue == 1.0f);
         }
 
         void colourChanged() override
@@ -418,6 +397,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
         Slider widthSlider, rightPanSlider;
         std::unique_ptr<SliderAttachment> widthAttach, rightPanAttach;
         std::atomic_bool& isStereoInput;
+        ParameterAttachment stereoAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PanSlider2)
     };

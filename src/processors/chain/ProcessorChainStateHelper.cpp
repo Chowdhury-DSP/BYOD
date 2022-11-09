@@ -30,8 +30,9 @@ String getProcessorName (const String& tag)
 }
 } // namespace
 
-ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain) : chain (thisChain),
-                                                                                   um (chain.um)
+ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain, chowdsp::DeferredAction& deferredAction) : chain (thisChain),
+                                                                                                                            um (chain.um),
+                                                                                                                            mainThreadStateLoader (deferredAction)
 {
 }
 
@@ -43,8 +44,8 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, const chow
         return;
     }
 
-    mainThreadStateLoader->call ([this, stateVersion, loadingPreset, xmlState = *xml]
-                                 { loadProcChainInternal (&xmlState, stateVersion, loadingPreset); });
+    mainThreadStateLoader.call ([this, stateVersion, loadingPreset, xmlState = *xml]
+                                { loadProcChainInternal (&xmlState, stateVersion, loadingPreset); });
 }
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
@@ -98,10 +99,12 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
     if (! loadingPreset)
         um->beginNewTransaction();
 
+    for (auto* proc : chain.procs)
+        ProcessorChainHelpers::removeOutputConnectionsFromProcessor (chain, proc, chain.um);
+    ProcessorChainHelpers::removeOutputConnectionsFromProcessor (chain, &chain.inputProcessor, chain.um);
+
     while (! chain.procs.isEmpty())
         um->perform (new AddOrRemoveProcessor (chain, chain.procs.getLast()));
-
-    ProcessorChainHelpers::removeOutputConnectionsFromProcessor (chain, &chain.inputProcessor, chain.um);
 
     using PortMap = std::vector<std::pair<int, int>>;
     using ProcConnectionMap = std::unordered_map<int, PortMap>;
