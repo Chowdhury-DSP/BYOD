@@ -29,7 +29,7 @@ ProcessorChain::ProcessorChain (ProcessorStore& store,
                                                                                       presetManager (presetMgr)
 {
     actionHelper = std::make_unique<ProcessorChainActionHelper> (*this);
-    stateHelper = std::make_unique<ProcessorChainStateHelper> (*this);
+    stateHelper = std::make_unique<ProcessorChainStateHelper> (*this, mainThreadAction);
     portMagsHelper = std::make_unique<ProcessorChainPortMagnitudesHelper> (*this);
 
     procs.ensureStorageAllocated (100);
@@ -209,8 +209,11 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
 
 void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, float /*newValue*/)
 {
-    jassert (presetManager != nullptr);
+    mainThreadAction.call ([this]
+                           {
+                               jassert (presetManager != nullptr);
 
-    if (! presetManager->getIsDirty())
-        presetManager->setIsDirty (true);
+                               if (! presetManager->getIsDirty())
+                                   presetManager->setIsDirty (true); },
+                           true);
 }
