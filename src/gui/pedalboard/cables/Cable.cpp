@@ -100,8 +100,7 @@ void Cable::repaintIfNeeded (bool force)
         ScopedLock sl (pathCrit);
         cablePath = std::move (createdPath);
 
-        auto cableBounds = cablePath.getBounds().toNearestInt();
-const auto cableBounds = cablePath.getBounds().expanded (std::ceil (minCableThickness), std::ceil (4.0f * minCableThickness).toNearestInt();
+        const auto cableBounds = cablePath.getBounds().expanded (std::ceil (minCableThickness), std::ceil (4.0f * minCableThickness)).toNearestInt();
         MessageManager::callAsync (
             [safeComp = Component::SafePointer (this), cableBounds]
             {
