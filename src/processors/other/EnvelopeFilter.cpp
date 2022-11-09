@@ -195,7 +195,7 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
 
             this->setName (senseTag + "__" + freqModTag + "__");
         }
-        
+
         void colourChanged() override
         {
             for (auto* s : { &freqModSlider, &sensitivitySlider })

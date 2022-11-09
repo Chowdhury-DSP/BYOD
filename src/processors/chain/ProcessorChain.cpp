@@ -214,6 +214,7 @@ void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, floa
                                            jassert (presetManager != nullptr);
 
                                            if (! presetManager->getIsDirty())
-                                               presetManager->setIsDirty (true); },
+                                               presetManager->setIsDirty (true);
+                                       },
                                        true);
 }
