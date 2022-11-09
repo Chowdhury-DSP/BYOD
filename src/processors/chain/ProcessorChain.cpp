@@ -209,8 +209,11 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
 
 void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, float /*newValue*/)
 {
-    jassert (presetManager != nullptr);
+    mainThreadPresetDirtyMarker->call ([this]
+                                       {
+                                           jassert (presetManager != nullptr);
 
-    if (! presetManager->getIsDirty())
-        presetManager->setIsDirty (true);
+                                           if (! presetManager->getIsDirty())
+                                               presetManager->setIsDirty (true); },
+                                       true);
 }

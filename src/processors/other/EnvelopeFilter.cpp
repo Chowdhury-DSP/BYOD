@@ -177,11 +177,15 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
 
 bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
 {
-    class ControlSlider : public Slider,
-                          private AudioProcessorValueTreeState::Listener
+    class ControlSlider : public Slider
     {
     public:
-        explicit ControlSlider (AudioProcessorValueTreeState& vtState) : vts (vtState)
+        explicit ControlSlider (AudioProcessorValueTreeState& vtState) : vts (vtState),
+                                                                         directControlAttach (
+                                                                             *vts.getParameter (directControlTag),
+                                                                             [this] (float newValue)
+                                                                             { updateSliderVisibility (newValue == 1.0f); },
+                                                                             vts.undoManager)
         {
             for (auto* s : { &freqModSlider, &sensitivitySlider })
                 addChildComponent (s);
@@ -189,24 +193,9 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
             freqModAttach = std::make_unique<SliderAttachment> (vts, freqModTag, freqModSlider);
             senseAttach = std::make_unique<SliderAttachment> (vts, senseTag, sensitivitySlider);
 
-            setName (senseTag + "__" + freqModTag + "__");
-
-            vts.addParameterListener (directControlTag, this);
+            this->setName (senseTag + "__" + freqModTag + "__");
         }
-
-        ~ControlSlider() override
-        {
-            vts.removeParameterListener (directControlTag, this);
-        }
-
-        void parameterChanged (const String& paramID, float newValue) override
-        {
-            if (paramID != directControlTag)
-                return;
-
-            updateSliderVisibility (newValue == 1.0f);
-        }
-
+        
         void colourChanged() override
         {
             for (auto* s : { &freqModSlider, &sensitivitySlider })
@@ -255,6 +244,7 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
         AudioProcessorValueTreeState& vts;
         Slider freqModSlider, sensitivitySlider;
         std::unique_ptr<SliderAttachment> freqModAttach, senseAttach;
+        ParameterAttachment directControlAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControlSlider)
     };

@@ -14,7 +14,15 @@ const Colour regularColour = Colours::yellow;
 const Colour invertedColour = Colours::red;
 } // namespace
 
-CleanGain::CleanGain (UndoManager* um) : BaseProcessor ("Clean Gain", createParameterLayout(), um)
+CleanGain::CleanGain (UndoManager* um) : BaseProcessor ("Clean Gain", createParameterLayout(), um),
+                                         invertAttach (
+                                             *vts.getParameter (invertTag),
+                                             [this] (float newValue)
+                                             {
+                                                 uiOptions.powerColour = newValue > 0.5f ? invertedColour : regularColour;
+                                                 uiOptionsChanged();
+                                             },
+                                             um)
 {
     chowdsp::ParamUtils::loadParameterPointer (gainDBParam, vts, gainTag);
     chowdsp::ParamUtils::loadParameterPointer (extGainDBParam, vts, extGainTag);
@@ -28,8 +36,6 @@ CleanGain::CleanGain (UndoManager* um) : BaseProcessor ("Clean Gain", createPara
     uiOptions.powerColour = regularColour;
     uiOptions.info.description = "Simple linear gain boost.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
-
-    vts.addParameterListener (invertTag, this);
 }
 
 ParamLayout CleanGain::createParameterLayout()
@@ -77,11 +83,15 @@ void CleanGain::processAudio (AudioBuffer<float>& buffer)
 
 bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps)
 {
-    class GainSlider : public Slider,
-                       private AudioProcessorValueTreeState::Listener
+    class GainSlider : public Slider
     {
     public:
-        explicit GainSlider (AudioProcessorValueTreeState& vtState) : vts (vtState)
+        explicit GainSlider (AudioProcessorValueTreeState& vtState) : vts (vtState),
+                                                                      extendAttach (
+                                                                          *vts.getParameter (extendTag),
+                                                                          [this] (float newValue)
+                                                                          { updateSliderVisibility (newValue == 1.0f); },
+                                                                          vts.undoManager)
         {
             for (auto* s : { &gainSlider, &extGainSlider })
                 addChildComponent (s);
@@ -90,21 +100,6 @@ bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps)
             extGainAttach = std::make_unique<SliderAttachment> (vts, extGainTag, extGainSlider);
 
             Slider::setName (gainTag + "__" + extGainTag + "__");
-
-            vts.addParameterListener (extendTag, this);
-        }
-
-        ~GainSlider() override
-        {
-            vts.removeParameterListener (extendTag, this);
-        }
-
-        void parameterChanged (const String& paramID, float newValue) override
-        {
-            if (paramID != extendTag)
-                return;
-
-            updateSliderVisibility (newValue == 1.0f);
         }
 
         void colourChanged() override
@@ -153,6 +148,7 @@ bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps)
         AudioProcessorValueTreeState& vts;
         Slider gainSlider, extGainSlider;
         std::unique_ptr<SliderAttachment> gainAttach, extGainAttach;
+        ParameterAttachment extendAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainSlider)
     };
@@ -160,16 +156,4 @@ bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps)
     customComps.add (std::make_unique<GainSlider> (vts));
 
     return false;
-}
-
-void CleanGain::parameterChanged (const String& paramID, float newValue)
-{
-    if (paramID != invertTag)
-    {
-        jassertfalse;
-        return;
-    }
-
-    uiOptions.powerColour = newValue > 0.5f ? invertedColour : regularColour;
-    uiOptionsChanged();
 }
