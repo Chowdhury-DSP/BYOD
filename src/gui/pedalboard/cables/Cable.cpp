@@ -105,8 +105,8 @@ const auto cableBounds = cablePath.getBounds().expanded (std::ceil (minCableThic
         MessageManager::callAsync (
             [safeComp = Component::SafePointer (this), cableBounds]
             {
-                if (auto* comp = safeComp.getComponent())
-                    comp->repaint (cableBounds);
+            if (auto* comp = safeComp.getComponent())
+                comp->repaint (cableBounds);
             });
     };
 
