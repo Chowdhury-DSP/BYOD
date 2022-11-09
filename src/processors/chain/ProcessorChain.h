@@ -72,7 +72,7 @@ private:
     friend class ProcessorChainPortMagnitudesHelper;
     std::unique_ptr<ProcessorChainPortMagnitudesHelper> portMagsHelper;
 
-    chowdsp::SharedDeferredAction mainThreadPresetDirtyMarker;
+    chowdsp::DeferredAction mainThreadAction;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

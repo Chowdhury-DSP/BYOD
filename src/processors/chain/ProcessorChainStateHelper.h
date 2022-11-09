@@ -5,7 +5,7 @@
 class ProcessorChainStateHelper
 {
 public:
-    explicit ProcessorChainStateHelper (ProcessorChain& thisChain);
+    ProcessorChainStateHelper (ProcessorChain& thisChain, chowdsp::DeferredAction& deferredAction);
 
     std::unique_ptr<XmlElement> saveProcChain();
     void loadProcChain (const XmlElement* xml, const chowdsp::Version& stateVersion, bool loadingPreset = false);
@@ -18,7 +18,7 @@ private:
     ProcessorChain& chain;
     UndoManager* um;
 
-    chowdsp::SharedDeferredAction mainThreadStateLoader;
+    chowdsp::DeferredAction& mainThreadStateLoader;
 
     static inline const String procChainStateTag = "proc_chain";
 
