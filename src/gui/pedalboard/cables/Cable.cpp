@@ -104,8 +104,8 @@ void Cable::repaintIfNeeded (bool force)
         MessageManager::callAsync (
             [safeComp = Component::SafePointer (this), cableBounds]
             {
-            if (auto* comp = safeComp.getComponent())
-                comp->repaint (cableBounds);
+                if (auto* comp = safeComp.getComponent())
+                    comp->repaint (cableBounds);
             });
     };
 
