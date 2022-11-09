@@ -47,7 +47,7 @@ void HighCut::processAudio (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
 
     Rv2.setTargetValue (freq2Rv2 (*cutoffParam, C8, R3));
-    auto** x = buffer.getArrayOfWritePointers();
+    auto x = buffer.getArrayOfWritePointers();
 
     if (Rv2.isSmoothing())
     {
