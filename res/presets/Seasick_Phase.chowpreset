@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Seasick Phase" plugin="BYOD" vendor="CHOW" category="Modulation"
+        version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Phaser8>
+      <Parameters x_pos="0.2808378636837006" y_pos="0.5300353169441223">
+        <PARAM id="depth" value="0.699999988079071"/>
+        <PARAM id="feedback" value="0.75"/>
+        <PARAM id="modulation" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="4.999999523162842"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="1"/>
+      <port_2 connection_0="1" connection_end_0="1"/>
+    </Phaser8>
+    <Phaser4>
+      <Parameters x_pos="0.2930000126361847" y_pos="0.09245283156633377">
+        <PARAM id="depth" value="0.699999988079071"/>
+        <PARAM id="fb_stage" value="0.0"/>
+        <PARAM id="feedback" value="0.2999999523162842"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.9999999403953552"/>
+        <PARAM id="stereo" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Phaser4>
+    <Stereo_Merger>
+      <Parameters x_pos="0.5779674053192139" y_pos="0.2561837434768677">
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Stereo_Merger>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0" connection_1="0" connection_end_1="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

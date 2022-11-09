@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Green Day" plugin="BYOD" vendor="CHOW" category="Players" version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Amp_IRs>
+      <Parameters x_pos="0.5360000133514404" y_pos="0.4169811308383942" ir_file="">
+        <PARAM id="gain" value="9.0"/>
+        <PARAM id="ir" value="1.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Amp_IRs>
+    <Metal_Face>
+      <Parameters x_pos="0.5429999828338623" y_pos="0.03962264209985733">
+        <PARAM id="gain" value="-25.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Metal_Face>
+    <Centaur>
+      <Parameters x_pos="0.2010000050067902" y_pos="0.01698113232851028">
+        <PARAM id="gain" value="0.6000000238418579"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Centaur>
+    <Blonde_Tone>
+      <Parameters x_pos="0.1860000044107437" y_pos="0.4283019006252289">
+        <PARAM id="bass" value="-0.6000000238418579"/>
+        <PARAM id="mid" value="0.2999999523162842"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.1000000238418579"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Blonde_Tone>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Boston" plugin="BYOD" vendor="CHOW" category="Players" version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Compressor>
+      <Parameters x_pos="0.131744921207428" y_pos="0.02902757562696934">
+        <PARAM id="attack" value="4.999999523162842"/>
+        <PARAM id="knee" value="6.0"/>
+        <PARAM id="makeup" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ratio" value="5.0"/>
+        <PARAM id="release" value="99.99999237060547"/>
+        <PARAM id="thresh" value="-20.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Compressor>
+    <Chorus>
+      <Parameters x_pos="0.4069660902023315" y_pos="0.02756508439779282">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="depth" value="0.699999988079071"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="mix" value="0.25"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Chorus>
+    <Amp_IRs>
+      <Parameters x_pos="0.6947754621505737" y_pos="0.335375189781189" ir_file="">
+        <PARAM id="gain" value="6.0"/>
+        <PARAM id="ir" value="1.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="6" connection_end_0="0"/>
+    </Amp_IRs>
+    <Graphic_EQ>
+      <Parameters x_pos="0.7039413452148438" y_pos="0.04594180732965469">
+        <PARAM id="gain_0" value="2.0"/>
+        <PARAM id="gain_1" value="2.0"/>
+        <PARAM id="gain_2" value="6.0"/>
+        <PARAM id="gain_3" value="5.0"/>
+        <PARAM id="gain_4" value="3.0"/>
+        <PARAM id="gain_5" value="2.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Graphic_EQ>
+    <Centaur>
+      <Parameters x_pos="0.04625087603926659" y_pos="0.3207547068595886">
+        <PARAM id="gain" value="1.0"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="5" connection_end_0="0"/>
+    </Centaur>
+    <Distortion_Plus>
+      <Parameters x_pos="0.3675526976585388" y_pos="0.3307810127735138">
+        <PARAM id="dist" value="0.2000000029802322"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Distortion_Plus>
+    <Delay>
+      <Parameters x_pos="0.06937631219625473" y_pos="0.6342525482177734">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="feedback" value="0.5"/>
+        <PARAM id="freq" value="2000.000122070312"/>
+        <PARAM id="mix" value="0.201109379529953"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ping_pong" value="0.0"/>
+        <PARAM id="time_ms" value="350.0000305175781"/>
+      </Parameters>
+      <port_0 connection_0="7" connection_end_0="0"/>
+    </Delay>
+    <Smooth_Reverb>
+      <Parameters x_pos="0.3545900583267212" y_pos="0.6458635926246643">
+        <PARAM id="decay" value="1000.0"/>
+        <PARAM id="high_cut" value="15000.0"/>
+        <PARAM id="low_cut" value="199.9999847412109"/>
+        <PARAM id="mix" value="0.2000000029802322"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="relax" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Smooth_Reverb>
+    <Input>
+      <Parameters x_pos="0.004204625263810158" y_pos="0.02612481825053692">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.7635197043418884" y_pos="0.6523736715316772">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

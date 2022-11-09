@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Mixed In Modulation" plugin="BYOD" vendor="CHOW" category="Modulation"
+        version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Rotary>
+      <Parameters x_pos="0.1829999983310699" y_pos="0.08113207668066025">
+        <PARAM id="depth" value="0.7084062695503235"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="1.500000357627869"/>
+        <PARAM id="stereo" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+      <port_1 connection_0="3" connection_end_0="1" connection_1="2" connection_end_1="1"/>
+    </Rotary>
+    <Stereo_Merger>
+      <Parameters x_pos="0.4344452917575836" y_pos="0.02296819724142551">
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="1"/>
+    </Stereo_Merger>
+    <Scanner_Vibrato>
+      <Parameters x_pos="0.4359968900680542" y_pos="0.5318021178245544">
+        <PARAM id="depth" value="0.8064062595367432"/>
+        <PARAM id="mix" value="0.800000011920929"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="5.88652229309082"/>
+        <PARAM id="stereo" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Scanner_Vibrato>
+    <Chorus>
+      <Parameters x_pos="0.1520558595657349" y_pos="0.5795053243637085">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="depth" value="1.0"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="1"/>
+    </Chorus>
+    <Mixer>
+      <Parameters x_pos="0.6664080619812012" y_pos="0.2932862043380737">
+        <PARAM id="gain0" value="3.0"/>
+        <PARAM id="gain1" value="-7.0"/>
+        <PARAM id="gain2" value="0.0"/>
+        <PARAM id="gain3" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Mixer>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0" connection_1="3" connection_end_1="0"
+              connection_2="2" connection_end_2="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8975950479507446" y_pos="0.2791519463062286">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

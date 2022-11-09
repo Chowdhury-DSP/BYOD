@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="George Harrison" plugin="BYOD" vendor="CHOW" category="Players"
+        version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Range_Booster>
+      <Parameters x_pos="0.2249999940395355" y_pos="0.03396226465702057">
+        <PARAM id="boost" value="6.0"/>
+        <PARAM id="high_q" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="range" value="4000.000244140625"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Range_Booster>
+    <Amp_IRs>
+      <Parameters x_pos="0.06300000101327896" y_pos="0.5660377144813538" ir_file="">
+        <PARAM id="gain" value="0.0"/>
+        <PARAM id="ir" value="0.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Amp_IRs>
+    <Spring_Reverb>
+      <Parameters x_pos="0.6439999938011169" y_pos="0.5849056839942932">
+        <PARAM id="chaos" value="0.25"/>
+        <PARAM id="damping" value="0.3944878578186035"/>
+        <PARAM id="decay" value="0.2303819507360458"/>
+        <PARAM id="mix" value="0.2000000029802322"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="reflect" value="0.3496961891651154"/>
+        <PARAM id="shake" value="0.0"/>
+        <PARAM id="size" value="0.25"/>
+        <PARAM id="spin" value="0.4410482048988342"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Spring_Reverb>
+    <Junior_B>
+      <Parameters x_pos="0.5429999828338623" y_pos="0.03584905713796616">
+        <PARAM id="juniorb_blend" value="0.75"/>
+        <PARAM id="juniorb_drive" value="0.300000011920929"/>
+        <PARAM id="juniorb_nstages" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Junior_B>
+    <Rotary>
+      <Parameters x_pos="0.3519999980926514" y_pos="0.5509433746337891">
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="on_off" value="0.0"/>
+        <PARAM id="rate" value="5.0"/>
+        <PARAM id="stereo" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Rotary>
+    <Input>
+      <Parameters x_pos="0.01099999994039536" y_pos="0.1905660331249237">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8579999804496765" y_pos="0.2207547128200531">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

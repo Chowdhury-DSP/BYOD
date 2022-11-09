@@ -102,6 +102,17 @@ void PresetManager::loadBYODFactoryPresets()
     setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
 
     std::vector<chowdsp::Preset> factoryPresets;
+
+    // amps
+    factoryPresets.emplace_back (BinaryData::Instant_Metal_chowpreset, BinaryData::Instant_Metal_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Bass_Face_chowpreset, BinaryData::Bass_Face_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Modern_HiGain_chowpreset, BinaryData::Modern_HiGain_chowpresetSize);
+
+    // modulation
+    factoryPresets.emplace_back (BinaryData::Chopped_Flange_chowpreset, BinaryData::Chopped_Flange_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Mixed_In_Modulation_chowpreset, BinaryData::Mixed_In_Modulation_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Seasick_Phase_chowpreset, BinaryData::Seasick_Phase_chowpresetSize);
+
     // pedals
     factoryPresets.emplace_back (BinaryData::American_Sound_chowpreset, BinaryData::American_Sound_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Big_Muff_chowpreset, BinaryData::Big_Muff_chowpresetSize);
@@ -111,12 +122,11 @@ void PresetManager::loadBYODFactoryPresets()
     factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::ZenDrive_chowpreset, BinaryData::ZenDrive_chowpresetSize);
 
-    // amps
-    factoryPresets.emplace_back (BinaryData::Instant_Metal_chowpreset, BinaryData::Instant_Metal_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Bass_Face_chowpreset, BinaryData::Bass_Face_chowpresetSize);
-
     // players
     factoryPresets.emplace_back (BinaryData::Black_Sabbath_chowpreset, BinaryData::Black_Sabbath_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Boston_chowpreset, BinaryData::Boston_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::George_Harrison_chowpreset, BinaryData::George_Harrison_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Green_Day_chowpreset, BinaryData::Green_Day_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::J_Mascis_chowpreset, BinaryData::J_Mascis_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Jimi_Hendrix_chowpreset, BinaryData::Jimi_Hendrix_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::John_Mayer_chowpreset, BinaryData::John_Mayer_chowpresetSize);

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Chopped Flange" plugin="BYOD" vendor="CHOW" category="Modulation"
+        version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Tremolo>
+      <Parameters x_pos="0.1820013374090195" y_pos="0.07154741883277893">
+        <PARAM id="depth" value="0.8999999761581421"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="6.999998569488525"/>
+        <PARAM id="stereo" value="0.0"/>
+        <PARAM id="wave" value="0.9009062647819519"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+      <port_1 connection_0="1" connection_end_0="1"/>
+    </Tremolo>
+    <Flanger>
+      <Parameters x_pos="0.2699767351150513" y_pos="0.4452296793460846">
+        <PARAM id="delayAmount" value="1.163132309913635"/>
+        <PARAM id="delayOffset" value="2.654526472091675"/>
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="feedback" value="0.2392500042915344"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Flanger>
+    <Shimmer_Reverb>
+      <Parameters x_pos="0.5065942406654358" y_pos="0.1678445190191269">
+        <PARAM id="feedback" value="0.6000000238418579"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="shift" value="12.0"/>
+        <PARAM id="size" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Shimmer_Reverb>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>
