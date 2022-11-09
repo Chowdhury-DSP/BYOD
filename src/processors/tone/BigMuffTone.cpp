@@ -71,7 +71,7 @@ void BigMuffTone::processAudio (AudioBuffer<float>& buffer)
     comps = &componentSets[(int) *typeParam];
     toneSmooth.setTargetValue (*toneParam);
     midsSmooth.setTargetValue (*midsParam);
-    auto** x = buffer.getArrayOfWritePointers();
+    auto x = buffer.getArrayOfWritePointers();
 
     if (toneSmooth.isSmoothing() || midsSmooth.isSmoothing())
     {

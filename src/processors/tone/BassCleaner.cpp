@@ -39,7 +39,7 @@ void BassCleaner::processAudio (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
 
     Rv1.setTargetValue (ParameterHelpers::logPot (*cleanParam) * Rv1Value);
-    auto** x = buffer.getArrayOfWritePointers();
+    auto x = buffer.getArrayOfWritePointers();
 
     if (Rv1.isSmoothing())
     {

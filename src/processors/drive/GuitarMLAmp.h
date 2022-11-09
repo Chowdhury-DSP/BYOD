@@ -22,7 +22,7 @@ public:
     bool getCustomComponents (OwnedArray<Component>& customComps) override;
     void addToPopupMenu (PopupMenu& menu) override;
 
-    void loadModel (int modelIndex);
+    void loadModel (int modelIndex, Component* parentComponent = nullptr);
     String getCurrentModelName() const;
 
 private:

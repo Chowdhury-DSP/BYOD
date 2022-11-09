@@ -86,7 +86,7 @@ void AmpIRs::parameterChanged (const String& parameterID, float newValue)
     convolution.loadImpulseResponse (irData.first, irData.second, dsp::Convolution::Stereo::yes, dsp::Convolution::Trim::yes, 0);
 }
 
-void AmpIRs::loadIRFromFile (const File& file)
+void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream)
 {
     auto failToLoad = [this] (const File& f, const String& message)
     {
@@ -96,15 +96,16 @@ void AmpIRs::loadIRFromFile (const File& file)
         curFile = File();
     };
 
-    if (! file.existsAsFile())
+    const auto file = [&stream]
     {
-        failToLoad (file, "The following IR file was not found: " + file.getFullPathName());
-        return;
-    }
+        if (auto* fileStream = dynamic_cast<FileInputStream*> (stream.get()))
+            return fileStream->getFile();
+        return File {};
+    }();
 
     AudioFormatManager manager;
     manager.registerBasicFormats();
-    std::unique_ptr<AudioFormatReader> formatReader (manager.createReaderFor (std::make_unique<FileInputStream> (file)));
+    std::unique_ptr<AudioFormatReader> formatReader (manager.createReaderFor (std::move (stream)));
 
     if (formatReader == nullptr)
     {
@@ -151,7 +152,7 @@ void AmpIRs::prepare (double sampleRate, int samplesPerBlock)
     if (curFile == File {})
         parameterChanged (irTag, vts.getRawParameterValue (irTag)->load());
     else
-        loadIRFromFile (curFile);
+        loadIRFromStream (curFile.createInputStream());
 }
 
 void AmpIRs::processAudio (AudioBuffer<float>& buffer)
@@ -185,7 +186,7 @@ void AmpIRs::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loa
 
     auto irFile = File (xml->getStringAttribute ("ir_file"));
     if (irFile.getFullPathName().isNotEmpty())
-        loadIRFromFile (irFile);
+        loadIRFromStream (irFile.createInputStream());
     else
         curFile = File();
 }
@@ -257,7 +258,7 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
             attachment = std::make_unique<CustomBoxAttach> (*param, *this, vts.undoManager);
             refreshBox();
 
-            setName (irTag + "__box");
+            this->setName (irTag + "__box");
 
             onIRChanged = ampIRs.irChangedBroadcaster.connect ([this]
                                                                { refreshBox(); });
@@ -285,9 +286,9 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
                     fileItem.text = file.getFileName();
                     fileItem.itemID = menuIdx++;
                     fileItem.isTicked = file == ampIRs.curFile;
-                    fileItem.action = [=]
+                    fileItem.action = [this, file]
                     {
-                        ampIRs.loadIRFromFile (file);
+                        ampIRs.loadIRFromStream (file.createInputStream());
                     };
                     menu->addItem (fileItem);
 
@@ -304,14 +305,24 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
             customItem.action = [=]
             {
                 constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
-                fileChooser = std::make_shared<FileChooser> ("Custom IR", File(), "*.wav", true, false, getTopLevelComponent());
+                fileChooser = std::make_shared<FileChooser> ("Custom IR", File(), "", true, false, getTopLevelComponent());
                 fileChooser->launchAsync (flags,
-                                          [=] (const FileChooser& fc)
+                                          [this] (const FileChooser& fc)
                                           {
-                                              if (fc.getResults().isEmpty())
+#if JUCE_IOS
+                                              if (fc.getURLResults().isEmpty())
                                                   return;
+                                              const auto irFile = fc.getURLResult(); //.getLocalFile();
+                                              Logger::writeToLog ("AmpIRs attempting to load IR from local file: " + irFile.getLocalFile().getFullPathName());
+                                              ampIRs.loadIRFromStream (irFile.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)));
+#else
+                        if (fc.getResults().isEmpty())
+                            return;
+                        const auto irFile = fc.getResult();
 
-                                              ampIRs.loadIRFromFile (fc.getResult());
+                        Logger::writeToLog ("AmpIRs attempting to load IR from local file: " + irFile.getFullPathName());
+                        ampIRs.loadIRFromStream (irFile.createInputStream());
+#endif
                                           });
             };
             menu->addItem (customItem);
