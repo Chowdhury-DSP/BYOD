@@ -100,15 +100,12 @@ void Cable::repaintIfNeeded (bool force)
         ScopedLock sl (pathCrit);
         cablePath = std::move (createdPath);
 
-        auto cableBounds = cablePath.getBounds().toNearestInt();
-        cableBounds.setY (cableBounds.getY() - roundToInt (std::ceil (4.0f * minCableThickness)));
-        cableBounds.setHeight (cableBounds.getHeight() + roundToInt (std::ceil (8.0f * minCableThickness)));
-
+        const auto cableBounds = cablePath.getBounds().expanded (std::ceil (minCableThickness), std::ceil (4.0f * minCableThickness)).toNearestInt();
         MessageManager::callAsync (
             [safeComp = Component::SafePointer (this), cableBounds]
             {
-                if (auto* comp = safeComp.getComponent())
-                    comp->repaint (cableBounds);
+            if (auto* comp = safeComp.getComponent())
+                comp->repaint (cableBounds);
             });
     };
 
@@ -173,7 +170,6 @@ void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float>
 void Cable::paint (Graphics& g)
 {
     g.setColour (cableColour.brighter (0.1f));
-
     drawCable (g, startPoint, endPoint);
 }
 
