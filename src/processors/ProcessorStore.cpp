@@ -147,7 +147,8 @@ ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
 
     for (auto& [name, procFactory] : store)
     {
-        futureProcInfos.push_back (std::async (std::launch::async, [this, name = name, procFactory = procFactory]
+        futureProcInfos.push_back (std::async (std::launch::async,
+                                               [this, name = name, procFactory = procFactory]
                                                {
                                                    auto proc = procFactory (undoManager);
                                                    jassert (name == proc->getName());
@@ -190,7 +191,7 @@ void ProcessorStore::duplicateProcessor (BaseProcessor& procToDuplicate)
 bool ProcessorStore::isModuleAvailable (const String& procName) const noexcept
 {
 #if BYOD_ENABLE_ADD_ON_MODULES
-    if (! addOnProcessorStore->isModuleAvailable (procName))
+    if (addOnProcessorStore->getModuleStatus (procName) == AddOnProcessorStore::ModuleStatus::AddOnModuleLocked)
         return false;
 #endif
 
@@ -230,13 +231,19 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
                 continue;
 
 #if BYOD_ENABLE_ADD_ON_MODULES
-            if (! store.isModuleAvailable (procName))
+            const auto ModuleStatus = store.addOnProcessorStore->getModuleStatus (procName);
+            if (ModuleStatus == AddOnProcessorStore::ModuleStatus::AddOnModuleLocked)
                 continue;
 #endif
 
             PopupMenu::Item item;
             item.itemID = ++menuID;
             item.text = procName;
+            item.colour =
+#if BYOD_ENABLE_ADD_ON_MODULES
+                ModuleStatus == AddOnProcessorStore::ModuleStatus::AddOnModuleUnlocked ? Colours::gold :
+#endif
+                                                                                       Colours::white;
             item.action = [&store, &procCreator = procCreator, procToReplace, connectionInfo]
             {
                 if (connectionInfo != nullptr)
