@@ -11,13 +11,13 @@ const String mixTag = "mix";
 
 void ShimmerReverb::ShimmerFDNConfig::prepare (double sampleRate)
 {
-    shifter.prepare ({ sampleRate, 128, 2 });
+    shifter.prepare ({ sampleRate, 128, 1 });
 
     highCutFilter.prepare (numFDNChannels);
-    highCutFilter.calcCoefs (10000.0f, (float) sampleRate);
+    highCutFilter.calcCoefs (6000.0f, (float) sampleRate);
 
     lowCutFilter.prepare (numFDNChannels);
-    lowCutFilter.calcCoefs (55.0f, (float) sampleRate);
+    lowCutFilter.calcCoefs (50.0f, (float) sampleRate);
 
     Base::prepare (sampleRate);
 }

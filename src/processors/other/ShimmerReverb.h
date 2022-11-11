@@ -27,7 +27,7 @@ private:
         void reset() override;
         static const float* doFeedbackProcess (ShimmerFDNConfig& fdnConfig, const float* data);
 
-        chowdsp::PitchShifter<float, chowdsp::DelayLineInterpolationTypes::Sinc<float, 16, 2048>> shifter;
+        chowdsp::PitchShifter<float, chowdsp::DelayLineInterpolationTypes::Linear> shifter { 1 << 15, 2048 };
         chowdsp::FirstOrderHPF<float> lowCutFilter;
         chowdsp::FirstOrderLPF<float> highCutFilter;
     };
