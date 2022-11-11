@@ -13,11 +13,12 @@ AAX, AUv3, and Standalone.
 ## Installation
 
 To install BYOD for desktop, download the plugin installer
-from the ChowDSP website. If you would like to try the latest
-changes (potentially unstable), you can download the latest
-Nightly build. It is also possible to compile the plugin from
-the [source code](https://github.com/Chowdhury-DSP/BYOD). BYOD
-for iOS can be downloaded from the [App Store](https://apps.apple.com/us/app/byod/id1595313287).
+from the [ChowDSP website](https://chowdsp.com/products.html#byod).
+If you would like to try the latest changes (potentially unstable),
+you can download the latest [Nightly build](https://chowdsp.com/nightly.html#byod).
+It is also possible to compile the plugin from the
+[source code](https://github.com/Chowdhury-DSP/BYOD). BYOD for iOS
+can be downloaded from the [App Store](https://apps.apple.com/us/app/byod/id1595313287).
 
 ## Getting Started
 
