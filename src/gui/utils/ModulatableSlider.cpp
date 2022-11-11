@@ -115,7 +115,7 @@ void ModulatableSlider::paint (Graphics& g)
     {
         const auto normRange = NormalisableRange { getRange() };
         const auto sliderPos = getPositionOfValue (getValue());
-        const auto modSliderPos = getPositionOfValue (normRange.convertTo0to1 (modulatedValue));
+        const auto modSliderPos = getPositionOfValue (modulatedValue);
         drawLinearSlider (g,
                           sliderRect.getX(),
                           sliderRect.getY(),
