@@ -18,7 +18,15 @@ void HostContextProvider::showParameterContextPopupMenu (const RangedAudioParame
     {
         auto popupMenu = contextMenu->getEquivalentPopupMenu();
         if (popupMenu.containsAnyActiveItems())
+        {
+            const auto options = PopupMenu::Options()
+                                     .withParentComponent (editor)
+                                     .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
+                                     .withStandardItemHeight (27);
+            popupMenu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
+
             popupMenu.showMenuAsync (juce::PopupMenu::Options());
+        }
     }
 }
 
