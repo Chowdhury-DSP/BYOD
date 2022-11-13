@@ -5,7 +5,7 @@
 class CableViewConnectionHelper
 {
 public:
-    explicit CableViewConnectionHelper (CableView& cableView);
+    CableViewConnectionHelper (CableView& cableView, BoardComponent& board);
 
     void processorBeingAdded (BaseProcessor* newProc);
     void processorBeingRemoved (const BaseProcessor* proc);
@@ -25,7 +25,7 @@ private:
     void connectionRemoved (const ConnectionInfo& info);
 
     CableView& cableView;
-    BoardComponent* board = nullptr;
+    BoardComponent& board;
     OwnedArray<Cable>& cables;
 
     bool ignoreConnectionCallbacks = false;

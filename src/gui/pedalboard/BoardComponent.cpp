@@ -29,7 +29,7 @@ juce::Point<int> getRandomPosition (const Component& comp)
 
 BoardComponent::BoardComponent (ProcessorChain& procs, const HostContextProvider& hostCP) : Component ("Board"),
                                                                                             procChain (procs),
-                                                                                            cableView (this),
+                                                                                            cableView (*this),
                                                                                             hostContextProvider (hostCP)
 {
     newProcButton.setButtonText ("+");
@@ -166,8 +166,15 @@ void BoardComponent::showInfoComp (const BaseProcessor& proc)
     infoComp.toFront (true);
 }
 
-void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset)
+void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset, bool dragEnded)
 {
+    if (dragEnded)
+    {
+        currentlyDraggingEditor = false;
+        return;
+    }
+
+    currentlyDraggingEditor = true;
     const auto relE = e.getEventRelativeTo (this);
     const auto bounds = getBounds();
 

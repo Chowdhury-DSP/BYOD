@@ -15,7 +15,7 @@ public:
 
 private:
     CableView& cableView;
-    const BoardComponent* board = nullptr;
+    const BoardComponent& board;
     OwnedArray<Cable>& cables;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CableViewPortLocationHelper)

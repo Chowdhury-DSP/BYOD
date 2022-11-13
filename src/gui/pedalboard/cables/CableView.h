@@ -10,7 +10,7 @@ class CableView : public Component,
                   private Timer
 {
 public:
-    explicit CableView (BoardComponent* comp);
+    explicit CableView (BoardComponent& comp);
     ~CableView() override;
 
     void paint (Graphics& g) override;
@@ -33,7 +33,7 @@ public:
 
     struct EditorPort
     {
-        ProcessorEditor* editor = nullptr;
+        const ProcessorEditor* editor = nullptr;
         int portIndex = 0;
         bool isInput = false;
     };
@@ -41,7 +41,7 @@ public:
 private:
     void timerCallback() override;
 
-    BoardComponent* board = nullptr;
+    const BoardComponent& board;
     OwnedArray<Cable> cables;
 
     float scaleFactor = 1.0f;
@@ -54,7 +54,6 @@ private:
     friend class CableViewPortLocationHelper;
     std::unique_ptr<CableViewPortLocationHelper> portLocationHelper;
 
-    EditorPort nearestPort {};
     juce::Point<int> portToPaint;
 
     bool mouseOverClickablePort();

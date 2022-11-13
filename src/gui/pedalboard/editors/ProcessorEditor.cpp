@@ -214,7 +214,12 @@ void ProcessorEditor::mouseDown (const MouseEvent& e)
 
 void ProcessorEditor::mouseDrag (const MouseEvent& e)
 {
-    editorDraggedBroadcaster (*this, e, mouseDownOffset);
+    editorDraggedBroadcaster (*this, e, mouseDownOffset, false);
+}
+
+void ProcessorEditor::mouseUp (const MouseEvent& e)
+{
+    editorDraggedBroadcaster (*this, e, mouseDownOffset, true);
 }
 
 Port* ProcessorEditor::getPortPrivate (int portIndex, bool isInput) const
@@ -230,6 +235,11 @@ Port* ProcessorEditor::getPortPrivate (int portIndex, bool isInput) const
 }
 
 Port* ProcessorEditor::getPort (int portIndex, bool isInput)
+{
+    return getPortPrivate (portIndex, isInput);
+}
+
+const Port* ProcessorEditor::getPort (int portIndex, bool isInput) const
 {
     return getPortPrivate (portIndex, isInput);
 }
