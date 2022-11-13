@@ -1,6 +1,6 @@
 #include "BoardViewport.h"
 
-BoardViewport::BoardViewport (ProcessorChain& procChain, const HostContextProvider& hostContextProvider) : comp (procChain, hostContextProvider)
+BoardViewport::BoardViewport (ProcessorChain& procChain, HostContextProvider& hostContextProvider) : comp (procChain, hostContextProvider)
 {
     pluginSettings->addProperties<&BoardViewport::globalSettingChanged> ({ { defaultZoomSettingID, 1.0 } }, *this);
     setScaleFactor ((float) pluginSettings->getProperty<double> (defaultZoomSettingID));
@@ -16,7 +16,7 @@ BoardViewport::BoardViewport (ProcessorChain& procChain, const HostContextProvid
     plusButton.setImages (plusImage.get());
     plusButton.setColour (TextButton::buttonColourId, buttonColour);
     addAndMakeVisible (plusButton);
-    plusButton.onClick = [=]
+    plusButton.onClick = [this]
     {
         setScaleFactor (scaleFactor * 1.1f);
         resized();
@@ -26,7 +26,7 @@ BoardViewport::BoardViewport (ProcessorChain& procChain, const HostContextProvid
     minusButton.setImages (minusImage.get());
     minusButton.setColour (TextButton::buttonColourId, buttonColour);
     addAndMakeVisible (minusButton);
-    minusButton.onClick = [=]
+    minusButton.onClick = [this]
     {
         setScaleFactor (scaleFactor / 1.1f);
         resized();

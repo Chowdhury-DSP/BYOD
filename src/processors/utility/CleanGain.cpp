@@ -1,5 +1,6 @@
 #include "CleanGain.h"
 #include "../ParameterHelpers.h"
+#include "gui/utils/ModulatableSlider.h"
 
 namespace
 {
@@ -81,23 +82,29 @@ void CleanGain::processAudio (AudioBuffer<float>& buffer)
     gain.process (context);
 }
 
-bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps)
+bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
 {
+    using namespace chowdsp::ParamUtils;
     class GainSlider : public Slider
     {
     public:
-        explicit GainSlider (AudioProcessorValueTreeState& vtState) : vts (vtState),
-                                                                      extendAttach (
-                                                                          *vts.getParameter (extendTag),
-                                                                          [this] (float newValue)
-                                                                          { updateSliderVisibility (newValue == 1.0f); },
-                                                                          vts.undoManager)
+        GainSlider (AudioProcessorValueTreeState& vtState, HostContextProvider& hcp)
+            : vts (vtState),
+              gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, gainTag), hcp),
+              extGainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, extGainTag), hcp),
+              gainAttach (vts, gainTag, gainSlider),
+              extGainAttach (vts, extGainTag, extGainSlider),
+              extendAttach (
+                  *vts.getParameter (extendTag),
+                  [this] (float newValue)
+                  { updateSliderVisibility (newValue == 1.0f); },
+                  vts.undoManager)
         {
             for (auto* s : { &gainSlider, &extGainSlider })
                 addChildComponent (s);
 
-            gainAttach = std::make_unique<SliderAttachment> (vts, gainTag, gainSlider);
-            extGainAttach = std::make_unique<SliderAttachment> (vts, extGainTag, extGainSlider);
+            hcp.registerParameterComponent (gainSlider, gainSlider.getParameter());
+            hcp.registerParameterComponent (extGainSlider, extGainSlider.getParameter());
 
             Slider::setName (gainTag + "__" + extGainTag + "__");
         }
@@ -146,14 +153,14 @@ bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps)
         using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
 
         AudioProcessorValueTreeState& vts;
-        Slider gainSlider, extGainSlider;
-        std::unique_ptr<SliderAttachment> gainAttach, extGainAttach;
+        ModulatableSlider gainSlider, extGainSlider;
+        SliderAttachment gainAttach, extGainAttach;
         ParameterAttachment extendAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainSlider)
     };
 
-    customComps.add (std::make_unique<GainSlider> (vts));
+    customComps.add (std::make_unique<GainSlider> (vts, hcp));
 
     return false;
 }

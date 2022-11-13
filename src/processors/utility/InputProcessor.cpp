@@ -32,7 +32,7 @@ void InputProcessor::processAudio (AudioBuffer<float>& buffer)
     rmsLevels[1] = buffer.getMagnitude (1 % numChannels, 0, numSamples);
 }
 
-bool InputProcessor::getCustomComponents (OwnedArray<Component>& customComps)
+bool InputProcessor::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider&)
 {
     customComps.add (std::make_unique<LevelMeterComponent> (rmsLevels));
     return false;

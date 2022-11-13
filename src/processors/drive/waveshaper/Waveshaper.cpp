@@ -1,5 +1,6 @@
 #include "Waveshaper.h"
 #include "../../ParameterHelpers.h"
+#include "gui/utils/HostContextProvider.h"
 
 namespace
 {
@@ -108,7 +109,7 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
     }
 }
 
-bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps)
+bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
 {
     struct CustomBoxAttach : private ComboBox::Listener
     {
@@ -157,14 +158,16 @@ bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps)
 
     struct WaveshapeComboBox : public ComboBox
     {
-        explicit WaveshapeComboBox (AudioProcessorValueTreeState& vtState) : vts (vtState)
+        WaveshapeComboBox (AudioProcessorValueTreeState& vtState, HostContextProvider& hcp) : vts (vtState)
         {
             auto* param = vts.getParameter (shapeTag);
             attachment = std::make_unique<CustomBoxAttach> (*param, *this, vts.undoManager);
             shapeParam = vts.getRawParameterValue (shapeTag);
             refreshBox();
 
-            setName (shapeTag + "__box");
+            hcp.registerParameterComponent (*this, *param);
+
+            this->setName (shapeTag + "__box");
         }
 
         void visibilityChanged() override
@@ -205,7 +208,7 @@ bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps)
         std::unique_ptr<CustomBoxAttach> attachment;
     };
 
-    customComps.add (std::make_unique<WaveshapeComboBox> (vts));
+    customComps.add (std::make_unique<WaveshapeComboBox> (vts, hcp));
 
     return false;
 }

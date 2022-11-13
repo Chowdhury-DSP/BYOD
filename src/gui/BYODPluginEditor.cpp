@@ -51,3 +51,8 @@ void BYODPluginEditor::resized()
 
     board.setBounds (bounds);
 }
+
+int BYODPluginEditor::getControlParameterIndex (Component& comp)
+{
+    return hostContextProvider.getParameterIndexForComponent (comp);
+}

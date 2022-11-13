@@ -1,4 +1,5 @@
 #include "GuitarMLAmp.h"
+#include "gui/utils/ModulatableSlider.h"
 
 namespace
 {
@@ -297,18 +298,27 @@ void GuitarMLAmp::fromXML (XmlElement* xml, const chowdsp::Version& version, boo
     BaseProcessor::fromXML (xml, version, loadPosition);
 }
 
-bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps)
+bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
 {
+    using namespace chowdsp::ParamUtils;
     class MainParamSlider : public Slider
     {
     public:
-        MainParamSlider (const ModelArch& modelArch, AudioProcessorValueTreeState& vts, ModelChangeBroadcaster& modelChangeBroadcaster) : currentModelArch (modelArch)
+        MainParamSlider (const ModelArch& modelArch,
+                         AudioProcessorValueTreeState& vts,
+                         ModelChangeBroadcaster& modelChangeBroadcaster,
+                         HostContextProvider& hcp)
+            : currentModelArch (modelArch),
+              gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, gainTag), hcp),
+              conditionSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, conditionTag), hcp),
+              gainAttach (vts, gainTag, gainSlider),
+              conditionAttach (vts, conditionTag, conditionSlider)
         {
             for (auto* s : { &gainSlider, &conditionSlider })
                 addChildComponent (s);
 
-            gainAttach = std::make_unique<SliderAttachment> (vts, gainTag, gainSlider);
-            conditionAttach = std::make_unique<SliderAttachment> (vts, conditionTag, conditionSlider);
+            hcp.registerParameterComponent (gainSlider, gainSlider.getParameter());
+            hcp.registerParameterComponent (conditionSlider, conditionSlider.getParameter());
 
             modelChangeCallback = modelChangeBroadcaster.connect<&MainParamSlider::updateSliderVisibility> (this);
 
@@ -361,8 +371,8 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps)
         using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
 
         const ModelArch& currentModelArch;
-        Slider gainSlider, conditionSlider;
-        std::unique_ptr<SliderAttachment> gainAttach, conditionAttach;
+        ModulatableSlider gainSlider, conditionSlider;
+        SliderAttachment gainAttach, conditionAttach;
 
         chowdsp::ScopedCallback modelChangeCallback;
 
@@ -372,7 +382,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps)
     class ModelChoiceBox : public ComboBox
     {
     public:
-        explicit ModelChoiceBox (GuitarMLAmp& processor, ModelChangeBroadcaster& modelChangeBroadcaster)
+        ModelChoiceBox (GuitarMLAmp& processor, ModelChangeBroadcaster& modelChangeBroadcaster)
         {
             addItemList (guitarMLModelNames, 1);
             addSeparator();
@@ -401,7 +411,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps)
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModelChoiceBox)
     };
 
-    customComps.add (std::make_unique<MainParamSlider> (modelArch, vts, modelChangeBroadcaster));
+    customComps.add (std::make_unique<MainParamSlider> (modelArch, vts, modelChangeBroadcaster, hcp));
     customComps.add (std::make_unique<ModelChoiceBox> (*this, modelChangeBroadcaster));
 
     return false;

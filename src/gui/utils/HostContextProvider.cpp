@@ -45,3 +45,20 @@ std::unique_ptr<HostProvidedContextMenu> HostContextProvider::getContextMenuForP
     }
     return {};
 }
+
+void HostContextProvider::registerParameterComponent (Component& comp, const RangedAudioParameter& param)
+{
+    componentToParameterIndexMap.insert_or_assign (&comp, param.getParameterIndex());
+}
+
+int HostContextProvider::getParameterIndexForComponent (Component& comp) const
+{
+    if (const auto iter = componentToParameterIndexMap.find (&comp); iter != componentToParameterIndexMap.end())
+        return iter->second;
+    return -1;
+}
+
+void HostContextProvider::componentBeingDeleted (Component& comp)
+{
+    componentToParameterIndexMap.erase (&comp);
+}

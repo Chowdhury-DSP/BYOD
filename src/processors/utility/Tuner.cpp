@@ -73,7 +73,7 @@ double Tuner::TunerBackgroundTask::getCurrentFreqHz() noexcept
 }
 
 //===================================================================
-bool Tuner::getCustomComponents (OwnedArray<Component>& customComps)
+bool Tuner::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider&)
 {
     struct TunerComp : public Component,
                        private Timer

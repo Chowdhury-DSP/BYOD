@@ -8,7 +8,7 @@
 class BoardComponent final : public Component
 {
 public:
-    BoardComponent (ProcessorChain& procs, const HostContextProvider& hostContextProvider);
+    BoardComponent (ProcessorChain& procs, HostContextProvider& hostContextProvider);
     ~BoardComponent() override;
 
     void resized() override;
@@ -57,7 +57,7 @@ private:
 
     chowdsp::SharedLNFAllocator lnfAllocator;
 
-    const HostContextProvider& hostContextProvider;
+    HostContextProvider& hostContextProvider;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BoardComponent)
 };

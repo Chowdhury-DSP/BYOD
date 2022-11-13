@@ -27,10 +27,10 @@ juce::Point<int> getRandomPosition (const Component& comp)
 }
 } // namespace
 
-BoardComponent::BoardComponent (ProcessorChain& procs, const HostContextProvider& hostCP) : Component ("Board"),
-                                                                                            procChain (procs),
-                                                                                            cableView (*this),
-                                                                                            hostContextProvider (hostCP)
+BoardComponent::BoardComponent (ProcessorChain& procs, HostContextProvider& hostCP) : Component ("Board"),
+                                                                                      procChain (procs),
+                                                                                      cableView (*this),
+                                                                                      hostContextProvider (hostCP)
 {
     newProcButton.setButtonText ("+");
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
@@ -110,6 +110,7 @@ void BoardComponent::resized()
         setEditorPosition (editor);
 
     cableView.setBounds (getLocalBounds());
+    cableView.updateCablePositions();
 
     newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));

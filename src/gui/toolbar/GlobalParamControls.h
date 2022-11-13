@@ -6,7 +6,7 @@ class GlobalParamControls : public Component
 {
 public:
     GlobalParamControls (AudioProcessorValueTreeState& vts,
-                         const HostContextProvider& hostContextProvider,
+                         HostContextProvider& hostContextProvider,
                          chowdsp::VariableOversampling<float>& oversampling);
 
     void resized() override;

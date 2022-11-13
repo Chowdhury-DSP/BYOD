@@ -1,5 +1,6 @@
 #include "StateVariableFilter.h"
 #include "../ParameterHelpers.h"
+#include "gui/utils/ModulatableSlider.h"
 
 namespace
 {
@@ -137,26 +138,32 @@ void StateVariableFilter::fromXML (XmlElement* xml, const chowdsp::Version& vers
     }
 }
 
-bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComps)
+bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
 {
+    using namespace chowdsp::ParamUtils;
     class ModeControl : public Slider
     {
     public:
-        explicit ModeControl (AudioProcessorValueTreeState& vtState) : vts (vtState),
-                                                                       multiModeOnOffAttach (
-                                                                           *vts.getParameter (multiModeTag),
-                                                                           [this] (float newValue)
-                                                                           { updateControlVisibility (newValue == 1.0f); },
-                                                                           vts.undoManager)
+        ModeControl (AudioProcessorValueTreeState& vtState, HostContextProvider& hcp)
+            : vts (vtState),
+              modeSelectorAttach (vts, modeTag, modeSelector),
+              multiModeSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, multiModeTypeTag), hcp),
+              multiModeAttach (vts, multiModeTypeTag, multiModeSlider),
+              multiModeOnOffAttach (
+                  *vts.getParameter (multiModeTag),
+                  [this] (float newValue)
+                  { updateControlVisibility (newValue == 1.0f); },
+                  vts.undoManager)
         {
             addChildComponent (modeSelector);
             addChildComponent (multiModeSlider);
 
-            modeSelector.addItemList (dynamic_cast<AudioParameterChoice*> (vts.getParameter (modeTag))->choices, 1);
+            const auto* modeChoiceParam = getParameterPointer<AudioParameterChoice*> (vts, modeTag);
+            modeSelector.addItemList (modeChoiceParam->choices, 1);
             modeSelector.setSelectedItemIndex (0);
+            hcp.registerParameterComponent (modeSelector, *modeChoiceParam);
 
-            modeSelectorAttach = std::make_unique<BoxAttachment> (vts, modeTag, modeSelector);
-            multiModeAttach = std::make_unique<SliderAttachment> (vts, multiModeTypeTag, multiModeSlider);
+            hcp.registerParameterComponent (multiModeSlider, multiModeSlider.getParameter());
 
             this->setName (modeTag + "__" + multiModeTypeTag + "__");
         }
@@ -210,17 +217,17 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
         AudioProcessorValueTreeState& vts;
 
         ComboBox modeSelector;
-        std::unique_ptr<BoxAttachment> modeSelectorAttach;
+        BoxAttachment modeSelectorAttach;
 
-        Slider multiModeSlider;
-        std::unique_ptr<SliderAttachment> multiModeAttach;
+        ModulatableSlider multiModeSlider;
+        SliderAttachment multiModeAttach;
 
         ParameterAttachment multiModeOnOffAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModeControl)
     };
 
-    customComps.add (std::make_unique<ModeControl> (vts));
+    customComps.add (std::make_unique<ModeControl> (vts, hcp));
 
     return false;
 }

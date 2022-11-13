@@ -1,5 +1,6 @@
 #include "AmpIRs.h"
 #include "../ParameterHelpers.h"
+#include "gui/utils/HostContextProvider.h"
 
 namespace
 {
@@ -192,7 +193,7 @@ void AmpIRs::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loa
 }
 
 //==========================================================================
-bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
+bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
 {
     struct CustomBoxAttach : private ComboBox::Listener
     {
@@ -252,11 +253,14 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
 
     struct IRComboBox : public ComboBox
     {
-        IRComboBox (AudioProcessorValueTreeState& vtState, AmpIRs& airs) : ampIRs (airs), vts (vtState)
+        IRComboBox (AudioProcessorValueTreeState& vtState, AmpIRs& airs, HostContextProvider& hcp)
+            : ampIRs (airs), vts (vtState)
         {
             auto* param = vts.getParameter (irTag);
             attachment = std::make_unique<CustomBoxAttach> (*param, *this, vts.undoManager);
             refreshBox();
+
+            hcp.registerParameterComponent (*this, *param);
 
             this->setName (irTag + "__box");
 
@@ -340,7 +344,7 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps)
         chowdsp::ScopedCallback onIRChanged;
     };
 
-    customComps.add (std::make_unique<IRComboBox> (vts, *this));
+    customComps.add (std::make_unique<IRComboBox> (vts, *this, hcp));
 
     return false;
 }

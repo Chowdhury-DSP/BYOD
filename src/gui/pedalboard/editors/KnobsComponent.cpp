@@ -10,7 +10,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
                                 AudioProcessorValueTreeState& vts,
                                 const Colour& cc,
                                 const Colour& ac,
-                                const HostContextProvider& hostContextProvider)
+                                HostContextProvider& hostContextProvider)
 {
     const auto addSlider = [this,
                             &vts,
@@ -20,6 +20,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
 
         addAndMakeVisible (newSlide.get());
         newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, *newSlide);
+        hostContextProvider.registerParameterComponent (*newSlide, *param);
 
         newSlide->setComponentID (param->paramID);
         newSlide->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
@@ -29,9 +30,10 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         sliders.add (std::move (newSlide));
     };
 
-    const auto addBox = [this, &vts] (AudioParameterChoice* param)
+    const auto addBox = [this, &vts, &hostContextProvider] (AudioParameterChoice* param)
     {
         auto newBox = std::make_unique<BoxWithAttachment>();
+        hostContextProvider.registerParameterComponent (*newBox, *param);
         addAndMakeVisible (newBox.get());
         newBox->setComponentID (param->paramID);
         newBox->setName (param->name);
@@ -41,12 +43,13 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         boxes.add (std::move (newBox));
     };
 
-    const auto addButton = [this, &vts] (AudioParameterBool* param)
+    const auto addButton = [this, &vts, &hostContextProvider] (AudioParameterBool* param)
     {
         if (param->paramID == "on_off")
             return;
 
         auto newButton = std::make_unique<ButtonWithAttachment>();
+        hostContextProvider.registerParameterComponent (*newButton, *param);
         addAndMakeVisible (newButton.get());
         newButton->setComponentID (param->paramID);
         newButton->setButtonText (param->name);
@@ -55,7 +58,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         buttons.add (std::move (newButton));
     };
 
-    auto customComponentsFirst = baseProc.getCustomComponents (customComponents);
+    auto customComponentsFirst = baseProc.getCustomComponents (customComponents, hostContextProvider);
 
     for (auto* param : vts.processor.getParameters())
     {

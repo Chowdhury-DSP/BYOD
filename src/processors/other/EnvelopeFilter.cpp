@@ -1,5 +1,6 @@
 #include "EnvelopeFilter.h"
 #include "../ParameterHelpers.h"
+#include "gui/utils/ModulatableSlider.h"
 
 namespace
 {
@@ -175,23 +176,29 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     buffer.applyGain (Decibels::decibelsToGain (-6.0f));
 }
 
-bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
+bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
 {
+    using namespace chowdsp::ParamUtils;
     class ControlSlider : public Slider
     {
     public:
-        explicit ControlSlider (AudioProcessorValueTreeState& vtState) : vts (vtState),
-                                                                         directControlAttach (
-                                                                             *vts.getParameter (directControlTag),
-                                                                             [this] (float newValue)
-                                                                             { updateSliderVisibility (newValue == 1.0f); },
-                                                                             vts.undoManager)
+        ControlSlider (AudioProcessorValueTreeState& vtState, HostContextProvider& hcp)
+            : vts (vtState),
+              freqModSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, freqModTag), hcp),
+              sensitivitySlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, senseTag), hcp),
+              freqModAttach (vts, freqModTag, freqModSlider),
+              senseAttach (vts, senseTag, sensitivitySlider),
+              directControlAttach (
+                  *vts.getParameter (directControlTag),
+                  [this] (float newValue)
+                  { updateSliderVisibility (newValue == 1.0f); },
+                  vts.undoManager)
         {
             for (auto* s : { &freqModSlider, &sensitivitySlider })
                 addChildComponent (s);
 
-            freqModAttach = std::make_unique<SliderAttachment> (vts, freqModTag, freqModSlider);
-            senseAttach = std::make_unique<SliderAttachment> (vts, senseTag, sensitivitySlider);
+            hcp.registerParameterComponent (freqModSlider, freqModSlider.getParameter());
+            hcp.registerParameterComponent (sensitivitySlider, sensitivitySlider.getParameter());
 
             this->setName (senseTag + "__" + freqModTag + "__");
         }
@@ -218,7 +225,7 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
 
             setName (vts.getParameter (directControlOn ? freqModTag : senseTag)->name);
             if (auto* parent = getParentComponent())
-                getParentComponent()->repaint();
+                parent->repaint();
         }
 
         void visibilityChanged() override
@@ -242,14 +249,14 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps)
         using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
 
         AudioProcessorValueTreeState& vts;
-        Slider freqModSlider, sensitivitySlider;
-        std::unique_ptr<SliderAttachment> freqModAttach, senseAttach;
+        ModulatableSlider freqModSlider, sensitivitySlider;
+        SliderAttachment freqModAttach, senseAttach;
         ParameterAttachment directControlAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControlSlider)
     };
 
-    customComps.add (std::make_unique<ControlSlider> (vts));
+    customComps.add (std::make_unique<ControlSlider> (vts, hcp));
 
     return false;
 }

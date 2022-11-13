@@ -10,6 +10,7 @@ public:
 
     void paint (Graphics& g) override;
     void mouseDown (const MouseEvent& e) override;
+    auto& getParameter() const { return param; }
 
 private:
     void timerCallback() override;
