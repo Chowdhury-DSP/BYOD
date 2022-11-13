@@ -4,12 +4,12 @@
 #include "CableViewConnectionHelper.h"
 #include "CableViewPortLocationHelper.h"
 
-CableView::CableView (BoardComponent* comp) : board (comp), pathTask (*this)
+CableView::CableView (BoardComponent& comp) : board (comp), pathTask (*this)
 {
     setInterceptsMouseClicks (false, true);
     startTimerHz (36);
 
-    connectionHelper = std::make_unique<CableViewConnectionHelper> (*this);
+    connectionHelper = std::make_unique<CableViewConnectionHelper> (*this, comp);
     portLocationHelper = std::make_unique<CableViewPortLocationHelper> (*this);
 }
 
@@ -17,15 +17,15 @@ CableView::~CableView() = default;
 
 bool CableView::mouseOverClickablePort()
 {
-    if (! mousePosition.has_value())
+    if (! mousePosition.has_value() || isDraggingCable || board.isDraggingEditor())
         return false;
 
-    nearestPort = portLocationHelper->getNearestPort (*mousePosition, board);
+    const auto nearestPort = portLocationHelper->getNearestPort (*mousePosition, &board);
     if (nearestPort.editor != nullptr)
     {
-        const bool isDraggingNearInputPort = nearestPort.isInput && isDraggingCable;
-        const bool isNearConnectedInput = nearestPort.isInput && ! portLocationHelper->isInputPortConnected (nearestPort);
-        if (! (isDraggingNearInputPort || isNearConnectedInput))
+        const auto hoveringNearConnectedInput = nearestPort.isInput && portLocationHelper->isInputPortConnected (nearestPort);
+        const auto hoveringNearOutput = ! nearestPort.isInput;
+        if (hoveringNearConnectedInput || hoveringNearOutput)
         {
             portToPaint = CableViewPortLocationHelper::getPortLocation (nearestPort);
             return true;
@@ -37,7 +37,7 @@ bool CableView::mouseOverClickablePort()
 
 bool CableView::mouseDraggingOverOutputPort()
 {
-    if (! mousePosition.has_value() || cables.isEmpty())
+    if (! mousePosition.has_value() || ! isDraggingCable)
         return false;
 
     const auto nearestInputPort = portLocationHelper->getNearestInputPort (*mousePosition, cables.getLast()->connectionInfo.startProc);
@@ -81,7 +81,7 @@ void CableView::mouseDown (const MouseEvent& e)
     if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || e.eventComponent == nullptr)
         return; // not a valid mouse event
 
-    nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition(), e.source.getComponentUnderMouse());
+    const auto nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition(), e.source.getComponentUnderMouse());
     if (nearestPort.editor == nullptr)
         return; // no nearest port
 
@@ -102,7 +102,7 @@ void CableView::mouseDrag (const MouseEvent& e)
         return;
 
     const auto eventCompName = e.eventComponent->getName();
-    if (eventCompName == "Port" || eventCompName == "Board" || eventCompName == Cable::componentName.data())
+    if (sst::cpputils::contains (std::array<String, 3> { "Port", "Board", Cable::componentName.data() }, eventCompName))
         mousePosition = e.getEventRelativeTo (this).getPosition();
 }
 
@@ -131,7 +131,7 @@ void CableView::timerCallback()
     using namespace CableDrawingHelpers;
 
     // repaint port glow
-    if (mouseOverClickablePort() || mouseDraggingOverOutputPort())
+    if (mouseDraggingOverOutputPort() || mouseOverClickablePort())
     {
         portGlow = true;
         repaint (getPortGlowBounds (portToPaint, scaleFactor).toNearestInt());

@@ -5,19 +5,19 @@
 
 namespace
 {
-void updateConnectionStatuses (const BoardComponent* board, const ConnectionInfo& connection, bool isConnected)
+void updateConnectionStatuses (const BoardComponent& board, const ConnectionInfo& connection, bool isConnected)
 {
-    if (auto* editor = board->findEditorForProcessor (connection.startProc))
+    if (auto* editor = board.findEditorForProcessor (connection.startProc))
     {
         bool shouldBeConnected = isConnected || connection.startProc->getNumOutputConnections (connection.startPort) > 0;
         editor->setConnectionStatus (shouldBeConnected, connection.startPort, false);
     }
 
-    if (auto* editor = board->findEditorForProcessor (connection.endProc))
+    if (auto* editor = board.findEditorForProcessor (connection.endProc))
         editor->setConnectionStatus (isConnected, connection.endPort, true);
 }
 
-void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent* board, CableView& cableView)
+void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent& board, CableView& cableView)
 {
     for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
     {
@@ -25,16 +25,17 @@ void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc,
         for (int cIdx = 0; cIdx < numConnections; ++cIdx)
         {
             const auto& connection = proc->getOutputConnection (portIdx, cIdx);
-            cables.add (std::make_unique<Cable> (board, cableView, connection));
+            cables.add (std::make_unique<Cable> (&board, cableView, connection));
             updateConnectionStatuses (board, connection, true);
         }
     }
 }
 } // namespace
 
-CableViewConnectionHelper::CableViewConnectionHelper (CableView& cv) : cableView (cv),
-                                                                       board (cableView.board),
-                                                                       cables (cableView.cables)
+CableViewConnectionHelper::CableViewConnectionHelper (CableView& cv, BoardComponent& boardComp)
+    : cableView (cv),
+      board (boardComp),
+      cables (cableView.cables)
 {
 }
 
@@ -75,9 +76,9 @@ void CableViewConnectionHelper::refreshConnections()
         cables.clear();
     }
 
-    for (auto* proc : board->procChain.getProcessors())
+    for (auto* proc : board.procChain.getProcessors())
         addConnectionsForProcessor (cables, proc, board, cableView);
-    addConnectionsForProcessor (cables, &board->procChain.getInputProcessor(), board, cableView);
+    addConnectionsForProcessor (cables, &board.procChain.getInputProcessor(), board, cableView);
 
     for (auto* cable : cables)
     {
@@ -132,7 +133,7 @@ void CableViewConnectionHelper::addCableToView (Cable* cable)
 void CableViewConnectionHelper::createCable (const ConnectionInfo& connection)
 {
     ScopedLock sl (cableView.cableMutex);
-    cables.add (std::make_unique<Cable> (board, cableView, connection));
+    cables.add (std::make_unique<Cable> (&board, cableView, connection));
     addCableToView (cables.getLast());
 }
 
@@ -152,7 +153,7 @@ bool CableViewConnectionHelper::releaseCable (const MouseEvent& e)
 
         const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
         auto connection = cable->connectionInfo;
-        board->procChain.getActionHelper().addConnection (std::move (connection));
+        board.procChain.getActionHelper().addConnection (std::move (connection));
 
         cableView.repaint();
         return true;
@@ -175,7 +176,7 @@ void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex
         if (cable->connectionInfo.endProc == proc && cable->connectionInfo.endPort == portIndex)
         {
             const ScopedValueSetter<bool> svs (ignoreConnectionCallbacks, true);
-            board->procChain.getActionHelper().removeConnection (std::move (cable->connectionInfo));
+            board.procChain.getActionHelper().removeConnection (std::move (cable->connectionInfo));
             ScopedLock sl (cableView.cableMutex);
             cables.removeObject (cable);
             break;
@@ -189,5 +190,5 @@ void CableViewConnectionHelper::clickOnCable (PopupMenu& menu, PopupMenu::Option
 {
     menu.addSectionHeader ("Replace Cable:");
     menu.addSeparator();
-    board->showNewProcMenu (menu, options, &(clickedCable->connectionInfo));
+    board.showNewProcMenu (menu, options, &(clickedCable->connectionInfo));
 }

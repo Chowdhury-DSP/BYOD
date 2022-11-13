@@ -15,6 +15,7 @@ public:
     void resized() override;
     void mouseDown (const MouseEvent& e) override;
     void mouseDrag (const MouseEvent& e) override;
+    void mouseUp (const MouseEvent& e) override;
 
     void addToBoard (class BoardComponent* boardComp);
 
@@ -22,6 +23,7 @@ public:
     const ProcessorUIOptions& getUIOptions() const { return procUI; }
 
     Port* getPort (int portIndex, bool isInput);
+    const Port* getPort (int portIndex, bool isInput) const;
     juce::Point<int> getPortLocation (int portIndex, bool isInput) const;
     void setConnectionStatus (bool isConnected, int portIndex, bool isInput);
     Colour getColour() const noexcept { return procUI.backgroundColour; }
@@ -35,7 +37,7 @@ private:
     void createReplaceProcMenu (PopupMenu& menu);
 
     chowdsp::Broadcaster<void (const BaseProcessor&)> showInfoCompBroadcaster;
-    chowdsp::Broadcaster<void (ProcessorEditor&, const MouseEvent&, const juce::Point<int>&)> editorDraggedBroadcaster;
+    chowdsp::Broadcaster<void (ProcessorEditor&, const MouseEvent&, const juce::Point<int>&, bool /* dragEnd */)> editorDraggedBroadcaster;
     chowdsp::Broadcaster<void (const ProcessorEditor&)> duplicateProcessorBroadcaster;
     chowdsp::ScopedCallbackList broadcasterCallbacks;
 

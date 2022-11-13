@@ -16,7 +16,8 @@ public:
     float getScaleFactor() const;
 
     void showInfoComp (const BaseProcessor& proc);
-    void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset);
+    void editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset, bool dragEnded);
+    bool isDraggingEditor() const noexcept { return currentlyDraggingEditor; }
     void duplicateProcessor (const ProcessorEditor& editor);
 
     void processorAdded (BaseProcessor* newProc);
@@ -36,6 +37,7 @@ private:
     chowdsp::ScopedCallbackList callbacks;
 
     OwnedArray<ProcessorEditor> processorEditors;
+    bool currentlyDraggingEditor = false;
     InfoComponent infoComp;
 
     std::unique_ptr<ProcessorEditor> inputEditor;

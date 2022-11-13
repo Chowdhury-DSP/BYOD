@@ -7,7 +7,9 @@ constexpr auto minDB = -45.0f;
 constexpr auto dBRange = maxDB - minDB;
 } // namespace
 
-LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsLevels (levelData)
+LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsLevels (levelData),
+                                                                            dbLevels ({ minDB, minDB }),
+                                                                            dbLevelsPrev ({ minDB, minDB })
 {
     constexpr int timerHz = 24;
 

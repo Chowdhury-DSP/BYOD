@@ -22,7 +22,7 @@ bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const B
     return result;
 }
 
-void getClosestPort (const juce::Point<int>& pos, ProcessorEditor* editor, int& minDistance, CableView::EditorPort& closestPort, bool wantsInputPort, float scaleFactor)
+void getClosestPort (const juce::Point<int>& pos, const ProcessorEditor* editor, int& minDistance, CableView::EditorPort& closestPort, bool wantsInputPort, float scaleFactor)
 {
     int numPorts = wantsInputPort ? editor->getProcPtr()->getNumInputs() : editor->getProcPtr()->getNumOutputs();
     const auto portDistanceLimit = CableConstants::getPortDistanceLimit (scaleFactor);
@@ -64,7 +64,7 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const ju
     auto result = CableView::EditorPort {};
     int minDistance = -1;
 
-    for (auto* editor : board->processorEditors)
+    for (const auto* editor : board.processorEditors)
     {
         if (wouldConnectingCreateFeedbackLoop (sourceProc, editor->getProcPtr(), cables))
             continue; // no feedback loops allowed
@@ -72,7 +72,7 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const ju
         getClosestPort (pos, editor, minDistance, result, true, cableView.scaleFactor);
     }
 
-    getClosestPort (pos, board->outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
+    getClosestPort (pos, board.outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
 
     if (result.editor == nullptr || isInputPortConnected (result))
         return {};
@@ -85,14 +85,14 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const juce::P
     auto result = CableView::EditorPort {};
     int minDistance = -1;
 
-    for (auto* editor : board->processorEditors)
+    for (auto* editor : board.processorEditors)
     {
         getClosestPort (pos, editor, minDistance, result, false, cableView.scaleFactor);
         getClosestPort (pos, editor, minDistance, result, true, cableView.scaleFactor);
     }
 
-    getClosestPort (pos, board->inputEditor.get(), minDistance, result, false, cableView.scaleFactor);
-    getClosestPort (pos, board->outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
+    getClosestPort (pos, board.inputEditor.get(), minDistance, result, false, cableView.scaleFactor);
+    getClosestPort (pos, board.outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
 
     if (result.editor == nullptr)
         return {};
@@ -102,7 +102,7 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const juce::P
         const auto* port = result.editor->getPort (result.portIndex, result.isInput);
 
         const auto isCableUnderMouse = compUnderMouse->getName() == Cable::componentName.data();
-        if (! (isCableUnderMouse || sst::cpputils::contains (std::array<const Component*, 3> { board, result.editor, port }, compUnderMouse)))
+        if (! (isCableUnderMouse || sst::cpputils::contains (std::array<const Component*, 3> { &board, result.editor, port }, compUnderMouse)))
             return {}; // wrong component under the mouse!
     }
 
