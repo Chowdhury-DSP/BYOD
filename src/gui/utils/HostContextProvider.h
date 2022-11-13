@@ -17,6 +17,8 @@ public:
     const bool supportsParameterModulation;
 
 private:
+    template <typename Action, typename ReturnType = std::invoke_result_t<Action, const RangedAudioParameter&>>
+    ReturnType doForParameterOrForwardedParameter (const RangedAudioParameter& param, Action&& action) const;
     void componentBeingDeleted (Component& comp) override;
 
     const BYOD& plugin;

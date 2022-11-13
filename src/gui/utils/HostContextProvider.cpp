@@ -30,25 +30,34 @@ void HostContextProvider::showParameterContextPopupMenu (const RangedAudioParame
     }
 }
 
+template <typename Action, typename ReturnType>
+ReturnType HostContextProvider::doForParameterOrForwardedParameter (const RangedAudioParameter& param, Action&& action) const
+{
+    if (plugin.getVTS().getParameter (param.paramID) != nullptr)
+        return action (param);
+
+    if (const auto* forwardedParam = paramForwarder.getForwardedParameterFromInternal (param))
+        return action (*forwardedParam);
+
+    return ReturnType();
+}
+
 std::unique_ptr<HostProvidedContextMenu> HostContextProvider::getContextMenuForParameter (const RangedAudioParameter* param) const
 {
     if (param == nullptr)
         return {};
 
     if (const auto* editorContext = editor->getHostContext())
-    {
-        if (plugin.getVTS().getParameter (param->paramID) != nullptr)
-            return editorContext->getContextMenuForParameter (param);
+        return doForParameterOrForwardedParameter (*param, [&editorContext] (auto& p)
+                                                   { return editorContext->getContextMenuForParameter (&p); });
 
-        if (const auto* forwardedParam = paramForwarder.getForwardedParameterFromInternal (*param))
-            return editorContext->getContextMenuForParameter (forwardedParam);
-    }
     return {};
 }
 
 void HostContextProvider::registerParameterComponent (Component& comp, const RangedAudioParameter& param)
 {
-    componentToParameterIndexMap.insert_or_assign (&comp, param.getParameterIndex());
+    doForParameterOrForwardedParameter (param, [this, &comp] (auto& p)
+                                        { componentToParameterIndexMap.insert_or_assign (&comp, p.getParameterIndex()); });
 }
 
 int HostContextProvider::getParameterIndexForComponent (Component& comp) const
