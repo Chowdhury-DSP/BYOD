@@ -1,5 +1,6 @@
 #include "Panner.h"
 #include "../BufferHelpers.h"
+#include "gui/utils/ModulatableSlider.h"
 #include "processors/ParameterHelpers.h"
 
 namespace
@@ -239,25 +240,32 @@ void Panner::processAudioBypassed (AudioBuffer<float>& buffer)
     outputBuffers.getReference (ModulationOutput) = &modulationBuffer;
 }
 
-bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
+bool Panner::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
 {
+    using namespace chowdsp::ParamUtils;
+
     /** Main pan or left pan */
     class PanSlider1 : public Slider
     {
     public:
-        explicit PanSlider1 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo) : vts (vtState),
-                                                                                                  isStereoInput (isStereo),
-                                                                                                  stereoAttach (
-                                                                                                      *vts.getParameter (stereoModeTag),
-                                                                                                      [this] (float newValue)
-                                                                                                      { updateSliderVisibility (newValue == 1.0f); },
-                                                                                                      vts.undoManager)
+        PanSlider1 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo, HostContextProvider& hcp)
+            : vts (vtState),
+              mainPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, mainPanTag), hcp),
+              leftPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, leftPanTag), hcp),
+              mainPanAttach (vts, mainPanTag, mainPanSlider),
+              leftPanAttach (vts, leftPanTag, leftPanSlider),
+              isStereoInput (isStereo),
+              stereoAttach (
+                  *vts.getParameter (stereoModeTag),
+                  [this] (float newValue)
+                  { updateSliderVisibility (newValue == 1.0f); },
+                  vts.undoManager)
         {
             for (auto* s : { &mainPanSlider, &leftPanSlider })
                 addChildComponent (s);
 
-            mainPanAttach = std::make_unique<SliderAttachment> (vts, mainPanTag, mainPanSlider);
-            leftPanAttach = std::make_unique<SliderAttachment> (vts, leftPanTag, leftPanSlider);
+            hcp.registerParameterComponent (mainPanSlider, mainPanSlider.getParameter());
+            hcp.registerParameterComponent (leftPanSlider, leftPanSlider.getParameter());
 
             this->setName (mainPanTag + "__" + leftPanTag + "__");
         }
@@ -287,7 +295,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
 
             setName (vts.getParameter (dualPanOn ? leftPanTag : mainPanTag)->name);
             if (auto* parent = getParentComponent())
-                getParentComponent()->repaint();
+                parent->repaint();
         }
 
         void visibilityChanged() override
@@ -311,8 +319,8 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
         using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
 
         AudioProcessorValueTreeState& vts;
-        Slider mainPanSlider, leftPanSlider;
-        std::unique_ptr<SliderAttachment> mainPanAttach, leftPanAttach;
+        ModulatableSlider mainPanSlider, leftPanSlider;
+        SliderAttachment mainPanAttach, leftPanAttach;
         std::atomic_bool& isStereoInput;
         ParameterAttachment stereoAttach;
 
@@ -324,19 +332,24 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
                        private Timer
     {
     public:
-        explicit PanSlider2 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo) : vts (vtState),
-                                                                                                  isStereoInput (isStereo),
-                                                                                                  stereoAttach (
-                                                                                                      *vts.getParameter (stereoModeTag),
-                                                                                                      [this] (float newValue)
-                                                                                                      { updateSliderVisibility (newValue == 1.0f); },
-                                                                                                      vts.undoManager)
+        PanSlider2 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo, HostContextProvider& hcp)
+            : vts (vtState),
+              widthSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, stereoWidthTag), hcp),
+              rightPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, rightPanTag), hcp),
+              widthAttach (vts, stereoWidthTag, widthSlider),
+              rightPanAttach (vts, rightPanTag, rightPanSlider),
+              isStereoInput (isStereo),
+              stereoAttach (
+                  *vts.getParameter (stereoModeTag),
+                  [this] (float newValue)
+                  { updateSliderVisibility (newValue == 1.0f); },
+                  vts.undoManager)
         {
             for (auto* s : { &widthSlider, &rightPanSlider })
                 addChildComponent (s);
 
-            widthAttach = std::make_unique<SliderAttachment> (vts, stereoWidthTag, widthSlider);
-            rightPanAttach = std::make_unique<SliderAttachment> (vts, rightPanTag, rightPanSlider);
+            hcp.registerParameterComponent (widthSlider, widthSlider.getParameter());
+            hcp.registerParameterComponent (rightPanSlider, rightPanSlider.getParameter());
 
             this->setName (stereoWidthTag + "__" + rightPanTag + "__");
 
@@ -370,7 +383,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
 
             setName (vts.getParameter (dualPanOn ? rightPanTag : stereoWidthTag)->name);
             if (auto* parent = getParentComponent())
-                getParentComponent()->repaint();
+                parent->repaint();
         }
 
         void visibilityChanged() override
@@ -394,16 +407,16 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps)
         using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
 
         AudioProcessorValueTreeState& vts;
-        Slider widthSlider, rightPanSlider;
-        std::unique_ptr<SliderAttachment> widthAttach, rightPanAttach;
+        ModulatableSlider widthSlider, rightPanSlider;
+        SliderAttachment widthAttach, rightPanAttach;
         std::atomic_bool& isStereoInput;
         ParameterAttachment stereoAttach;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PanSlider2)
     };
 
-    customComps.add (std::make_unique<PanSlider1> (vts, isStereoInput));
-    customComps.add (std::make_unique<PanSlider2> (vts, isStereoInput));
+    customComps.add (std::make_unique<PanSlider1> (vts, isStereoInput, hcp));
+    customComps.add (std::make_unique<PanSlider2> (vts, isStereoInput, hcp));
 
     return true;
 }

@@ -4,14 +4,13 @@
 
 namespace GUIColours = GUIConstants::Colours;
 
-ToolBar::ToolBar (BYOD& plugin,
-                  const HostContextProvider& hostContextProvider) : undoRedoComp (plugin.getUndoManager()),
-                                                                    globalParamControls (plugin.getVTS(),
-                                                                                         hostContextProvider,
-                                                                                         plugin.getOversampling()),
-                                                                    settingsButton (plugin, plugin.getOpenGLHelper()),
-                                                                    cpuMeter (plugin.getLoadMeasurer()),
-                                                                    presetsComp (reinterpret_cast<PresetManager&> (plugin.getPresetManager()))
+ToolBar::ToolBar (BYOD& plugin, HostContextProvider& hostContextProvider) : undoRedoComp (plugin.getUndoManager()),
+                                                                            globalParamControls (plugin.getVTS(),
+                                                                                                 hostContextProvider,
+                                                                                                 plugin.getOversampling()),
+                                                                            settingsButton (plugin, plugin.getOpenGLHelper()),
+                                                                            cpuMeter (plugin.getLoadMeasurer()),
+                                                                            presetsComp (reinterpret_cast<PresetManager&> (plugin.getPresetManager()))
 {
     addAndMakeVisible (undoRedoComp);
     addAndMakeVisible (globalParamControls);

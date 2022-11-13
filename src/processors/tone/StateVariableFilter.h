@@ -18,7 +18,7 @@ public:
     void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
 
 private:
-    bool getCustomComponents (OwnedArray<Component>& customComps) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp) override;
 
     chowdsp::FloatParameter* freqParam = nullptr;
     chowdsp::FloatParameter* qParam = nullptr;

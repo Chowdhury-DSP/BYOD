@@ -13,7 +13,7 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
-    bool getCustomComponents (OwnedArray<Component>& customComps) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider&) override;
 
 private:
     chowdsp::FloatParameter* gainDBParam = nullptr;

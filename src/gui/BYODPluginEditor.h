@@ -14,11 +14,13 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
+    int getControlParameterIndex (Component& c) override;
+
 private:
     void setResizeBehaviour();
 
     BYOD& plugin;
-    const HostContextProvider hostContextProvider;
+    HostContextProvider hostContextProvider;
 
     ComponentBoundsConstrainer constrainer;
 

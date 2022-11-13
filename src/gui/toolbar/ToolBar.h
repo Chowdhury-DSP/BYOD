@@ -9,7 +9,7 @@ class BYOD;
 class ToolBar : public Component
 {
 public:
-    ToolBar (BYOD& plugin, const HostContextProvider& hostContextProvider);
+    ToolBar (BYOD& plugin, HostContextProvider& hostContextProvider);
 
     void paint (Graphics& g) override;
     void resized() override;

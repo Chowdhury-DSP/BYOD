@@ -34,7 +34,7 @@ void OutputProcessor::processAudio (AudioBuffer<float>& buffer)
     outputBuffers.getReference (0) = &buffer;
 }
 
-bool OutputProcessor::getCustomComponents (OwnedArray<Component>& customComps)
+bool OutputProcessor::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider&)
 {
     customComps.add (std::make_unique<LevelMeterComponent> (rmsLevels));
     return false;

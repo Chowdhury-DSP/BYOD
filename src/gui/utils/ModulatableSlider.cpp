@@ -4,7 +4,7 @@ ModulatableSlider::ModulatableSlider (const chowdsp::FloatParameter& p, const Ho
                                                                                                           hostContextProvider (hcp)
 {
     if (hostContextProvider.supportsParameterModulation)
-        startTimerHz (25);
+        startTimerHz (32);
 }
 
 void ModulatableSlider::drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float modSliderPos)

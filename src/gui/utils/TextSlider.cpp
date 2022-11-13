@@ -27,6 +27,7 @@ void TextSlider::mouseDown (const MouseEvent& e)
         hostContextProvider.showParameterContextPopupMenu (parameter);
         return;
     }
+
     Slider::mouseDown (e);
 }
 

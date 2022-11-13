@@ -19,7 +19,7 @@ public:
     std::unique_ptr<XmlElement> toXML() override;
     void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
 
-    bool getCustomComponents (OwnedArray<Component>& customComps) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp) override;
     void addToPopupMenu (PopupMenu& menu) override;
 
     void loadModel (int modelIndex, Component* parentComponent = nullptr);
