@@ -53,6 +53,7 @@ public:
 
 private:
     void loadBYODFactoryPresets();
+    void parameterChanged (const juce::String&, float) override {}
 
     ProcessorChain* procChain;
 
