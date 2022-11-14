@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Superdrag" plugin="BYOD" vendor="CHOW" category="Players"
+        version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Amp_IRs>
+      <Parameters x_pos="0.5764482617378235" y_pos="0.5060975551605225" ir_file="">
+        <PARAM id="gain" value="5.0"/>
+        <PARAM id="ir" value="0.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Amp_IRs>
+    <Junior_B>
+      <Parameters x_pos="0.2962962985038757" y_pos="0.5081300735473633">
+        <PARAM id="juniorb_blend" value="1.0"/>
+        <PARAM id="juniorb_drive" value="1.0"/>
+        <PARAM id="juniorb_nstages" value="2.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Junior_B>
+    <Yen_Drive>
+      <Parameters x_pos="0.2431149035692215" y_pos="0.03252032399177551">
+        <PARAM id="gain" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="voice" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Yen_Drive>
+    <TS-Tone>
+      <Parameters x_pos="0.5874769687652588" y_pos="0.04042179137468338">
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </TS-Tone>
+    <Chorus>
+      <Parameters x_pos="0.01329534687101841" y_pos="0.4796747863292694">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="feedback" value="0.3499999940395355"/>
+        <PARAM id="mix" value="0.2000000029802322"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.25"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Chorus>
+    <Input>
+      <Parameters x_pos="0.01104972418397665" y_pos="0.02460457012057304">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8556505441665649" y_pos="0.5040650367736816">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

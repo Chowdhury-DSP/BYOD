@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="George Harrison" plugin="BYOD" vendor="CHOW" category="Players"
+        version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Phaser8>
+      <Parameters x_pos="0.5359361171722412" y_pos="0.5129870176315308">
+        <PARAM id="depth" value="0.75"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="modulation" value="0.4000000059604645"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.2489900290966034"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Phaser8>
+    <Bass_Cleaner>
+      <Parameters x_pos="0.532386839389801" y_pos="0.1525973975658417">
+        <PARAM id="clean" value="0.75"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Bass_Cleaner>
+    <Muff_Drive>
+      <Parameters x_pos="0.1978704482316971" y_pos="0.1509740203619003">
+        <PARAM id="harmonics" value="1.0"/>
+        <PARAM id="high_q" value="0.0"/>
+        <PARAM id="level" value="0.8500000238418579"/>
+        <PARAM id="n_stages" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="sustain" value="0.25"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Muff_Drive>
+    <High_Cut>
+      <Parameters x_pos="0.1792369186878204" y_pos="0.5113636255264282">
+        <PARAM id="cutoff" value="8000.0009765625"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </High_Cut>
+    <Input>
+      <Parameters x_pos="0.01774622872471809" y_pos="0.2808441519737244">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8677905797958374" y_pos="0.2288961112499237">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

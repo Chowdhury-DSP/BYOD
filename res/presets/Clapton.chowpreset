@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Clapton" plugin="BYOD" vendor="CHOW" category="Players"
+        version="1.0.9">
+  <proc_chain state_plugin_version="1.0.9">
+    <Chorus>
+      <Parameters x_pos="0.2965009212493896" y_pos="0.5184534192085266">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="feedback" value="0.1000000014901161"/>
+        <PARAM id="mix" value="0.2000000029802322"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="5" connection_end_0="0"/>
+    </Chorus>
+    <Distortion_Plus>
+      <Parameters x_pos="0.4418810904026031" y_pos="0.06493506580591202">
+        <PARAM id="dist" value="0.8500000238418579"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Distortion_Plus>
+    <Range_Booster>
+      <Parameters x_pos="0.1606033742427826" y_pos="0.07629869878292084">
+        <PARAM id="boost" value="-3.0"/>
+        <PARAM id="high_q" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="range" value="1000.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Range_Booster>
+    <High_Cut>
+      <Parameters x_pos="0.7160603404045105" y_pos="0.06818182021379471">
+        <PARAM id="cutoff" value="5000.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </High_Cut>
+    <Compressor>
+      <Parameters x_pos="0.03038674034178257" y_pos="0.5079085826873779">
+        <PARAM id="attack" value="10.0"/>
+        <PARAM id="knee" value="6.0"/>
+        <PARAM id="makeup" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ratio" value="2.0"/>
+        <PARAM id="release" value="99.99999237060547"/>
+        <PARAM id="thresh" value="-15.50721168518066"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Compressor>
+    <Delay>
+      <Parameters x_pos="0.579189658164978" y_pos="0.5360281467437744">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="feedback" value="0.2219074666500092"/>
+        <PARAM id="freq" value="6000.0009765625"/>
+        <PARAM id="mix" value="0.229095458984375"/>
+        <PARAM id="on_off" value="0.0"/>
+        <PARAM id="ping_pong" value="0.0"/>
+        <PARAM id="time_ms" value="130.1467742919922"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Delay>
+    <Input>
+      <Parameters x_pos="0.001774622942321002" y_pos="0.06006493419408798">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8598048090934753" y_pos="0.5584415793418884">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>
