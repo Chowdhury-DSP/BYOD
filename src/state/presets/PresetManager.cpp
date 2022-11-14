@@ -125,6 +125,7 @@ void PresetManager::loadBYODFactoryPresets()
     // players
     factoryPresets.emplace_back (BinaryData::Black_Sabbath_chowpreset, BinaryData::Black_Sabbath_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Boston_chowpreset, BinaryData::Boston_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Clapton_chowpreset, BinaryData::Clapton_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::George_Harrison_chowpreset, BinaryData::George_Harrison_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Green_Day_chowpreset, BinaryData::Green_Day_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::J_Mascis_chowpreset, BinaryData::J_Mascis_chowpresetSize);
@@ -134,6 +135,7 @@ void PresetManager::loadBYODFactoryPresets()
     factoryPresets.emplace_back (BinaryData::Neil_Young_chowpreset, BinaryData::Neil_Young_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Nirvana_chowpreset, BinaryData::Nirvana_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Pete_Townshend_chowpreset, BinaryData::Pete_Townshend_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Superdrag_chowpreset, BinaryData::Superdrag_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::The_Strokes_chowpreset, BinaryData::The_Strokes_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::White_Stripes_chowpreset, BinaryData::White_Stripes_chowpresetSize);
 
