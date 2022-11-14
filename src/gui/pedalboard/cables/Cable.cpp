@@ -84,10 +84,14 @@ Path Cable::createCablePath (juce::Point<float> start, juce::Point<float> end, f
     bezier = CubicBezier (start, start.translated (pointOff, 0.0f), end.translated (-pointOff, 0.0f), end);
     numPointsInPath = (int) start.getDistanceFrom (end) + 1;
     Path bezierPath;
-    bezierPath.preallocateSpace (numPointsInPath * 3 / 2);
+    bezierPath.preallocateSpace ((numPointsInPath + 1) * 3);
     bezierPath.startNewSubPath (start);
-    for (int i = 1; i <= numPointsInPath; ++i)
-        bezierPath.lineTo (bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath));
+    for (int i = 1; i < numPointsInPath; ++i)
+    {
+        const auto nextPoint = bezier.getPointOnCubicBezier ((float) i / (float) numPointsInPath);
+        bezierPath.lineTo (nextPoint);
+    }
+    bezierPath.lineTo (end);
 
     return std::move (bezierPath);
 }
@@ -100,7 +104,7 @@ void Cable::repaintIfNeeded (bool force)
         ScopedLock sl (pathCrit);
         cablePath = std::move (createdPath);
 
-        const auto cableBounds = cablePath.getBounds().expanded (std::ceil (minCableThickness), std::ceil (4.0f * minCableThickness)).toNearestInt();
+        const auto cableBounds = cablePath.getBounds().expanded (std::ceil (minCableThickness), std::ceil (2.0f * minCableThickness)).toNearestInt();
         MessageManager::callAsync (
             [safeComp = Component::SafePointer (this), cableBounds]
             {
@@ -136,8 +140,11 @@ float Cable::getCableThickness() const
 
 void Cable::drawCableShadow (Graphics& g, float thickness)
 {
-    ScopedLock sl (pathCrit);
-    auto cableShadow = Path (cablePath);
+    auto cableShadow = [this]
+    {
+        ScopedLock sl (pathCrit);
+        return Path { cablePath };
+    }();
     cableShadow.applyTransform (AffineTransform::translation (0.0f, thickness * 0.6f));
     g.setColour (Colours::black.withAlpha (0.3f));
     g.strokePath (cableShadow, PathStrokeType (minCableThickness, PathStrokeType::JointStyle::curved));
@@ -156,8 +163,8 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
 void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
     drawCableShadow (g, cableThickness);
+    
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
-
     {
         ScopedLock sl (pathCrit);
         g.strokePath (cablePath, PathStrokeType (cableThickness, PathStrokeType::JointStyle::curved));
@@ -169,7 +176,6 @@ void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float>
 
 void Cable::paint (Graphics& g)
 {
-    g.setColour (cableColour.brighter (0.1f));
     drawCable (g, startPoint, endPoint);
 }
 

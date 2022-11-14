@@ -17,19 +17,36 @@ CableView::~CableView() = default;
 
 bool CableView::mouseOverClickablePort()
 {
-    if (! mousePosition.has_value() || isDraggingCable || board.isDraggingEditor())
+    if (! mousePosition.has_value() || board.isDraggingEditor())
         return false;
 
+#if ! JUCE_IOS
+    if (isDraggingCable)
+        return false;
+#endif
+
     const auto nearestPort = portLocationHelper->getNearestPort (*mousePosition, &board);
-    if (nearestPort.editor != nullptr)
+    if (nearestPort.editor == nullptr)
+        return false;
+
+#if JUCE_IOS
+    if (isDraggingCable && nearestPort.isInput)
+        return false;
+
+    if (const auto* lastCable = cables.getLast())
     {
-        const auto hoveringNearConnectedInput = nearestPort.isInput && portLocationHelper->isInputPortConnected (nearestPort);
-        const auto hoveringNearOutput = ! nearestPort.isInput;
-        if (hoveringNearConnectedInput || hoveringNearOutput)
-        {
-            portToPaint = CableViewPortLocationHelper::getPortLocation (nearestPort);
-            return true;
-        }
+        const auto& lastCableInfo = lastCable->connectionInfo;
+        if (isDraggingCable && (lastCableInfo.startProc != nearestPort.editor->getProcPtr() || lastCableInfo.startPort != nearestPort.portIndex))
+            return false;
+    }
+#endif
+
+    const auto hoveringNearConnectedInput = nearestPort.isInput && portLocationHelper->isInputPortConnected (nearestPort);
+    const auto hoveringNearOutput = ! nearestPort.isInput;
+    if (hoveringNearConnectedInput || hoveringNearOutput)
+    {
+        portToPaint = CableViewPortLocationHelper::getPortLocation (nearestPort);
+        return true;
     }
 
     return false;

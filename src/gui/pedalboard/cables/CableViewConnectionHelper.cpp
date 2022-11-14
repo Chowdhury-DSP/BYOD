@@ -125,8 +125,7 @@ void CableViewConnectionHelper::connectionRemoved (const ConnectionInfo& info)
 
 void CableViewConnectionHelper::addCableToView (Cable* cable)
 {
-    cableView.addChildComponent (cable);
-    cableView.addAndMakeVisible (cable);
+    cableView.addAndMakeVisible (cable, 0);
     cable->setBounds (cableView.getLocalBounds());
 }
 
