@@ -173,6 +173,12 @@ void ProcessorLNF::drawLabel (Graphics& g, Label& label)
     g.drawRoundedRectangle (label.getLocalBounds().toFloat().reduced (0.5f), 3.0f, 1.0f);
 }
 
+std::unique_ptr<ModulatableSlider> ProcessorLNF::createSlider (const chowdsp::FloatParameter& param,
+                                                               const HostContextProvider& hostContextProvider) const
+{
+    return std::make_unique<ModulatableSlider> (param, hostContextProvider);
+}
+
 //==================================================================
 int BottomBarLNF::getNameWidth (int height, const String& text)
 {

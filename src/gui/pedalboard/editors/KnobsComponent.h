@@ -20,15 +20,8 @@ public:
     void setColours (const Colour& contrastColour, const Colour& accentColour);
 
 private:
-    using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
     using ComboBoxAttachment = AudioProcessorValueTreeState::ComboBoxAttachment;
     using ButtonAttachment = AudioProcessorValueTreeState::ButtonAttachment;
-
-    struct SliderWithAttachment : public ModulatableSlider
-    {
-        SliderWithAttachment (const chowdsp::FloatParameter& param, const HostContextProvider& hcp) : ModulatableSlider (param, hcp) {}
-        std::unique_ptr<SliderAttachment> attachment;
-    };
 
     struct BoxWithAttachment : public ComboBox
     {

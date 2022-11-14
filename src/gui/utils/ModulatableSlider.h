@@ -12,7 +12,10 @@ public:
     void mouseDown (const MouseEvent& e) override;
     auto& getParameter() const { return param; }
 
-private:
+    using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
+    std::unique_ptr<SliderAttachment> attachment;
+
+protected:
     void timerCallback() override;
     void drawRotarySlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float modSliderPos);
     void drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float modSliderPos);
@@ -29,5 +32,6 @@ private:
     };
     SharedResourcePointer<KnobAssets> sharedAssets;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModulatableSlider)
 };

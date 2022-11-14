@@ -1,5 +1,6 @@
 #include "KnobsComponent.h"
 #include "processors/BaseProcessor.h"
+#include "gui/utils/LookAndFeels.h"
 
 namespace
 {
@@ -12,14 +13,22 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
                                 const Colour& ac,
                                 HostContextProvider& hostContextProvider)
 {
+    if (auto* lnf = baseProc.getCustomLookAndFeel())
+        setLookAndFeel (lnf);
+
     const auto addSlider = [this,
                             &vts,
                             &hostContextProvider] (chowdsp::FloatParameter* param)
     {
-        auto newSlide = std::make_unique<SliderWithAttachment> (*param, hostContextProvider);
+        auto newSlide = [this, &param, &hostContextProvider]
+        {
+            if (const auto* lnf = dynamic_cast<ProcessorLNF*> (&getLookAndFeel()))
+                return lnf->createSlider (*param, hostContextProvider);
+            return std::make_unique<ModulatableSlider> (*param, hostContextProvider);
+        }();
 
         addAndMakeVisible (newSlide.get());
-        newSlide->attachment = std::make_unique<SliderAttachment> (vts, param->paramID, *newSlide);
+        newSlide->attachment = std::make_unique<ModulatableSlider::SliderAttachment> (vts, param->paramID, *newSlide);
         hostContextProvider.registerParameterComponent (*newSlide, *param);
 
         newSlide->setComponentID (param->paramID);

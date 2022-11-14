@@ -1,5 +1,6 @@
 #include "HostContextProvider.h"
 #include "BYOD.h"
+#include "LookAndFeels.h"
 
 HostContextProvider::HostContextProvider (const BYOD& p, AudioProcessorEditor* ed)
     : supportsParameterModulation (p.supportsParameterModulation()),

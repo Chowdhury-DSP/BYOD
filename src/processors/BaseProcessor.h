@@ -1,7 +1,6 @@
 #pragma once
 
 #include "JuceProcWrapper.h"
-#include "gui/utils/LookAndFeels.h"
 
 enum ProcessorType
 {

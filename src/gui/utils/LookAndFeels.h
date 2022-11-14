@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pch.h>
+#include "ModulatableSlider.h"
 
 class ByodLNF : public chowdsp::ChowLNF
 {
@@ -33,6 +33,9 @@ public:
 
     void drawLabel (Graphics& g, Label& label) override;
     Font getLabelFont (Label& label) override;
+
+    virtual std::unique_ptr<ModulatableSlider> createSlider (const chowdsp::FloatParameter& param,
+                                                             const HostContextProvider& hostContextProvider) const;
 
 private:
     static constexpr float labelWidthPct = 0.65f;
