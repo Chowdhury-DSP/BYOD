@@ -238,7 +238,8 @@ int PresetsComp::addPresetShareOptions (PopupMenu* menu, int optionID)
                                           return;
 
                                       if (auto presetXml = XmlDocument::parse (presetText))
-                                          presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (presetXml.get()));
+                                          presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (presetXml.get()),
+                                                                        getParentComponent());
                                   });
 
 #if ! JUCE_IOS
@@ -266,12 +267,13 @@ void PresetsComp::loadFromFileBrowser()
     constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
     fileChooser = std::make_shared<FileChooser> ("Load Preset", manager.getUserPresetPath(), "*" + PresetConstants::presetExt, true, false, getTopLevelComponent());
     fileChooser->launchAsync (flags,
-                              [&] (const FileChooser& fc)
+                              [&, safeParent = SafePointer { getParentComponent() }] (const FileChooser& fc)
                               {
                                   if (fc.getResults().isEmpty())
                                       return;
 
-                                  presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (fc.getResult()));
+                                  presetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (fc.getResult()),
+                                                                safeParent.getComponent());
                               });
 }
 

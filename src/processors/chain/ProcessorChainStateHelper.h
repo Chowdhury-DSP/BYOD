@@ -8,12 +8,18 @@ public:
     ProcessorChainStateHelper (ProcessorChain& thisChain, chowdsp::DeferredAction& deferredAction);
 
     std::unique_ptr<XmlElement> saveProcChain();
-    void loadProcChain (const XmlElement* xml, const chowdsp::Version& stateVersion, bool loadingPreset = false);
+    void loadProcChain (const XmlElement* xml,
+                        const chowdsp::Version& stateVersion,
+                        bool loadingPreset = false,
+                        Component* associatedComponent = nullptr);
 
     bool validateProcChainState (const XmlElement* xml) const;
 
 private:
-    void loadProcChainInternal (const XmlElement* xml, const chowdsp::Version& stateVersion, bool loadingPreset);
+    void loadProcChainInternal (const XmlElement* xml,
+                                const chowdsp::Version& stateVersion,
+                                bool loadingPreset,
+                                Component* associatedComp);
 
     ProcessorChain& chain;
     UndoManager* um;

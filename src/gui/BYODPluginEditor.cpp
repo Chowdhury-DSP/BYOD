@@ -14,6 +14,7 @@ BYODPluginEditor::BYODPluginEditor (BYOD& p) : AudioProcessorEditor (p),
     addAndMakeVisible (titleBar);
     addAndMakeVisible (toolBar);
     addAndMakeVisible (board);
+    addChildComponent (errorMessageView);
 
     setResizeBehaviour();
 }
@@ -50,6 +51,8 @@ void BYODPluginEditor::resized()
 #endif
 
     board.setBounds (bounds);
+
+    errorMessageView.setBounds (getLocalBounds());
 }
 
 int BYODPluginEditor::getControlParameterIndex (Component& comp)

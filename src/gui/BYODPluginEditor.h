@@ -4,6 +4,7 @@
 #include "TitleBar.h"
 #include "pedalboard/BoardViewport.h"
 #include "toolbar/ToolBar.h"
+#include "utils/ErrorMessageView.h"
 
 class BYODPluginEditor : public AudioProcessorEditor
 {
@@ -15,6 +16,8 @@ public:
     void resized() override;
 
     int getControlParameterIndex (Component& c) override;
+
+    auto& getErrorMessageView() { return errorMessageView; }
 
 private:
     void setResizeBehaviour();
@@ -28,6 +31,7 @@ private:
     TitleBar titleBar;
     BoardViewport board;
     ToolBar toolBar;
+    ErrorMessageView errorMessageView;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BYODPluginEditor)
 };
