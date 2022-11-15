@@ -1,8 +1,8 @@
 #include "PresetManager.h"
 #include "../StateManager.h"
 #include "PresetInfoHelpers.h"
-#include "processors/chain/ProcessorChainStateHelper.h"
 #include "gui/utils/ErrorMessageView.h"
+#include "processors/chain/ProcessorChainStateHelper.h"
 
 #if BYOD_ENABLE_ADD_ON_MODULES
 #include <AddOnPresets.h>

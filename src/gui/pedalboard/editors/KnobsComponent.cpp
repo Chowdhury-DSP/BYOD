@@ -1,6 +1,6 @@
 #include "KnobsComponent.h"
-#include "processors/BaseProcessor.h"
 #include "gui/utils/LookAndFeels.h"
+#include "processors/BaseProcessor.h"
 
 namespace
 {

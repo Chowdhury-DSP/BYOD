@@ -2,7 +2,6 @@
 
 #include <pch.h>
 
-
 class ErrorMessageView : public Component
 {
 public:

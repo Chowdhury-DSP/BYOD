@@ -1,7 +1,7 @@
 #include "AmpIRs.h"
 #include "../ParameterHelpers.h"
-#include "gui/utils/HostContextProvider.h"
 #include "gui/utils/ErrorMessageView.h"
+#include "gui/utils/HostContextProvider.h"
 
 namespace
 {
