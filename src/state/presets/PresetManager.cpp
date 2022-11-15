@@ -2,6 +2,7 @@
 #include "../StateManager.h"
 #include "PresetInfoHelpers.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
+#include "gui/utils/ErrorMessageView.h"
 
 #if BYOD_ENABLE_ADD_ON_MODULES
 #include <AddOnPresets.h>
@@ -48,17 +49,9 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChangePresetAction)
 };
 
-void PresetManager::showErrorMessage (const String& title, const String& message)
+void PresetManager::showErrorMessage (const String& title, const String& message, Component* associatedComp)
 {
-    MessageManager::callAsync (
-        [title, message]
-        {
-            AlertWindow::show (MessageBoxOptions()
-                                   .withIconType (MessageBoxIconType::WarningIcon)
-                                   .withTitle (title)
-                                   .withMessage (message)
-                                   .withButton ("OK"));
-        });
+    ErrorMessageView::showErrorMessage (title, message, "OK", associatedComp);
 }
 
 PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
@@ -277,7 +270,7 @@ void PresetManager::loadPresetState (const XmlElement* xml)
     }
 
     const auto statePluginVersion = StateManager::getPluginVersionFromXML (xml);
-    procChain->getStateHelper().loadProcChain (xml, statePluginVersion, true);
+    procChain->getStateHelper().loadProcChain (xml, statePluginVersion, true, processor.getActiveEditor());
 }
 
 File PresetManager::getPresetFile (const chowdsp::Preset& preset) const
@@ -375,11 +368,11 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     addPresets (presets);
 }
 
-void PresetManager::loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad)
+void PresetManager::loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad, Component* associatedComp)
 {
     if (presetToLoad == nullptr || ! presetToLoad->isValid())
     {
-        showErrorMessage ("Preset Load Failure", "Unable to load preset!");
+        showErrorMessage ("Preset Load Failure", "Unable to load preset!", associatedComp);
         return;
     }
 

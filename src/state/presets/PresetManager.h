@@ -38,10 +38,10 @@ public:
     void saveUserPreset (const String& name, const String& category, bool isPublic, const String& presetID = {});
     void loadUserPresetsFromFolder (const juce::File& file) final;
 
-    void loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad);
+    void loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad, Component* associatedComp);
     void filterPresets (std::vector<chowdsp::Preset>& presets);
 
-    static void showErrorMessage (const String& title, const String& message);
+    static void showErrorMessage (const String& title, const String& message, Component* associatedComp);
 
 #if BYOD_BUILD_PRESET_SERVER
     void presetLoginStatusChanged() override;

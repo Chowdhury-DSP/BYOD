@@ -12,7 +12,7 @@ public:
     static ParamLayout createParameterLayout();
 
     void parameterChanged (const String& parameterID, float newValue) final;
-    void loadIRFromStream (std::unique_ptr<InputStream>&& stream);
+    void loadIRFromStream (std::unique_ptr<InputStream>&& stream, Component* associatedComp = nullptr);
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
