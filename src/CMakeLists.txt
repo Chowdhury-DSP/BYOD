@@ -36,6 +36,7 @@ target_sources(BYOD PRIVATE
     gui/utils/LookAndFeels.cpp
     gui/utils/ModulatableSlider.cpp
     gui/utils/TextSlider.cpp
+    gui/utils/ErrorMessageView.cpp
 
     state/StateManager.cpp
     state/ParamForwardManager.cpp

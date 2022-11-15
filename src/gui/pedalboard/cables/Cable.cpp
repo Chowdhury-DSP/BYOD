@@ -163,7 +163,7 @@ void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour c
 void Cable::drawCable (Graphics& g, juce::Point<float> start, juce::Point<float> end)
 {
     drawCableShadow (g, cableThickness);
-    
+
     g.setGradientFill (ColourGradient { startColour, start, endColour, end, false });
     {
         ScopedLock sl (pathCrit);

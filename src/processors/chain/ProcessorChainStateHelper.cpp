@@ -36,7 +36,10 @@ ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain,
 {
 }
 
-void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, const chowdsp::Version& stateVersion, bool loadingPreset)
+void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml,
+                                               const chowdsp::Version& stateVersion,
+                                               bool loadingPreset,
+                                               Component* associatedComponent)
 {
     if (xml == nullptr)
     {
@@ -44,8 +47,8 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml, const chow
         return;
     }
 
-    mainThreadStateLoader.call ([this, stateVersion, loadingPreset, xmlState = *xml]
-                                { loadProcChainInternal (&xmlState, stateVersion, loadingPreset); });
+    mainThreadStateLoader.call ([this, stateVersion, loadingPreset, xmlState = *xml, safeComp = Component::SafePointer { associatedComponent }]
+                                { loadProcChainInternal (&xmlState, stateVersion, loadingPreset, safeComp.getComponent()); });
 }
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
@@ -94,7 +97,10 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
     return std::move (xml);
 }
 
-void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, const chowdsp::Version& stateVersion, bool loadingPreset)
+void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml,
+                                                       const chowdsp::Version& stateVersion,
+                                                       bool loadingPreset,
+                                                       Component* associatedComp)
 {
     if (! loadingPreset)
         um->beginNewTransaction();
@@ -191,7 +197,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml, co
         for (const auto& name : unavailableProcessors)
             warningStream << name << '\n';
         warningStream.seekp (-1, std::ios_base::end); // remove the trailing newline
-        PresetManager::showErrorMessage ("Error Loading Preset", warningStream.str());
+        PresetManager::showErrorMessage ("Error Loading Preset", warningStream.str(), associatedComp);
     }
 
     // wait until all the processors are created before connecting them

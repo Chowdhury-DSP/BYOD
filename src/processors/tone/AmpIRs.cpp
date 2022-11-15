@@ -1,5 +1,6 @@
 #include "AmpIRs.h"
 #include "../ParameterHelpers.h"
+#include "gui/utils/ErrorMessageView.h"
 #include "gui/utils/HostContextProvider.h"
 
 namespace
@@ -87,12 +88,12 @@ void AmpIRs::parameterChanged (const String& parameterID, float newValue)
     convolution.loadImpulseResponse (irData.first, irData.second, dsp::Convolution::Stereo::yes, dsp::Convolution::Trim::yes, 0);
 }
 
-void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream)
+void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, Component* associatedComp)
 {
-    auto failToLoad = [this] (const File& f, const String& message)
+    auto failToLoad = [this, associatedComp] (const File& f, const String& message)
     {
         irFiles.removeAllInstancesOf (f);
-        AlertWindow::showMessageBoxAsync (AlertWindow::AlertIconType::WarningIcon, "Unable to load IR!", message);
+        ErrorMessageView::showErrorMessage ("Unable to load IR!", message, "OK", associatedComp);
         vts.getParameter (irTag)->setValueNotifyingHost (0.0f);
         curFile = File();
     };
@@ -292,7 +293,7 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, HostContex
                     fileItem.isTicked = file == ampIRs.curFile;
                     fileItem.action = [this, file]
                     {
-                        ampIRs.loadIRFromStream (file.createInputStream());
+                        ampIRs.loadIRFromStream (file.createInputStream(), getParentComponent());
                     };
                     menu->addItem (fileItem);
 
@@ -311,21 +312,22 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, HostContex
                 constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
                 fileChooser = std::make_shared<FileChooser> ("Custom IR", File(), "", true, false, getTopLevelComponent());
                 fileChooser->launchAsync (flags,
-                                          [this] (const FileChooser& fc)
+                                          [this, safeParent = SafePointer { getParentComponent() }] (const FileChooser& fc)
                                           {
 #if JUCE_IOS
                                               if (fc.getURLResults().isEmpty())
                                                   return;
                                               const auto irFile = fc.getURLResult(); //.getLocalFile();
                                               Logger::writeToLog ("AmpIRs attempting to load IR from local file: " + irFile.getLocalFile().getFullPathName());
-                                              ampIRs.loadIRFromStream (irFile.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)));
+                                              ampIRs.loadIRFromStream (irFile.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)),
+                                                                       safeParent.getComponent());
 #else
                         if (fc.getResults().isEmpty())
                             return;
                         const auto irFile = fc.getResult();
 
                         Logger::writeToLog ("AmpIRs attempting to load IR from local file: " + irFile.getFullPathName());
-                        ampIRs.loadIRFromStream (irFile.createInputStream());
+                        ampIRs.loadIRFromStream (irFile.createInputStream(), safeParent.getComponent());
 #endif
                                           });
             };

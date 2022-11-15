@@ -1,4 +1,5 @@
 #include "GuitarMLAmp.h"
+#include "gui/utils/ErrorMessageView.h"
 #include "gui/utils/ModulatableSlider.h"
 
 namespace
@@ -75,26 +76,26 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
         auto& lstm = model.template get<0>();
         auto& dense = model.template get<1>();
 
-        Vec2d lstm_weights_ih = weights_json["/state_dict/rec.weight_ih_l0"_json_pointer];
+        Vec2d lstm_weights_ih = weights_json.at ("/state_dict/rec.weight_ih_l0"_json_pointer);
         lstm.setWVals (transpose (lstm_weights_ih));
 
-        Vec2d lstm_weights_hh = weights_json["/state_dict/rec.weight_hh_l0"_json_pointer];
+        Vec2d lstm_weights_hh = weights_json.at ("/state_dict/rec.weight_hh_l0"_json_pointer);
         lstm.setUVals (transpose (lstm_weights_hh));
 
-        std::vector<float> lstm_bias_ih = weights_json["/state_dict/rec.bias_ih_l0"_json_pointer];
-        std::vector<float> lstm_bias_hh = weights_json["/state_dict/rec.bias_hh_l0"_json_pointer];
+        std::vector<float> lstm_bias_ih = weights_json.at ("/state_dict/rec.bias_ih_l0"_json_pointer);
+        std::vector<float> lstm_bias_hh = weights_json.at ("/state_dict/rec.bias_hh_l0"_json_pointer);
         for (int i = 0; i < 4 * hiddenSize; ++i)
             lstm_bias_hh[(size_t) i] += lstm_bias_ih[(size_t) i];
         lstm.setBVals (lstm_bias_hh);
 
-        Vec2d dense_weights = weights_json["/state_dict/lin.weight"_json_pointer];
+        Vec2d dense_weights = weights_json.at ("/state_dict/lin.weight"_json_pointer);
         dense.setWeights (dense_weights);
 
-        std::vector<float> dense_bias = weights_json["/state_dict/lin.bias"_json_pointer];
+        std::vector<float> dense_bias = weights_json.at ("/state_dict/lin.bias"_json_pointer);
         dense.setBias (dense_bias.data());
     };
 
-    const auto& modelDataJson = modelJson["model_data"];
+    const auto& modelDataJson = modelJson.at ("model_data");
     const auto numInputs = modelDataJson.value ("input_size", 1);
     const auto hiddenSize = modelDataJson.value ("hidden_size", 0);
     const auto modelSampleRate = modelDataJson.value ("sample_rate", 44100.0);
@@ -151,7 +152,7 @@ void GuitarMLAmp::loadModel (int modelIndex, Component* parentComponent)
     {
         customModelChooser = std::make_shared<FileChooser> ("GuitarML Model", File {}, "*.json", true, false, parentComponent);
         customModelChooser->launchAsync (FileBrowserComponent::FileChooserFlags::canSelectFiles,
-                                         [this] (const FileChooser& modelChooser)
+                                         [this, safeParent = Component::SafePointer { parentComponent }] (const FileChooser& modelChooser)
                                          {
 #if JUCE_IOS
                                              const auto chosenFile = modelChooser.getURLResult();
@@ -181,15 +182,14 @@ void GuitarMLAmp::loadModel (int modelIndex, Component* parentComponent)
                     loadModelFromJson (modelJson, chosenFile.getFileNameWithoutExtension());
                 }
 #endif
-                                             catch (...)
+                                             catch (const std::exception& exc)
                                              {
                                                  loadModel (0);
-                                                 AlertWindow::showAsync (MessageBoxOptions()
-                                                                             .withButton ("Ok")
-                                                                             .withIconType (MessageBoxIconType::WarningIcon)
-                                                                             .withTitle ("GuitarML Error")
-                                                                             .withMessage ("Unable to load GuitarML model from file!"),
-                                                                         nullptr);
+                                                 const auto errorMessage = String { "Unable to load GuitarML model from file!\n\n" } + exc.what();
+                                                 ErrorMessageView::showErrorMessage ("GuitarML Error",
+                                                                                     errorMessage,
+                                                                                     "OK",
+                                                                                     safeParent.getComponent());
                                              }
                                          });
     }
@@ -394,7 +394,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, HostC
 
             onChange = [this, &processor]
             {
-                processor.loadModel (getSelectedItemIndex(), getTopLevelComponent());
+                processor.loadModel (getSelectedItemIndex(), getParentComponent());
             };
 
             this->setName (modelTag + "__box");
