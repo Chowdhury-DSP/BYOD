@@ -1,4 +1,5 @@
 #include "PresetsComp.h"
+#include "gui/utils/ErrorMessageView.h"
 
 PresetsComp::PresetsComp (PresetManager& presetMgr) : chowdsp::PresetsComp (presetMgr),
                                                       presetManager (presetMgr),
@@ -192,18 +193,18 @@ int PresetsComp::addBasicPresetOptions (PopupMenu* menu, int optionID)
         optionID = addPresetMenuItem (menu,
                                       optionID,
                                       "Delete Preset",
-                                      [&]
+                                      [&, safeParent = SafePointer {getParentComponent() }]
                                       {
                                           if (auto* currentPreset = manager.getCurrentPreset())
                                           {
                                               auto presetFile = currentPreset->getPresetFile();
                                               if (! (presetFile.existsAsFile() && presetFile.hasFileExtension (PresetConstants::presetExt)))
                                               {
-                                                  NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Preset Deletion", "Unable to find preset file!");
+                                                  ErrorMessageView::showErrorMessage ("Preset Deletion Error!", "Unable to find preset file!", "OK", safeParent.getComponent());
                                                   return;
                                               }
 
-                                              if (NativeMessageBox::showOkCancelBox (MessageBoxIconType::QuestionIcon, "Preset Deletion", "Are you sure you want to delete this preset? This operation cannot be undone."))
+                                              if (ErrorMessageView::showYesNoBox ("Preset Deletion", "Are you sure you want to delete this preset? This operation cannot be undone.", safeParent.getComponent()))
                                               {
                                                   presetFile.deleteFile();
                                                   manager.loadDefaultPreset();
@@ -333,13 +334,13 @@ int PresetsComp::addPresetServerMenuOptions (int optionID)
 
 void PresetsComp::savePreset (const PresetSaveInfo& saveInfo)
 {
-    auto savePresetLambda = [] (PresetManager& presetMgr, const PresetSaveInfo& sInfo)
+    auto savePresetLambda = [safeParent = SafePointer { getParentComponent() }] (PresetManager& presetMgr, const PresetSaveInfo& sInfo)
     {
         if (presetMgr.getPresetFile (presetMgr.getUserPresetName(), sInfo.category, sInfo.name).existsAsFile())
         {
             const String warningBoxTitle = "Preset Save Warning!";
             const String warningBoxMessage = "You are about to overwrite an existing preset! Are you sure you want to continue?";
-            if (NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, warningBoxTitle, warningBoxMessage) == 0)
+            if (! ErrorMessageView::showYesNoBox (warningBoxTitle, warningBoxMessage, safeParent.getComponent()))
                 return;
         }
 

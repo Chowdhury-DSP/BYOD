@@ -26,8 +26,6 @@ private:
     std::unique_ptr<ResultsListModel> resultsBoxModel;
     ListBox resultsBox;
 
-    std::vector<const chowdsp::Preset*> allPresetsVector;
-
     Label numResultsLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PresetSearchWindow)

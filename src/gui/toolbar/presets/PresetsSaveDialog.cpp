@@ -1,5 +1,6 @@
 #include "PresetsSaveDialog.h"
 #include "state/presets/PresetInfoHelpers.h"
+#include "gui/utils/ErrorMessageView.h"
 
 namespace
 {
@@ -71,7 +72,7 @@ void PresetsSaveDialog::prepareToShow (const chowdsp::Preset* presetToEdit, cons
         const auto nameText = nameLabel.getText (true);
         if (nameText.isEmpty())
         {
-            NativeMessageBox::showMessageBox (MessageBoxIconType::WarningIcon, "Preset Save Error!", "Preset name must not be empty");
+            ErrorMessageView::showErrorMessage ("Preset Save Error!", "Preset name must not be empty", "OK", getParentComponent());
             return;
         }
 

@@ -13,38 +13,75 @@ ErrorMessageView::ErrorMessageView()
     addAndMakeVisible (closeButton);
     closeButton.onClick = [this]
     { setVisible (false); };
+
+    addAndMakeVisible (yesButton);
+    yesButton.onClick = [this]
+    {
+        result = 1;
+        setVisible (false);
+    };
+
+    addAndMakeVisible (noButton);
+    noButton.onClick = [this]
+    {
+        result = 0;
+        setVisible (false);
+    };
+}
+
+BYODPluginEditor* findTopLevelEditor (Component* currentComponent)
+{
+    BYODPluginEditor* topLevelEditor = nullptr;
+    while (currentComponent != nullptr)
+    {
+        if ((topLevelEditor = dynamic_cast<BYODPluginEditor*> (currentComponent)))
+            break;
+        currentComponent = currentComponent->getParentComponent();
+    }
+
+    // Unable to find top level component!
+    jassert (topLevelEditor != nullptr);
+
+    return topLevelEditor;
 }
 
 void ErrorMessageView::showErrorMessage (const String& title, const String& message, const String& buttonText, Component* comp)
 {
-#if ! JUCE_IOS
-    NativeMessageBox::showAsync (MessageBoxOptions()
-                                     .withIconType (MessageBoxIconType::WarningIcon)
-                                     .withTitle (title)
-                                     .withMessage (message)
-                                     .withButton (buttonText)
-                                     .withAssociatedComponent (comp),
-                                 nullptr);
-#else
-    BYODPluginEditor* topLevelEditor = nullptr;
-    while (comp != nullptr)
+    // similar to:
+//    NativeMessageBox::showAsync (MessageBoxOptions()
+//                                     .withIconType (MessageBoxIconType::WarningIcon)
+//                                     .withTitle (title)
+//                                     .withMessage (message)
+//                                     .withButton (buttonText)
+//                                     .withAssociatedComponent (comp),
+//                                 nullptr);
+
+    if (auto* topLevelEditor = findTopLevelEditor (comp))
     {
-        if ((topLevelEditor = dynamic_cast<BYODPluginEditor*> (comp)))
-            break;
-        comp = comp->getParentComponent();
+        auto& errorMessageView = topLevelEditor->getErrorMessageView();
+        errorMessageView.setParameters (title, message, buttonText);
+        errorMessageView.setVisible (true);
+    }
+}
+
+bool ErrorMessageView::showYesNoBox (const juce::String& title, const juce::String& message, juce::Component* comp)
+{
+    // similar to:
+//    return NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, title, message, comp) == 1;
+
+    if (auto* topLevelEditor = findTopLevelEditor (comp))
+    {
+        auto& errorMessageView = topLevelEditor->getErrorMessageView();
+        errorMessageView.setParametersYesNo (title, message);
+        errorMessageView.setVisible (true);
+
+        while (errorMessageView.result < 0)
+            MessageManager::getInstance()->runDispatchLoopUntil (50);
+
+        return errorMessageView.result > 0;
     }
 
-    if (topLevelEditor == nullptr)
-    {
-        // Unable to find top level component!
-        jassertfalse;
-        return;
-    }
-
-    auto& errorMessageView = topLevelEditor->getErrorMessageView();
-    errorMessageView.setParameters (title, message, buttonText);
-    errorMessageView.setVisible (true);
-#endif
+    return false;
 }
 
 void ErrorMessageView::setParameters (const juce::String& titleText,
@@ -55,6 +92,22 @@ void ErrorMessageView::setParameters (const juce::String& titleText,
     title.setText (titleText, juce::dontSendNotification);
     message.setText (messageText, juce::dontSendNotification);
     closeButton.setButtonText (buttonText);
+
+    closeButton.setVisible (true);
+    yesButton.setVisible (false);
+    noButton.setVisible (false);
+}
+
+void ErrorMessageView::setParametersYesNo (const String& titleText, const String& messageText)
+{
+    result = -1;
+    setAlwaysOnTop (true);
+    title.setText (titleText, juce::dontSendNotification);
+    message.setText (messageText, juce::dontSendNotification);
+
+    closeButton.setVisible (false);
+    yesButton.setVisible (true);
+    noButton.setVisible (true);
 }
 
 void ErrorMessageView::paint (Graphics& g)
@@ -83,4 +136,10 @@ void ErrorMessageView::resized()
     const auto buttonY = proportionOfHeight (0.8f);
     const auto buttonHeight = proportionOfHeight (0.1f);
     closeButton.setBounds (buttonX, buttonY, buttonWidth, buttonHeight);
+
+    const auto yesX = proportionOfWidth (0.375f);
+    yesButton.setBounds (yesX, buttonY, buttonWidth, buttonHeight);
+
+    const auto noX = proportionOfWidth (0.525f);
+    noButton.setBounds (noX, buttonY, buttonWidth, buttonHeight);
 }

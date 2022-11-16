@@ -117,9 +117,6 @@ PresetSearchWindow::PresetSearchWindow (chowdsp::PresetManager& presetMgr) : pre
     numResultsLabel.setJustificationType (Justification::left);
     addAndMakeVisible (numResultsLabel);
 
-    for (const auto& [_, preset] : presetManager.getPresetMap())
-        allPresetsVector.push_back (&preset);
-
     updateSearchResults (String());
 
     setSize (600, 400);
@@ -148,9 +145,9 @@ void PresetSearchWindow::updateSearchResults (const String& searchQuery)
     if (searchQuery.isEmpty())
     {
         ResultsVec resultsVector;
-        resultsVector.reserve (allPresetsVector.size());
-        for (const auto* preset : allPresetsVector)
-            resultsVector.emplace_back (preset, 0.0);
+        resultsVector.reserve ((size_t) presetManager.getNumPresets());
+        for (const auto& [_, preset] : presetManager.getPresetMap())
+            resultsVector.emplace_back (&preset, 0.0);
 
         setUpListModel (std::move (resultsVector));
         return;
@@ -160,11 +157,11 @@ void PresetSearchWindow::updateSearchResults (const String& searchQuery)
     const auto searchQueryStr = searchQuery.toStdString();
     constexpr double scoreThreshold = 35.0;
     auto searchScorer = rapidfuzz::fuzz::CachedRatio<char> (searchQueryStr);
-    for (const auto* preset : allPresetsVector)
+    for (const auto& [_, preset] : presetManager.getPresetMap())
     {
-        auto score = searchScorer.similarity (preset->getName().toStdString());
+        auto score = searchScorer.similarity (preset.getName().toStdString());
         if (score > scoreThreshold)
-            resultsVector.emplace_back (preset, score);
+            resultsVector.emplace_back (&preset, score);
     }
 
     std::sort (resultsVector.begin(), resultsVector.end(), [] (const auto& a, const auto& b)
