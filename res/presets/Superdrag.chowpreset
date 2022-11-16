@@ -5,7 +5,7 @@
   <proc_chain state_plugin_version="1.0.9">
     <Amp_IRs>
       <Parameters x_pos="0.5764482617378235" y_pos="0.5060975551605225" ir_file="">
-        <PARAM id="gain" value="5.0"/>
+        <PARAM id="gain" value="0.0"/>
         <PARAM id="ir" value="0.0"/>
         <PARAM id="mix" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>
@@ -39,7 +39,7 @@
     <Chorus>
       <Parameters x_pos="0.01329534687101841" y_pos="0.4796747863292694">
         <PARAM id="delay_type" value="0.0"/>
-        <PARAM id="depth" value="0.5"/>
+        <PARAM id="depth" value="0.35"/>
         <PARAM id="feedback" value="0.3499999940395355"/>
         <PARAM id="mix" value="0.2000000029802322"/>
         <PARAM id="on_off" value="1.0"/>
