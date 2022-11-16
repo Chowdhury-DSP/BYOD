@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
 - Added UI control to replace a wire with a 1-input/1-output module.
 - Added UI control to replace a 1-input/1-output module with a wire.
 - Added UI size to the saved plugin state.
+- Added parameter context menus for AAX and VST3 plugins formats.
 - Improved neural network-based modules performance and sound quality at different sample rates.
 - Improved UI rendering performance.
 - Fixed cutoff frequency behaviour in High Cut module.
