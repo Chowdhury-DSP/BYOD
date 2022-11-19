@@ -96,15 +96,13 @@ void BYOD::getStateInformation (MemoryBlock& destData)
 void BYOD::setStateInformation (const void* data, int sizeInBytes)
 {
     stateManager->loadState (getXmlFromBinary (data, sizeInBytes).get());
-    
+
     if (wrapperType == WrapperType::wrapperType_AudioUnitv3)
     {
         // In the AUv3 we need to alert the hsot about parmaeter tree changes
         // _after_ the host has finished loading the plugin state.
         Timer::callAfterDelay (500, [this]
-                               {
-                                   updateHostDisplay (ChangeDetails{}.withParameterInfoChanged (true));
-                               });
+                               { updateHostDisplay (ChangeDetails {}.withParameterInfoChanged (true)); });
     }
 }
 

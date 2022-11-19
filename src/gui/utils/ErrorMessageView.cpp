@@ -48,13 +48,13 @@ BYODPluginEditor* findTopLevelEditor (Component* currentComponent)
 void ErrorMessageView::showErrorMessage (const String& title, const String& message, const String& buttonText, Component* comp)
 {
     // similar to:
-//    NativeMessageBox::showAsync (MessageBoxOptions()
-//                                     .withIconType (MessageBoxIconType::WarningIcon)
-//                                     .withTitle (title)
-//                                     .withMessage (message)
-//                                     .withButton (buttonText)
-//                                     .withAssociatedComponent (comp),
-//                                 nullptr);
+    //    NativeMessageBox::showAsync (MessageBoxOptions()
+    //                                     .withIconType (MessageBoxIconType::WarningIcon)
+    //                                     .withTitle (title)
+    //                                     .withMessage (message)
+    //                                     .withButton (buttonText)
+    //                                     .withAssociatedComponent (comp),
+    //                                 nullptr);
 
     if (auto* topLevelEditor = findTopLevelEditor (comp))
     {
@@ -67,7 +67,7 @@ void ErrorMessageView::showErrorMessage (const String& title, const String& mess
 bool ErrorMessageView::showYesNoBox (const juce::String& title, const juce::String& message, juce::Component* comp)
 {
     // similar to:
-//    return NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, title, message, comp) == 1;
+    //    return NativeMessageBox::showYesNoBox (MessageBoxIconType::WarningIcon, title, message, comp) == 1;
 
     if (auto* topLevelEditor = findTopLevelEditor (comp))
     {

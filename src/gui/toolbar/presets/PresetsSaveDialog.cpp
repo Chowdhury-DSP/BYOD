@@ -1,6 +1,6 @@
 #include "PresetsSaveDialog.h"
-#include "state/presets/PresetInfoHelpers.h"
 #include "gui/utils/ErrorMessageView.h"
+#include "state/presets/PresetInfoHelpers.h"
 
 namespace
 {
