@@ -193,7 +193,7 @@ int PresetsComp::addBasicPresetOptions (PopupMenu* menu, int optionID)
         optionID = addPresetMenuItem (menu,
                                       optionID,
                                       "Delete Preset",
-                                      [&, safeParent = SafePointer {getParentComponent() }]
+                                      [&, safeParent = SafePointer { getParentComponent() }]
                                       {
                                           if (auto* currentPreset = manager.getCurrentPreset())
                                           {
