@@ -45,5 +45,7 @@ private:
 
     bool isPrepared = false;
 
+    chowdsp::SharedDeferredAction mainThreadAction;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChainIOProcessor)
 };
