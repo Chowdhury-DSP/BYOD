@@ -3,10 +3,10 @@
 Build-Your-Own-Distortion (BYOD) is an audio plugin that allows
 the user to create custom guitar effects, with a focus on guitar
 distortion. The plugin contains emulations of guitar distortion
-and tone-shaping circuits from various, along with a handful of
-other useful effects. BYOD is currently available for Windows,
-Linux, Mac, and iOS in the following formats: VST/VST3, AU, LV2,
-AAX, AUv3, and Standalone.
+and tone-shaping circuits from various pedals and amplifiers,
+along with a handful of  other useful effects. BYOD is currently
+available for Windows, Linux, Mac, and iOS in the following formats:
+VST/VST3, AU, CLAP, LV2, AAX, AUv3, and Standalone.
 
 <img src="./screenshots/full_gui.png" alt="Plugin GUI" height="400">
 
@@ -63,7 +63,7 @@ Purple modulation ports are available on all modulation processors. When connect
 
 Each processor has an on/off switch, as well as a settings menu,
 containing options to reset the processor's parameters, duplicate
-the processor, or show the processor information.
+the processor, replace the processor, or show the processor information.
 
 <img src="./screenshots/Proc_Controls.gif" alt="Processor Controls" height="400">
 
@@ -74,7 +74,7 @@ The bottom bar of the plugin (or top bar on iOS) contains several
 saving a preset.
 
 ### Undo/Redo
-The undo/redo controls will undoor redo the following actions:
+The undo/redo controls will undo or redo the following actions:
 - Adding/removing/replacing a processor
 - Creating/destroying a cables
 - Changing a parameter
@@ -83,7 +83,7 @@ The undo/redo controls will undoor redo the following actions:
 Input mode: selects which channel(s) will be used as the input
 to the processor chain. In order to save computing resources (CPU),
 it is recommended to avoid using "Stereo" mode except when the
-input is a stereo signal.
+input is a true stereo signal.
 
 ### Input/Output Gain
 These controls can be used to affect the gain staging before or
@@ -112,8 +112,10 @@ Modules".
 For the desktop plugin, add-on packs can be purchased from the
 [ChowDSP website](https://chowdsp.com/products/byod-add-ons/store.html);
 after purchase, an activation code will be sent via email, which can
-then be used to activate the pack inside the plugin. For the iOS plugin,
-add-on packs can be purchased in the plugin via an in-app purchase.
+then be used to activate the pack inside the plugin. An activation code
+may be used on up to 5 devices. For the iOS plugin, add-on packs can be
+purchased in the plugin via an in-app purchase. Add-on packs for the iOS
+plugin must be purchased separately due to the [App Store guidelines](https://developer.apple.com/app-store/review/guidelines).
 
 ## Presets
 
@@ -148,12 +150,11 @@ To reset the global settings, you may delete this file, and it will
 automatically be regenerated the next time the plugin is used.
 
 ### OpenGL Rendering
-On Windows and Linux, BYOD will use OpenGL for rendering the UI by
-default, unless the host system does not support OpenGL version 2.0
-or greater. If OpenGL is available, it is possible to turn off rendering
-with OpenGL in the [global settings menu](#settings). If you need
-to override your chosen OpenGL setting, please visit the [global
-settings file](#resetting-global-settings).
+On Windows, BYOD will use OpenGL for rendering the UI by default,
+unless the host system does not support OpenGL version 2.0 or greater.
+If OpenGL is available, it is possible to turn off rendering with
+OpenGL in the [global settings menu](#settings). If you need to
+override your chosen OpenGL setting, please visit the [global settings file](#resetting-global-settings).
 
 ### Viewing Log Files
 Information about specific sessions of the plugin can be seen in

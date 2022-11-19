@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [1.1.0] 2022-11-21
 - Added support for the CLAP plugin format (with parameter modulation).
 - Added modulation ports so modules with internal modulation can share modulation signals.
 - Added "Rotary" module.
@@ -13,12 +13,13 @@ All notable changes to this project will be documented in this file.
 - Added "Junior B" module.
 - Added "Bass Face" module.
 - Added "Blonde" modules.
-- Added "Smooth Reverb" module.
+- Added "Smooth Reverb" and "Shimmer Reverb" modules.
 - Added "Octaver" module.
 - Added "Neural" mode to Centaur module.
 - Added "Multi-Mode" option to SVF module.
-- Added "High-Quality" options for RangeBooster and MuffDrive modules.
+- Added "High-Quality" options for Range Booster and Muff Drive modules.
 - Added "Extend" and "Invert" options for Clean Gain module.
+- Added support for Proteus models with a conditioning input for GuitarML module.
 - Added new factory presets.
 - Added UI control to replace a wire with a 1-input/1-output module.
 - Added UI control to replace a 1-input/1-output module with a wire.
