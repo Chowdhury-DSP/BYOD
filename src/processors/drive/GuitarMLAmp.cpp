@@ -139,6 +139,8 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
 
 void GuitarMLAmp::loadModel (int modelIndex, Component* parentComponent)
 {
+    normalizationGain = 1.0f;
+
     if (juce::isPositiveAndBelow (modelIndex, numBuiltInModels))
     {
         int modelDataSize = 0;
@@ -147,6 +149,12 @@ void GuitarMLAmp::loadModel (int modelIndex, Component* parentComponent)
 
         const auto modelJson = chowdsp::JSONUtils::fromBinaryData (modelData, modelDataSize);
         loadModelFromJson (modelJson, guitarMLModelNames[modelIndex]);
+
+        // The Mesa model is a bit loud, so let's normalize the level down a bit
+        // Eventually it would be good to do this sort of thing programmatically.
+        // so that it could work for custom loaded models as well.
+        if (modelIndex == 2)
+            normalizationGain = 0.5f;
     }
     else if (modelIndex == numBuiltInModels)
     {
@@ -270,6 +278,8 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
             }
         }
     }
+
+    buffer.applyGain (normalizationGain);
 
     dcBlocker.processAudio (buffer);
 }

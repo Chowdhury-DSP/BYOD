@@ -46,7 +46,7 @@ Phaser8::Phaser8 (UndoManager* um) : BaseProcessor ("Phaser8",
 
     uiOptions.backgroundColour = Colour { 0xff00a8e9 };
     uiOptions.powerColour = Colour { 0xfff44e44 };
-    uiOptions.info.description = "A phaser effect based on a classic \"Compact\" 8-stage phaser pedal.";
+    uiOptions.info.description = "A phaser effect based on a classic \"Compact\" 8-stage phaser pedal. The first output contains the signal after the pedal's feedback and modulation stages. The second output contains the sigal after only the feedback stage.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 

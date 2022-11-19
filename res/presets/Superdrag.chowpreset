@@ -5,7 +5,7 @@
   <proc_chain state_plugin_version="1.0.9">
     <Amp_IRs>
       <Parameters x_pos="0.5764482617378235" y_pos="0.5060975551605225" ir_file="">
-        <PARAM id="gain" value="0.0"/>
+        <PARAM id="gain" value="-3.0"/>
         <PARAM id="ir" value="0.0"/>
         <PARAM id="mix" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>
