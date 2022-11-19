@@ -42,6 +42,14 @@ $ cmake -Bbuild
 $ cmake --build build --parallel 4
 ```
 
+Graham's helpful hint:
+
+```bash
+# This worked for me:
+$ cmake -Bbuild -DBYOD_BUILD_CLAP=OFF
+$ cmake --build build --parallel 4
+```
+
 If you'd like to make an optimized "release" build, it
 is suggested to use some slightly different build commands:
 ```bash
