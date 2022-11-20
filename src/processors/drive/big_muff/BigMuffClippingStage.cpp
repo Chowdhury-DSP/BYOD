@@ -91,8 +91,8 @@ void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer, const float
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
-    // capacitor C12 admittance, smoothing adds or removed 100 pF
-    float G_C_12 = (2.0f * (C12 + smoothing * 2.0e-12f - 100.0e-12) * fs);
+    // capacitor C12 admittance, smoothing adds or removes 200 pF
+    float G_C_12 = (2.0f * (C12 + (smoothing - 50.0f) * 4.0e-12f) * fs);
 
 
     for (int ch = 0; ch < numChannels; ++ch)
