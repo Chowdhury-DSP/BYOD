@@ -63,8 +63,6 @@ void BigMuffClippingStage::prepare (double sampleRate)
 {
     fs = (float) sampleRate;
 
-    G_C_12 = (2.0f * C12 * fs);
-
     // set coefficients for input filter
     float b_s[] = { C5 * R20, 0.0f };
     float a_s[] = { C5 * (R19 + R20), 1.0f };
@@ -93,6 +91,9 @@ void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer) noexcept
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
+    // capacitor C12 admittance
+    float G_C_12 = (2.0f * C12 * fs);
+
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
