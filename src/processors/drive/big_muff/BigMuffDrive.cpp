@@ -153,16 +153,17 @@ void BigMuffDrive::processAudio (AudioBuffer<float>& buffer)
 
     processInputStage (buffer);
 
+    float smoothing = smoothingParam->getCurrentValue();
     const auto useHighQualityMode = hiQParam->load() == 1.0f;
     if (useHighQualityMode)
     {
         for (int i = 0; i < numStages; ++i)
-            stages[i].processBlock<true> (buffer);
+            stages[i].processBlock<true> (buffer, smoothing);
     }
     else
     {
         for (int i = 0; i < numStages; ++i)
-            stages[i].processBlock<false> (buffer);
+            stages[i].processBlock<false> (buffer, smoothing);
     }
 
     for (int ch = 0; ch < numChannels; ++ch)
