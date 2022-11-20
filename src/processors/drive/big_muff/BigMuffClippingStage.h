@@ -11,7 +11,7 @@ public:
     void reset();
 
     template <bool highQuality>
-    void processBlock (AudioBuffer<float>& buffer) noexcept;
+    void processBlock (AudioBuffer<float>& buffer, const int smoothing) noexcept;
 
 private:
     chowdsp::IIRFilter<1, float> inputFilter[2];

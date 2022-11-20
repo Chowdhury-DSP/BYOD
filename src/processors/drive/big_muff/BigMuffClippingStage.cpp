@@ -87,12 +87,12 @@ void BigMuffClippingStage::reset()
 }
 
 template <bool highQuality>
-void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer) noexcept
+void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer, const int smoothing) noexcept
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
-    // capacitor C12 admittance
-    float G_C_12 = (2.0f * C12 * fs);
+    // capacitor C12 admittance, smoothing adds or removed 100 pF
+    float G_C_12 = (2.0f * (C12 + smoothing * 2.0f - 100.0e-12) * fs);
 
 
     for (int ch = 0; ch < numChannels; ++ch)
