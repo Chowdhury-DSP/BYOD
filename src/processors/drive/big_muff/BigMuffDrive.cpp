@@ -19,6 +19,7 @@ BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Muff Drive", crea
     loadParameterPointer (sustainParam, vts, "sustain");
     loadParameterPointer (harmParam, vts, "harmonics");
     loadParameterPointer (levelParam, vts, "level");
+    loadParameterPointer (smoothingParam, vts, "smoothing");
     nStagesParam = vts.getRawParameterValue ("n_stages");
     hiQParam = vts.getRawParameterValue ("high_q");
 
@@ -39,6 +40,7 @@ ParamLayout BigMuffDrive::createParameterLayout()
     createPercentParameter (params, "sustain", "Sustain", 0.5f);
     createPercentParameter (params, "harmonics", "Harmonics", 0.65f);
     createPercentParameter (params, "level", "Level", 0.65f);
+    createPercentParameter (params, "smoothing", "Smoothing", 0.5f);
 
     emplace_param<AudioParameterChoice> (params, "n_stages", "Stages", StringArray { "1 Stage", "2 Stages", "3 Stages", "4 Stages" }, 1);
     emplace_param<AudioParameterBool> (params, "high_q", "High Quality", false);
