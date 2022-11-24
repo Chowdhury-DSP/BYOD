@@ -6,8 +6,7 @@ namespace
 constexpr float C5 = 100.0e-9f;
 constexpr float R19 = 10.0e3f;
 constexpr float R20 = 100.0e3f;
-// from http://www.kitrae.net/music/big_muff_guts.html
-constexpr float C12 = 500.0e-12f;
+constexpr float C12 = 470.0e-12f;
 constexpr float G17 = 1.0f / 470.0e3f;
 
 // diode constants
