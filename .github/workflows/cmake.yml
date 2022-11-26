@@ -49,6 +49,7 @@ jobs:
 
     - name: Checkout add-ons
       uses: actions/checkout@v2
+      if: github.event_name != 'pull_request'
       with:
         ref: main
         repository: Chowdhury-DSP/BYOD-add-ons
@@ -59,7 +60,8 @@ jobs:
       shell: bash
       env:
         CMAKE_ARGS: ${{ matrix.cmake_args }}
-      run: cmake -Bbuild -DBYOD_BUILD_ADD_ON_MODULES=ON $CMAKE_ARGS
+        CONFIGURE_ADD_ONS_FLAG: "${{ github.event_name != 'pull_request' && '-DBYOD_BUILD_ADD_ON_MODULES=ON' || '' }}"
+      run: cmake -Bbuild $CONFIGURE_ADD_ONS_FLAG $CMAKE_ARGS
 
     - name: Build
       shell: bash
