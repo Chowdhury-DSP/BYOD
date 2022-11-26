@@ -19,7 +19,11 @@ SettingsButton::SettingsButton (BYOD& processor, chowdsp::OpenGLHelper* oglHelpe
 {
     Logger::writeToLog ("Checking OpenGL availability...");
     const auto shouldUseOpenGLByDefault = openGLHelper != nullptr && openGLHelper->isOpenGLAvailable();
+#if CHOWDSP_OPENGL_IS_AVAILABLE
     Logger::writeToLog ("OpenGL is available on this system: " + String (shouldUseOpenGLByDefault ? "TRUE" : "FALSE"));
+#else
+    Logger::writeToLog ("Plugin was built without linking to OpenGL!");
+#endif
     pluginSettings->addProperties<&SettingsButton::globalSettingChanged> ({ { openglID, shouldUseOpenGLByDefault } }, *this);
     globalSettingChanged (openglID);
 
