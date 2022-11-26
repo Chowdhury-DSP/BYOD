@@ -8,7 +8,16 @@ else()
     set(CMAKE_CXX_STANDARD 20)
 endif()
 
-option(BYOD_BUILD_CLAP "Create a CLAP target for BYOD" ON)
+if (NOT IOS)
+    option(BYOD_BUILD_CLAP "Create a CLAP target for BYOD" ON)
+else()
+    option(BYOD_BUILD_CLAP "Create a CLAP target for BYOD" OFF)
+endif()
+
+if (BYOD_BUILD_CLAP AND (CMAKE_VERSION VERSION_LESS 3.21.0))
+    message(WARNING "CLAP builds require CMake version 3.21 or higher! To disable CLAP builds, run CMake configuration with \"-DBYOD_BUILD_CLAP=OFF\"")
+endif()
+
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
@@ -94,7 +103,7 @@ juce_add_plugin(BYOD
     APP_GROUP_IDS ${APP_GROUP_IDS_TO_USE}
 )
 
-if(NOT IOS AND BYOD_BUILD_CLAP)
+if(BYOD_BUILD_CLAP)
     clap_juce_extensions_plugin(
         TARGET BYOD
         CLAP_ID "org.chowdsp.byod"

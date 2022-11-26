@@ -49,6 +49,11 @@ $ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build --config Release --parallel 4
 ```
 
+BYOD requires CMake version 3.15 or higher, however, BYOD
+CLAP builds require CMake 3.21 or higher. CLAP builds can
+be disabled by adding `-DBYOD_BUILD_CLAP=OFF` to the first
+CMake command.
+
 After a successful build, the resulting plugin binaries will be located in
 `build/BYOD_artefacts`.
 
