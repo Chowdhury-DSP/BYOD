@@ -25,7 +25,7 @@ inline auto sinh_cosh (float x) noexcept
     // let B = e^x, then sinh = (B^2 - 1) / (2B), cosh = (B^2 + 1) / (2B)
     // simplifying, we get: sinh = 0.5 (B - 1/B), cosh = 0.5 (B + 1/B)
 
-    auto B = chowdsp::Omega::exp_approx (x); // std::exp (x);
+    auto B = std::exp (x);
     auto Br = 0.5f / B;
     B *= 0.5f;
 
