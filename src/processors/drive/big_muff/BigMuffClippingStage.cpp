@@ -25,7 +25,7 @@ inline auto sinh_cosh (float x) noexcept
     // let B = e^x, then sinh = (B^2 - 1) / (2B), cosh = (B^2 + 1) / (2B)
     // simplifying, we get: sinh = 0.5 (B - 1/B), cosh = 0.5 (B + 1/B)
 
-    auto B = std::exp (x);
+    auto B = chowdsp::Omega::exp_approx (x); // std::exp (x);
     auto Br = 0.5f / B;
     B *= 0.5f;
 
@@ -85,35 +85,51 @@ void BigMuffClippingStage::reset()
     }
 }
 
+float BigMuffClippingStage::getGC12 (float fs, float smoothing)
+{
+    // capacitor C12 admittance, smoothing adds or removes 200 pF
+    return 2.0f * (C12 + smoothing * 200.0e-12f) * fs;
+}
+
 template <bool highQuality>
-void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer, const float smoothing) noexcept
+void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer, const chowdsp::SmoothedBufferValue<float>& gc12Smoothed) noexcept
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
-    // capacitor C12 admittance, smoothing adds or removes 200 pF
-    float G_C_12 = (2.0f * (C12 + (smoothing - 50.0f) * 4.0e-12f) * fs);
 
+    const auto processSample = [this] (int ch, float x, float G_C_12)
+    {
+        // input filter
+        auto u_n = inputFilter[ch].processSample (x);
+
+        // newton-raphson
+        float y_k = newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12);
+
+        // update state
+        C_12_1[ch] = 2.0f * (y_k - VbiasA) * G_C_12 - C_12_1[ch];
+        y_1[ch] = y_k;
+
+        return y_k;
+    };
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* x = buffer.getWritePointer (ch);
 
-        for (int n = 0; n < numSamples; ++n)
+        if (gc12Smoothed.isSmoothing())
         {
-            // input filter
-            auto u_n = inputFilter[ch].processSample (x[n]);
-
-            // newton-raphson
-            float y_k = newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12);
-
-            // update state
-            C_12_1[ch] = 2.0f * (y_k - VbiasA) * G_C_12 - C_12_1[ch];
-            y_1[ch] = y_k;
-
-            x[n] = y_k;
+            const auto G_C_12_data = gc12Smoothed.getSmoothedBuffer();
+            for (int n = 0; n < numSamples; ++n)
+                x[n] = processSample (ch, x[n], G_C_12_data[n]);
+        }
+        else
+        {
+            const auto G_C_12 = gc12Smoothed.getCurrentValue();
+            for (int n = 0; n < numSamples; ++n)
+                x[n] = processSample (ch, x[n], G_C_12);
         }
     }
 }
 
-template void BigMuffClippingStage::processBlock<true> (AudioBuffer<float>& buffer, const float smoothing) noexcept;
-template void BigMuffClippingStage::processBlock<false> (AudioBuffer<float>& buffer, const float smoothing) noexcept;
+template void BigMuffClippingStage::processBlock<true> (AudioBuffer<float>&, const chowdsp::SmoothedBufferValue<float>&) noexcept;
+template void BigMuffClippingStage::processBlock<false> (AudioBuffer<float>&, const chowdsp::SmoothedBufferValue<float>&) noexcept;

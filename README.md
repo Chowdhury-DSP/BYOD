@@ -38,7 +38,6 @@ $ cd BYOD
 $ git submodule update --init --recursive
 
 # build with CMake
-# add -DBYOD_BUILD_CLAP=OFF if you get a complaint about the CMake version
 $ cmake -Bbuild
 $ cmake --build build --parallel 4
 ```
@@ -46,7 +45,6 @@ $ cmake --build build --parallel 4
 If you'd like to make an optimized "release" build, it
 is suggested to use some slightly different build commands:
 ```bash
-# add -DBYOD_BUILD_CLAP=OFF if you get a complaint about the CMake version
 $ cmake -Bbuild -DCMAKE_BUILD_TYPE=Release
 $ cmake --build build --config Release --parallel 4
 ```

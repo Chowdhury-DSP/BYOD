@@ -19,7 +19,7 @@ BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Muff Drive", crea
     loadParameterPointer (sustainParam, vts, "sustain");
     loadParameterPointer (harmParam, vts, "harmonics");
     loadParameterPointer (levelParam, vts, "level");
-    loadParameterPointer (smoothingParam, vts, "smoothing");
+    smoothingParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, "smoothing"));
     nStagesParam = vts.getRawParameterValue ("n_stages");
     hiQParam = vts.getRawParameterValue ("high_q");
 
@@ -39,7 +39,7 @@ ParamLayout BigMuffDrive::createParameterLayout()
 
     createPercentParameter (params, "sustain", "Sustain", 0.5f);
     createPercentParameter (params, "harmonics", "Harmonics", 0.65f);
-    createPercentParameter (params, "smoothing", "Smoothing", 0.5f);
+    createBipolarPercentParameter (params, "smoothing", "Smoothing", 0.0f);
     createPercentParameter (params, "level", "Level", 0.65f);
 
     emplace_param<AudioParameterChoice> (params, "n_stages", "", StringArray { "1 Stage", "2 Stages", "3 Stages", "4 Stages" }, 1);
@@ -59,6 +59,13 @@ void BigMuffDrive::prepare (double sampleRate, int samplesPerBlock)
         filt.calcCoefs (cutoffSmooth.getTargetValue(), fs);
         filt.reset();
     }
+
+    smoothingParam.prepare (sampleRate, samplesPerBlock);
+    smoothingParam.setRampLength (0.05);
+    smoothingParam.mappingFunction = [fs = this->fs] (float val)
+    {
+        return BigMuffClippingStage::getGC12 (fs, val);
+    };
 
     for (auto& stage : stages)
         stage.prepare (sampleRate);
@@ -153,17 +160,17 @@ void BigMuffDrive::processAudio (AudioBuffer<float>& buffer)
 
     processInputStage (buffer);
 
-    float smoothing = smoothingParam->getCurrentValue();
+    smoothingParam.process (numSamples);
     const auto useHighQualityMode = hiQParam->load() == 1.0f;
     if (useHighQualityMode)
     {
         for (int i = 0; i < numStages; ++i)
-            stages[i].processBlock<true> (buffer, smoothing);
+            stages[i].processBlock<true> (buffer, smoothingParam);
     }
     else
     {
         for (int i = 0; i < numStages; ++i)
-            stages[i].processBlock<false> (buffer, smoothing);
+            stages[i].processBlock<false> (buffer, smoothingParam);
     }
 
     for (int ch = 0; ch < numChannels; ++ch)
