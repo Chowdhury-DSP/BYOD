@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Big Muff (Russian)" plugin="BYOD" vendor="CHOW" category="Pedals"
+        version="1.1.0">
+  <proc_chain state_plugin_version="1.1.0">
+    <Muff_Drive>
+      <Parameters x_pos="0.2234146296977997" y_pos="0.3075657784938812">
+        <PARAM id="harmonics" value="0.8799999952316284"/>
+        <PARAM id="level" value="0.6499999761581421"/>
+        <PARAM id="n_stages" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="sustain" value="0.5"/>
+        <PARAM id="high_q"/>
+        <PARAM id="smoothing" value="-0.2049999833106995"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Muff_Drive>
+    <Muff_Tone>
+      <Parameters x_pos="0.5463414788246155" y_pos="0.320723682641983">
+        <PARAM id="mids" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+        <PARAM id="type" value="3.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Muff_Tone>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

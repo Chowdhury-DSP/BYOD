@@ -60,12 +60,12 @@ void BigMuffDrive::prepare (double sampleRate, int samplesPerBlock)
         filt.reset();
     }
 
-    smoothingParam.prepare (sampleRate, samplesPerBlock);
     smoothingParam.setRampLength (0.05);
     smoothingParam.mappingFunction = [fs = this->fs] (float val)
     {
         return BigMuffClippingStage::getGC12 (fs, val);
     };
+    smoothingParam.prepare (sampleRate, samplesPerBlock);
 
     for (auto& stage : stages)
         stage.prepare (sampleRate);
