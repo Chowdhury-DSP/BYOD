@@ -17,10 +17,11 @@ public:
 private:
     void doPrebuffering();
     void processInputStage (AudioBuffer<float>& buffer);
-
+    
     chowdsp::FloatParameter* sustainParam = nullptr;
     chowdsp::FloatParameter* harmParam = nullptr;
     chowdsp::FloatParameter* levelParam = nullptr;
+    chowdsp::SmoothedBufferValue<float> smoothingParam;
     std::atomic<float>* nStagesParam = nullptr;
     std::atomic<float>* hiQParam = nullptr;
 

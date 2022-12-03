@@ -11,15 +11,15 @@ public:
     void reset();
 
     template <bool highQuality>
-    void processBlock (AudioBuffer<float>& buffer) noexcept;
+    void processBlock (AudioBuffer<float>& buffer, const chowdsp::SmoothedBufferValue<float>& gc12Smoothed) noexcept;
+
+    static float getGC12 (float fs, float smoothing);
 
 private:
     chowdsp::IIRFilter<1, float> inputFilter[2];
 
     float fs = 48000.0f;
     float y_1[2] {}; // newton-raphson state
-
-    float G_C_12 = 1.0f; // capacitor C12 admittance
     float C_12_1[2] {}; // capacitor C12 state
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BigMuffClippingStage)

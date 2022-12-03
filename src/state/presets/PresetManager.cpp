@@ -109,6 +109,9 @@ void PresetManager::loadBYODFactoryPresets()
     // pedals
     factoryPresets.emplace_back (BinaryData::American_Sound_chowpreset, BinaryData::American_Sound_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Big_Muff_chowpreset, BinaryData::Big_Muff_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Big_Muff_Triangle_chowpreset, BinaryData::Big_Muff_Triangle_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Big_Muff_Rams_Head_56_chowpreset, BinaryData::Big_Muff_Rams_Head_56_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Big_Muff_Russian_chowpreset, BinaryData::Big_Muff_Russian_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Centaur_chowpreset, BinaryData::Centaur_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::King_Of_Tone_chowpreset, BinaryData::King_Of_Tone_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
