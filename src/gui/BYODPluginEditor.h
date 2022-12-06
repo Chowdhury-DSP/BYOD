@@ -23,7 +23,7 @@ private:
     void setResizeBehaviour();
 
     BYOD& plugin;
-    HostContextProvider hostContextProvider;
+    chowdsp::HostContextProvider hostContextProvider;
 
     ComponentBoundsConstrainer constrainer;
 

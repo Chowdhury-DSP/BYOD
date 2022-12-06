@@ -9,7 +9,7 @@ class BYOD;
 class ToolBar : public Component
 {
 public:
-    ToolBar (BYOD& plugin, HostContextProvider& hostContextProvider);
+    ToolBar (BYOD& plugin, chowdsp::HostContextProvider& hostContextProvider);
 
     void paint (Graphics& g) override;
     void resized() override;

@@ -176,13 +176,13 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     buffer.applyGain (Decibels::decibelsToGain (-6.0f));
 }
 
-bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
+bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
 {
     using namespace chowdsp::ParamUtils;
     class ControlSlider : public Slider
     {
     public:
-        ControlSlider (AudioProcessorValueTreeState& vtState, HostContextProvider& hcp)
+        ControlSlider (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
               freqModSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, freqModTag), hcp),
               sensitivitySlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, senseTag), hcp),

@@ -9,6 +9,8 @@
 #include <random>
 #include <unordered_map>
 
+#include <magic_enum.hpp> // Needs to be included before JUCE
+
 // JUCE modules
 #include <JuceHeader.h>
 
@@ -16,7 +18,6 @@
 #include <Eigen/Dense>
 #include <RTNeural/RTNeural.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>
-#include <magic_enum.hpp>
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
 #include <rapidfuzz/fuzz.hpp>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE

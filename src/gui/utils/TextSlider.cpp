@@ -1,6 +1,6 @@
 #include "TextSlider.h"
 
-TextSlider::TextSlider (const chowdsp::FloatParameter* param, const HostContextProvider& hcp)
+TextSlider::TextSlider (const chowdsp::FloatParameter* param, const chowdsp::HostContextProvider& hcp)
     : parameter (param),
       hostContextProvider (hcp)
 {
@@ -24,7 +24,12 @@ void TextSlider::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
-        hostContextProvider.showParameterContextPopupMenu (parameter);
+        hostContextProvider.showParameterContextPopupMenu (
+            *parameter,
+            PopupMenu::Options()
+                .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
+                .withStandardItemHeight (27),
+            chowdsp::SharedLNFAllocator {} -> getLookAndFeel<ByodLNF>());
         return;
     }
 

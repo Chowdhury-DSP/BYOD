@@ -4,7 +4,7 @@
 
 namespace GUIColours = GUIConstants::Colours;
 
-ToolBar::ToolBar (BYOD& plugin, HostContextProvider& hostContextProvider) : undoRedoComp (plugin.getUndoManager()),
+ToolBar::ToolBar (BYOD& plugin, chowdsp::HostContextProvider& hostContextProvider) : undoRedoComp (plugin.getUndoManager()),
                                                                             globalParamControls (plugin.getVTS(),
                                                                                                  hostContextProvider,
                                                                                                  plugin.getOversampling()),

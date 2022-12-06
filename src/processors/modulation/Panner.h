@@ -23,7 +23,7 @@ private:
     void processStereoInput (const AudioBuffer<float>& buffer);
     void processSingleChannelPan (chowdsp::Panner<float>& panner, const AudioBuffer<float>& inBuffer, AudioBuffer<float>& outBuffer, float basePanValue, int inBufferChannel = 0, float modMultiply = 1.0f);
 
-    bool getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
     chowdsp::FloatParameter* mainPan = nullptr;
     chowdsp::FloatParameter* leftPan = nullptr;

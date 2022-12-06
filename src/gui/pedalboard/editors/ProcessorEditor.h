@@ -8,7 +8,7 @@
 class ProcessorEditor : public Component
 {
 public:
-    ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs, HostContextProvider& hostContextProvider);
+    ProcessorEditor (BaseProcessor& baseProc, ProcessorChain& procs, chowdsp::HostContextProvider& hostContextProvider);
     ~ProcessorEditor() override;
 
     void paint (Graphics& g) override;

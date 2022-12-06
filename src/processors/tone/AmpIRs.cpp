@@ -1,7 +1,7 @@
 #include "AmpIRs.h"
 #include "../ParameterHelpers.h"
 #include "gui/utils/ErrorMessageView.h"
-#include "gui/utils/HostContextProvider.h"
+
 
 namespace
 {
@@ -194,7 +194,7 @@ void AmpIRs::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loa
 }
 
 //==========================================================================
-bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
+bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
 {
     struct CustomBoxAttach : private ComboBox::Listener
     {
@@ -254,7 +254,7 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, HostContex
 
     struct IRComboBox : public ComboBox
     {
-        IRComboBox (AudioProcessorValueTreeState& vtState, AmpIRs& airs, HostContextProvider& hcp)
+        IRComboBox (AudioProcessorValueTreeState& vtState, AmpIRs& airs, chowdsp::HostContextProvider& hcp)
             : ampIRs (airs), vts (vtState)
         {
             auto* param = vts.getParameter (irTag);

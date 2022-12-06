@@ -1,9 +1,10 @@
 #include "ModulatableSlider.h"
+#include "LookAndFeels.h"
 
-ModulatableSlider::ModulatableSlider (const chowdsp::FloatParameter& p, const HostContextProvider& hcp) : param (p),
-                                                                                                          hostContextProvider (hcp)
+ModulatableSlider::ModulatableSlider (const chowdsp::FloatParameter& p, const chowdsp::HostContextProvider& hcp) : param (p),
+                                                                                                                   hostContextProvider (hcp)
 {
-    if (hostContextProvider.supportsParameterModulation)
+    if (hostContextProvider.supportsParameterModulation())
         startTimerHz (32);
 }
 
@@ -130,7 +131,11 @@ void ModulatableSlider::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
-        hostContextProvider.showParameterContextPopupMenu (&param);
+        hostContextProvider.showParameterContextPopupMenu (param,
+                                                           PopupMenu::Options()
+                                                               .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
+                                                               .withStandardItemHeight (27),
+                                                           chowdsp::SharedLNFAllocator{}->getLookAndFeel<ByodLNF>());
         return;
     }
 

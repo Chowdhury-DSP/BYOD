@@ -9,7 +9,7 @@ constexpr float cornerSize = 5.0f;
 
 ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
                                   ProcessorChain& procs,
-                                  HostContextProvider& hostContextProvider) : proc (baseProc),
+                                  chowdsp::HostContextProvider& hostContextProvider) : proc (baseProc),
                                                                               procChain (procs),
                                                                               procUI (proc.getUIOptions()),
                                                                               contrastColour (procUI.backgroundColour.contrasting()),

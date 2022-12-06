@@ -6,7 +6,7 @@ class GlobalParamControls : public Component
 {
 public:
     GlobalParamControls (AudioProcessorValueTreeState& vts,
-                         HostContextProvider& hostContextProvider,
+                         chowdsp::HostContextProvider& hostContextProvider,
                          chowdsp::VariableOversampling<float>& oversampling);
 
     void resized() override;
@@ -17,7 +17,7 @@ private:
 
     struct SliderWithAttachment : public TextSlider
     {
-        SliderWithAttachment (const chowdsp::FloatParameter* param, const HostContextProvider& hcp) : TextSlider (param, hcp) {}
+        SliderWithAttachment (const chowdsp::FloatParameter* param, const chowdsp::HostContextProvider& hcp) : TextSlider (param, hcp) {}
         std::unique_ptr<SliderAttachment> attachment;
     };
 

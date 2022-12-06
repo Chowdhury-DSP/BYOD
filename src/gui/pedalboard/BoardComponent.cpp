@@ -27,7 +27,7 @@ juce::Point<int> getRandomPosition (const Component& comp)
 }
 } // namespace
 
-BoardComponent::BoardComponent (ProcessorChain& procs, HostContextProvider& hostCP) : Component ("Board"),
+BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvider& hostCP) : Component ("Board"),
                                                                                       procChain (procs),
                                                                                       cableView (*this),
                                                                                       hostContextProvider (hostCP)
