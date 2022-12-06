@@ -26,9 +26,7 @@ void TextSlider::mouseDown (const MouseEvent& e)
     {
         hostContextProvider.showParameterContextPopupMenu (
             *parameter,
-            PopupMenu::Options()
-                .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-                .withStandardItemHeight (27),
+            PopupMenu::Options(),
             chowdsp::SharedLNFAllocator {} -> getLookAndFeel<ByodLNF>());
         return;
     }

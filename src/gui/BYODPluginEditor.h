@@ -4,6 +4,7 @@
 #include "TitleBar.h"
 #include "pedalboard/BoardViewport.h"
 #include "toolbar/ToolBar.h"
+#include "utils/HostContextProvider.h"
 #include "utils/ErrorMessageView.h"
 
 class BYODPluginEditor : public AudioProcessorEditor
@@ -23,7 +24,7 @@ private:
     void setResizeBehaviour();
 
     BYOD& plugin;
-    chowdsp::HostContextProvider hostContextProvider;
+    HostContextProvider hostContextProvider;
 
     ComponentBoundsConstrainer constrainer;
 

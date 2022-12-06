@@ -132,9 +132,7 @@ void ModulatableSlider::mouseDown (const MouseEvent& e)
     if (e.mods.isPopupMenu())
     {
         hostContextProvider.showParameterContextPopupMenu (param,
-                                                           PopupMenu::Options()
-                                                               .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-                                                               .withStandardItemHeight (27),
+                                                           PopupMenu::Options(),
                                                            chowdsp::SharedLNFAllocator{}->getLookAndFeel<ByodLNF>());
         return;
     }
