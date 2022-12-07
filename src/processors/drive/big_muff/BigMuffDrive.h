@@ -17,7 +17,7 @@ public:
 private:
     void doPrebuffering();
     void processInputStage (AudioBuffer<float>& buffer);
-    
+
     chowdsp::FloatParameter* sustainParam = nullptr;
     chowdsp::FloatParameter* harmParam = nullptr;
     chowdsp::FloatParameter* levelParam = nullptr;

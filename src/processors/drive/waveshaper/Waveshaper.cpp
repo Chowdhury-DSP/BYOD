@@ -1,7 +1,6 @@
 #include "Waveshaper.h"
 #include "../../ParameterHelpers.h"
 
-
 namespace
 {
 const String shapeTag = "shape";

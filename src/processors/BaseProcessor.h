@@ -35,7 +35,6 @@ struct ConnectionInfo
     int endPort;
 };
 
-
 class BaseProcessor : private JuceProcWrapper
 {
 public:

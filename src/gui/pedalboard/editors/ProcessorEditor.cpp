@@ -10,15 +10,15 @@ constexpr float cornerSize = 5.0f;
 ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
                                   ProcessorChain& procs,
                                   chowdsp::HostContextProvider& hostContextProvider) : proc (baseProc),
-                                                                              procChain (procs),
-                                                                              procUI (proc.getUIOptions()),
-                                                                              contrastColour (procUI.backgroundColour.contrasting()),
-                                                                              knobs (baseProc,
-                                                                                     proc.getVTS(),
-                                                                                     contrastColour,
-                                                                                     procUI.powerColour,
-                                                                                     hostContextProvider),
-                                                                              powerButton (procUI.powerColour)
+                                                                                       procChain (procs),
+                                                                                       procUI (proc.getUIOptions()),
+                                                                                       contrastColour (procUI.backgroundColour.contrasting()),
+                                                                                       knobs (baseProc,
+                                                                                              proc.getVTS(),
+                                                                                              contrastColour,
+                                                                                              procUI.powerColour,
+                                                                                              hostContextProvider),
+                                                                                       powerButton (procUI.powerColour)
 {
     addAndMakeVisible (knobs);
     setBroughtToFrontOnMouseClick (true);

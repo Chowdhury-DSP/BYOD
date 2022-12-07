@@ -2,7 +2,6 @@
 #include "../ParameterHelpers.h"
 #include "gui/utils/ErrorMessageView.h"
 
-
 namespace
 {
 const StringArray irNames {

@@ -28,9 +28,9 @@ juce::Point<int> getRandomPosition (const Component& comp)
 } // namespace
 
 BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvider& hostCP) : Component ("Board"),
-                                                                                      procChain (procs),
-                                                                                      cableView (*this),
-                                                                                      hostContextProvider (hostCP)
+                                                                                               procChain (procs),
+                                                                                               cableView (*this),
+                                                                                               hostContextProvider (hostCP)
 {
     newProcButton.setButtonText ("+");
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));

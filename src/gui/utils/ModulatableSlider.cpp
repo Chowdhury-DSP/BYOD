@@ -131,9 +131,10 @@ void ModulatableSlider::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
-        hostContextProvider.showParameterContextPopupMenu (param,
-                                                           PopupMenu::Options(),
-                                                           chowdsp::SharedLNFAllocator{}->getLookAndFeel<ByodLNF>());
+        hostContextProvider.showParameterContextPopupMenu (
+            param,
+            PopupMenu::Options(),
+            chowdsp::SharedLNFAllocator {} -> getLookAndFeel<ByodLNF>());
         return;
     }
 
