@@ -5,6 +5,7 @@
 #include "pedalboard/BoardViewport.h"
 #include "toolbar/ToolBar.h"
 #include "utils/ErrorMessageView.h"
+#include "utils/HostContextProvider.h"
 
 class BYODPluginEditor : public AudioProcessorEditor
 {

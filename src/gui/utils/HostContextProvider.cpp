@@ -2,33 +2,11 @@
 #include "BYOD.h"
 #include "LookAndFeels.h"
 
-HostContextProvider::HostContextProvider (const BYOD& p, AudioProcessorEditor* ed)
-    : supportsParameterModulation (p.supportsParameterModulation()),
+HostContextProvider::HostContextProvider (const BYOD& p, AudioProcessorEditor& ed)
+    : chowdsp::HostContextProvider (p, ed),
       plugin (p),
-      editor (ed),
       paramForwarder (plugin.getParamForwarder())
 {
-}
-
-void HostContextProvider::showParameterContextPopupMenu (const RangedAudioParameter* param) const
-{
-    if (param == nullptr)
-        return;
-
-    if (const auto contextMenu = getContextMenuForParameter (param))
-    {
-        auto popupMenu = contextMenu->getEquivalentPopupMenu();
-        if (popupMenu.containsAnyActiveItems())
-        {
-            const auto options = PopupMenu::Options()
-                                     .withParentComponent (editor)
-                                     .withPreferredPopupDirection (PopupMenu::Options::PopupDirection::downwards)
-                                     .withStandardItemHeight (27);
-            popupMenu.setLookAndFeel (lnfAllocator->getLookAndFeel<ByodLNF>());
-
-            popupMenu.showMenuAsync (juce::PopupMenu::Options());
-        }
-    }
 }
 
 template <typename Action, typename ReturnType>
@@ -43,32 +21,19 @@ ReturnType HostContextProvider::doForParameterOrForwardedParameter (const Ranged
     return ReturnType();
 }
 
-std::unique_ptr<HostProvidedContextMenu> HostContextProvider::getContextMenuForParameter (const RangedAudioParameter* param) const
+std::unique_ptr<HostProvidedContextMenu> HostContextProvider::getContextMenuForParameter (const RangedAudioParameter& param) const
 {
-    if (param == nullptr)
-        return {};
-
-    if (const auto* editorContext = editor->getHostContext())
-        return doForParameterOrForwardedParameter (*param, [&editorContext] (auto& p)
-                                                   { return editorContext->getContextMenuForParameter (&p); });
-
-    return {};
+    return doForParameterOrForwardedParameter (param,
+                                               [this] (auto& p) -> std::unique_ptr<HostProvidedContextMenu> {
+                                                   return chowdsp::HostContextProvider::getContextMenuForParameter (p);
+                                               });
 }
 
 void HostContextProvider::registerParameterComponent (Component& comp, const RangedAudioParameter& param)
 {
-    doForParameterOrForwardedParameter (param, [this, &comp] (auto& p)
-                                        { componentToParameterIndexMap.insert_or_assign (&comp, p.getParameterIndex()); });
-}
-
-int HostContextProvider::getParameterIndexForComponent (Component& comp) const
-{
-    if (const auto iter = componentToParameterIndexMap.find (&comp); iter != componentToParameterIndexMap.end())
-        return iter->second;
-    return -1;
-}
-
-void HostContextProvider::componentBeingDeleted (Component& comp)
-{
-    componentToParameterIndexMap.erase (&comp);
+    doForParameterOrForwardedParameter (param,
+                                        [this, &comp] (auto& p)
+                                        {
+                                            chowdsp::HostContextProvider::registerParameterComponent (comp, p);
+                                        });
 }

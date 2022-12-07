@@ -1,12 +1,12 @@
 #pragma once
 
-#include "HostContextProvider.h"
+#include <pch.h>
 
 class ModulatableSlider : public Slider,
                           private Timer
 {
 public:
-    ModulatableSlider (const chowdsp::FloatParameter& param, const HostContextProvider& hostContextProvider);
+    ModulatableSlider (const chowdsp::FloatParameter& param, const chowdsp::HostContextProvider& hostContextProvider);
 
     void paint (Graphics& g) override;
     void mouseDown (const MouseEvent& e) override;
@@ -21,7 +21,7 @@ protected:
     void drawLinearSlider (juce::Graphics& g, int x, int y, int width, int height, float sliderPos, float modSliderPos);
 
     const chowdsp::FloatParameter& param;
-    const HostContextProvider& hostContextProvider;
+    const chowdsp::HostContextProvider& hostContextProvider;
 
     double modulatedValue = param.getCurrentValue();
 

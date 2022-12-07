@@ -35,7 +35,7 @@ public:
     Font getLabelFont (Label& label) override;
 
     virtual std::unique_ptr<ModulatableSlider> createSlider (const chowdsp::FloatParameter& param,
-                                                             const HostContextProvider& hostContextProvider) const;
+                                                             const chowdsp::HostContextProvider& hostContextProvider) const;
 
 private:
     static constexpr float labelWidthPct = 0.65f;

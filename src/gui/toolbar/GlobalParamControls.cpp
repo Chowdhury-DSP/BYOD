@@ -5,7 +5,7 @@
 namespace GUIColours = GUIConstants::Colours;
 
 GlobalParamControls::GlobalParamControls (AudioProcessorValueTreeState& vts,
-                                          HostContextProvider& hostContextProvider,
+                                          chowdsp::HostContextProvider& hostContextProvider,
                                           chowdsp::VariableOversampling<float>& oversampling)
     : osMenu (oversampling, vts)
 {

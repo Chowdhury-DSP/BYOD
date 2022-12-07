@@ -308,7 +308,7 @@ void GuitarMLAmp::fromXML (XmlElement* xml, const chowdsp::Version& version, boo
     BaseProcessor::fromXML (xml, version, loadPosition);
 }
 
-bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
+bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
 {
     using namespace chowdsp::ParamUtils;
     class MainParamSlider : public Slider
@@ -317,7 +317,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, HostC
         MainParamSlider (const ModelArch& modelArch,
                          AudioProcessorValueTreeState& vts,
                          ModelChangeBroadcaster& modelChangeBroadcaster,
-                         HostContextProvider& hcp)
+                         chowdsp::HostContextProvider& hcp)
             : currentModelArch (modelArch),
               gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, gainTag), hcp),
               conditionSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, conditionTag), hcp),

@@ -1,6 +1,5 @@
 #include "Waveshaper.h"
 #include "../../ParameterHelpers.h"
-#include "gui/utils/HostContextProvider.h"
 
 namespace
 {
@@ -109,7 +108,7 @@ void Waveshaper::processAudio (AudioBuffer<float>& buffer)
     }
 }
 
-bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
+bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
 {
     struct CustomBoxAttach : private ComboBox::Listener
     {
@@ -158,7 +157,7 @@ bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps, HostCo
 
     struct WaveshapeComboBox : public ComboBox
     {
-        WaveshapeComboBox (AudioProcessorValueTreeState& vtState, HostContextProvider& hcp) : vts (vtState)
+        WaveshapeComboBox (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp) : vts (vtState)
         {
             auto* param = vts.getParameter (shapeTag);
             attachment = std::make_unique<CustomBoxAttach> (*param, *this, vts.undoManager);

@@ -138,13 +138,13 @@ void StateVariableFilter::fromXML (XmlElement* xml, const chowdsp::Version& vers
     }
 }
 
-bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
+bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
 {
     using namespace chowdsp::ParamUtils;
     class ModeControl : public Slider
     {
     public:
-        ModeControl (AudioProcessorValueTreeState& vtState, HostContextProvider& hcp)
+        ModeControl (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
               modeSelectorAttach (vts, modeTag, modeSelector),
               multiModeSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, multiModeTypeTag), hcp),

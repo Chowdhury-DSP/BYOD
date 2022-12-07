@@ -11,7 +11,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
                                 AudioProcessorValueTreeState& vts,
                                 const Colour& cc,
                                 const Colour& ac,
-                                HostContextProvider& hostContextProvider)
+                                chowdsp::HostContextProvider& hostContextProvider)
 {
     if (auto* lnf = baseProc.getCustomLookAndFeel())
         setLookAndFeel (lnf);

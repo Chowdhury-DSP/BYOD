@@ -35,7 +35,6 @@ struct ConnectionInfo
     int endPort;
 };
 
-class HostContextProvider;
 class BaseProcessor : private JuceProcWrapper
 {
 public:
@@ -78,7 +77,7 @@ public:
      *
      * Return true if the custom components should be ordered before the other components on the UI.
      */
-    virtual bool getCustomComponents (OwnedArray<Component>& /*customComps*/, HostContextProvider&) { return false; }
+    virtual bool getCustomComponents (OwnedArray<Component>& /*customComps*/, chowdsp::HostContextProvider&) { return false; }
 
     /** if your processor needs a custom looks and feel, create it here! (with the shared lnfAllocator) */
     virtual LookAndFeel* getCustomLookAndFeel() const { return nullptr; }

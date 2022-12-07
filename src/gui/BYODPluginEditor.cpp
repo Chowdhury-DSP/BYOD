@@ -4,7 +4,7 @@
 
 BYODPluginEditor::BYODPluginEditor (BYOD& p) : AudioProcessorEditor (p),
                                                plugin (p),
-                                               hostContextProvider (plugin, this),
+                                               hostContextProvider (plugin, *this),
                                                titleBar (plugin),
                                                board (plugin.getProcChain(), hostContextProvider),
                                                toolBar (plugin, hostContextProvider)
