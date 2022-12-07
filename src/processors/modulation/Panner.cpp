@@ -240,7 +240,7 @@ void Panner::processAudioBypassed (AudioBuffer<float>& buffer)
     outputBuffers.getReference (ModulationOutput) = &modulationBuffer;
 }
 
-bool Panner::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
+bool Panner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
 {
     using namespace chowdsp::ParamUtils;
 
@@ -248,7 +248,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps, HostContex
     class PanSlider1 : public Slider
     {
     public:
-        PanSlider1 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo, HostContextProvider& hcp)
+        PanSlider1 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
               mainPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, mainPanTag), hcp),
               leftPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, leftPanTag), hcp),
@@ -332,7 +332,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps, HostContex
                        private Timer
     {
     public:
-        PanSlider2 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo, HostContextProvider& hcp)
+        PanSlider2 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
               widthSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, stereoWidthTag), hcp),
               rightPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, rightPanTag), hcp),

@@ -4,6 +4,7 @@
 #include "TitleBar.h"
 #include "pedalboard/BoardViewport.h"
 #include "toolbar/ToolBar.h"
+#include "utils/HostContextProvider.h"
 #include "utils/ErrorMessageView.h"
 
 class BYODPluginEditor : public AudioProcessorEditor

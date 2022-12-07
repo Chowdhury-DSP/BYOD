@@ -10,7 +10,7 @@ public:
                     AudioProcessorValueTreeState& vts,
                     const Colour& contrastColour,
                     const Colour& accentColour,
-                    HostContextProvider& hostContextProvider);
+                    chowdsp::HostContextProvider& hostContextProvider);
 
     void paint (Graphics& g) override;
     void resized() override;

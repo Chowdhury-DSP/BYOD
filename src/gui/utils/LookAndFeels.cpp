@@ -174,7 +174,7 @@ void ProcessorLNF::drawLabel (Graphics& g, Label& label)
 }
 
 std::unique_ptr<ModulatableSlider> ProcessorLNF::createSlider (const chowdsp::FloatParameter& param,
-                                                               const HostContextProvider& hostContextProvider) const
+                                                               const chowdsp::HostContextProvider& hostContextProvider) const
 {
     return std::make_unique<ModulatableSlider> (param, hostContextProvider);
 }

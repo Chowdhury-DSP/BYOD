@@ -17,7 +17,7 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
-    bool getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
     std::unique_ptr<XmlElement> toXML() override;
     void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;

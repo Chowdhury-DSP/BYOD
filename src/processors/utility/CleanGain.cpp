@@ -82,13 +82,13 @@ void CleanGain::processAudio (AudioBuffer<float>& buffer)
     gain.process (context);
 }
 
-bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp)
+bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
 {
     using namespace chowdsp::ParamUtils;
     class GainSlider : public Slider
     {
     public:
-        GainSlider (AudioProcessorValueTreeState& vtState, HostContextProvider& hcp)
+        GainSlider (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
               gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, gainTag), hcp),
               extGainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, extGainTag), hcp),

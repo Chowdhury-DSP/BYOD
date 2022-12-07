@@ -1,13 +1,12 @@
 #pragma once
 
-#include "HostContextProvider.h"
 #include "LookAndFeels.h"
 
 /* Slider that shows only a text bubble */
 class TextSlider : public Slider
 {
 public:
-    TextSlider (const chowdsp::FloatParameter* param, const HostContextProvider& hostContextProvider);
+    TextSlider (const chowdsp::FloatParameter* param, const chowdsp::HostContextProvider& hostContextProvider);
     ~TextSlider() override;
 
     void resized() override;
@@ -19,7 +18,7 @@ private:
     chowdsp::SharedLNFAllocator lnfAllocator;
 
     const chowdsp::FloatParameter* parameter;
-    const HostContextProvider& hostContextProvider;
+    const chowdsp::HostContextProvider& hostContextProvider;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TextSlider)
 };

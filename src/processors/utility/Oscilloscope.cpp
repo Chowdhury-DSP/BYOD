@@ -109,7 +109,7 @@ Path Oscilloscope::ScopeBackgroundTask::getScopePath() const noexcept
 }
 
 //===================================================================
-bool Oscilloscope::getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider&)
+bool Oscilloscope::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider&)
 {
     struct ScopeComp : public Component,
                        private Timer

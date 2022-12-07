@@ -14,7 +14,7 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
-    bool getCustomComponents (OwnedArray<Component>& customComps, HostContextProvider& hcp) override;
+    bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
 private:
     chowdsp::FloatParameter* driveParam = nullptr;
