@@ -21,12 +21,15 @@ namespace
 ProcessorChain::ProcessorChain (ProcessorStore& store,
                                 AudioProcessorValueTreeState& vts,
                                 std::unique_ptr<chowdsp::PresetManager>& presetMgr,
-                                std::function<void (int)>&& latencyChangedCallback) : procStore (store),
-                                                                                      um (vts.undoManager),
-                                                                                      inputProcessor (um),
-                                                                                      outputProcessor (um),
-                                                                                      ioProcessor (vts, std::move (latencyChangedCallback)),
-                                                                                      presetManager (presetMgr)
+                                std::unique_ptr<ParamForwardManager>& paramForwarder,
+                                std::function<void (int)>&& latencyChangedCallback)
+    : procStore (store),
+      um (vts.undoManager),
+      inputProcessor (um),
+      outputProcessor (um),
+      ioProcessor (vts, std::move (latencyChangedCallback)),
+      presetManager (presetMgr),
+      paramForwardManager (paramForwarder)
 {
     actionHelper = std::make_unique<ProcessorChainActionHelper> (*this);
     stateHelper = std::make_unique<ProcessorChainStateHelper> (*this, mainThreadAction);
@@ -214,7 +217,6 @@ void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, floa
                                jassert (presetManager != nullptr);
 
                                if (! presetManager->getIsDirty())
-                                   presetManager->setIsDirty (true);
-                           },
+                                   presetManager->setIsDirty (true); },
                            true);
 }
