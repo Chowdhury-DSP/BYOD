@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Added "Smoothing" parameter for "Muff Drive" module.
 - Added new factory presets.
 - Fixed parameter name changes not showing up in some CLAP hosts.
+- Fixed crashes when loading AUv3 plugin state in GarageBand.
 
 ## [1.1.0] 2022-11-21
 - Added support for the CLAP plugin format (with parameter modulation).
