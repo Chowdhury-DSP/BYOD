@@ -69,7 +69,7 @@ void JuniorB::processAudio (AudioBuffer<float>& buffer)
     const auto numSamples = buffer.getNumSamples();
 
     dryBuffer.setCurrentSize (numChannels, numSamples);
-    chowdsp::BufferMath::copyBufferData (chowdsp::BufferView { buffer }, dryBuffer);
+    chowdsp::BufferMath::copyBufferData (buffer, dryBuffer);
 
     const auto drivePercent = driveParamPct->getCurrentValue();
     const auto blendPercent = blendParamPct->getCurrentValue();

@@ -38,8 +38,7 @@ public:
                                          plugin.processBlock (buffer, midi);
                                          bufferCount++;
                                      }
-                                     waiter.signal();
-                                 });
+                                     waiter.signal(); });
 
         int numPrograms = plugin.getNumPrograms();
         for (int i = 0; i < numPrograms; ++i)

@@ -1,5 +1,6 @@
 #include "ProcessorChainStateHelper.h"
 #include "ProcessorChainActions.h"
+#include "state/ParamForwardManager.h"
 #include "state/presets/PresetManager.h"
 
 namespace
@@ -30,9 +31,10 @@ String getProcessorName (const String& tag)
 }
 } // namespace
 
-ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain, chowdsp::DeferredAction& deferredAction) : chain (thisChain),
-                                                                                                                            um (chain.um),
-                                                                                                                            mainThreadStateLoader (deferredAction)
+ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain, chowdsp::DeferredAction& deferredAction)
+    : chain (thisChain),
+      um (chain.um),
+      mainThreadStateLoader (deferredAction)
 {
 }
 
@@ -102,6 +104,8 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml,
                                                        bool loadingPreset,
                                                        Component* associatedComp)
 {
+    ParamForwardManager::ScopedForceDeferHostNotifications scopedDeferNotifs { *chain.paramForwardManager };
+
     if (! loadingPreset)
         um->beginNewTransaction();
 

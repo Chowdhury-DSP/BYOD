@@ -9,12 +9,14 @@
 class ProcessorChainActionHelper;
 class ProcessorChainPortMagnitudesHelper;
 class ProcessorChainStateHelper;
+class ParamForwardManager;
 class ProcessorChain : private AudioProcessorValueTreeState::Listener
 {
 public:
     ProcessorChain (ProcessorStore& store,
                     AudioProcessorValueTreeState& vts,
                     std::unique_ptr<chowdsp::PresetManager>& presetMgr,
+                    std::unique_ptr<ParamForwardManager>& paramForwardManager,
                     std::function<void (int)>&& latencyChangedCallback);
     ~ProcessorChain() override;
 
@@ -73,6 +75,7 @@ private:
     std::unique_ptr<ProcessorChainPortMagnitudesHelper> portMagsHelper;
 
     chowdsp::DeferredAction mainThreadAction;
+    std::unique_ptr<ParamForwardManager>& paramForwardManager;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

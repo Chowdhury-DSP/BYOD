@@ -24,7 +24,8 @@ ReturnType HostContextProvider::doForParameterOrForwardedParameter (const Ranged
 std::unique_ptr<HostProvidedContextMenu> HostContextProvider::getContextMenuForParameter (const RangedAudioParameter& param) const
 {
     return doForParameterOrForwardedParameter (param,
-                                               [this] (auto& p) -> std::unique_ptr<HostProvidedContextMenu> {
+                                               [this] (auto& p) -> std::unique_ptr<HostProvidedContextMenu>
+                                               {
                                                    return chowdsp::HostContextProvider::getContextMenuForParameter (p);
                                                });
 }
