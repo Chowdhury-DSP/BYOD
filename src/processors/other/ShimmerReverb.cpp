@@ -88,22 +88,22 @@ void ShimmerReverb::prepare (double sampleRate, int samplesPerBlock)
 {
     shiftParam.prepare (sampleRate, samplesPerBlock);
     shiftParam.setRampLength (0.05);
-    sizeParam.prepare (sampleRate, samplesPerBlock);
-    sizeParam.setRampLength (0.2);
-    feedbackParam.prepare (sampleRate, samplesPerBlock);
-    feedbackParam.setRampLength (0.05);
 
     sizeParam.mappingFunction = [] (float x)
     {
         const auto delayMs = 50.0f * std::pow (250.0f / 50.0f, x);
         return delayMs;
     };
-
+    sizeParam.setRampLength (0.2);
+    sizeParam.prepare (sampleRate, samplesPerBlock);
+    
     feedbackParam.mappingFunction = [] (float x)
     {
         const auto delayMs = 1000.0f * std::pow (10000.0f / 1000.0f, x);
         return delayMs;
     };
+    feedbackParam.setRampLength (0.05);
+    feedbackParam.prepare (sampleRate, samplesPerBlock);
 
     for (auto& channelFDN : fdn)
         channelFDN.prepare (sampleRate);

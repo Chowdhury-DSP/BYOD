@@ -53,14 +53,16 @@ void Rotary::prepare (double sampleRate, int samplesPerBlock)
 
     audioOutBuffer.setSize (2, samplesPerBlock);
 
-    tremDepthSmoothed.prepare (sampleRate, samplesPerBlock);
     tremDepthSmoothed.mappingFunction = [] (float val)
     { return 0.85f * std::pow (val, 0.75f); };
+    tremDepthSmoothed.setRampLength (0.05);
+    tremDepthSmoothed.prepare (sampleRate, samplesPerBlock);
     tremModData.resize ((size_t) samplesPerBlock);
 
-    spectralDepthSmoothed.prepare (sampleRate, samplesPerBlock);
     spectralDepthSmoothed.mappingFunction = [this] (float val)
     { return std::pow (val, 0.8f) * (0.2f / std::pow (*rateHzParam, 1.25f)); };
+    spectralDepthSmoothed.setRampLength (0.05);
+    spectralDepthSmoothed.prepare (sampleRate, samplesPerBlock);
 
     chorusDepthSmoothed.prepare (sampleRate, samplesPerBlock);
 
