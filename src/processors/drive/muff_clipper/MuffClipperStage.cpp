@@ -12,26 +12,25 @@ constexpr float G17 = 1.0f / 470.0e3f;
 // diode constants
 constexpr float Vt = 25.85e-3f;
 constexpr float twoIs = 2.0f * 2.52e-9f;
-constexpr float twoIs_over_Vt = twoIs / Vt;
 
 constexpr float A = -10000.0f / 150.0f; // BJT Common-Emitter amp gain
 constexpr float VbiasA = 0.7f; // bias point after input filter
 
 // compute asymmetric sinh and cosh at the same time so it's faster...
-inline auto sinh_cosh_asym (float x1, float x2) noexcept
+inline auto sinh_cosh_asym (float x, float Vt1, float Vt2) noexcept
 {
     // ref: https://en.wikipedia.org/wiki/Hyperbolic_functions#Definitions
     // sinh = (e^(2x) - 1) / (2e^x), cosh = (e^(2x) + 1) / (2e^x)
     // let B = e^x, then sinh = (B^2 - 1) / (2B), cosh = (B^2 + 1) / (2B)
     // simplifying, we get: sinh = 0.5 (B - 1/B), cosh = 0.5 (B + 1/B)
 
-    auto B = 0.5f * std::exp (x1);
-    auto Br = 0.5f / std::exp (x2);
+    auto B = 0.5f * std::exp (x / Vt1);
+    // asymmetric variant
+    auto Br = 0.5f / std::exp (x / Vt2);
 
     auto sinh = B - Br;
     // cosh is pragmatically defined as the derivative of sinh
-    // consistent with x1 being the expected multiplier
-    auto cosh = B + Br * x2 / x1;
+    auto cosh = B / Vt1 + Br / Vt2;
 
     return std::make_pair (sinh, cosh);
 }
@@ -43,9 +42,9 @@ inline float newton_raphson (float x, float y, float C_12_state, float G_C_12, f
     {
         auto v_drop = y - VbiasA;
 
-        auto [sinh_v, cosh_v] = sinh_cosh_asym (v_drop / Vt * clip1, v_drop / Vt * clip2);
+        auto [sinh_v, cosh_v] = sinh_cosh_asym (v_drop, Vt / clip1, Vt / clip2);
         auto i_diodes = twoIs * sinh_v;
-        auto di_diodes = twoIs_over_Vt * cosh_v;
+        auto di_diodes = twoIs * cosh_v;
 
         auto i_R17 = v_drop * G17;
         auto i_C12 = v_drop * G_C_12 - C_12_state;
