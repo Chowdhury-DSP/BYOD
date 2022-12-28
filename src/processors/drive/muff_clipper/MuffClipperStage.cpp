@@ -88,8 +88,8 @@ void MuffClipperStage::reset()
 
 float MuffClipperStage::getGC12 (float fs, float smoothing)
 {
-    // capacitor C12 admittance, smoothing adds or removes 200 pF
-    return 2.0f * (C12 + smoothing * 200.0e-12f) * fs;
+    // capacitor C12 admittance, scaled by smoothing
+    return 2.0f * C12 * (smoothing + 1.0) * fs;
 }
 
 template <bool highQuality>
