@@ -21,6 +21,8 @@ private:
     chowdsp::FloatParameter* sustainParam = nullptr;
     chowdsp::FloatParameter* harmParam = nullptr;
     chowdsp::FloatParameter* levelParam = nullptr;
+    chowdsp::SmoothedBufferValue<float> clip1Param;
+    chowdsp::SmoothedBufferValue<float> clip2Param;
     chowdsp::SmoothedBufferValue<float> smoothingParam;
     std::atomic<float>* hiQParam = nullptr;
 

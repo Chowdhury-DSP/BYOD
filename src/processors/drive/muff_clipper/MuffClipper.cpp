@@ -19,6 +19,8 @@ MuffClipper::MuffClipper (UndoManager* um) : BaseProcessor ("Muff Clipper", crea
     loadParameterPointer (sustainParam, vts, "sustain");
     loadParameterPointer (harmParam, vts, "harmonics");
     loadParameterPointer (levelParam, vts, "level");
+    clip1Param.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, "clip1"));
+    clip2Param.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, "clip2"));
     smoothingParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, "smoothing"));
     hiQParam = vts.getRawParameterValue ("high_q");
 
@@ -59,6 +61,20 @@ void MuffClipper::prepare (double sampleRate, int samplesPerBlock)
         filt.calcCoefs (cutoffSmooth.getTargetValue(), fs);
         filt.reset();
     }
+
+    clip1Param.setRampLength (0.05);
+    clip1Param.mappingFunction = [fs = this->fs] (float val)
+    {
+        return val + 1.0;
+    };
+    clip1Param.prepare (sampleRate, samplesPerBlock);
+
+    clip2Param.setRampLength (0.05);
+    clip2Param.mappingFunction = [fs = this->fs] (float val)
+    {
+        return val + 1.0;
+    };
+    clip2Param.prepare (sampleRate, samplesPerBlock);
 
     smoothingParam.setRampLength (0.05);
     smoothingParam.mappingFunction = [fs = this->fs] (float val)
@@ -151,15 +167,17 @@ void MuffClipper::processAudio (AudioBuffer<float>& buffer)
 
     processInputStage (buffer);
 
+    clip1Param.process (numSamples);
+    clip2Param.process (numSamples);
     smoothingParam.process (numSamples);
     const auto useHighQualityMode = hiQParam->load() == 1.0f;
     if (useHighQualityMode)
     {
-        stage.processBlock<true> (buffer, smoothingParam);
+        stage.processBlock<true> (buffer, clip1Param, clip2Param, smoothingParam);
     }
     else
     {
-        stage.processBlock<false> (buffer, smoothingParam);
+        stage.processBlock<false> (buffer, clip1Param, clip2Param, smoothingParam);
     }
 
     for (int ch = 0; ch < numChannels; ++ch)

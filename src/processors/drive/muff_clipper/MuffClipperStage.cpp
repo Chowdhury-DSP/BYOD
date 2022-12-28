@@ -17,32 +17,33 @@ constexpr float twoIs_over_Vt = twoIs / Vt;
 constexpr float A = -10000.0f / 150.0f; // BJT Common-Emitter amp gain
 constexpr float VbiasA = 0.7f; // bias point after input filter
 
-// compute sinh and cosh at the same time so it's faster...
-inline auto sinh_cosh (float x) noexcept
+// compute asymmetric sinh and cosh at the same time so it's faster...
+inline auto sinh_cosh_asym (float x1, float x2) noexcept
 {
     // ref: https://en.wikipedia.org/wiki/Hyperbolic_functions#Definitions
     // sinh = (e^(2x) - 1) / (2e^x), cosh = (e^(2x) + 1) / (2e^x)
     // let B = e^x, then sinh = (B^2 - 1) / (2B), cosh = (B^2 + 1) / (2B)
     // simplifying, we get: sinh = 0.5 (B - 1/B), cosh = 0.5 (B + 1/B)
 
-    auto B = std::exp (x);
-    auto Br = 0.5f / B;
-    B *= 0.5f;
+    auto B = 0.5f * std::exp (x1);
+    auto Br = 0.5f / std::exp (x2);
 
     auto sinh = B - Br;
-    auto cosh = B + Br;
+    // cosh is pragmatically defined as the derivative of sinh
+    // consistent with x1 being the expected multiplier
+    auto cosh = B + Br * x2 / x1;
 
     return std::make_pair (sinh, cosh);
 }
 
 template <int numIters>
-inline float newton_raphson (float x, float y, float C_12_state, float G_C_12) noexcept
+inline float newton_raphson (float x, float y, float C_12_state, float G_C_12, float clip1, float clip2) noexcept
 {
     for (int k = 0; k < numIters; ++k)
     {
         auto v_drop = y - VbiasA;
 
-        auto [sinh_v, cosh_v] = sinh_cosh (v_drop / Vt);
+        auto [sinh_v, cosh_v] = sinh_cosh_asym (v_drop / Vt * clip1, v_drop / Vt * clip2);
         auto i_diodes = twoIs * sinh_v;
         auto di_diodes = twoIs_over_Vt * cosh_v;
 
@@ -92,18 +93,21 @@ float MuffClipperStage::getGC12 (float fs, float smoothing)
 }
 
 template <bool highQuality>
-void MuffClipperStage::processBlock (AudioBuffer<float>& buffer, const chowdsp::SmoothedBufferValue<float>& gc12Smoothed) noexcept
+void MuffClipperStage::processBlock (AudioBuffer<float>& buffer,
+        const chowdsp::SmoothedBufferValue<float>& clip1Smoothed,
+        const chowdsp::SmoothedBufferValue<float>& clip2Smoothed,
+        const chowdsp::SmoothedBufferValue<float>& gc12Smoothed) noexcept
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    const auto processSample = [this] (int ch, float x, float G_C_12)
+    const auto processSample = [this] (int ch, float x, float clip1, float clip2, float G_C_12)
     {
         // input filter
         auto u_n = inputFilter[ch].processSample (x);
 
         // newton-raphson
-        float y_k = newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12);
+        float y_k = newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12, clip1, clip2);
 
         // update state
         C_12_1[ch] = 2.0f * (y_k - VbiasA) * G_C_12 - C_12_1[ch];
@@ -118,18 +122,28 @@ void MuffClipperStage::processBlock (AudioBuffer<float>& buffer, const chowdsp::
 
         if (gc12Smoothed.isSmoothing())
         {
+            const auto clip1_data = clip1Smoothed.getSmoothedBuffer();
+            const auto clip2_data = clip2Smoothed.getSmoothedBuffer();
             const auto G_C_12_data = gc12Smoothed.getSmoothedBuffer();
             for (int n = 0; n < numSamples; ++n)
-                x[n] = processSample (ch, x[n], G_C_12_data[n]);
+                x[n] = processSample (ch, x[n], clip1_data[n], clip2_data[n], G_C_12_data[n]);
         }
         else
         {
+            const auto clip1 = clip1Smoothed.getCurrentValue();
+            const auto clip2 = clip2Smoothed.getCurrentValue();
             const auto G_C_12 = gc12Smoothed.getCurrentValue();
             for (int n = 0; n < numSamples; ++n)
-                x[n] = processSample (ch, x[n], G_C_12);
+                x[n] = processSample (ch, x[n], clip1, clip2, G_C_12);
         }
     }
 }
 
-template void MuffClipperStage::processBlock<true> (AudioBuffer<float>&, const chowdsp::SmoothedBufferValue<float>&) noexcept;
-template void MuffClipperStage::processBlock<false> (AudioBuffer<float>&, const chowdsp::SmoothedBufferValue<float>&) noexcept;
+template void MuffClipperStage::processBlock<true> (AudioBuffer<float>&,
+        const chowdsp::SmoothedBufferValue<float>&,
+        const chowdsp::SmoothedBufferValue<float>&,
+        const chowdsp::SmoothedBufferValue<float>&) noexcept;
+template void MuffClipperStage::processBlock<false> (AudioBuffer<float>&,
+        const chowdsp::SmoothedBufferValue<float>&,
+        const chowdsp::SmoothedBufferValue<float>&,
+        const chowdsp::SmoothedBufferValue<float>&) noexcept;
