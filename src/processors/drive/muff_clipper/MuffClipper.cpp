@@ -20,7 +20,6 @@ MuffClipper::MuffClipper (UndoManager* um) : BaseProcessor ("Muff Clipper", crea
     loadParameterPointer (harmParam, vts, "harmonics");
     loadParameterPointer (levelParam, vts, "level");
     smoothingParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, "smoothing"));
-    nStagesParam = vts.getRawParameterValue ("n_stages");
     hiQParam = vts.getRawParameterValue ("high_q");
 
     addPopupMenuParameter ("high_q");
@@ -42,7 +41,6 @@ ParamLayout MuffClipper::createParameterLayout()
     createBipolarPercentParameter (params, "smoothing", "Smoothing", 0.0f);
     createPercentParameter (params, "level", "Level", 0.65f);
 
-    emplace_param<AudioParameterChoice> (params, "n_stages", "", StringArray { "1 Stage", "2 Stages", "3 Stages", "4 Stages" }, 1);
     emplace_param<AudioParameterBool> (params, "high_q", "High Quality", false);
 
     return { params.begin(), params.end() };
@@ -67,8 +65,7 @@ void MuffClipper::prepare (double sampleRate, int samplesPerBlock)
     };
     smoothingParam.prepare (sampleRate, samplesPerBlock);
 
-    for (auto& stage : stages)
-        stage.prepare (sampleRate);
+    stage.prepare (sampleRate);
 
     auto spec = dsp::ProcessSpec { sampleRate, (uint32) samplesPerBlock, 2 };
 
@@ -84,7 +81,6 @@ void MuffClipper::prepare (double sampleRate, int samplesPerBlock)
         filt.reset();
     }
 
-    prevNumStages = (int) *nStagesParam + 1;
     maxBlockSize = samplesPerBlock;
     doPrebuffering();
 }
@@ -148,13 +144,6 @@ void MuffClipper::processInputStage (AudioBuffer<float>& buffer)
 
 void MuffClipper::processAudio (AudioBuffer<float>& buffer)
 {
-    const int numStages = (int) *nStagesParam + 1;
-    if (numStages != prevNumStages)
-    {
-        prevNumStages = numStages;
-        doPrebuffering();
-    }
-
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
@@ -164,21 +153,19 @@ void MuffClipper::processAudio (AudioBuffer<float>& buffer)
     const auto useHighQualityMode = hiQParam->load() == 1.0f;
     if (useHighQualityMode)
     {
-        for (int i = 0; i < numStages; ++i)
-            stages[i].processBlock<true> (buffer, smoothingParam);
+        stage.processBlock<true> (buffer, smoothingParam);
     }
     else
     {
-        for (int i = 0; i < numStages; ++i)
-            stages[i].processBlock<false> (buffer, smoothingParam);
+        stage.processBlock<false> (buffer, smoothingParam);
     }
 
     for (int ch = 0; ch < numChannels; ++ch)
         dcBlocker[ch].processBlock (buffer.getWritePointer (ch), numSamples);
 
     auto outGain = Decibels::decibelsToGain (levelRange.convertFrom0to1 (*levelParam), levelRange.start);
-    outGain *= Decibels::decibelsToGain (13.0f); // makeup from level lost in clipping stages
-    outGain *= numStages % 2 == 0 ? 1.0f : -1.0f;
+    outGain *= Decibels::decibelsToGain (13.0f); // makeup from level lost in clipping stage
+    outGain *= -1.0f;
     outLevel.setGainLinear (outGain);
     dsp::AudioBlock<float> block { buffer };
     outLevel.process (dsp::ProcessContextReplacing<float> { block });

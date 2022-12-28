@@ -22,15 +22,13 @@ private:
     chowdsp::FloatParameter* harmParam = nullptr;
     chowdsp::FloatParameter* levelParam = nullptr;
     chowdsp::SmoothedBufferValue<float> smoothingParam;
-    std::atomic<float>* nStagesParam = nullptr;
     std::atomic<float>* hiQParam = nullptr;
 
     chowdsp::FirstOrderLPF<float> inputFilter[2];
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> cutoffSmooth;
     dsp::Gain<float> sustainGain;
 
-    MuffClipperStage stages[4];
-    int prevNumStages = 0;
+    MuffClipperStage stage;
 
     chowdsp::FirstOrderHPF<float> dcBlocker[2];
     dsp::Gain<float> outLevel;
