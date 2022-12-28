@@ -28,8 +28,8 @@ MuffClipper::MuffClipper (UndoManager* um) : BaseProcessor ("Muff Clipper", crea
 
     uiOptions.backgroundColour = Colours::darkgrey.brighter (0.3f).withRotatedHue (0.2f);
     uiOptions.powerColour = Colours::red.brighter (0.15f);
-    uiOptions.info.description = "Fuzz effect based on the drive stage from the Electro-Harmonix Big Muff Pi.";
-    uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+    uiOptions.info.description = "Fuzz effect based on a single drive stage from the Electro-Harmonix Big Muff Pi.";
+    uiOptions.info.authors = StringArray { "Jatin Chowdhury", "Graham Breed" };
 }
 
 ParamLayout MuffClipper::createParameterLayout()
