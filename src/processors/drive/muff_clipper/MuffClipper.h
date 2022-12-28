@@ -3,10 +3,10 @@
 #include "../../BaseProcessor.h"
 #include "MuffClipperStage.h"
 
-class MuffClipperDrive : public BaseProcessor
+class MuffClipper : public BaseProcessor
 {
 public:
-    explicit MuffClipperDrive (UndoManager* um);
+    explicit MuffClipper (UndoManager* um);
 
     ProcessorType getProcessorType() const override { return Drive; }
     static ParamLayout createParameterLayout();
@@ -38,5 +38,5 @@ private:
     float fs = 48000.0f;
     int maxBlockSize = 0;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MuffClipperDrive)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MuffClipper)
 };

@@ -1,4 +1,4 @@
-#include "MuffClipperDrive.h"
+#include "MuffClipper.h"
 #include "../../ParameterHelpers.h"
 
 namespace
@@ -13,7 +13,7 @@ const auto sustainRange = ParameterHelpers::createNormalisableRange (0.4f, 2.0f,
 const auto levelRange = ParameterHelpers::createNormalisableRange (-60.0f, 0.0f, -9.0f);
 } // namespace
 
-MuffClipperDrive::MuffClipperDrive (UndoManager* um) : BaseProcessor ("Muff Drive", createParameterLayout(), um)
+MuffClipper::MuffClipper (UndoManager* um) : BaseProcessor ("Muff Clipper", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (sustainParam, vts, "sustain");
@@ -31,7 +31,7 @@ MuffClipperDrive::MuffClipperDrive (UndoManager* um) : BaseProcessor ("Muff Driv
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
-ParamLayout MuffClipperDrive::createParameterLayout()
+ParamLayout MuffClipper::createParameterLayout()
 {
     using namespace ParameterHelpers;
 
@@ -48,7 +48,7 @@ ParamLayout MuffClipperDrive::createParameterLayout()
     return { params.begin(), params.end() };
 }
 
-void MuffClipperDrive::prepare (double sampleRate, int samplesPerBlock)
+void MuffClipper::prepare (double sampleRate, int samplesPerBlock)
 {
     fs = (float) sampleRate;
 
@@ -89,7 +89,7 @@ void MuffClipperDrive::prepare (double sampleRate, int samplesPerBlock)
     doPrebuffering();
 }
 
-void MuffClipperDrive::doPrebuffering()
+void MuffClipper::doPrebuffering()
 {
     AudioBuffer<float> buffer (2, maxBlockSize);
     for (int i = 0; i < 10000; i += maxBlockSize)
@@ -99,7 +99,7 @@ void MuffClipperDrive::doPrebuffering()
     }
 }
 
-void MuffClipperDrive::processInputStage (AudioBuffer<float>& buffer)
+void MuffClipper::processInputStage (AudioBuffer<float>& buffer)
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
@@ -146,7 +146,7 @@ void MuffClipperDrive::processInputStage (AudioBuffer<float>& buffer)
     sustainGain.process (dsp::ProcessContextReplacing<float> { block });
 }
 
-void MuffClipperDrive::processAudio (AudioBuffer<float>& buffer)
+void MuffClipper::processAudio (AudioBuffer<float>& buffer)
 {
     const int numStages = (int) *nStagesParam + 1;
     if (numStages != prevNumStages)
