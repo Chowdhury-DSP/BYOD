@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Gainful Clipper" plugin="BYOD" vendor="User" category="Pedals"
-        version="1.1.1" preset_file="/home/graham/music/effects/User/Pedals/Gainful Clipper.chowpreset">
-  <proc_chain state_plugin_version="1.1.1">
+<Preset name="Gainful Clipper" plugin="BYOD" vendor="CHOW" category="Pedals"
+        version="1.1.0">
+  <proc_chain state_plugin_version="1.1.0">
     <Muff_Tone>
       <Parameters x_pos="0.6112957000732422" y_pos="0.2140151560306549">
         <PARAM id="mids" value="0.3120000660419464"/>

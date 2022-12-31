@@ -113,6 +113,7 @@ void PresetManager::loadBYODFactoryPresets()
     factoryPresets.emplace_back (BinaryData::Big_Muff_Rams_Head_56_chowpreset, BinaryData::Big_Muff_Rams_Head_56_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Big_Muff_Russian_chowpreset, BinaryData::Big_Muff_Russian_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Centaur_chowpreset, BinaryData::Centaur_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Gainful_Clipper_chowpreset, BinaryData::Gainful_Clipper_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::King_Of_Tone_chowpreset, BinaryData::King_Of_Tone_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
