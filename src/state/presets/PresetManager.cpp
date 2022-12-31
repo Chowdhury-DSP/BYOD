@@ -116,6 +116,7 @@ void PresetManager::loadBYODFactoryPresets()
     factoryPresets.emplace_back (BinaryData::King_Of_Tone_chowpreset, BinaryData::King_Of_Tone_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Violet_Mist_chowpreset, BinaryData::Violet_Mist_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::ZenDrive_chowpreset, BinaryData::ZenDrive_chowpresetSize);
 
     // players
