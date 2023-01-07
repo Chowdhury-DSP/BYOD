@@ -41,8 +41,8 @@ ParamLayout MuffClipper::createParameterLayout()
     createPercentParameter (params, "sustain", "Gain", 0.5f);
     createPercentParameter (params, "harmonics", "Harm.", 0.65f);
     createBipolarPercentParameter (params, "smoothing", "Smooth", 0.0f);
-    createBipolarPercentParameter (params, "clip1", "+Clip", 0.0f);
-    createBipolarPercentParameter (params, "clip2", "-Clip", 0.0f);
+    createBipolarPercentParameter (params, "clip2", "+Clip", 0.0f);
+    createBipolarPercentParameter (params, "clip1", "-Clip", 0.0f);
     createPercentParameter (params, "level", "Level", 0.65f);
 
     emplace_param<AudioParameterBool> (params, "high_q", "High Quality", true);
