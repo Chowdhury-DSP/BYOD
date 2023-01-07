@@ -63,16 +63,16 @@ void MuffClipper::prepare (double sampleRate, int samplesPerBlock)
     }
 
     clip1Param.setRampLength (0.05);
-    clip1Param.mappingFunction = [fs = this->fs] (float val)
+    clip1Param.mappingFunction = [] (float val)
     {
-        return val + 1.0;
+        return MuffClipperStage::getClipV (val);
     };
     clip1Param.prepare (sampleRate, samplesPerBlock);
 
     clip2Param.setRampLength (0.05);
-    clip2Param.mappingFunction = [fs = this->fs] (float val)
+    clip2Param.mappingFunction = [] (float val)
     {
-        return val + 1.0;
+        return MuffClipperStage::getClipV (val);
     };
     clip2Param.prepare (sampleRate, samplesPerBlock);
 

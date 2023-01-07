@@ -12,11 +12,12 @@ public:
 
     template <bool highQuality>
     void processBlock (AudioBuffer<float>& buffer,
-            const chowdsp::SmoothedBufferValue<float>& clip1Smoothed,
-            const chowdsp::SmoothedBufferValue<float>& clip2Smoothed,
-            const chowdsp::SmoothedBufferValue<float>& gc12Smoothed) noexcept;
+                       const chowdsp::SmoothedBufferValue<float>& clipV1Smoothed,
+                       const chowdsp::SmoothedBufferValue<float>& clipV2Smoothed,
+                       const chowdsp::SmoothedBufferValue<float>& gc12Smoothed) noexcept;
 
     static float getGC12 (float fs, float smoothing);
+    static float getClipV (float clip);
 
 private:
     chowdsp::IIRFilter<1, float> inputFilter[2];
