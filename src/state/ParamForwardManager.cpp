@@ -3,6 +3,15 @@
 ParamForwardManager::ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& procChain) : chowdsp::ForwardingParametersManager<ParamForwardManager, 500> (vts),
                                                                                                           chain (procChain)
 {
+    // In some AUv3 hosts (cough, cough, GarageBand), sending parameter info change notifications
+    // causes the host to crash. Since there's no way for the plugin to determine which AUv3
+    // host it's running in, we give the user an option to disable these notifications.
+    // @TODO: get rid of this option once GarageBand fixes the crash on their end.
+    if (vts.processor.wrapperType == AudioProcessor::WrapperType::wrapperType_AudioUnitv3)
+        pluginSettings->addProperties<&ParamForwardManager::deferHostNotificationsGlobalSettingChanged> (
+            { { refreshParamTreeID, true } }, *this);
+    deferHostNotificationsGlobalSettingChanged (refreshParamTreeID);
+
     callbacks += {
         chain.processorAddedBroadcaster.connect<&ParamForwardManager::processorAdded> (this),
         chain.processorRemovedBroadcaster.connect<&ParamForwardManager::processorRemoved> (this),
@@ -81,4 +90,15 @@ void ParamForwardManager::processorRemoved (const BaseProcessor* proc)
             break;
         }
     }
+}
+
+void ParamForwardManager::deferHostNotificationsGlobalSettingChanged (SettingID settingID)
+{
+    if (settingID != refreshParamTreeID)
+        return;
+
+    if (pluginSettings->getProperty<bool> (refreshParamTreeID))
+        deferHostNotifs.reset();
+    else
+        deferHostNotifs.emplace (*this);
 }

@@ -2,6 +2,7 @@
 #include "BYOD.h"
 #include "gui/pedalboard/BoardViewport.h"
 #include "processors/chain/ProcessorChainPortMagnitudesHelper.h"
+#include "state/ParamForwardManager.h"
 
 namespace
 {
@@ -28,7 +29,7 @@ SettingsButton::SettingsButton (BYOD& processor, chowdsp::OpenGLHelper* oglHelpe
     globalSettingChanged (openglID);
 
     setImages (Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize).get());
-    onClick = [=]
+    onClick = [this]
     { showSettingsMenu(); };
 }
 
@@ -52,9 +53,15 @@ void SettingsButton::showSettingsMenu()
 {
     PopupMenu menu;
 
-    cableVizMenu (menu, 100);
-    defaultZoomMenu (menu, 200);
-    openGLManu (menu, 300);
+    addPluginSettingMenuOption ("Cable Visualizations", ProcessorChainPortMagnitudesHelper::cableVizOnOffID, menu, 100);
+
+    if (openGLHelper != nullptr && openGLHelper->isOpenGLAvailable())
+        addPluginSettingMenuOption ("Use OpenGL", openglID, menu, 200);
+
+    if (pluginSettings->hasProperty (ParamForwardManager::refreshParamTreeID))
+        addPluginSettingMenuOption ("Refresh Parameter Tree", ParamForwardManager::refreshParamTreeID, menu, 300);
+
+    defaultZoomMenu (menu, 400);
 
     menu.addSeparator();
     menu.addItem ("View Source Code", []
@@ -77,20 +84,6 @@ void SettingsButton::showSettingsMenu()
     menu.showMenuAsync (options);
 }
 
-void SettingsButton::cableVizMenu (PopupMenu& menu, int itemID)
-{
-    const auto isCurrentlyOn = pluginSettings->getProperty<bool> (ProcessorChainPortMagnitudesHelper::cableVizOnOffID);
-
-    PopupMenu::Item item;
-    item.itemID = ++itemID;
-    item.text = "Cable Visualizations";
-    item.action = [=]
-    { pluginSettings->setProperty (ProcessorChainPortMagnitudesHelper::cableVizOnOffID, ! isCurrentlyOn); };
-    item.colour = isCurrentlyOn ? onColour : offColour;
-
-    menu.addItem (item);
-}
-
 void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
 {
     PopupMenu defaultZoomMenu;
@@ -103,7 +96,7 @@ void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
         PopupMenu::Item item;
         item.itemID = ++itemID;
         item.text = String (int (zoomLevel * 100.0)) + "%";
-        item.action = [=]
+        item.action = [this, zoomLevel]
         { pluginSettings->setProperty (BoardViewport::defaultZoomSettingID, zoomLevel); };
         item.colour = isWithin (zoomLevel, curDefaultZoomLevel, 0.001) ? onColour : offColour;
 
@@ -113,25 +106,22 @@ void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
     menu.addSubMenu ("Default Zoom", defaultZoomMenu);
 }
 
-void SettingsButton::openGLManu (PopupMenu& menu, int itemID)
-{
-    if (openGLHelper == nullptr || ! openGLHelper->isOpenGLAvailable())
-        return;
-
-    const auto isCurrentlyOn = pluginSettings->getProperty<bool> (openglID);
-
-    PopupMenu::Item item;
-    item.itemID = ++itemID;
-    item.text = "Use OpenGL";
-    item.action = [=]
-    { pluginSettings->setProperty (openglID, ! isCurrentlyOn); };
-    item.colour = isCurrentlyOn ? onColour : offColour;
-
-    menu.addItem (item);
-}
-
 void SettingsButton::copyDiagnosticInfo()
 {
     Logger::writeToLog ("Copying diagnostic info...");
     SystemClipboard::copyTextToClipboard (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (proc));
+}
+
+void SettingsButton::addPluginSettingMenuOption (const String& name, const SettingID& id, PopupMenu& menu, int itemID)
+{
+    const auto isCurrentlyOn = pluginSettings->getProperty<bool> (id);
+
+    PopupMenu::Item item;
+    item.itemID = itemID;
+    item.text = name;
+    item.action = [this, id, isCurrentlyOn]
+    { pluginSettings->setProperty (id, ! isCurrentlyOn); };
+    item.colour = isCurrentlyOn ? onColour : offColour;
+
+    menu.addItem (item);
 }
