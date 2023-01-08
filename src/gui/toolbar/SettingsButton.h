@@ -18,10 +18,9 @@ public:
 
 private:
     void showSettingsMenu();
-    void cableVizMenu (PopupMenu& menu, int itemID);
     void defaultZoomMenu (PopupMenu& menu, int itemID);
-    void openGLManu (PopupMenu& menu, int itemID);
     void copyDiagnosticInfo();
+    void addPluginSettingMenuOption (const String& name, const SettingID& id, PopupMenu& menu, int itemID);
 
     const BYOD& proc;
     chowdsp::OpenGLHelper* openGLHelper;
