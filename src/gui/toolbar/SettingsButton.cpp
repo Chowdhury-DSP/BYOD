@@ -54,13 +54,13 @@ void SettingsButton::showSettingsMenu()
     PopupMenu menu;
 
     addPluginSettingMenuOption ("Cable Visualizations", ProcessorChainPortMagnitudesHelper::cableVizOnOffID, menu, 100);
-    
+
     if (openGLHelper != nullptr && openGLHelper->isOpenGLAvailable())
         addPluginSettingMenuOption ("Use OpenGL", openglID, menu, 200);
-    
+
     if (pluginSettings->hasProperty (ParamForwardManager::refreshParamTreeID))
         addPluginSettingMenuOption ("Refresh Parameter Tree", ParamForwardManager::refreshParamTreeID, menu, 300);
-    
+
     defaultZoomMenu (menu, 400);
 
     menu.addSeparator();

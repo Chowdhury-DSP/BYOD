@@ -6,6 +6,7 @@ class ParamForwardManager : public chowdsp::ForwardingParametersManager<ParamFor
                             public chowdsp::TrackedByBroadcasters
 {
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
+
 public:
     ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& chain);
     ~ParamForwardManager();

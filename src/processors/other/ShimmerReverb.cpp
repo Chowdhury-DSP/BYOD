@@ -96,7 +96,7 @@ void ShimmerReverb::prepare (double sampleRate, int samplesPerBlock)
     };
     sizeParam.setRampLength (0.2);
     sizeParam.prepare (sampleRate, samplesPerBlock);
-    
+
     feedbackParam.mappingFunction = [] (float x)
     {
         const auto delayMs = 1000.0f * std::pow (10000.0f / 1000.0f, x);
