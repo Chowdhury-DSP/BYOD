@@ -8,9 +8,11 @@ ParamForwardManager::ParamForwardManager (AudioProcessorValueTreeState& vts, Pro
     // host it's running in, we give the user an option to disable these notifications.
     // @TODO: get rid of this option once GarageBand fixes the crash on their end.
     if (vts.processor.wrapperType == AudioProcessor::WrapperType::wrapperType_AudioUnitv3)
+    {
         pluginSettings->addProperties<&ParamForwardManager::deferHostNotificationsGlobalSettingChanged> (
             { { refreshParamTreeID, true } }, *this);
-    deferHostNotificationsGlobalSettingChanged (refreshParamTreeID);
+        deferHostNotificationsGlobalSettingChanged (refreshParamTreeID);
+    }
 
     callbacks += {
         chain.processorAddedBroadcaster.connect<&ParamForwardManager::processorAdded> (this),

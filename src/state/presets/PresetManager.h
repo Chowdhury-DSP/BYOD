@@ -39,7 +39,7 @@ public:
     void loadUserPresetsFromFolder (const juce::File& file) final;
 
     void loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad, Component* associatedComp);
-    void filterPresets (std::vector<chowdsp::Preset>& presets);
+    void filterPresets (std::vector<chowdsp::Preset>& presets) const;
 
     static void showErrorMessage (const String& title, const String& message, Component* associatedComp);
 
@@ -52,7 +52,7 @@ public:
 #endif
 
 private:
-    void loadBYODFactoryPresets();
+    std::vector<chowdsp::Preset> getFactoryPresets() const;
     void parameterChanged (const juce::String&, float) override {}
 
     ProcessorChain* procChain;
