@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Violet Mist" plugin="BYOD" vendor="x31eq" category="Pedals"
+        version="1.1.0">
+  <proc_chain state_plugin_version="1.1.0">
+    <Muff_Tone>
+      <Parameters x_pos="0.579734206199646" y_pos="0.3162878751754761">
+        <PARAM id="mids" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+        <PARAM id="type" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Muff_Tone>
+    <Muff_Clipper>
+      <Parameters x_pos="0.1644518226385117" y_pos="0.1780302971601486">
+        <PARAM id="clip1" value="-0.3777777552604675"/>
+        <PARAM id="clip2" value="-0.3111110925674438"/>
+        <PARAM id="harmonics" value="0.8888888955116272"/>
+        <PARAM id="high_q" value="1.0"/>
+        <PARAM id="level" value="0.4888888895511627"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="smoothing" value="-0.04444444179534912"/>
+        <PARAM id="sustain" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Muff_Clipper>
+    <Muff_Clipper>
+      <Parameters x_pos="0.3197674453258514" y_pos="0.564393937587738">
+        <PARAM id="clip1" value="0.4444444179534912"/>
+        <PARAM id="clip2" value="0.2666666507720947"/>
+        <PARAM id="harmonics" value="0.2666666805744171"/>
+        <PARAM id="high_q" value="1.0"/>
+        <PARAM id="level" value="0.7444444298744202"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="smoothing" value="0.355555534362793"/>
+        <PARAM id="sustain" value="0.4777777791023254"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Muff_Clipper>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>
