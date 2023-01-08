@@ -54,8 +54,9 @@ void PresetManager::showErrorMessage (const String& title, const String& message
     ErrorMessageView::showErrorMessage (title, message, "OK", associatedComp);
 }
 
-PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState) : chowdsp::PresetManager (vtState),
-                                                                                              procChain (chain)
+PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeState& vtState)
+    : chowdsp::PresetManager (vtState),
+      procChain (chain)
 {
 #if BYOD_BUILD_PRESET_SERVER
     if (userManager->getUsername().isNotEmpty())
@@ -64,7 +65,13 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
     userManager->addListener (this);
 #endif
 
-    loadBYODFactoryPresets();
+    auto factoryPresets = getFactoryPresets();
+    addPresets (factoryPresets);
+
+    setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
+    loadDefaultPreset();
+    vts.undoManager->clearUndoHistory();
+
     setUserPresetConfigFile (userPresetPath);
 
 #if JUCE_IOS
@@ -83,69 +90,11 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
 #endif // JUCE_IOS
 }
 
-PresetManager::~PresetManager()
+PresetManager::~PresetManager() // NOLINT
 {
 #if BYOD_BUILD_PRESET_SERVER
     userManager->removeListener (this);
 #endif
-}
-
-void PresetManager::loadBYODFactoryPresets()
-{
-    setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
-
-    std::vector<chowdsp::Preset> factoryPresets;
-
-    // amps
-    factoryPresets.emplace_back (BinaryData::Instant_Metal_chowpreset, BinaryData::Instant_Metal_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Bass_Face_chowpreset, BinaryData::Bass_Face_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Modern_HiGain_chowpreset, BinaryData::Modern_HiGain_chowpresetSize);
-
-    // modulation
-    factoryPresets.emplace_back (BinaryData::Chopped_Flange_chowpreset, BinaryData::Chopped_Flange_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Mixed_In_Modulation_chowpreset, BinaryData::Mixed_In_Modulation_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Seasick_Phase_chowpreset, BinaryData::Seasick_Phase_chowpresetSize);
-
-    // pedals
-    factoryPresets.emplace_back (BinaryData::American_Sound_chowpreset, BinaryData::American_Sound_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Big_Muff_chowpreset, BinaryData::Big_Muff_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Big_Muff_Triangle_chowpreset, BinaryData::Big_Muff_Triangle_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Big_Muff_Rams_Head_56_chowpreset, BinaryData::Big_Muff_Rams_Head_56_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Big_Muff_Russian_chowpreset, BinaryData::Big_Muff_Russian_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Centaur_chowpreset, BinaryData::Centaur_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Gainful_Clipper_chowpreset, BinaryData::Gainful_Clipper_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::King_Of_Tone_chowpreset, BinaryData::King_Of_Tone_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Violet_Mist_chowpreset, BinaryData::Violet_Mist_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::ZenDrive_chowpreset, BinaryData::ZenDrive_chowpresetSize);
-
-    // players
-    factoryPresets.emplace_back (BinaryData::Black_Sabbath_chowpreset, BinaryData::Black_Sabbath_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Boston_chowpreset, BinaryData::Boston_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Clapton_chowpreset, BinaryData::Clapton_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::George_Harrison_chowpreset, BinaryData::George_Harrison_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Green_Day_chowpreset, BinaryData::Green_Day_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::J_Mascis_chowpreset, BinaryData::J_Mascis_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Jimi_Hendrix_chowpreset, BinaryData::Jimi_Hendrix_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::John_Mayer_chowpreset, BinaryData::John_Mayer_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Johnny_Greenwood_chowpreset, BinaryData::Johnny_Greenwood_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Neil_Young_chowpreset, BinaryData::Neil_Young_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Nirvana_chowpreset, BinaryData::Nirvana_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Pete_Townshend_chowpreset, BinaryData::Pete_Townshend_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::Superdrag_chowpreset, BinaryData::Superdrag_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::The_Strokes_chowpreset, BinaryData::The_Strokes_chowpresetSize);
-    factoryPresets.emplace_back (BinaryData::White_Stripes_chowpreset, BinaryData::White_Stripes_chowpresetSize);
-
-#if BYOD_ENABLE_ADD_ON_MODULES
-    AddOnPresets::addFactoryPresets (factoryPresets);
-#endif
-
-    filterPresets (factoryPresets);
-    addPresets (factoryPresets);
-
-    loadDefaultPreset();
-    vts.undoManager->clearUndoHistory();
 }
 
 #if BYOD_BUILD_PRESET_SERVER
@@ -245,7 +194,64 @@ bool PresetManager::syncServerPresetsToLocal()
 }
 #endif // BYOD_BUILD_PRESET_SERVER
 
-void PresetManager::filterPresets (std::vector<chowdsp::Preset>& presets)
+std::vector<chowdsp::Preset> PresetManager::getFactoryPresets() const
+{
+    std::vector<chowdsp::Preset> factoryPresets;
+
+    // default
+    factoryPresets.emplace_back (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
+
+    // amps
+    factoryPresets.emplace_back (BinaryData::Instant_Metal_chowpreset, BinaryData::Instant_Metal_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Bass_Face_chowpreset, BinaryData::Bass_Face_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Modern_HiGain_chowpreset, BinaryData::Modern_HiGain_chowpresetSize);
+
+    // modulation
+    factoryPresets.emplace_back (BinaryData::Chopped_Flange_chowpreset, BinaryData::Chopped_Flange_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Mixed_In_Modulation_chowpreset, BinaryData::Mixed_In_Modulation_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Seasick_Phase_chowpreset, BinaryData::Seasick_Phase_chowpresetSize);
+
+    // pedals
+    factoryPresets.emplace_back (BinaryData::American_Sound_chowpreset, BinaryData::American_Sound_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Big_Muff_chowpreset, BinaryData::Big_Muff_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Big_Muff_Triangle_chowpreset, BinaryData::Big_Muff_Triangle_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Big_Muff_Rams_Head_56_chowpreset, BinaryData::Big_Muff_Rams_Head_56_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Big_Muff_Russian_chowpreset, BinaryData::Big_Muff_Russian_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Centaur_chowpreset, BinaryData::Centaur_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Gainful_Clipper_chowpreset, BinaryData::Gainful_Clipper_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::King_Of_Tone_chowpreset, BinaryData::King_Of_Tone_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Violet_Mist_chowpreset, BinaryData::Violet_Mist_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::ZenDrive_chowpreset, BinaryData::ZenDrive_chowpresetSize);
+
+    // players
+    factoryPresets.emplace_back (BinaryData::Black_Sabbath_chowpreset, BinaryData::Black_Sabbath_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Boston_chowpreset, BinaryData::Boston_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Clapton_chowpreset, BinaryData::Clapton_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::George_Harrison_chowpreset, BinaryData::George_Harrison_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Green_Day_chowpreset, BinaryData::Green_Day_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::J_Mascis_chowpreset, BinaryData::J_Mascis_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Jimi_Hendrix_chowpreset, BinaryData::Jimi_Hendrix_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::John_Mayer_chowpreset, BinaryData::John_Mayer_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Johnny_Greenwood_chowpreset, BinaryData::Johnny_Greenwood_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Neil_Young_chowpreset, BinaryData::Neil_Young_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Nirvana_chowpreset, BinaryData::Nirvana_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Pete_Townshend_chowpreset, BinaryData::Pete_Townshend_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Superdrag_chowpreset, BinaryData::Superdrag_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::The_Strokes_chowpreset, BinaryData::The_Strokes_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::White_Stripes_chowpreset, BinaryData::White_Stripes_chowpresetSize);
+
+#if BYOD_ENABLE_ADD_ON_MODULES
+    AddOnPresets::addFactoryPresets (factoryPresets);
+#endif
+
+    filterPresets (factoryPresets);
+
+    return factoryPresets;
+}
+
+void PresetManager::filterPresets (std::vector<chowdsp::Preset>& presets) const
 {
     sst::cpputils::nodal_erase_if (presets,
                                    [this] (const chowdsp::Preset& preset)
@@ -362,8 +368,8 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     }
 
     // delete old user presets
-    sst::cpputils::nodal_erase_if (presetMap, [] (const auto& presetPair)
-                                   { return presetPair.second.getVendor() != PresetConstants::factoryPresetVendor; });
+    sst::cpputils::nodal_erase_if (presetMap, [factoryPresets = getFactoryPresets()] (const auto& presetPair)
+                                   { return ! sst::cpputils::contains (factoryPresets, presetPair.second); });
 
     int presetID = userIDMap[userPresetsName];
     while (presetMap.find (presetID) != presetMap.end())
