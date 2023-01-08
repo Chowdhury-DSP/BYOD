@@ -3,10 +3,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
+- Added "Muff Clipper" module.
 - Added "Smoothing" parameter for "Muff Drive" module.
 - Added new factory presets.
+- Added option to skip parameter tree refreshes for AUv3 hosts.
 - Fixed parameter name changes not showing up in some CLAP hosts.
-- Fixed crashes when loading AUv3 plugin state in GarageBand.
 
 ## [1.1.0] 2022-11-21
 - Added support for the CLAP plugin format (with parameter modulation).
