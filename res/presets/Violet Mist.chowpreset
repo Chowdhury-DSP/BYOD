@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="Violet Mist" plugin="BYOD" vendor="CHOW" category="Pedals"
+<Preset name="Violet Mist" plugin="BYOD" vendor="x31eq" category="Pedals"
         version="1.1.0">
   <proc_chain state_plugin_version="1.1.0">
     <Muff_Tone>
