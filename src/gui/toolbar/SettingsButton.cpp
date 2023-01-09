@@ -64,6 +64,8 @@ void SettingsButton::showSettingsMenu()
     defaultZoomMenu (menu, 400);
 
     menu.addSeparator();
+    menu.addItem ("User Manual", []
+                  { URL ("https://github.com/Chowdhury-DSP/BYOD/blob/main/manual/Manual.md#byod-user-manual").launchInDefaultBrowser(); });
     menu.addItem ("View Source Code", []
                   { URL ("https://github.com/Chowdhury-DSP/BYOD").launchInDefaultBrowser(); });
 
