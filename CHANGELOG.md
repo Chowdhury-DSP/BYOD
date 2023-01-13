@@ -2,14 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [1.1.3] - 2023-01-13
 - Added "Muff Clipper" module.
 - Added "Smoothing" parameter for "Muff Drive" module.
 - Added new factory presets.
 - Added option to skip parameter tree refreshes for AUv3 hosts.
 - Fixed parameter name changes not showing up in some CLAP hosts.
 
-## [1.1.0] 2022-11-21
+## [1.1.0] - 2022-11-21
 - Added support for the CLAP plugin format (with parameter modulation).
 - Added modulation ports so modules with internal modulation can share modulation signals.
 - Added "Rotary" module.
@@ -38,7 +38,7 @@ All notable changes to this project will be documented in this file.
 - Fixed gain normalization across sample-rates for IR modules.
 - Fixed undo/redo not restoring preset name.
 
-## [1.0.1] 2022-03-15
+## [1.0.1] - 2022-03-15
 - Changed UI rendering to use OpenGL by default on Windows/Linux, unless OpenGL 2.0+ is not available on the host system.
 - Fixed YenDrive giving NaN output when Gain parameter set to zero.
 - Fixed Spring Reverb "pop" when switching from mono to stereo input.
@@ -46,5 +46,5 @@ All notable changes to this project will be documented in this file.
 - Fixed plugin state not saving/loading correctly in VST2.
 - Fixed noise spikes in King Of Tone, RONN, and Muff Drive processors.
 
-## [1.0.0] 2022-03-11
+## [1.0.0] - 2022-03-11
 - Initial release.
