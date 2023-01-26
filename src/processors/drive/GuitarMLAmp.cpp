@@ -21,6 +21,7 @@ const auto numBuiltInModels = (int) guitarMLModelResources.size();
 const String modelTag = "model";
 const String gainTag = "gain";
 const String conditionTag = "condition";
+const String sampleRateCorrFilterTag = "sample_rate_corr_filter";
 const String customModelTag = "custom_model";
 constexpr std::string_view modelNameTag = "byod_guitarml_model_name";
 
@@ -46,6 +47,8 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
     using namespace ParameterHelpers;
     loadParameterPointer (gainParam, vts, gainTag);
     conditionParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, conditionTag));
+    loadParameterPointer (sampleRateCorrectionFilterParam, vts, sampleRateCorrFilterTag);
+    addPopupMenuParameter (sampleRateCorrFilterTag);
 
     loadModel (0); // load Blues Jr. model by default
 
@@ -65,6 +68,7 @@ ParamLayout GuitarMLAmp::createParameterLayout()
 
     createGainDBParameter (params, gainTag, "Gain", -18.0f, 18.0f, 0.0f);
     createPercentParameter (params, conditionTag, "Condition", 0.5f);
+    emplace_param<chowdsp::BoolParameter> (params, sampleRateCorrFilterTag, "Sample Rate Correction Filter", true);
 
     return { params.begin(), params.end() };
 }
@@ -100,6 +104,14 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
     const auto hiddenSize = modelDataJson.value ("hidden_size", 0);
     const auto modelSampleRate = modelDataJson.value ("sample_rate", 44100.0);
     const auto rnnDelaySamples = jmax (1.0, processSampleRate / modelSampleRate);
+
+    sampleRateCorrectionFilter.reset();
+    sampleRateCorrectionFilter.calcCoefsDB (8100.0f,
+                                            chowdsp::CoefficientCalculators::butterworthQ<float>,
+                                            (processSampleRate < modelSampleRate * 1.1)
+                                                ? 0.0f
+                                                : -(18.0f + float (processSampleRate / modelSampleRate)),
+                                            (float) processSampleRate);
 
     if (numInputs == 1 && hiddenSize == 40) // non-conditioned LSMT40
     {
@@ -220,6 +232,8 @@ void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
     inGain.prepare (spec);
     inGain.setRampDurationSeconds (0.1);
 
+    sampleRateCorrectionFilter.prepare (2);
+
     conditionParam.prepare (sampleRate, samplesPerBlock);
     conditionParam.setRampLength (0.05);
 
@@ -279,6 +293,11 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         }
     }
 
+    if (sampleRateCorrectionFilterParam->get())
+    {
+        sampleRateCorrectionFilter.processBlock (buffer);
+    }
+
     buffer.applyGain (normalizationGain);
 
     dcBlocker.processAudio (buffer);
@@ -306,6 +325,12 @@ void GuitarMLAmp::fromXML (XmlElement* xml, const chowdsp::Version& version, boo
     }
 
     BaseProcessor::fromXML (xml, version, loadPosition);
+
+    if (version < chowdsp::Version { "1.1.4" })
+    {
+        // Sample rate correction filters were only added in version 1.1.4
+        sampleRateCorrectionFilterParam->setValueNotifyingHost (0.0f);
+    }
 }
 
 bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
@@ -429,6 +454,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
 
 void GuitarMLAmp::addToPopupMenu (PopupMenu& menu)
 {
+    BaseProcessor::addToPopupMenu (menu);
     menu.addItem ("Download more models", []
                   { URL { "https://guitarml.com/tonelibrary/tonelib-pro.html" }.launchInDefaultBrowser(); });
     menu.addSeparator();
