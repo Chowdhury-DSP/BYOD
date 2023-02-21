@@ -429,7 +429,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
 
             onChange = [this, &processor]
             {
-                processor.loadModel (getSelectedItemIndex(), getParentComponent());
+                processor.loadModel (getSelectedItemIndex(), getTopLevelComponent());
             };
 
             this->setName (modelTag + "__box");
