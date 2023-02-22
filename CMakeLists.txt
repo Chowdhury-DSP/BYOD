@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment target")
 if(WIN32)
-    set(CMAKE_SYSTEM_VERSION 7.1 CACHE TYPE INTERNAL FORCE) # Windows SDK for Windows 7 and up
+    set(CMAKE_SYSTEM_VERSION 7.1 CACHE STRING INTERNAL FORCE) # Windows SDK for Windows 7 and up
 endif()
 project(BYOD VERSION 1.1.3)
 
