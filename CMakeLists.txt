@@ -102,6 +102,7 @@ juce_add_plugin(BYOD
     PLIST_TO_MERGE ${APPLE_LOCAL_NETWORK_PLIST} # Apple won't let you use local network unless we add this
     ICLOUD_PERMISSIONS_ENABLED TRUE
     HARDENED_RUNTIME_ENABLED ${HARDENED_RUNTIME_ENABLED}
+    HARDENED_RUNTIME_OPTIONS "com.apple.security.device.audio-input"
     APP_GROUPS_ENABLED ${USE_APP_GROUPS}
     APP_GROUP_IDS ${APP_GROUP_IDS_TO_USE}
 )
