@@ -39,7 +39,7 @@ public:
     }
 
     bool undo() override { return perform(); }
-    int getSizeInUnits() override { return (int) sizeof (*this); }
+    int getSizeInUnits() override { return 500; } // allow for 100 preset change actions
 
 private:
     PresetManager& manager;

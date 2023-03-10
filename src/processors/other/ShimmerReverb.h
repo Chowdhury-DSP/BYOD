@@ -11,6 +11,7 @@ public:
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
+    void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
@@ -32,7 +33,7 @@ private:
         chowdsp::FirstOrderLPF<float> highCutFilter;
     };
 
-    chowdsp::Reverb::FDN<ShimmerFDNConfig> fdn[2];
+    std::unique_ptr<std::array<chowdsp::Reverb::FDN<ShimmerFDNConfig>, 2>> fdns;
 
     static constexpr int numLFOs = 2;
     chowdsp::SineWave<float> lfos[numLFOs];

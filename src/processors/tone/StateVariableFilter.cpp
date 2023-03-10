@@ -130,7 +130,8 @@ void StateVariableFilter::fromXML (XmlElement* xml, const chowdsp::Version& vers
 {
     BaseProcessor::fromXML (xml, version, loadPosition);
 
-    if (version <= chowdsp::Version { "1.0.1" })
+    using namespace std::string_view_literals;
+    if (version <= chowdsp::Version { "1.0.1"sv })
     {
         // Multi-mode behaviour was only added in version 1.0.2, so we need to
         // make sure we don't break older patches.

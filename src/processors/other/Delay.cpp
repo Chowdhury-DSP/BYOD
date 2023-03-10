@@ -69,6 +69,12 @@ void DelayModule::prepare (double sampleRate, int samplesPerBlock)
     bypassNeedsReset = false;
 }
 
+void DelayModule::releaseMemory()
+{
+    cleanDelayLine.delay.free();
+    lofiDelayLine.free();
+}
+
 template <typename DelayType>
 void DelayModule::processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType& delayLine)
 {

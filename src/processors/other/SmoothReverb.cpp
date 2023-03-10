@@ -63,8 +63,9 @@ void SmoothReverb::prepare (double sampleRate, int samplesPerBlock)
     preDelay1.setDelay (preDelay1LengthMs * 0.001f * fs);
     preDelay2.setDelay (preDelay2LengthMs * 0.001f * fs);
 
-    diffuser.prepare (sampleRate);
-    fdn.prepare (sampleRate);
+    reverbInternal = std::make_unique<ReverbInternal>();
+    reverbInternal->diffuser.prepare (sampleRate);
+    reverbInternal->fdn.prepare (sampleRate);
 
     envelopeFollower.prepare (spec);
     envelopeFollower.setParameters (20.0f, 2000.0f);
@@ -78,6 +79,14 @@ void SmoothReverb::prepare (double sampleRate, int samplesPerBlock)
     mixer.setMixingRule (juce::dsp::DryWetMixingRule::sin3dB);
 
     outBuffer.setSize (2, samplesPerBlock);
+}
+
+void SmoothReverb::releaseMemory()
+{
+    preDelay1.free();
+    preDelay2.free();
+    reverbInternal.reset();
+    outBuffer.setSize (0, 0);
 }
 
 void SmoothReverb::processReverb (float* left, float* right, int numSamples)
@@ -95,9 +104,11 @@ void SmoothReverb::processReverb (float* left, float* right, int numSamples)
     preDelay1.setDelay (baseDelay1 * delayFactor);
     preDelay2.setDelay (baseDelay2 * delayFactor);
 
+    auto& diffuser = reverbInternal->diffuser;
+    auto& fdn = reverbInternal->fdn;
     diffuser.setDiffusionTimeMs (std::pow (curDecayParam * 0.005f, 0.75f));
     fdn.setDelayTimeMs (std::pow (curDecayParam * 0.2f, 0.95f));
-    fdn.getFDNConfig().setDecayTimeMs (fdn, curDecayParam * 1.25f, curDecayParam * 0.5f, 750.0f);
+    fdn.getFDNConfig().setDecayTimeMs (reverbInternal->fdn, curDecayParam * 1.25f, curDecayParam * 0.5f, 750.0f);
 
     float xVecArr alignas (16)[4] {};
     for (int n = 0; n < numSamples; ++n)

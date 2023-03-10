@@ -12,6 +12,7 @@ public:
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
+    void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
@@ -24,7 +25,7 @@ private:
     chowdsp::FloatParameter* shakeParam = nullptr;
     chowdsp::FloatParameter* mixParam = nullptr;
 
-    SpringReverb reverb;
+    std::unique_ptr<SpringReverb> reverb;
 
     AudioBuffer<float> dryBuffer;
     dsp::Gain<float> wetGain;

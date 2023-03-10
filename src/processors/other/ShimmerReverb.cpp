@@ -105,7 +105,8 @@ void ShimmerReverb::prepare (double sampleRate, int samplesPerBlock)
     feedbackParam.setRampLength (0.05);
     feedbackParam.prepare (sampleRate, samplesPerBlock);
 
-    for (auto& channelFDN : fdn)
+    fdns = std::make_unique<std::array<chowdsp::Reverb::FDN<ShimmerFDNConfig>, 2>>();
+    for (auto& channelFDN : *fdns)
         channelFDN.prepare (sampleRate);
 
     mixer.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 });
@@ -116,6 +117,11 @@ void ShimmerReverb::prepare (double sampleRate, int samplesPerBlock)
         lfos[i].prepare ({ sampleRate, (uint32_t) samplesPerBlock, 1 });
         lfoVals[i] = 0;
     }
+}
+
+void ShimmerReverb::releaseMemory()
+{
+    fdns.reset();
 }
 
 void ShimmerReverb::processAudio (AudioBuffer<float>& buffer)
@@ -136,6 +142,7 @@ void ShimmerReverb::processAudio (AudioBuffer<float>& buffer)
     const auto* sizeData = sizeParam.getSmoothedBuffer();
     const auto* feedbackData = feedbackParam.getSmoothedBuffer();
 
+    auto& fdn = *fdns;
     for (int i = 0; i < numSamples;)
     {
         const auto smallBlockSamples = jmin (smallBlockSize, numSamples - i);

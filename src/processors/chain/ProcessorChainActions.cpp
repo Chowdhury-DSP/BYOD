@@ -57,8 +57,11 @@ public:
                 procToRemove->getVTS().removeParameterListener (paramCast->paramID, &chain);
         }
 
-        SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
-        saveProc.reset (chain.procs.removeAndReturn (chain.procs.indexOf (procToRemove)));
+        {
+            SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
+            saveProc.reset (chain.procs.removeAndReturn (chain.procs.indexOf (procToRemove)));
+        }
+        saveProc->freeInternalMemory();
     }
 
     static void addConnection (ProcessorChain& chain, const ConnectionInfo& info)

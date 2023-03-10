@@ -84,7 +84,8 @@ void HighCut::fromXML (XmlElement* xml, const chowdsp::Version& version, bool lo
 {
     BaseProcessor::fromXML (xml, version, loadPosition);
 
-    if (version <= chowdsp::Version { "1.0.1" })
+    using namespace std::string_view_literals;
+    if (version <= chowdsp::Version { "1.0.1"sv })
     {
         // Up to version 1.0.2, this module had a bug where the cutoff frequency was off by a factor of 2*pi.
         // The bug is fixed now, but we need to make sure we don't break patches from earlier versions.
