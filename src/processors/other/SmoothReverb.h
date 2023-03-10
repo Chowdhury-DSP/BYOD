@@ -11,6 +11,7 @@ public:
     static ParamLayout createParameterLayout();
 
     void prepare (double sampleRate, int samplesPerBlock) override;
+    void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
@@ -30,9 +31,13 @@ private:
     chowdsp::NthOrderFilter<xsimd::batch<float>, 4> preDelayFilt;
 
     static constexpr int nDiffuserChannels = 8;
-    chowdsp::Reverb::DiffuserChain<4, chowdsp::Reverb::Diffuser<float, nDiffuserChannels>> diffuser;
     static constexpr int nFDNChannels = 12;
-    chowdsp::Reverb::FDN<chowdsp::Reverb::DefaultFDNConfig<float, nFDNChannels>> fdn;
+    struct ReverbInternal
+    {
+        chowdsp::Reverb::DiffuserChain<4, chowdsp::Reverb::Diffuser<float, nDiffuserChannels>> diffuser;
+        chowdsp::Reverb::FDN<chowdsp::Reverb::DefaultFDNConfig<float, nFDNChannels>> fdn;
+    };
+    std::unique_ptr<ReverbInternal> reverbInternal;
 
     chowdsp::LevelDetector<float> envelopeFollower;
 
