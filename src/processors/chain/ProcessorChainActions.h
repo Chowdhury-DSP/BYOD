@@ -15,7 +15,7 @@ public:
 
     bool perform() override;
     bool undo() override;
-    int getSizeInUnits() override { return (int) sizeof (*this); }
+    int getSizeInUnits() override { return 100; } // allow for 500 add/remove actions
 
 private:
     ProcessorChain& chain;
@@ -35,7 +35,7 @@ public:
 
     bool perform() override;
     bool undo() override;
-    int getSizeInUnits() override { return (int) sizeof (*this); }
+    int getSizeInUnits() override { return 1; }
 
 private:
     ProcessorChain& chain;
