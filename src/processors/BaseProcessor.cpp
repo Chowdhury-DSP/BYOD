@@ -38,6 +38,13 @@ void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
     }
 }
 
+void BaseProcessor::freeInternalMemory()
+{
+    releaseMemory();
+    for (auto& b : inputBuffers)
+        b.setSize (0, 0);
+}
+
 void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
 {
     auto updateBufferMag = [&] (const AudioBuffer<float>& inBuffer, int inputIndex)

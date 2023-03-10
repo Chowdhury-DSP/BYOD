@@ -39,7 +39,8 @@ ParamLayout SpringReverbProcessor::createParameterLayout()
 void SpringReverbProcessor::prepare (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
-    reverb.prepare (spec);
+    reverb = std::make_unique<SpringReverb>();
+    reverb->prepare (spec);
 
     dryBuffer.setSize (2, samplesPerBlock);
 
@@ -47,15 +48,20 @@ void SpringReverbProcessor::prepare (double sampleRate, int samplesPerBlock)
     wetGain.setRampDurationSeconds (0.1);
 }
 
+void SpringReverbProcessor::releaseMemory()
+{
+    reverb.reset();
+}
+
 void SpringReverbProcessor::processAudio (AudioBuffer<float>& buffer)
 {
     if (numChannels != buffer.getNumChannels())
     {
-        reverb.reset();
+        reverb->reset();
         numChannels = buffer.getNumChannels();
     }
 
-    reverb.setParams ({
+    reverb->setParams ({
         sizeParam->getCurrentValue(),
         decayParam->getCurrentValue(),
         reflectParam->getCurrentValue(),
@@ -67,7 +73,7 @@ void SpringReverbProcessor::processAudio (AudioBuffer<float>& buffer)
 
     dryBuffer.makeCopyOf (buffer);
 
-    reverb.processBlock (buffer);
+    reverb->processBlock (buffer);
 
     dsp::AudioBlock<float> dryBlock (dryBuffer);
     dsp::AudioBlock<float> block (buffer);

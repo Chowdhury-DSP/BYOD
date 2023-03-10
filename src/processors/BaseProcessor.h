@@ -53,6 +53,7 @@ public:
     // audio processing methods
     bool isBypassed() const { return ! static_cast<bool> (onOffParam->load()); }
     void prepareProcessing (double sampleRate, int numSamples);
+    void freeInternalMemory();
     void processAudioBlock (AudioBuffer<float>& buffer);
 
     // methods for working with port input levels
@@ -117,6 +118,7 @@ public:
 
 protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
+    virtual void releaseMemory() {}
     virtual void processAudio (AudioBuffer<float>& buffer) = 0;
 
     /** All multi-input or multi-output modules should override this method! */
