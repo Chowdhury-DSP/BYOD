@@ -46,10 +46,11 @@ void Flapjack::processAudio (AudioBuffer<float>& buffer)
 {
     for (auto [channelIndex, channelData] : chowdsp::buffer_iters::channels (buffer))
     {
+        wdf[channelIndex].setParams (1.0f - driveParam->getCurrentValue(), presenceParam->getCurrentValue());
         for (auto& x : channelData)
             x = wdf[channelIndex].processSample (x);
     }
 
-    level.setGainLinear (levelParam->getCurrentValue());
+    level.setGainLinear (levelParam->getCurrentValue() * Decibels::decibelsToGain (-20.0f));
     level.process (buffer);
 }
