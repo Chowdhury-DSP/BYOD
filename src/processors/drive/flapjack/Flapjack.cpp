@@ -37,8 +37,19 @@ ParamLayout Flapjack::createParameterLayout()
 
 void Flapjack::prepare (double sampleRate, int samplesPerBlock)
 {
+    for (auto& model : wdf)
+        model.prepare (sampleRate);
+    level.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 });
 }
 
 void Flapjack::processAudio (AudioBuffer<float>& buffer)
 {
+    for (auto [channelIndex, channelData] : chowdsp::buffer_iters::channels (buffer))
+    {
+        for (auto& x : channelData)
+            x = wdf[channelIndex].processSample (x);
+    }
+
+    level.setGainLinear (levelParam->getCurrentValue());
+    level.process (buffer);
 }
