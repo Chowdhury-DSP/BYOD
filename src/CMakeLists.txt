@@ -136,3 +136,18 @@ target_sources(BYOD PRIVATE
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)
+
+make_lib_simd_runtime(resampled_rnn_accelerated processors/drive/neural_utils/ResampledRNNAccelerated.cpp)
+foreach(target IN ITEMS resampled_rnn_accelerated_sse_or_arm resampled_rnn_accelerated_avx)
+    target_link_libraries(${target} PRIVATE juce_plugin_modules)
+endforeach()
+target_compile_definitions(resampled_rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32)
+
+target_link_libraries(resampled_rnn_accelerated PRIVATE juce_plugin_modules)
+target_link_libraries(BYOD PRIVATE resampled_rnn_accelerated)
+set_target_properties(resampled_rnn_accelerated PROPERTIES
+    POSITION_INDEPENDENT_CODE TRUE
+    VISIBILITY_INLINES_HIDDEN TRUE
+    C_VISIBILITY_PRESET hidden
+    CXX_VISIBILITY_PRESET hidden
+)

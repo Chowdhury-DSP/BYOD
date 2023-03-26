@@ -60,12 +60,12 @@ void loadGRUModel (ModelType& model, const nlohmann::json& weights_json)
 }
 } // namespace
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
-void ResampledRNN<hiddenSize, RecurrentLayerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType, typename Arch>
+void ResampledRNN<hiddenSize, RecurrentLayerType, Arch>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
 {
     targetSampleRate = modelSampleRate;
 
-    MemoryInputStream jsonInputStream (modelData, (size_t) modelDataSize, false);
+    juce::MemoryInputStream jsonInputStream (modelData, (size_t) modelDataSize, false);
     auto weightsJson = nlohmann::json::parse (jsonInputStream.readEntireStreamAsString().toStdString());
 
     if constexpr (std::is_same_v<RecurrentLayerTypeComplete, RTNeural::GRULayerT<float, 1, 8, DefaultSRCMode>>) // Centaur model has keras-style weights
@@ -74,8 +74,8 @@ void ResampledRNN<hiddenSize, RecurrentLayerType>::initialise (const void* model
         loadLSTMModel (model, hiddenSize, weightsJson);
 }
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
-void ResampledRNN<hiddenSize, RecurrentLayerType>::prepare (double sampleRate, int samplesPerBlock)
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType, typename Arch>
+void ResampledRNN<hiddenSize, RecurrentLayerType, Arch>::prepare (double sampleRate, int samplesPerBlock)
 {
     const auto [resampleRatio, rnnDelaySamples] = [] (auto curFs, auto targetFs)
     {
@@ -93,14 +93,14 @@ void ResampledRNN<hiddenSize, RecurrentLayerType>::prepare (double sampleRate, i
     }(sampleRate, targetSampleRate);
 
     needsResampling = resampleRatio != 1.0;
-    resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, sampleRate * resampleRatio);
+    resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32_t) samplesPerBlock, 1 }, sampleRate * resampleRatio);
 
     model.template get<0>().prepare (rnnDelaySamples);
     model.reset();
 }
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
-void ResampledRNN<hiddenSize, RecurrentLayerType>::reset()
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType, typename Arch>
+void ResampledRNN<hiddenSize, RecurrentLayerType, Arch>::reset()
 {
     resampler.reset();
     model.reset();
@@ -108,5 +108,4 @@ void ResampledRNN<hiddenSize, RecurrentLayerType>::reset()
 
 //=======================================================
 template class ResampledRNN<20, RTNeural::LSTMLayerT>; // GuitarML
-template class ResampledRNN<28, RTNeural::LSTMLayerT>; // MetalFace
 template class ResampledRNN<8, RTNeural::GRULayerT>; // Centaur

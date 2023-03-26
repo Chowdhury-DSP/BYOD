@@ -1,8 +1,16 @@
 #pragma once
 
-#include <pch.h>
+#include <juce_dsp/juce_dsp.h>
+#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wshorten-64-to-32")
+#include <RTNeural/RTNeural.h>
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT>
+#if JUCE_INTEL
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT, typename Arch = xsimd::sse4_1>
+#elif JUCE_ARM
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT, typename Arch = xsimd::neon64>
+#endif
 class ResampledRNN
 {
 public:
@@ -15,7 +23,7 @@ public:
     void prepare (double sampleRate, int samplesPerBlock);
     void reset();
 
-    template <bool useRedisuals = false>
+    template <bool useResiduals = false>
     void process (juce::dsp::AudioBlock<float>& block)
     {
         auto processNNInternal = [this] (const chowdsp::BufferView<float>& bufferView)
@@ -23,7 +31,7 @@ public:
             const auto numSamples = bufferView.getNumSamples();
             auto* x = bufferView.getWritePointer (0);
 
-            if constexpr (useRedisuals)
+            if constexpr (useResiduals)
             {
                 for (int i = 0; i < numSamples; ++i)
                     x[i] += model.forward (&x[i]);

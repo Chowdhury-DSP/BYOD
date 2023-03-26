@@ -2,7 +2,7 @@
 
 #include "../BaseProcessor.h"
 #include "../utility/DCBlocker.h"
-#include "neural_utils/ResampledRNN.h"
+#include "neural_utils/ResampledRNNAccelerated.h"
 
 class MetalFace : public BaseProcessor
 {
@@ -19,7 +19,7 @@ private:
     chowdsp::FloatParameter* gainDBParam = nullptr;
 
     dsp::Gain<float> gain;
-    ResampledRNN<28> rnn[2];
+    ResampledRNNAccelerated<28> rnn[2];
 
     DCBlocker dcBlocker;
 
