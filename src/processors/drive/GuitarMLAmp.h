@@ -2,7 +2,7 @@
 
 #include "../BaseProcessor.h"
 #include "../utility/DCBlocker.h"
-#include "neural_utils/ResampledRNN.h"
+#include "neural_utils/ResampledRNNAccelerated.h"
 
 class GuitarMLAmp : public BaseProcessor
 {

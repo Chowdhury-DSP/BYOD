@@ -1,16 +1,8 @@
 #pragma once
 
-#include <juce_dsp/juce_dsp.h>
-#include <chowdsp_dsp_utils/chowdsp_dsp_utils.h>
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wshorten-64-to-32")
-#include <RTNeural/RTNeural.h>
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+#include <pch.h>
 
-#if JUCE_INTEL
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT, typename Arch = xsimd::sse4_1>
-#elif JUCE_ARM
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT, typename Arch = xsimd::neon64>
-#endif
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT>
 class ResampledRNN
 {
 public:
