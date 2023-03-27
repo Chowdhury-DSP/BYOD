@@ -1,8 +1,8 @@
 #pragma once
 
+#include "neural_utils/ResampledRNNAccelerated.h"
 #include "../BaseProcessor.h"
 #include "../utility/DCBlocker.h"
-#include "neural_utils/ResampledRNNAccelerated.h"
 
 class GuitarMLAmp : public BaseProcessor
 {
@@ -39,8 +39,19 @@ private:
     double processSampleRate = 96000.0;
     std::shared_ptr<FileChooser> customModelChooser;
 
+    template <int numIns, int hiddenSize, typename Arch>
+    using GuitarML_Part_LSTM = RNNAccelerated<numIns, hiddenSize, RTNeural::LSTMLayerT, RTNeural::SampleRateCorrectionMode::LinInterp, Arch>;
+
+#if JUCE_INTEL
     template <int numIns, int hiddenSize>
-    using GuitarML_LSTM = RTNeural::ModelT<float, numIns, 1, RTNeural::LSTMLayerT<float, numIns, hiddenSize, RTNeural::SampleRateCorrectionMode::LinInterp>, RTNeural::DenseT<float, hiddenSize, 1>>;
+    using GuitarML_LSTM = mpark::variant<
+        GuitarML_Part_LSTM<numIns, hiddenSize, xsimd::sse4_1>,
+        GuitarML_Part_LSTM<numIns, hiddenSize, xsimd::fma3<xsimd::avx>>>;
+#else
+    template <int numIns, int hiddenSize>
+    using GuitarML_LSTM = mpark::variant<
+        GuitarML_Part_LSTM<numIns, hiddenSize, xsimd::neon64>>;
+#endif
 
     using LSTM40Cond = GuitarML_LSTM<2, 40>;
     using LSTM40NoCond = GuitarML_LSTM<1, 40>;

@@ -24,22 +24,6 @@ const String conditionTag = "condition";
 const String sampleRateCorrFilterTag = "sample_rate_corr_filter";
 const String customModelTag = "custom_model";
 constexpr std::string_view modelNameTag = "byod_guitarml_model_name";
-
-using Vec2d = std::vector<std::vector<float>>;
-auto transpose = [] (const Vec2d& x) -> Vec2d
-{
-    auto outer_size = x.size();
-    auto inner_size = x[0].size();
-    Vec2d y (inner_size, std::vector<float> (outer_size, 0.0f));
-
-    for (size_t i = 0; i < outer_size; ++i)
-    {
-        for (size_t j = 0; j < inner_size; ++j)
-            y[j][i] = x[i][j];
-    }
-
-    return std::move (y);
-};
 } // namespace
 
 GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createParameterLayout(), um)
@@ -57,6 +41,17 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
     uiOptions.info.description = "An implementation of the neural LSTM guitar amp modeller used by the GuitarML project. Supports loading custom models that are compatible with the GuitarML Protues plugin";
     uiOptions.info.authors = StringArray { "Keith Bloemer", "Jatin Chowdhury" };
     uiOptions.info.infoLink = "https://guitarml.com";
+
+#if JUCE_INTEL
+    if (xsimd::available_architectures().fma3_avx2) // move down to AVX after XSIMD fixes it
+    {
+        juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
+        lstm40CondModels[0].template emplace<GuitarML_Part_LSTM<2, 40, xsimd::fma3<xsimd::avx>>>();
+        lstm40CondModels[1].template emplace<GuitarML_Part_LSTM<2, 40, xsimd::fma3<xsimd::avx>>>();
+        lstm40NoCondModels[0].template emplace<GuitarML_Part_LSTM<1, 40, xsimd::fma3<xsimd::avx>>>();
+        lstm40NoCondModels[1].template emplace<GuitarML_Part_LSTM<1, 40, xsimd::fma3<xsimd::avx>>>();
+    }
+#endif
 }
 
 GuitarMLAmp::~GuitarMLAmp() = default;
@@ -75,30 +70,6 @@ ParamLayout GuitarMLAmp::createParameterLayout()
 
 void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const String& newModelName)
 {
-    const auto setModelWeights = [] (const chowdsp::json& weights_json, auto& model, int hiddenSize)
-    {
-        auto& lstm = model.template get<0>();
-        auto& dense = model.template get<1>();
-
-        Vec2d lstm_weights_ih = weights_json.at ("/state_dict/rec.weight_ih_l0"_json_pointer);
-        lstm.setWVals (transpose (lstm_weights_ih));
-
-        Vec2d lstm_weights_hh = weights_json.at ("/state_dict/rec.weight_hh_l0"_json_pointer);
-        lstm.setUVals (transpose (lstm_weights_hh));
-
-        std::vector<float> lstm_bias_ih = weights_json.at ("/state_dict/rec.bias_ih_l0"_json_pointer);
-        std::vector<float> lstm_bias_hh = weights_json.at ("/state_dict/rec.bias_hh_l0"_json_pointer);
-        for (int i = 0; i < 4 * hiddenSize; ++i)
-            lstm_bias_hh[(size_t) i] += lstm_bias_ih[(size_t) i];
-        lstm.setBVals (lstm_bias_hh);
-
-        Vec2d dense_weights = weights_json.at ("/state_dict/lin.weight"_json_pointer);
-        dense.setWeights (dense_weights);
-
-        std::vector<float> dense_bias = weights_json.at ("/state_dict/lin.bias"_json_pointer);
-        dense.setBias (dense_bias.data());
-    };
-
     const auto& modelDataJson = modelJson.at ("model_data");
     const auto numInputs = modelDataJson.value ("input_size", 1);
     const auto hiddenSize = modelDataJson.value ("hidden_size", 0);
@@ -114,22 +85,28 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
     if (numInputs == 1 && hiddenSize == 40) // non-conditioned LSMT40
     {
         SpinLock::ScopedLockType modelChangingLock { modelChangingMutex };
-        for (auto& model : lstm40NoCondModels)
-            setModelWeights (modelJson, model, hiddenSize);
-
-        for (auto& model : lstm40NoCondModels)
-            model.get<0>().prepare ((float) rnnDelaySamples);
+        for (auto& modelVariant : lstm40NoCondModels)
+        {
+            mpark::visit ([rnnDelaySamples, &modelJson] (auto& model)
+                          {
+                              model.initialise (modelJson);
+                              model.prepare ((float) rnnDelaySamples);
+                          }, modelVariant);
+        }
 
         modelArch = ModelArch::LSTM40NoCond;
     }
     else if (numInputs == 2 && hiddenSize == 40) // conditioned LSMT40
     {
         SpinLock::ScopedLockType modelChangingLock { modelChangingMutex };
-        for (auto& model : lstm40CondModels)
-            setModelWeights (modelJson, model, hiddenSize);
-
-        for (auto& model : lstm40CondModels)
-            model.get<0>().prepare ((float) rnnDelaySamples);
+        for (auto& modelVariant : lstm40CondModels)
+        {
+            mpark::visit ([rnnDelaySamples, &modelJson] (auto& model)
+                          {
+                              model.initialise (modelJson);
+                              model.prepare ((float) rnnDelaySamples);
+                          }, modelVariant);
+        }
 
         modelArch = ModelArch::LSTM40Cond;
         conditionParam.reset();
@@ -235,9 +212,6 @@ void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
     conditionParam.prepare (sampleRate, samplesPerBlock);
     conditionParam.setRampLength (0.05);
 
-    for (auto& model : lstm40NoCondModels)
-        model.get<0>().prepare (1.0f);
-
     processSampleRate = sampleRate;
     loadModelFromJson (cachedModel);
 
@@ -269,8 +243,10 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         for (int ch = 0; ch < numChannels; ++ch)
         {
             auto* x = buffer.getWritePointer (ch);
-            for (int n = 0; n < numSamples; ++n)
-                x[n] += lstm40NoCondModels[ch].forward (&x[n]);
+            mpark::visit ([x, numSamples] (auto& model)
+                          {
+                              model.process ({ x, (size_t) numSamples }, true);
+                          }, lstm40NoCondModels[ch]);
         }
     }
     else if (modelArch == ModelArch::LSTM40Cond)
@@ -278,16 +254,13 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         conditionParam.process (numSamples);
         const auto* conditionData = conditionParam.getSmoothedBuffer();
 
-        alignas (RTNEURAL_DEFAULT_ALIGNMENT) float inputVec[4] {};
         for (int ch = 0; ch < numChannels; ++ch)
         {
             auto* x = buffer.getWritePointer (ch);
-            for (int n = 0; n < numSamples; ++n)
-            {
-                inputVec[0] = x[n];
-                inputVec[1] = conditionData[n];
-                x[n] += lstm40CondModels[ch].forward (inputVec);
-            }
+            mpark::visit ([x, conditionData, numSamples] (auto& model)
+                          {
+                              model.process_conditioned ({ x, (size_t) numSamples }, { conditionData, (size_t) numSamples }, true);
+                          }, lstm40CondModels[ch]);
         }
     }
 

@@ -41,11 +41,11 @@ public:
 
 private:
 #if JUCE_INTEL
-    mpark::variant<RNNAccelerated<hiddenSize, RecurrentLayerType, xsimd::sse4_1>,
-                   RNNAccelerated<hiddenSize, RecurrentLayerType, xsimd::fma3<xsimd::avx>>>
+    mpark::variant<RNNAccelerated<1, hiddenSize, RecurrentLayerType, RTNeural::SampleRateCorrectionMode::NoInterp, xsimd::sse4_1>,
+                   RNNAccelerated<1, hiddenSize, RecurrentLayerType, RTNeural::SampleRateCorrectionMode::NoInterp, xsimd::fma3<xsimd::avx>>>
         model_variant;
 #elif JUCE_ARM
-    mpark::variant<RNNAccelerated<hiddenSize, RecurrentLayerType, xsimd::neon64>> model_variant;
+    mpark::variant<RNNAccelerated<1, hiddenSize, RecurrentLayerType, RTNeural::SampleRateCorrectionMode::NoInterp, xsimd::neon64>> model_variant;
 #endif
 
     using ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<8192, 8>;

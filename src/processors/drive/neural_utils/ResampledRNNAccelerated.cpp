@@ -7,7 +7,7 @@ ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::ResampledRNNAccelerated
     if (xsimd::available_architectures().fma3_avx2) // move down to AVX after XSIMD fixes it
     {
         juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
-        model_variant.template emplace<RNNAccelerated<hiddenSize, RecurrentLayerType, xsimd::fma3<xsimd::avx>>>();
+        model_variant.template emplace<RNNAccelerated<1, hiddenSize, RecurrentLayerType, RTNeural::SampleRateCorrectionMode::NoInterp, xsimd::fma3<xsimd::avx>>>();
     }
 #endif
     juce::ignoreUnused (this);
