@@ -1,5 +1,6 @@
 #pragma once
 
+#include "FlapjackOpAmpRType.h"
 #include "FlapjackWDFScatteringMatrix.h"
 #include <pch.h>
 
@@ -29,7 +30,7 @@ public:
 
     void setParams (float driveParam, float presenceParam)
     {
-        R4_Rdrive.setResistanceValue (R4 + std::pow (driveParam, 0.5f) * Rdrive);
+        R4_Rdrive.setResistanceValue (R4 + driveParam * Rdrive); // maybe add some skew on this parameter?
 
         Rp_p.setResistanceValue (presenceParam * Rpresence);
         Rp_p.setResistanceValue ((1.0f - presenceParam) * Rpresence);
@@ -102,7 +103,7 @@ private:
         }
     };
 
-    using RType = wdft::RootRtypeAdaptor<float,
+    using RType = FlapjackOpAmpRType<float,
                                          ImpedanceCalc,
                                          decltype (Sa),
                                          decltype (Sb),
