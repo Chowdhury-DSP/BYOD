@@ -324,7 +324,8 @@ void GuitarMLAmp::fromXML (XmlElement* xml, const chowdsp::Version& version, boo
 
     BaseProcessor::fromXML (xml, version, loadPosition);
 
-    if (version < chowdsp::Version { "1.1.4" })
+    using namespace std::string_view_literals;
+    if (version < chowdsp::Version { "1.1.4"sv })
     {
         // Sample rate correction filters were only added in version 1.1.4
         sampleRateCorrectionFilterParam->setValueNotifyingHost (0.0f);
