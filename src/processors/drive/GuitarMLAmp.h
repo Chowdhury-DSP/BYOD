@@ -32,6 +32,7 @@ private:
 
     chowdsp::FloatParameter* gainParam = nullptr;
     chowdsp::SmoothedBufferValue<float> conditionParam;
+    chowdsp::BoolParameter* sampleRateCorrectionFilterParam = nullptr;
     chowdsp::Gain<float> inGain;
 
     SpinLock modelChangingMutex;
@@ -46,6 +47,7 @@ private:
 
     std::array<LSTM40Cond, 2> lstm40CondModels;
     std::array<LSTM40NoCond, 2> lstm40NoCondModels;
+    chowdsp::HighShelfFilter<float> sampleRateCorrectionFilter;
 
     enum class ModelArch
     {

@@ -292,7 +292,7 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::H
                     fileItem.isTicked = file == ampIRs.curFile;
                     fileItem.action = [this, file]
                     {
-                        ampIRs.loadIRFromStream (file.createInputStream(), getParentComponent());
+                        ampIRs.loadIRFromStream (file.createInputStream(), getTopLevelComponent());
                     };
                     menu->addItem (fileItem);
 
