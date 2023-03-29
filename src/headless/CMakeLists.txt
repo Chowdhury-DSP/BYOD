@@ -14,6 +14,7 @@ target_sources(BYOD_headless PRIVATE
     PresetResaver.cpp
     PresetSaveLoadTime.cpp
     ScreenshotGenerator.cpp
+    GuitarMLFilterDesigner.cpp
 
     tests/ParameterSmoothTest.cpp
     tests/PreBufferTest.cpp

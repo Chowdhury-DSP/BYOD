@@ -1,3 +1,4 @@
+#include "GuitarMLFilterDesigner.h"
 #include "PresetResaver.h"
 #include "PresetSaveLoadTime.h"
 #include "ScreenshotGenerator.h"
@@ -29,6 +30,7 @@ int main (int argc, char* argv[])
     app.addCommand (ScreenshotGenerator());
     app.addCommand (PresetResaver());
     app.addCommand (PresetSaveLoadTime());
+    app.addCommand (GuitarMLFilterDesigner());
     app.addCommand (UnitTests());
 
     // ArgumentList args { "--unit-tests", "--all" };
