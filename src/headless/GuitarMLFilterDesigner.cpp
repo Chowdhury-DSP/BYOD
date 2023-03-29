@@ -39,9 +39,9 @@ void GuitarMLFilterDesigner::generateFiles ([[maybe_unused]] const ArgumentList&
         buffer.clear();
         auto&& block = dsp::AudioBlock<float> { buffer };
 
-        noiseGenerator.process(dsp::ProcessContextReplacing<float> { block });
+        noiseGenerator.process (dsp::ProcessContextReplacing<float> { block });
         buffer.clear();
-        noiseGenerator.process(dsp::ProcessContextReplacing<float> { block });
+        noiseGenerator.process (dsp::ProcessContextReplacing<float> { block });
         processor->processAudioBlock (buffer);
 
         file.deleteFile();
