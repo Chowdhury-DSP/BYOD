@@ -106,12 +106,10 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
     const auto rnnDelaySamples = jmax (1.0, processSampleRate / modelSampleRate);
 
     sampleRateCorrectionFilter.reset();
-    sampleRateCorrectionFilter.calcCoefsDB (8100.0f,
-                                            chowdsp::CoefficientCalculators::butterworthQ<float>,
-                                            (processSampleRate < modelSampleRate * 1.1)
-                                                ? 0.0f
-                                                : -(18.0f + float (processSampleRate / modelSampleRate)),
-                                            (float) processSampleRate);
+    sampleRateCorrectionFilter.calcCoefs (8100.0f,
+                                          chowdsp::CoefficientCalculators::butterworthQ<float>,
+                                          (processSampleRate < modelSampleRate * 1.1) ? 1.0f : 0.25f,
+                                          (float) processSampleRate);
 
     if (numInputs == 1 && hiddenSize == 40) // non-conditioned LSMT40
     {
