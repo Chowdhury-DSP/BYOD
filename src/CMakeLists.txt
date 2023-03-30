@@ -75,6 +75,7 @@ target_sources(BYOD PRIVATE
     processors/drive/centaur/PreAmpStage.cpp
     processors/drive/diode_circuits/DiodeClipper.cpp
     processors/drive/diode_circuits/DiodeRectifier.cpp
+    processors/drive/flapjack/Flapjack.cpp
     processors/drive/hysteresis/Hysteresis.cpp
     processors/drive/hysteresis/HysteresisProcessing.cpp
     processors/drive/junior_b/JuniorB.cpp

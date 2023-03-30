@@ -68,7 +68,6 @@ argument `-DCHOWDSP_ENABLE_OPENGL=<ON|OFF>` to the CMake configure step.
 
 ## Credits:
 
-- GUI Framework - [Plugin GUI Magic](https://github.com/ffAudio/PluginGUIMagic)
 - Extra Icons - [FontAwesome](https://fontawesome.com/)
 - Fuzzy String Searching - [RapidFuzz](https://github.com/maxbachmann/rapidfuzz-cpp)
 - C++ Utilities:
