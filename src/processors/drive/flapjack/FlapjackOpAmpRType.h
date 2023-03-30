@@ -2,6 +2,13 @@
 
 #include <pch.h>
 
+enum class FlapjackClipMode
+{
+    HardClip = 1,
+    AlgSigmoid,
+    Asymm,
+};
+
 template <typename T, typename ImpedanceCalculator, typename... PortTypes>
 class FlapjackOpAmpRType : public wdft::RootWDF
 {
@@ -42,15 +49,43 @@ public:
     }
 
     /** Computes both the incident and reflected waves at this root node. */
+    template <FlapjackClipMode clipMode>
     inline void compute() noexcept
     {
         wdft::rtype_detail::RtypeScatter (S_matrix, a_vec, b_vec);
 
-        for (int i = 0; i < numPorts; ++i)
+        static constexpr auto v_size = xsimd::batch<float>::size;
+        for (int i = 0; i < numPorts; i += v_size)
         {
-            auto voltage = 0.5f * (a_vec[i] + b_vec[i]);
-            voltage = std::clamp (voltage, -9.0f, 0.0f);
-            b_vec[i] = 2.0f * voltage - a_vec[i];
+            const auto a_batch = xsimd::load_aligned (a_vec.data() + i);
+            const auto b_batch = xsimd::load_aligned (b_vec.data() + i);
+            auto voltage = -0.5f * (a_batch + b_batch);
+
+            const auto sigmoid = [](auto x, float offset)
+            {
+                static constexpr auto r4_5 = 1.0f / 4.5f;
+                const auto rdenominator = xsimd::rsqrt (1.0f + 0.75f * chowdsp::Power::ipow<2> ((x - offset) * r4_5));
+                return (x - offset) * rdenominator + 4.5f;
+            };
+
+            if constexpr (clipMode == FlapjackClipMode::HardClip)
+            {
+                voltage = xsimd::clip (voltage, xsimd::broadcast (0.0f), xsimd::broadcast (9.0f));
+            }
+            else if constexpr (clipMode == FlapjackClipMode::AlgSigmoid)
+            {
+                voltage = sigmoid (voltage, 4.5f);
+            }
+            else if constexpr (clipMode == FlapjackClipMode::Asymm)
+            {
+//                static constexpr auto A = -3.7f;
+//                static constexpr auto O = gcem::tanh (A);
+//                static constexpr auto K = 200.0f / (O + 1.0f);
+//                voltage = K * (chowdsp::Math::algebraicSigmoid (chowdsp::PowApprox::exp (0.1f * voltage - 4.5f) - A) + O);
+                voltage = sigmoid (voltage, 4.8f);
+            }
+
+            xsimd::store_aligned (b_vec.data() + i, -2.0f * voltage - a_batch);
         }
 
         wdft::rtype_detail::forEachInTuple ([&] (auto& port, size_t i) {

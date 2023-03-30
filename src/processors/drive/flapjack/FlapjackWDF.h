@@ -28,18 +28,23 @@ public:
         C8_C9.reset();
     }
 
-    void setParams (float driveParam, float presenceParam)
+    void setParams (float driveParam, float presenceParam, bool xlfOn)
     {
-        R4_Rdrive.setResistanceValue (R4 + driveParam * Rdrive); // maybe add some skew on this parameter?
+        chowdsp::wdft::ScopedDeferImpedancePropagation deferImpedance { R };
 
-        Rp_p.setResistanceValue (presenceParam * Rpresence);
+        R4_Rdrive.setResistanceValue (R4 + driveParam * Rdrive);
+
+        Rp_m.setResistanceValue (presenceParam * Rpresence);
         Rp_p.setResistanceValue ((1.0f - presenceParam) * Rpresence);
+
+        C8_C9.setCapacitanceValue (xlfOn ? 147.0e-9f : 47.0e-9f);
     }
 
+    template <FlapjackClipMode clipMode>
     inline float processSample (float x)
     {
         Vin.setVoltage (x);
-        R.compute();
+        R.compute<clipMode>();
 
         return wdft::voltage<float> (Rlevel);
     }
@@ -104,16 +109,16 @@ private:
     };
 
     using RType = FlapjackOpAmpRType<float,
-                                         ImpedanceCalc,
-                                         decltype (Sa),
-                                         decltype (Sb),
-                                         decltype (R3),
-                                         decltype (R5),
-                                         decltype (R6),
-                                         decltype (C6),
-                                         decltype (Rp_p),
-                                         decltype (Rp_m),
-                                         decltype (Sj),
-                                         decltype (Sk)>;
+                                     ImpedanceCalc,
+                                     decltype (Sa),
+                                     decltype (Sb),
+                                     decltype (R3),
+                                     decltype (R5),
+                                     decltype (R6),
+                                     decltype (C6),
+                                     decltype (Rp_p),
+                                     decltype (Rp_m),
+                                     decltype (Sj),
+                                     decltype (Sk)>;
     RType R { Sa, Sb, R3, R5, R6, C6, Rp_p, Rp_m, Sj, Sk };
 };

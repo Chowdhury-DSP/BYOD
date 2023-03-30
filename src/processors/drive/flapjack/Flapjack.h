@@ -15,12 +15,15 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    chowdsp::FloatParameter* driveParam = nullptr;
-    chowdsp::FloatParameter* presenceParam = nullptr;
+    chowdsp::SmoothedBufferValue<float> driveParam;
+    chowdsp::SmoothedBufferValue<float> presenceParam;
     chowdsp::FloatParameter* levelParam = nullptr;
+    chowdsp::ChoiceParameter* modeParam = nullptr;
+    chowdsp::BoolParameter* xlfParam = nullptr;
 
     FlapjackWDF wdf[2];
     chowdsp::Gain<float> level;
+    chowdsp::FirstOrderHPF<float> dcBlocker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Flapjack)
 };
