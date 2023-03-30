@@ -29,7 +29,7 @@ private:
 
     std::unique_ptr<dsp::Oversampling<float>> oversampling;
 
-    chowdsp::SecondOrderHPF<float> dcBlocker;
+    chowdsp::SVFHighpass<float> dcBlocker;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BassFace)
 };

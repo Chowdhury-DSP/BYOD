@@ -43,11 +43,11 @@ void BassFace::prepare (double sampleRate, int samplesPerBlock)
     for (auto& m : model)
         m.prepare (osSampleRate, osSamplesPerBlock);
 
-    gainSmoothed.prepare (osSampleRate, (int) std::ceil ((float) osSamplesPerBlock));
+    gainSmoothed.prepare (osSampleRate, osSamplesPerBlock);
     gainSmoothed.setRampLength (0.05);
 
-    dcBlocker.prepare (2);
-    dcBlocker.calcCoefs (15.0f, chowdsp::CoefficientCalculators::butterworthQ<float>, (float) sampleRate);
+    dcBlocker.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 });
+    dcBlocker.setCutoffFrequency (15.0f);
 
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);
