@@ -20,14 +20,8 @@ private:
 
     static constexpr int hiddenSize = 24;
     ResampledRNNAccelerated<2, hiddenSize> model[2];
-//    using Model = RTNeural::ModelT<float,
-//                                   2,
-//                                   1,
-//                                   RTNeural::LSTMLayerT<float, 2, hiddenSize, RTNeural::SampleRateCorrectionMode::NoInterp>,
-//                                   RTNeural::DenseT<float, hiddenSize, 1>>;
-//    Model model[2];
 
-    std::unique_ptr<dsp::Oversampling<float>> oversampling;
+    std::optional<dsp::Oversampling<float>> oversampling;
 
     chowdsp::SVFHighpass<float> dcBlocker;
 

@@ -35,7 +35,7 @@ void BassFace::prepare (double sampleRate, int samplesPerBlock)
     }
 
     const size_t oversamplingOrder = sampleRate <= 48000.0 ? 1 : 0;
-    oversampling = std::make_unique<juce::dsp::Oversampling<float>> (2, oversamplingOrder, juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
+    oversampling.emplace (2, oversamplingOrder, juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
     oversampling->initProcessing (samplesPerBlock);
     const auto osSampleRate = sampleRate * (double) oversampling->getOversamplingFactor();
     const auto osSamplesPerBlock = samplesPerBlock * (int) oversampling->getOversamplingFactor();
