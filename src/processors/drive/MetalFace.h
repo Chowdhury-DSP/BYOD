@@ -1,8 +1,9 @@
 #pragma once
 
+#include "neural_utils/ResampledRNNAccelerated.h"
+
 #include "../BaseProcessor.h"
 #include "../utility/DCBlocker.h"
-#include "neural_utils/ResampledRNNAccelerated.h"
 
 class MetalFace : public BaseProcessor
 {

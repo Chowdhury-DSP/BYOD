@@ -3,7 +3,7 @@
 #include "RNNAccelerated.h"
 #include <pch.h>
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT>
+template <int hiddenSize, int RecurrentLayerType = RecurrentLayerType::LSTMLayer>
 class ResampledRNNAccelerated
 {
 public:
@@ -41,11 +41,11 @@ public:
 
 private:
 #if JUCE_INTEL
-    mpark::variant<RNNAccelerated<1, hiddenSize, RecurrentLayerType, RTNeural::SampleRateCorrectionMode::NoInterp, xsimd::sse4_1>,
-                   RNNAccelerated<1, hiddenSize, RecurrentLayerType, RTNeural::SampleRateCorrectionMode::NoInterp, xsimd::fma3<xsimd::avx>>>
+    mpark::variant<rnn_sse::RNNAccelerated<1, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>,
+                   rnn_avx::RNNAccelerated<1, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>>
         model_variant;
 #elif JUCE_ARM
-    mpark::variant<RNNAccelerated<1, hiddenSize, RecurrentLayerType, RTNeural::SampleRateCorrectionMode::NoInterp, xsimd::neon64>> model_variant;
+    mpark::variant<RNNAccelerated<1, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>> model_variant;
 #endif
 
     using ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<8192, 8>;

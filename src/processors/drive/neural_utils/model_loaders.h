@@ -1,6 +1,5 @@
 #pragma once
 
-#include <RTNeural/RTNeural.h>
 
 namespace model_loaders
 {

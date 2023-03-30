@@ -1,19 +1,19 @@
 #include "ResampledRNNAccelerated.h"
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+template <int hiddenSize, int RecurrentLayerType>
 ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::ResampledRNNAccelerated()
 {
 #if JUCE_INTEL
-    if (xsimd::available_architectures().fma3_avx2) // move down to AVX after XSIMD fixes it
-    {
-        juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
-        model_variant.template emplace<RNNAccelerated<1, hiddenSize, RecurrentLayerType, RTNeural::SampleRateCorrectionMode::NoInterp, xsimd::fma3<xsimd::avx>>>();
-    }
+//    if (xsimd::available_architectures().fma3_avx2) // move down to AVX after XSIMD fixes it
+//    {
+//        juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
+//        model_variant.template emplace<rnn_avx::RNNAccelerated<1, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>>();
+//    }
 #endif
     juce::ignoreUnused (this);
 }
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+template <int hiddenSize, int RecurrentLayerType>
 void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
 {
     targetSampleRate = modelSampleRate;
@@ -26,7 +26,7 @@ void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::initialise (const 
                   model_variant);
 }
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+template <int hiddenSize, int RecurrentLayerType>
 void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::prepare (double sampleRate, int samplesPerBlock)
 {
     const auto [resampleRatio, rnnDelaySamples] = [] (auto curFs, auto targetFs)
@@ -52,7 +52,7 @@ void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::prepare (double sa
                   model_variant);
 }
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+template <int hiddenSize, int RecurrentLayerType>
 void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::reset()
 {
     resampler.reset();
@@ -62,4 +62,4 @@ void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::reset()
 }
 
 //=======================================================
-template class ResampledRNNAccelerated<28, RTNeural::LSTMLayerT>; // MetalFace
+template class ResampledRNNAccelerated<28, 1>; // MetalFace
