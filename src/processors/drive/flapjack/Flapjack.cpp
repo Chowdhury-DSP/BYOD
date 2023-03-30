@@ -81,8 +81,9 @@ void Flapjack::processAudio (AudioBuffer<float>& buffer)
 
     const auto clipMode = magic_enum::enum_value<FlapjackClipMode> (modeParam->getIndex());
     magic_enum::enum_switch (
-        [this, &buffer] (auto mode)
+        [this, &buffer] (auto modeVal)
         {
+            static constexpr FlapjackClipMode mode = modeVal;
             for (auto [channelIndex, channelData] : chowdsp::buffer_iters::channels (buffer))
             {
                 if (driveParam.isSmoothing() || presenceParam.isSmoothing() || lowCutParam.isSmoothing())
