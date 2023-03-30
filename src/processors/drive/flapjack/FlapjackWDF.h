@@ -28,7 +28,7 @@ public:
         C8_C9.reset();
     }
 
-    void setParams (float driveParam, float presenceParam, bool xlfOn)
+    void setParams (float driveParam, float presenceParam, float lowCutHz)
     {
         chowdsp::wdft::ScopedDeferImpedancePropagation deferImpedance { R };
 
@@ -37,7 +37,8 @@ public:
         Rp_m.setResistanceValue (presenceParam * Rpresence);
         Rp_p.setResistanceValue ((1.0f - presenceParam) * Rpresence);
 
-        C8_C9.setCapacitanceValue (xlfOn ? 147.0e-9f : 47.0e-9f);
+        const auto c8c9Val = 1.0f / (juce::MathConstants<float>::twoPi * RlevelVal * lowCutHz);
+        C8_C9.setCapacitanceValue (c8c9Val);
     }
 
     template <FlapjackClipMode clipMode>
@@ -92,7 +93,8 @@ private:
 
     // Port K
     wdft::CapacitorT<float> C8_C9 { 47.0e-9f };
-    wdft::ResistorT<float> Rlevel { 47.0e3f };
+    static constexpr float RlevelVal = 47.0e3f;
+    wdft::ResistorT<float> Rlevel { RlevelVal };
     wdft::WDFSeriesT<float, decltype (C8_C9), decltype (Rlevel)> Sk { C8_C9, Rlevel };
 
     struct ImpedanceCalc

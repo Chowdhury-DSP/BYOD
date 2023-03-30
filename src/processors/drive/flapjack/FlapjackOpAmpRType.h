@@ -82,7 +82,7 @@ public:
 //                static constexpr auto O = gcem::tanh (A);
 //                static constexpr auto K = 200.0f / (O + 1.0f);
 //                voltage = K * (chowdsp::Math::algebraicSigmoid (chowdsp::PowApprox::exp (0.1f * voltage - 4.5f) - A) + O);
-                voltage = sigmoid (voltage, 4.8f);
+                voltage = sigmoid (voltage, 4.9f);
             }
 
             xsimd::store_aligned (b_vec.data() + i, -2.0f * voltage - a_batch);

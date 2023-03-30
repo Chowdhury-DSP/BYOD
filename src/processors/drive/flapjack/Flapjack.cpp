@@ -15,7 +15,7 @@ const auto driveTag = "drive";
 const auto presenceTag = "presence";
 const auto levelTag = "level";
 const auto modeTag = "mode";
-const auto xlfTag = "xlf";
+const auto lowCutTag = "lowcut";
 }
 
 Flapjack::Flapjack (UndoManager* um)
@@ -31,16 +31,16 @@ Flapjack::Flapjack (UndoManager* um)
     };
     presenceParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, presenceTag));
     presenceParam.setRampLength (0.025);
+    lowCutParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, lowCutTag));
+    lowCutParam.setRampLength (0.025);
 
     loadParameterPointer (levelParam, vts, levelTag);
     loadParameterPointer (modeParam, vts, modeTag);
-    loadParameterPointer (xlfParam, vts, xlfTag);
 
     uiOptions.backgroundColour = Colours::whitesmoke.darker (0.1f);
     uiOptions.powerColour = Colours::red.darker (0.2f);
-    uiOptions.info.description = "Virtual analog emulation of \"Hot Cake\" overdrive pedal.";
+    uiOptions.info.description = "Overdrive effect based on the \"Hot Cake\" overdrive pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
-    addPopupMenuParameter (xlfTag);
 }
 
 ParamLayout Flapjack::createParameterLayout()
@@ -50,9 +50,9 @@ ParamLayout Flapjack::createParameterLayout()
     auto params = createBaseParams();
     createPercentParameter (params, driveTag, "Drive", 0.5f);
     createPercentParameter (params, presenceTag, "Presence", 0.5f);
+    createFreqParameter (params, lowCutTag, "Low Cut", 20.0f, 750.0f, 100.0f, 100.0f);
     createPercentParameter (params, levelTag, "Level", 0.5f);
     emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", StringArray { "Op-Amp Clip", "Bluesberry", "Peachy" }, 0);
-    emplace_param<chowdsp::BoolParameter> (params, xlfTag, "XLF", true);
 
     return { params.begin(), params.end() };
 }
@@ -61,6 +61,7 @@ void Flapjack::prepare (double sampleRate, int samplesPerBlock)
 {
     driveParam.prepare (sampleRate, samplesPerBlock);
     presenceParam.prepare (sampleRate, samplesPerBlock);
+    lowCutParam.prepare (sampleRate, samplesPerBlock);
 
     for (auto& model : wdf)
         model.prepare (sampleRate);
@@ -76,6 +77,7 @@ void Flapjack::processAudio (AudioBuffer<float>& buffer)
     const auto numSamples = buffer.getNumSamples();
     driveParam.process (numSamples);
     presenceParam.process (numSamples);
+    lowCutParam.process (numSamples);
 
     const auto clipMode = magic_enum::enum_value<FlapjackClipMode> (modeParam->getIndex());
     magic_enum::enum_switch (
@@ -83,20 +85,20 @@ void Flapjack::processAudio (AudioBuffer<float>& buffer)
         {
             for (auto [channelIndex, channelData] : chowdsp::buffer_iters::channels (buffer))
             {
-                if (driveParam.isSmoothing() || presenceParam.isSmoothing())
+                if (driveParam.isSmoothing() || presenceParam.isSmoothing() || lowCutParam.isSmoothing())
                 {
                     const auto* driveSmooth = driveParam.getSmoothedBuffer();
                     const auto* presenceSmooth = presenceParam.getSmoothedBuffer();
-                    const auto useXLF = xlfParam->get();
+                    const auto lowCutSmooth = lowCutParam.getSmoothedBuffer();
                     for (auto [n, x] : chowdsp::enumerate (channelData))
                     {
-                        wdf[channelIndex].setParams (driveSmooth[n], presenceSmooth[n], useXLF);
+                        wdf[channelIndex].setParams (driveSmooth[n], presenceSmooth[n], lowCutSmooth[n]);
                         x = wdf[channelIndex].processSample<mode> (x);
                     }
                 }
                 else
                 {
-                    wdf[channelIndex].setParams (driveParam.getCurrentValue(), presenceParam.getCurrentValue(), xlfParam->get());
+                    wdf[channelIndex].setParams (driveParam.getCurrentValue(), presenceParam.getCurrentValue(), lowCutParam.getCurrentValue());
                     for (auto& x : channelData)
                         x = wdf[channelIndex].processSample<mode> (x);
                 }

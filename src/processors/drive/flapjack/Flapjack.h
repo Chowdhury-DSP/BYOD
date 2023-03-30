@@ -17,9 +17,9 @@ public:
 private:
     chowdsp::SmoothedBufferValue<float> driveParam;
     chowdsp::SmoothedBufferValue<float> presenceParam;
+    chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> lowCutParam;
     chowdsp::FloatParameter* levelParam = nullptr;
     chowdsp::ChoiceParameter* modeParam = nullptr;
-    chowdsp::BoolParameter* xlfParam = nullptr;
 
     FlapjackWDF wdf[2];
     chowdsp::Gain<float> level;
