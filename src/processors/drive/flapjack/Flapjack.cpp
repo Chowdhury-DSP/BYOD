@@ -16,7 +16,7 @@ const auto presenceTag = "presence";
 const auto levelTag = "level";
 const auto modeTag = "mode";
 const auto lowCutTag = "lowcut";
-}
+} // namespace
 
 Flapjack::Flapjack (UndoManager* um)
     : BaseProcessor ("Flapjack", createParameterLayout(), um)
