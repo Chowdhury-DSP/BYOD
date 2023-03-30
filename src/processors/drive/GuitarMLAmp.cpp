@@ -46,10 +46,10 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
     if (xsimd::available_architectures().fma3_avx2) // move down to AVX after XSIMD fixes it
     {
         juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
-        lstm40CondModels[0].template emplace<GuitarML_Part_LSTM<2, 40, xsimd::fma3<xsimd::avx>>>();
-        lstm40CondModels[1].template emplace<GuitarML_Part_LSTM<2, 40, xsimd::fma3<xsimd::avx>>>();
-        lstm40NoCondModels[0].template emplace<GuitarML_Part_LSTM<1, 40, xsimd::fma3<xsimd::avx>>>();
-        lstm40NoCondModels[1].template emplace<GuitarML_Part_LSTM<1, 40, xsimd::fma3<xsimd::avx>>>();
+        lstm40CondModels[0].template emplace<rnn_avx::RNNAccelerated<2, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>();
+        lstm40CondModels[1].template emplace<rnn_avx::RNNAccelerated<2, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>();
+        lstm40NoCondModels[0].template emplace<rnn_avx::RNNAccelerated<1, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>();
+        lstm40NoCondModels[1].template emplace<rnn_avx::RNNAccelerated<1, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>();
     }
 #endif
 }
