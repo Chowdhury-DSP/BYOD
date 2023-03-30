@@ -94,14 +94,14 @@ void Flapjack::processAudio (AudioBuffer<float>& buffer)
                     for (auto [n, x] : chowdsp::enumerate (channelData))
                     {
                         wdf[channelIndex].setParams (driveSmooth[n], presenceSmooth[n], lowCutSmooth[n]);
-                        x = wdf[channelIndex].processSample<mode> (x);
+                        x = wdf[channelIndex].template processSample<mode> (x);
                     }
                 }
                 else
                 {
                     wdf[channelIndex].setParams (driveParam.getCurrentValue(), presenceParam.getCurrentValue(), lowCutParam.getCurrentValue());
                     for (auto& x : channelData)
-                        x = wdf[channelIndex].processSample<mode> (x);
+                        x = wdf[channelIndex].template processSample<mode> (x);
                 }
             }
         },
