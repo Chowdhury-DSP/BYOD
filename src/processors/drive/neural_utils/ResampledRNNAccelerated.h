@@ -48,7 +48,6 @@ public:
             auto blockAtSampleRate = resampler.processIn (bufferView);
             processNNInternal (blockAtSampleRate);
             resampler.processOut (blockAtSampleRate, bufferView);
-            bufferView.clear();
         }
     }
 

@@ -23,19 +23,16 @@ ParamLayout BassFace::createParameterLayout()
 
 void BassFace::prepare (double sampleRate, int samplesPerBlock)
 {
-    const auto targetSampleRate = [this, sampleRate]
+    if ((int) sampleRate % 44100 == 0)
     {
-        if ((int) sampleRate % 44100 == 0)
-        {
-            for (auto& m : model)
-                m.initialise (BinaryData::bass_face_model_88_2k_json, BinaryData::bass_face_model_88_2k_jsonSize, 88200.0);
-            return 88200.0;
-        }
-
+        for (auto& m : model)
+            m.initialise (BinaryData::bass_face_model_88_2k_json, BinaryData::bass_face_model_88_2k_jsonSize, 88200.0);
+    }
+    else
+    {
         for (auto& m : model)
             m.initialise (BinaryData::bass_face_model_96k_json, BinaryData::bass_face_model_96k_jsonSize, 96000.0);
-        return 96000.0;
-    }();
+    }
 
     const size_t oversamplingOrder = sampleRate <= 48000.0 ? 1 : 0;
     oversampling = std::make_unique<juce::dsp::Oversampling<float>> (2, oversamplingOrder, juce::dsp::Oversampling<float>::filterHalfBandPolyphaseIIR);
