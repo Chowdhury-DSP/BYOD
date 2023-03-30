@@ -4,7 +4,7 @@ template <int numIns, int hiddenSize, int RecurrentLayerType>
 ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::ResampledRNNAccelerated()
 {
 #if JUCE_INTEL
-    if (xsimd::available_architectures().fma3_avx2) // move down to AVX after XSIMD fixes it
+    if (xsimd::available_architectures().fma3_avx)
     {
         juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
         model_variant.template emplace<rnn_avx::RNNAccelerated<1, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>>();
