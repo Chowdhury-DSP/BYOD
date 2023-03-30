@@ -63,7 +63,7 @@ public:
             const auto b_batch = xsimd::load_aligned (b_vec.data() + i);
             auto voltage = -0.5f * (a_batch + b_batch);
 
-            const auto sigmoid = [] (auto x, float offset)
+            [[maybe_unused]] const auto sigmoid = [] (auto x, float offset)
             {
                 static constexpr auto r4_5 = 1.0f / 4.5f;
                 const auto rdenominator = xsimd::rsqrt (1.0f + 0.75f * chowdsp::Power::ipow<2> ((x - offset) * r4_5));

@@ -70,6 +70,14 @@ void Flapjack::prepare (double sampleRate, int samplesPerBlock)
     dcBlocker.calcCoefs (20.0f, (float) sampleRate);
 
     level.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 });
+
+    // pre-buffering
+    AudioBuffer<float> buffer (2, samplesPerBlock);
+    for (int i = 0; i < 2000; i += samplesPerBlock)
+    {
+        buffer.clear();
+        processAudio (buffer);
+    }
 }
 
 void Flapjack::processAudio (AudioBuffer<float>& buffer)
