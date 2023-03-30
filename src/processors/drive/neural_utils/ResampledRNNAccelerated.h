@@ -45,7 +45,7 @@ private:
                    rnn_avx::RNNAccelerated<1, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>>
         model_variant;
 #elif JUCE_ARM
-    mpark::variant<RNNAccelerated<1, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>> model_variant;
+    mpark::variant<rnn_arm::RNNAccelerated<1, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>> model_variant;
 #endif
 
     using ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<8192, 8>;

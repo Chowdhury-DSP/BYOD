@@ -13,7 +13,7 @@ constexpr int GRULayer = 2;
 #if __aarch64__ || __arm__
 namespace rnn_arm
 {
-template <int inputSize, int hiddenSize, template <typename, int, int, RTNeural_arm::SampleRateCorrectionMode> typename RecurrentLayerType, RTNeural_arm::SampleRateCorrectionMode SRCMode, typename Arch>
+template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
 class RNNAccelerated
 {
 public:
@@ -38,8 +38,8 @@ private:
     struct Internal;
     Internal* internal = nullptr;
 
-    static constexpr size_t max_model_size = 40000;
-    alignas (Arch::alignment()) char internal_data[max_model_size] {};
+    static constexpr size_t max_model_size = 30000;
+    alignas (16) char internal_data[max_model_size] {};
 };
 }
 #else // intel
