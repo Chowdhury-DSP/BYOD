@@ -1,7 +1,7 @@
 #include "ResampledRNNAccelerated.h"
 
-template <int hiddenSize, int RecurrentLayerType>
-ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::ResampledRNNAccelerated()
+template <int numIns, int hiddenSize, int RecurrentLayerType>
+ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::ResampledRNNAccelerated()
 {
 #if JUCE_INTEL
 //    if (xsimd::available_architectures().fma3_avx2) // move down to AVX after XSIMD fixes it
@@ -13,8 +13,8 @@ ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::ResampledRNNAccelerated
     juce::ignoreUnused (this);
 }
 
-template <int hiddenSize, int RecurrentLayerType>
-void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
+template <int numIns, int hiddenSize, int RecurrentLayerType>
+void ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
 {
     targetSampleRate = modelSampleRate;
 
@@ -26,8 +26,8 @@ void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::initialise (const 
                   model_variant);
 }
 
-template <int hiddenSize, int RecurrentLayerType>
-void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::prepare (double sampleRate, int samplesPerBlock)
+template <int numIns, int hiddenSize, int RecurrentLayerType>
+void ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::prepare (double sampleRate, int samplesPerBlock)
 {
     const auto [resampleRatio, rnnDelaySamples] = [] (auto curFs, auto targetFs)
     {
@@ -52,8 +52,8 @@ void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::prepare (double sa
                   model_variant);
 }
 
-template <int hiddenSize, int RecurrentLayerType>
-void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::reset()
+template <int numIns, int hiddenSize, int RecurrentLayerType>
+void ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::reset()
 {
     resampler.reset();
     mpark::visit ([] (auto& model)
@@ -62,4 +62,5 @@ void ResampledRNNAccelerated<hiddenSize, RecurrentLayerType>::reset()
 }
 
 //=======================================================
-template class ResampledRNNAccelerated<28, 1>; // MetalFace
+template class ResampledRNNAccelerated<1, 28>; // MetalFace
+template class ResampledRNNAccelerated<2, 24>; // BassFace

@@ -20,7 +20,7 @@ private:
     chowdsp::FloatParameter* gainDBParam = nullptr;
 
     dsp::Gain<float> gain;
-    ResampledRNNAccelerated<28> rnn[2];
+    ResampledRNNAccelerated<1, 28> rnn[2];
 
     DCBlocker dcBlocker;
 

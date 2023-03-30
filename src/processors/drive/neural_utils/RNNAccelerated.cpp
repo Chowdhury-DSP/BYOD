@@ -137,6 +137,7 @@ void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::process
 }
 
 template class RNNAccelerated<1, 28, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::NoInterp>; // MetalFace
+template class RNNAccelerated<2, 24, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::NoInterp>; // BassFace
 template class RNNAccelerated<1, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>; // GuitarML (no-cond)
 template class RNNAccelerated<2, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>; // GuitarML (cond)
 #endif // NEON + AVX
