@@ -11,6 +11,7 @@
 #include "drive/centaur/Centaur.h"
 #include "drive/diode_circuits/DiodeClipper.h"
 #include "drive/diode_circuits/DiodeRectifier.h"
+#include "drive/flapjack/Flapjack.h"
 #include "drive/hysteresis/Hysteresis.h"
 #include "drive/junior_b/JuniorB.h"
 #include "drive/king_of_tone/KingOfToneDrive.h"
@@ -81,6 +82,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Diode Rectifier", &processorFactory<DiodeRectifier> },
     { "Dirty Tube", &processorFactory<TubeAmp> },
     { "Distortion Plus", &processorFactory<MXRDistortion> },
+    { "Flapjack", &processorFactory<Flapjack> },
     { "GuitarML", &processorFactory<GuitarMLAmp> },
     { "Hysteresis", &processorFactory<Hysteresis> },
     { "Junior B", &processorFactory<JuniorB> },
