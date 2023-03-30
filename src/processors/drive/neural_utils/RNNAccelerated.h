@@ -39,7 +39,8 @@ private:
     Internal* internal = nullptr;
 
     static constexpr size_t max_model_size = 30000;
-    alignas (16) char internal_data[max_model_size] {};
+    static constexpr size_t alignment = 16;
+    alignas (alignment) char internal_data[max_model_size] {};
 };
 }
 #else // intel
@@ -71,7 +72,8 @@ private:
     Internal* internal = nullptr;
 
     static constexpr size_t max_model_size = 30000;
-    alignas (16) char internal_data[max_model_size] {};
+    static constexpr size_t alignment = 16;
+    alignas (alignment) char internal_data[max_model_size] {};
 };
 }
 
@@ -103,7 +105,8 @@ private:
     Internal* internal = nullptr;
 
     static constexpr size_t max_model_size = 40000;
-    alignas (32) char internal_data[max_model_size] {};
+    static constexpr size_t alignment = 32;
+    alignas (alignment) char internal_data[max_model_size] {};
 };
 }
 #endif

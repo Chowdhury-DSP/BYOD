@@ -18,6 +18,7 @@
 #endif
 
 #include <RTNeural/RTNeural.h>
+
 #include "model_loaders.h"
 
 #if _MSC_VER
@@ -42,8 +43,8 @@ template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
 struct RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::Internal
 {
     using RecurrentLayerTypeComplete = std::conditional_t<RecurrentLayerType == RecurrentLayerType::LSTMLayer,
-          RTNeural::LSTMLayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode>,
-          RTNeural::GRULayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode>>;
+                                                          RTNeural::LSTMLayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode>,
+                                                          RTNeural::GRULayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode>>;
     using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
     RTNeural::ModelT<float, inputSize, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
 };
@@ -53,7 +54,6 @@ RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::RNNAccelerat
 {
     static_assert (sizeof (Internal) <= max_model_size);
     internal = new (internal_data) Internal();
-    //    std::cout << "Using RNN with SIMD width: " << internal->model.template get<0>().outs[0].size << std::endl;
 }
 
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
@@ -65,10 +65,8 @@ RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::~RNNAccelera
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
 void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::initialise (const nlohmann::json& weights_json)
 {
-//    if constexpr (::std::is_same_v<typename Internal::RecurrentLayerTypeComplete, RTNeural::GRULayerT<float, 1, 8, SRCMode>>) // Centaur model has keras-style weights
-//        model_loaders::loadGRUModel (internal->model, weights_json);
-//    else
-        model_loaders::loadLSTMModel (internal->model, hiddenSize, weights_json);
+    // @TODO: handle GRU models if needed...
+    model_loaders::loadLSTMModel (internal->model, hiddenSize, weights_json);
 }
 
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
@@ -98,7 +96,7 @@ void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::reset()
 }
 
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
-void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::process (::std::span<float> buffer, bool useResiduals) noexcept
+void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::process (std::span<float> buffer, bool useResiduals) noexcept
 {
     if (useResiduals)
     {
@@ -113,9 +111,9 @@ void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::process
 }
 
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
-void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::process_conditioned (::std::span<float> buffer, ::std::span<const float> condition, bool useResiduals) noexcept
+void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::process_conditioned (std::span<float> buffer, std::span<const float> condition, bool useResiduals) noexcept
 {
-    alignas (RTNEURAL_DEFAULT_ALIGNMENT) float input_vec[::xsimd::batch<float>::size] {};
+    alignas (alignment) float input_vec[xsimd::batch<float>::size] {};
     if (useResiduals)
     {
         for (size_t n = 0; n < buffer.size(); ++n)

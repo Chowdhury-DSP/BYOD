@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace model_loaders
 {
 using Vec2d = std::vector<std::vector<float>>;
