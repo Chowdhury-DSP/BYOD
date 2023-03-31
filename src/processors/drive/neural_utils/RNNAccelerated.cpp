@@ -26,15 +26,17 @@
 #pragma GCC diagnostic pop
 #endif
 
-#if __AVX__
+#if (__aarch64__ || __arm__)
+namespace rnn_arm
+{
+#elif __AVX__ || (_MSC_VER && BYOD_COMPILING_WITH_AVX)
 namespace rnn_avx
 {
-#elif __SSE__
+#elif __SSE4_1__ || (_MSC_VER && ! BYOD_COMPILING_WITH_AVX)
 namespace rnn_sse
 {
 #else
-namespace rnn_arm
-{
+#error "Unknown or un-supported platform!"
 #endif
 
 #if ! (XSIMD_WITH_NEON && BYOD_COMPILING_WITH_AVX)

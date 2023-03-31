@@ -146,9 +146,6 @@ foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
             ${CMAKE_CURRENT_SOURCE_DIR}/../modules/RTNeural
             ${CMAKE_CURRENT_SOURCE_DIR}/../modules/RTNeural/modules/xsimd/include
     )
-#    if (APPLE)
-#        target_compile_options(${target} PRIVATE -faligned-allocation)
-#    endif()
     target_compile_definitions(${target} PRIVATE RTNEURAL_USE_XSIMD=1)
     set_target_properties(${target} PROPERTIES
         POSITION_INDEPENDENT_CODE TRUE
@@ -160,19 +157,3 @@ endforeach()
 target_compile_definitions(rnn_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=16)
 target_compile_definitions(rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32)
 target_link_libraries(BYOD PRIVATE rnn_accelerated)
-
-
-#make_lib_simd_runtime(resampled_rnn_accelerated processors/drive/neural_utils/ResampledRNNAccelerated.cpp)
-#foreach(target IN ITEMS resampled_rnn_accelerated_sse_or_arm resampled_rnn_accelerated_avx)
-#    target_link_libraries(${target} PRIVATE juce_plugin_modules)
-#endforeach()
-#target_compile_definitions(resampled_rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32)
-#
-#target_link_libraries(resampled_rnn_accelerated PRIVATE juce_plugin_modules)
-#target_link_libraries(BYOD PRIVATE resampled_rnn_accelerated)
-#set_target_properties(resampled_rnn_accelerated PROPERTIES
-#    POSITION_INDEPENDENT_CODE TRUE
-#    VISIBILITY_INLINES_HIDDEN TRUE
-#    C_VISIBILITY_PRESET hidden
-#    CXX_VISIBILITY_PRESET hidden
-#)
