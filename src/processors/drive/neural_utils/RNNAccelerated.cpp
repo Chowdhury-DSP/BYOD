@@ -32,7 +32,7 @@ namespace rnn_arm
 #elif __AVX__ || (_MSC_VER && BYOD_COMPILING_WITH_AVX)
 namespace rnn_avx
 {
-#elif __SSE4_1__ || (_MSC_VER && ! BYOD_COMPILING_WITH_AVX)
+#elif __SSE__ || (_MSC_VER && ! BYOD_COMPILING_WITH_AVX)
 namespace rnn_sse
 {
 #else
