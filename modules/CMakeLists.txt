@@ -16,9 +16,11 @@ add_subdirectory(RTNeural)
  # add other C++ libraries
 add_subdirectory(sst-cpputils)
 add_subdirectory(rapidfuzz-cpp)
+add_subdirectory(variant)
 
 include(cmake/WarningFlags.cmake)
 include(cmake/ConfigFlags.cmake)
+include(cmake/RuntimeSIMDLib.cmake)
 add_library(juce_plugin_modules STATIC)
 target_link_libraries(juce_plugin_modules
     PRIVATE
@@ -38,6 +40,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_wdf
         RTNeural
         rapidfuzz::rapidfuzz
+        mpark_variant
     PUBLIC
         config_flags
         juce::juce_recommended_lto_flags

@@ -40,6 +40,7 @@ target_include_directories(BYOD_headless
         ../../modules/chowdsp_utils/modules/common
         ../../modules/JUCE/modules
         ../../modules/chowdsp_wdf/include
+        ../../modules/variant/include
         ${juce_includes}
 )
 

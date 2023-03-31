@@ -22,3 +22,6 @@
 [submodule "modules/chowdsp_wdf"]
 	path = modules/chowdsp_wdf
 	url = https://github.com/Chowdhury-DSP/chowdsp_wdf
+[submodule "modules/variant"]
+	path = modules/variant
+	url = https://github.com/mpark/variant
