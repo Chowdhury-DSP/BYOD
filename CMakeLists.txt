@@ -4,12 +4,7 @@ if(WIN32)
     set(CMAKE_SYSTEM_VERSION 7.1 CACHE STRING INTERNAL FORCE) # Windows SDK for Windows 7 and up
 endif()
 project(BYOD VERSION 1.1.4)
-
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_CXX_STANDARD 17)
-else()
-    set(CMAKE_CXX_STANDARD 20)
-endif()
+set(CMAKE_CXX_STANDARD 20)
 
 if (NOT IOS)
     option(BYOD_BUILD_CLAP "Create a CLAP target for BYOD" ON)

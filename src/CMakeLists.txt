@@ -84,6 +84,7 @@ target_sources(BYOD PRIVATE
     processors/drive/muff_clipper/MuffClipperStage.cpp
     processors/drive/mxr_distortion/MXRDistortion.cpp
     processors/drive/neural_utils/ResampledRNN.cpp
+    processors/drive/neural_utils/ResampledRNNAccelerated.cpp
     processors/drive/tube_amp/TubeAmp.cpp
     processors/drive/tube_screamer/TubeScreamer.cpp
     processors/drive/waveshaper/SurgeWaveshapers.cpp
@@ -136,3 +137,23 @@ target_sources(BYOD PRIVATE
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)
+
+make_lib_simd_runtime(rnn_accelerated processors/drive/neural_utils/RNNAccelerated.cpp)
+foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
+    target_link_libraries(${target} PRIVATE config_flags juce::juce_recommended_lto_flags warning_flags)
+    target_include_directories(${target}
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/../modules/RTNeural
+            ${CMAKE_CURRENT_SOURCE_DIR}/../modules/RTNeural/modules/xsimd/include
+    )
+    target_compile_definitions(${target} PRIVATE RTNEURAL_USE_XSIMD=1)
+    set_target_properties(${target} PROPERTIES
+        POSITION_INDEPENDENT_CODE TRUE
+        VISIBILITY_INLINES_HIDDEN TRUE
+        C_VISIBILITY_PRESET hidden
+        CXX_VISIBILITY_PRESET hidden
+    )
+endforeach()
+target_compile_definitions(rnn_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=16)
+target_compile_definitions(rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32)
+target_link_libraries(BYOD PRIVATE rnn_accelerated)

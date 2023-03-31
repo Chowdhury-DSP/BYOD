@@ -15,7 +15,7 @@ public:
     void prepare (double sampleRate, int samplesPerBlock);
     void reset();
 
-    template <bool useRedisuals = false>
+    template <bool useResiduals = false>
     void process (juce::dsp::AudioBlock<float>& block)
     {
         auto processNNInternal = [this] (const chowdsp::BufferView<float>& bufferView)
@@ -23,7 +23,7 @@ public:
             const auto numSamples = bufferView.getNumSamples();
             auto* x = bufferView.getWritePointer (0);
 
-            if constexpr (useRedisuals)
+            if constexpr (useResiduals)
             {
                 for (int i = 0; i < numSamples; ++i)
                     x[i] += model.forward (&x[i]);
