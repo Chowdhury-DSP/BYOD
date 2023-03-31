@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cmake_args: "-DCMAKE_CXX_COMPILER=g++11"
+            cmake_args: "-DCMAKE_CXX_COMPILER=g++-11"
           - os: windows-2019
             cmake_args: ""
           - os: macos-latest
@@ -35,7 +35,7 @@ jobs:
       if: runner.os == 'Linux'
       run: |
         sudo apt-get update
-        sudo apt install g++-11 libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfreetype6-dev libglu1-mesa-dev libjack-jackd2-dev
+        sudo apt install libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfreetype6-dev libglu1-mesa-dev libjack-jackd2-dev
 
     - name: Get latest CMake
       uses: lukka/get-cmake@latest
