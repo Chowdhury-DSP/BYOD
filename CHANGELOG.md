@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Added "Flapjack" module.
+- Added AVX support (for PCs that support it) for neural network-based modules.
+- Added sample rate correction filter for GuitarML module.
+- Improved plugin RAM usage.
+- Fixed hardened runtime flags for standalone audio input on MacOS.
+
 ## [1.1.3] - 2023-01-13
 - Added "Muff Clipper" module.
 - Added "Smoothing" parameter for "Muff Drive" module.
