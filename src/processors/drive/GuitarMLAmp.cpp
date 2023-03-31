@@ -43,7 +43,7 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
     uiOptions.info.infoLink = "https://guitarml.com";
 
 #if JUCE_INTEL
-    if (xsimd::available_architectures().fma3_avx)
+    if (juce::SystemStats::hasAVX() && juce::SystemStats::hasFMA3())
     {
         juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
         lstm40CondModels[0].template emplace<rnn_avx::RNNAccelerated<2, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>();
