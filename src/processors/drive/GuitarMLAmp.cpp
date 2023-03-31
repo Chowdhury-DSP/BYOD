@@ -90,8 +90,8 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
             mpark::visit ([rnnDelaySamples, &modelJson] (auto& model)
                           {
                               model.initialise (modelJson);
-                              model.prepare ((float) rnnDelaySamples);
-                          }, modelVariant);
+                              model.prepare ((float) rnnDelaySamples); },
+                          modelVariant);
         }
 
         modelArch = ModelArch::LSTM40NoCond;
@@ -104,8 +104,8 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
             mpark::visit ([rnnDelaySamples, &modelJson] (auto& model)
                           {
                               model.initialise (modelJson);
-                              model.prepare ((float) rnnDelaySamples);
-                          }, modelVariant);
+                              model.prepare ((float) rnnDelaySamples); },
+                          modelVariant);
         }
 
         modelArch = ModelArch::LSTM40Cond;
@@ -244,9 +244,8 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         {
             auto* x = buffer.getWritePointer (ch);
             mpark::visit ([x, numSamples] (auto& model)
-                          {
-                              model.process ({ x, (size_t) numSamples }, true);
-                          }, lstm40NoCondModels[ch]);
+                          { model.process ({ x, (size_t) numSamples }, true); },
+                          lstm40NoCondModels[ch]);
         }
     }
     else if (modelArch == ModelArch::LSTM40Cond)
@@ -258,9 +257,8 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         {
             auto* x = buffer.getWritePointer (ch);
             mpark::visit ([x, conditionData, numSamples] (auto& model)
-                          {
-                              model.process_conditioned ({ x, (size_t) numSamples }, { conditionData, (size_t) numSamples }, true);
-                          }, lstm40CondModels[ch]);
+                          { model.process_conditioned ({ x, (size_t) numSamples }, { conditionData, (size_t) numSamples }, true); },
+                          lstm40CondModels[ch]);
         }
     }
 

@@ -1,14 +1,14 @@
 #pragma once
 
 #include <memory>
-#include <span>
 #include <modules/json/json.hpp>
+#include <span>
 
 namespace RecurrentLayerType
 {
 constexpr int LSTMLayer = 1;
 constexpr int GRULayer = 2;
-}
+} // namespace RecurrentLayerType
 
 #if __aarch64__ || __arm__
 namespace rnn_arm
@@ -42,7 +42,7 @@ private:
     static constexpr size_t alignment = 16;
     alignas (alignment) char internal_data[max_model_size] {};
 };
-}
+} // namespace rnn_arm
 #else // intel
 namespace rnn_sse
 {
@@ -75,7 +75,7 @@ private:
     static constexpr size_t alignment = 16;
     alignas (alignment) char internal_data[max_model_size] {};
 };
-}
+} // namespace rnn_sse
 
 namespace rnn_avx
 {
@@ -108,5 +108,5 @@ private:
     static constexpr size_t alignment = 32;
     alignas (alignment) char internal_data[max_model_size] {};
 };
-}
+} // namespace rnn_avx
 #endif

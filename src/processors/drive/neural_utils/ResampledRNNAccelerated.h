@@ -33,8 +33,7 @@ public:
                               {
                                   jassert ((int) condition_data.size() == bufferView.getNumSamples());
                                   model.process_conditioned (bufferView.getWriteSpan (0), condition_data, useResiduals);
-                              }
-                          },
+                              } },
                           model_variant);
         };
 

@@ -21,8 +21,8 @@
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
 #include <rapidfuzz/fuzz.hpp>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
-#include <sst/cpputils.h>
 #include <mpark/variant.hpp>
+#include <sst/cpputils.h>
 
 // global definitions
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;

@@ -58,4 +58,4 @@ void loadGRUModel (ModelType& model, const nlohmann::json& weights_json)
     RTNeural::json_parser::loadGRU<float> (gru, gru_weights);
     RTNeural::modelt_detail::loadLayer<float> (dense, layer_idx, dense_layer_json, "dense", 1, false);
 }
-}
+} // namespace model_loaders
