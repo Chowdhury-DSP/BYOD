@@ -31,7 +31,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
     xSvg->replaceColour (Colours::white, contrastColour);
     xButton.setImages (xSvg.get());
     addAndMakeVisible (xButton);
-    xButton.onClick = [=]
+    xButton.onClick = [this]
     { procChain.getActionHelper().removeProcessor (&proc); };
 
     if (proc.getNumInputs() != 0 && proc.getNumOutputs() != 0)

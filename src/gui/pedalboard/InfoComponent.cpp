@@ -8,7 +8,7 @@ InfoComponent::InfoComponent()
     xButton.setColour (TextButton::buttonColourId, Colours::transparentWhite);
     xButton.setColour (ComboBox::outlineColourId, Colours::transparentWhite);
     xButton.setColour (TextButton::textColourOffId, Colours::white);
-    xButton.onClick = [=]
+    xButton.onClick = [this]
     {
         setVisible (false);
     };

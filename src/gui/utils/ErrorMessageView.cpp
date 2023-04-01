@@ -34,7 +34,8 @@ BYODPluginEditor* findTopLevelEditor (Component* currentComponent)
     BYODPluginEditor* topLevelEditor = nullptr;
     while (currentComponent != nullptr)
     {
-        if ((topLevelEditor = dynamic_cast<BYODPluginEditor*> (currentComponent)))
+        topLevelEditor = dynamic_cast<BYODPluginEditor*> (currentComponent);
+        if (topLevelEditor != nullptr)
             break;
         currentComponent = currentComponent->getParentComponent();
     }

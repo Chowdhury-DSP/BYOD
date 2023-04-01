@@ -37,7 +37,7 @@ public:
     {
         runTestForAllProcessors (
             this,
-            [=] (BaseProcessor* proc)
+            [this] (BaseProcessor* proc)
             {
                 proc->prepareProcessing (testSampleRate, testBlockSize);
 

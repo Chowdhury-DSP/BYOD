@@ -43,7 +43,7 @@ public:
     void runTest() override
     {
         runTestForAllProcessors (this,
-                                 [=] (BaseProcessor* proc)
+                                 [this] (BaseProcessor* proc)
                                  {
                                      auto params = proc->getVTS().processor.getParameters();
                                      for (auto* p : params)
