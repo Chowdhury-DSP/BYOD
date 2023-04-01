@@ -306,7 +306,7 @@ bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::H
             PopupMenu::Item customItem;
             customItem.text = "Custom";
             customItem.itemID = menuIdx++;
-            customItem.action = [=]
+            customItem.action = [this]
             {
                 constexpr auto flags = FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles;
                 fileChooser = std::make_shared<FileChooser> ("Custom IR", File(), "", true, false, getTopLevelComponent());

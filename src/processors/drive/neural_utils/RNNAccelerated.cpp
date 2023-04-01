@@ -11,8 +11,7 @@
 #define xsimd xsimd_arm
 #endif
 
-#if _MSC_VER
-#else
+#if __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshorten-64-to-32"
 #endif
@@ -21,8 +20,7 @@
 
 #include "model_loaders.h"
 
-#if _MSC_VER
-#else
+#if __clang__
 #pragma GCC diagnostic pop
 #endif
 

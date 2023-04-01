@@ -48,7 +48,7 @@ int SpringReverb::prepareRebuffering (const dsp::ProcessSpec& spec)
 
 void SpringReverb::setParams (const Params& params)
 {
-    auto msToSamples = [=] (float ms)
+    auto msToSamples = [this] (float ms)
     {
         return (ms / 1000.0f) * fs;
     };
@@ -138,7 +138,7 @@ void SpringReverb::processDownsampledBuffer (AudioBuffer<float>& buffer)
     //   [2-3]: equivalents for right channel, or zeros
     float simdReg alignas (16)[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-    auto doSpringInput = [=, &shakePtr] (int ch, float input, int n) -> float
+    auto doSpringInput = [this, &shakePtr] (int ch, float input, int n) -> float
     {
         auto output = std::tanh (input - feedbackGain * delay.popSample (ch));
         return dcBlocker.processSample (ch, output) + shakePtr[n];

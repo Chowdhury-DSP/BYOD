@@ -116,7 +116,7 @@ int PresetsComp::createPresetsMenu (int optionID)
 
         juce::PopupMenu::Item presetItem { preset.getName() };
         presetItem.itemID = presetID + 1;
-        presetItem.action = [=, &preset]
+        presetItem.action = [this, &preset]
         {
             updatePresetBoxText();
             manager.loadPreset (preset);

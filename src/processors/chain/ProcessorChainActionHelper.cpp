@@ -4,11 +4,11 @@
 ProcessorChainActionHelper::ProcessorChainActionHelper (ProcessorChain& thisChain) : chain (thisChain),
                                                                                      um (chain.um)
 {
-    chain.procStore.addProcessorCallback = [=] (auto newProc)
+    chain.procStore.addProcessorCallback = [this] (auto newProc)
     { addProcessor (std::move (newProc)); };
-    chain.procStore.replaceProcessorCallback = [=] (auto newProc, auto procToReplace)
+    chain.procStore.replaceProcessorCallback = [this] (auto newProc, auto procToReplace)
     { replaceProcessor (std::move (newProc), procToReplace); };
-    chain.procStore.replaceConnectionWithProcessorCallback = [=] (auto newProc, auto connectionInfo)
+    chain.procStore.replaceConnectionWithProcessorCallback = [this] (auto newProc, auto connectionInfo)
     { replaceConnectionWithProcessor (std::move (newProc), connectionInfo); };
 }
 
@@ -45,7 +45,7 @@ void ProcessorChainActionHelper::removeProcessor (BaseProcessor* procToRemove)
 {
     um->beginNewTransaction();
 
-    auto removeConnections = [=] (BaseProcessor* proc)
+    auto removeConnections = [this, procToRemove] (BaseProcessor* proc)
     {
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {
