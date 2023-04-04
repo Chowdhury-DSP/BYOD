@@ -10,10 +10,10 @@
 // Both filters are resonant four-poles, which can self-oscillate
 // The models are based on ideas presented by Vadim Zavalishin in his (fantastic) book:
 // "The Art of VA Filter Design"
-class LadderFilter : public BaseProcessor
+class LadderFilterProcessor : public BaseProcessor
 {
 public:
-    LadderFilter (UndoManager* um = nullptr);
+    LadderFilterProcessor (UndoManager* um = nullptr);
 
     ProcessorType getProcessorType() const override { return Tone; }
 
@@ -29,5 +29,5 @@ private:
     LowPassLadder lp[2];
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LadderFilter)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LadderFilterProcessor)
 };

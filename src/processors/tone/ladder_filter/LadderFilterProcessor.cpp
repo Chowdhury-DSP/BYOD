@@ -1,8 +1,8 @@
 #include "../../ParameterHelpers.h"
 
-#include "LadderFilter.h"
+#include "LadderFilterProcessor.h"
 
-LadderFilter::LadderFilter (UndoManager* um) : BaseProcessor ("Ladder Filter", LadderParameters::createParameterLayout(), um), p (vts)
+LadderFilterProcessor::LadderFilterProcessor (UndoManager* um) : BaseProcessor ("Ladder Filter", LadderParameters::createParameterLayout(), um), p (vts)
 {
     // Info and style
     uiOptions.info.description = "Resonant 4-pole ladder high-pass and low-pass,\n capable of self-oscillation. With nonlinear drive.";
@@ -12,7 +12,7 @@ LadderFilter::LadderFilter (UndoManager* um) : BaseProcessor ("Ladder Filter", L
     uiOptions.powerColour = juce::Colour::fromRGB (0x99, 0x0B, 0x3C);
 }
 
-void LadderFilter::prepare (double sampleRate, int samplesPerBlock)
+void LadderFilterProcessor::prepare (double sampleRate, int samplesPerBlock)
 {
     // Initialize filters
     for (int channel = 0; channel < 2; ++channel)
@@ -25,7 +25,7 @@ void LadderFilter::prepare (double sampleRate, int samplesPerBlock)
     p.reset (sampleRate, samplesPerBlock);
 }
 
-void LadderFilter::processAudio (AudioBuffer<float>& buffer)
+void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
 {
     // Get parameter values for current block
 

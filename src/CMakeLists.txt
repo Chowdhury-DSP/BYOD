@@ -105,7 +105,7 @@ target_sources(BYOD PRIVATE
     processors/tone/baxandall/BaxandallEQ.cpp
     processors/tone/baxandall/BaxandallWDF.cpp
     processors/tone/tube_screamer_tone/TubeScreamerTone.cpp
-    processors/tone/ladder_filter/LadderFilter.cpp
+    processors/tone/ladder_filter/LadderFilterProcessor.cpp
     processors/tone/ladder_filter/HighPassOnePole.cpp
     processors/tone/ladder_filter/LowPassOnePole.cpp
     processors/tone/ladder_filter/HighPassLadder.cpp
