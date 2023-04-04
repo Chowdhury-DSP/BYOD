@@ -222,6 +222,9 @@ that can be done as follows:
 class MyEffect : public BaseProcessor
 {
     ...
+    
+    LookAndFeel* getCustomLookAndFeel() const override;
+    
 private:
     ...
     SharedResourcePointer<LNFAllocator> lnfAllocator;
@@ -232,10 +235,9 @@ class MyEffectLookAndFeel : public LookAndFeel_V4
     // custom LookAndFeel implementation...
 };
 
-MyEffect::MyEffect (UndoManager* um) : BaseProcessor ("My Effect", createParameterLayout(), um)
+LookAndFeel* MyEffect::getCustomLookAndFeel() const
 {
-    ...
-    uiOptions.lnf = lnfAllocator->getLookAndFeel<MyEffectLookAndFeel>();
+    return lnfAllocator->getLookAndFeel<MyEffectLookAndFeel>();
 }
 ```
 
