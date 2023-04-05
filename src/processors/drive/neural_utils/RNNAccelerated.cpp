@@ -66,7 +66,7 @@ template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
 void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::initialise (const nlohmann::json& weights_json)
 {
     // @TODO: handle GRU models if needed...
-    model_loaders::loadLSTMModel (internal->model, hiddenSize, weights_json);
+    model_loaders::loadLSTMModel (internal->model, weights_json);
 }
 
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>

@@ -19,28 +19,11 @@ inline Vec2d transpose (const Vec2d& x)
 }
 
 template <typename ModelType>
-void loadLSTMModel (ModelType& model, int hiddenSize, const nlohmann::json& weights_json)
+void loadLSTMModel (ModelType& model, const nlohmann::json& weights_json)
 {
-    auto& lstm = model.template get<0>();
-    auto& dense = model.template get<1>();
-
-    Vec2d lstm_weights_ih = weights_json["/state_dict/rec.weight_ih_l0"_json_pointer];
-    lstm.setWVals (transpose (lstm_weights_ih));
-
-    Vec2d lstm_weights_hh = weights_json["/state_dict/rec.weight_hh_l0"_json_pointer];
-    lstm.setUVals (transpose (lstm_weights_hh));
-
-    std::vector<float> lstm_bias_ih = weights_json["/state_dict/rec.bias_ih_l0"_json_pointer];
-    std::vector<float> lstm_bias_hh = weights_json["/state_dict/rec.bias_hh_l0"_json_pointer];
-    for (int i = 0; i < 4 * hiddenSize; ++i)
-        lstm_bias_hh[(size_t) i] += lstm_bias_ih[(size_t) i];
-    lstm.setBVals (lstm_bias_hh);
-
-    Vec2d dense_weights = weights_json["/state_dict/lin.weight"_json_pointer];
-    dense.setWeights (dense_weights);
-
-    std::vector<float> dense_bias = weights_json["/state_dict/lin.bias"_json_pointer];
-    dense.setBias (dense_bias.data());
+    const auto& state_dict = weights_json.at ("state_dict");
+    RTNeural::torch_helpers::loadLSTM<float> (state_dict, "rec.", model.template get<0>());
+    RTNeural::torch_helpers::loadDense<float> (state_dict, "lin.", model.template get<1>());
 }
 
 template <typename ModelType>
