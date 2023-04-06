@@ -31,7 +31,16 @@ public:
     //==============================================================================
 
     // Process a single audio sample
-    double process (double x);
+    inline double process (double x)
+    {
+        // Calculate output sample
+        const double y = G * (x - state);
+
+        // Update state register
+        state = state + y * g2;
+
+        return y;
+    }
 
 private:
     double sample_rate { 0.0 };

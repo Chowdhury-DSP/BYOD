@@ -29,7 +29,24 @@ public:
     //==============================================================================
 
     // Process a single audio sample
-    double process (double x);
+    inline double process (double x)
+    {
+        const double s1 = hp[0].get_state();
+        const double s2 = hp[1].get_state();
+        const double s3 = hp[2].get_state();
+        const double s4 = hp[3].get_state();
+
+        const double S = -G4 * s1 - G3 * s2 - G2 * s3 - G * s4;
+        double y = (x - k * S) / (1.0 + k * G4);
+
+        for (int i = 0; i < 4; ++i)
+        {
+            y = hp[i].process (y);
+        }
+
+        // Compensate for preceived volume loss with higher resonance settings
+        return y * (1.0 + k);
+    }
 
 private:
     double sample_rate { 0.0 };
@@ -38,7 +55,7 @@ private:
 
     double g { 0.0 }; // Trapezoidal integrator "instantaneous gain"
     double G { 0.0 }; // One-pole filter "instantaneous gain"
-    double G2 { 0.0 }; // G * G 
+    double G2 { 0.0 }; // G * G
     double G3 { 0.0 }; // G * G * G
     double G4 { 0.0 }; // G * G * G * G
 

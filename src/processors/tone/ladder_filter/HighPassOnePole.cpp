@@ -27,16 +27,3 @@ double HighPassOnePole::get_state() const
 {
     return state;
 }
-
-//==============================================================================
-
-double HighPassOnePole::process (double x)
-{
-    // Calculate output sample
-    const double y = G * (x - state);
-
-    // Update state register
-    state = state + y * g2;
-
-    return y;
-}

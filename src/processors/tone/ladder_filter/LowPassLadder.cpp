@@ -38,24 +38,3 @@ void LowPassLadder::set_resonance (const double resonance)
 {
     k = ladder_filter_utility::map_linear_normalized (resonance, 0.0, 4.0);
 }
-
-//==============================================================================
-
-double LowPassLadder::process (double x)
-{
-    const double s1 = lp[0].get_state();
-    const double s2 = lp[1].get_state();
-    const double s3 = lp[2].get_state();
-    const double s4 = lp[3].get_state();
-
-    const double S = (G3 * s1 + G2 * s2 + G * s3 + s4) / (1.0 + g);
-    double y = (x - k * S) / (1.0 + k * G4);
-
-    for (int i = 0; i < 4; ++i)
-    {
-        y = lp[i].process (y);
-    }
-
-    // Compensate for preceived volume loss with higher resonance settings
-    return y * (1.0 + k);
-}

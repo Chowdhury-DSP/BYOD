@@ -39,24 +39,3 @@ void HighPassLadder::set_resonance (const double resonance)
 {
     k = ladder_filter_utility::map_linear_normalized (resonance, 0.0, 4.0);
 }
-
-//==============================================================================
-
-double HighPassLadder::process (double x)
-{
-    const double s1 = hp[0].get_state();
-    const double s2 = hp[1].get_state();
-    const double s3 = hp[2].get_state();
-    const double s4 = hp[3].get_state();
-
-    const double S = -G4 * s1 - G3 * s2 - G2 * s3 - G * s4;
-    double y = (x - k * S) / (1.0 + k * G4);
-
-    for (int i = 0; i < 4; ++i)
-    {
-        y = hp[i].process (y);
-    }
-
-    // Compensate for preceived volume loss with higher resonance settings
-    return y * (1.0 + k);
-}
