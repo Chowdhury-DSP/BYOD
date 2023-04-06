@@ -57,5 +57,6 @@ double HighPassLadder::process (double x)
         y = hp[i].process (y);
     }
 
+    // Compensate for preceived volume loss with higher resonance settings
     return y * (1.0 + k);
 }
