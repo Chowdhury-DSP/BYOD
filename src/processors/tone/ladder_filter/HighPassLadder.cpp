@@ -19,8 +19,8 @@ double HighPassLadder::get_sample_rate() const
 
 void HighPassLadder::set_cutoff (const double cutoff)
 {
-    const double omega_digital = TWO_PI * cutoff;
-    const double omega_analog = prewarp (omega_digital, sample_rate);
+    const double omega_digital = ladder_filter_utility::TWO_PI * cutoff;
+    const double omega_analog = ladder_filter_utility::prewarp (omega_digital, sample_rate);
 
     g = omega_analog / (2.0 * sample_rate);
     G = 1.0 / (1.0 + g);
@@ -37,7 +37,7 @@ void HighPassLadder::set_cutoff (const double cutoff)
 
 void HighPassLadder::set_resonance (const double resonance)
 {
-    k = map_linear_normalized (resonance, 0.0, 4.0);
+    k = ladder_filter_utility::map_linear_normalized (resonance, 0.0, 4.0);
 }
 
 //==============================================================================

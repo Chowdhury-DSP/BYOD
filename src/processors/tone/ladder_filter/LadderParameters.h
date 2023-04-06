@@ -52,10 +52,10 @@ private:
     //==============================================================================
     // Filters to smooth out parameter changes
 
-    ParameterSmoother drive_smooth;
+    ladder_filter_utility::ParameterSmoother drive_smooth;
 
-    ParameterSmoother lp_cutoff_smooth;
-    ParameterSmoother hp_cutoff_smooth;
+    ladder_filter_utility::ParameterSmoother lp_cutoff_smooth;
+    ladder_filter_utility::ParameterSmoother hp_cutoff_smooth;
 
     //==============================================================================
     // Virtual volt per octave for the filters

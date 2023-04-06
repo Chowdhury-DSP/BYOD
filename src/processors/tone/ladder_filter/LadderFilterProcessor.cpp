@@ -62,7 +62,7 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
             x *= gain;
 
             // Saturate (static nonlinearity) and blend using drive param
-            x = p.drive_normalized() * fast_tanh_2 (x) + (1.0 - p.drive_normalized()) * x;
+            x = p.drive_normalized() * ladder_filter_utility::fast_tanh_2 (x) + (1.0 - p.drive_normalized()) * x;
         }
     }
 }
