@@ -10,6 +10,8 @@ LadderFilterProcessor::LadderFilterProcessor (UndoManager* um) : BaseProcessor (
     uiOptions.info.infoLink = "https://butchwarns.de/";
     uiOptions.backgroundColour = juce::Colour::fromRGB (0xBB, 0xE1, 0xC3);
     uiOptions.powerColour = juce::Colour::fromRGB (0x99, 0x0B, 0x3C);
+
+    addPopupMenuParameter ("FILTER_MODE");
 }
 
 void LadderFilterProcessor::prepare (double sampleRate, int samplesPerBlock)

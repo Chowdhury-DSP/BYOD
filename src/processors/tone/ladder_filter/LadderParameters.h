@@ -49,6 +49,8 @@ private:
     std::atomic<float>* lp_cutoff_norm;
     std::atomic<float>* lp_resonance_norm;
 
+    std::atomic<float>* filter_mode_norm;
+
     //==============================================================================
     // Filters to smooth out parameter changes
 

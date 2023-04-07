@@ -52,6 +52,15 @@ inline double skew_normalized (const double normalized_val, const double skew)
     return pow (normalized_val, 1.0 / skew);
 }
 
+// Limit value to not exceed an upper (positive) threshold
+inline double limit_upper (const double value_to_limit, const double limit)
+{
+    if (value_to_limit >= limit)
+    {
+        return limit;
+    }
+}
+
 //==============================================================================
 // Parameter smoothing filter (exponential one-pole smoother)
 class ParameterSmoother

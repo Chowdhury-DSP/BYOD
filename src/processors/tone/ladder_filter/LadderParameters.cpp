@@ -12,6 +12,8 @@ LadderParameters::LadderParameters (juce::AudioProcessorValueTreeState& _vts) : 
     lp_cutoff_norm = vts.getRawParameterValue ("LP_CUTOFF");
     lp_resonance_norm = vts.getRawParameterValue ("LP_RESONANCE");
 
+    filter_mode_norm = vts.getRawParameterValue ("FILTER_MODE");
+
     // Tune volt/octave conversions, so that -5V to +5V spans 10 octaves above MIN_FILTER_FREQ
     filter_vpo.set_zero_volt_freq (ladder_filter_utility::MIN_FILTER_FREQ * pow (2.0, 5.0));
 }
@@ -36,6 +38,9 @@ AudioProcessorValueTreeState::ParameterLayout LadderParameters::createParameterL
     createPercentParameter (params, "LP_RESONANCE", "LP RES", 0.0f);
     createPercentParameter (params, "LP_CUTOFF", "LP CUT", 1.0f);
     createPercentParameter (params, "DRIVE", "DRIVE", 0.5f);
+
+    // emplace_param<AudioParameterChoice> (params, modeTag, "Mode", StringArray { "Traditional", "Neural" }, 0);
+    emplace_param<AudioParameterChoice> (params, "FILTER_MODE", "FILTER MODE", StringArray { "Normal", "Oscillating" }, 0);
 
     return { params.begin(), params.end() };
 }
@@ -65,7 +70,13 @@ double LadderParameters::lp_cutoff()
 
 double LadderParameters::lp_resonance() const
 {
-    return ladder_filter_utility::skew_normalized (static_cast<double> (*lp_resonance_norm), 0.33);
+    double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (*lp_resonance_norm), 0.33);
+    if (*filter_mode_norm == 0.0)
+    {
+        resonance = ladder_filter_utility::limit_upper (resonance, 0.97);
+    }
+
+    return resonance;
 }
 
 double LadderParameters::hp_cutoff()
@@ -78,5 +89,12 @@ double LadderParameters::hp_cutoff()
 
 double LadderParameters::hp_resonance() const
 {
-    return ladder_filter_utility::skew_normalized (static_cast<double> (*hp_resonance_norm), 0.33);
+    double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (*hp_resonance_norm), 0.33);
+
+    if (*filter_mode_norm == 0.0)
+    {
+        resonance = ladder_filter_utility::limit_upper (resonance, 0.97);
+    }
+
+    return resonance;
 }
