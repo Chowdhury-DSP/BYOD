@@ -3,7 +3,6 @@
 #include "../../ParameterHelpers.h"
 #include <JuceHeader.h>
 
-#include "VoltPerOct.h"
 #include "utility.h"
 
 // This class handles processor parameters used in the dsp calculations
@@ -58,10 +57,6 @@ private:
 
     ladder_filter_utility::ParameterSmoother lp_cutoff_smooth;
     ladder_filter_utility::ParameterSmoother hp_cutoff_smooth;
-
-    //==============================================================================
-    // Virtual volt per octave for the filters
-    VoltPerOct filter_vpo;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LadderParameters)

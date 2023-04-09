@@ -20,6 +20,8 @@ constexpr double MIN_FILTER_FREQ = 20.0;
 // Maximum filter cutoff frequency: 20480 Hz (10 octaves above 20 Hz)
 constexpr double MAX_FILTER_FREQ = 20480.0;
 
+constexpr double ZERO_VOLT_FREQ = MIN_FILTER_FREQ * 2.0 * 2.0 * 2.0 * 2.0 * 2.0;
+
 //==============================================================================
 // Mappings / skews
 
@@ -59,6 +61,12 @@ inline double limit_upper (const double value_to_limit, const double limit)
     {
         return limit;
     }
+}
+
+// Convert control-voltage to requency
+inline double volt_to_freq (const double& volt)
+{
+    return ZERO_VOLT_FREQ * pow (2.0, volt);
 }
 
 //==============================================================================

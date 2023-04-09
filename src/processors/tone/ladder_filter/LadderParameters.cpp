@@ -13,9 +13,6 @@ LadderParameters::LadderParameters (juce::AudioProcessorValueTreeState& _vts) : 
     lp_resonance_norm = vts.getRawParameterValue ("LP_RESONANCE");
 
     filter_mode_norm = vts.getRawParameterValue ("FILTER_MODE");
-
-    // Tune volt/octave conversions, so that -5V to +5V spans 10 octaves above MIN_FILTER_FREQ
-    filter_vpo.set_zero_volt_freq (ladder_filter_utility::MIN_FILTER_FREQ * pow (2.0, 5.0));
 }
 
 //==============================================================================
@@ -63,7 +60,7 @@ double LadderParameters::drive_normalized()
 double LadderParameters::lp_cutoff()
 {
     const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (*lp_cutoff_norm), -5.0, 5.0);
-    double cutoff = filter_vpo.volt_to_freq (control_voltage);
+    double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
 
     return lp_cutoff_smooth.process (cutoff);
 }
@@ -82,7 +79,7 @@ double LadderParameters::lp_resonance() const
 double LadderParameters::hp_cutoff()
 {
     const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (*hp_cutoff_norm), -5.0, 5.0);
-    double cutoff = filter_vpo.volt_to_freq (control_voltage);
+    double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
 
     return hp_cutoff_smooth.process (cutoff);
 }
