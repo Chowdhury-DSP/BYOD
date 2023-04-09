@@ -13,11 +13,6 @@ public:
     LadderParameters (juce::AudioProcessorValueTreeState& _vts);
     ~LadderParameters() = default;
 
-    //==============================================================================
-
-    // Initialize parameter smoothing
-    void reset (const double sample_rate, const int samples_per_block);
-
     // Create parameter layout
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
@@ -49,14 +44,6 @@ private:
     std::atomic<float>* lp_resonance_norm;
 
     std::atomic<float>* filter_mode_norm;
-
-    //==============================================================================
-    // Filters to smooth out parameter changes
-
-    ladder_filter_utility::ParameterSmoother drive_smooth;
-
-    ladder_filter_utility::ParameterSmoother lp_cutoff_smooth;
-    ladder_filter_utility::ParameterSmoother hp_cutoff_smooth;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LadderParameters)

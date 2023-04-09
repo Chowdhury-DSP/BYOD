@@ -70,36 +70,6 @@ inline double volt_to_freq (const double& volt)
 }
 
 //==============================================================================
-// Parameter smoothing filter (exponential one-pole smoother)
-class ParameterSmoother
-{
-public:
-    ParameterSmoother() = default;
-    ~ParameterSmoother() = default;
-
-    //==============================================================================
-
-    void reset (const double smoothing_time, const double sample_rate, const int samples_per_block = 1)
-    {
-        const double block_rate = sample_rate / static_cast<double> (samples_per_block);
-        b1 = exp (-TWO_PI / (smoothing_time * block_rate));
-        a0 = 1.0 - b1;
-        state = 0.0;
-    }
-
-    inline double process (double x)
-    {
-        state = (x * a0) + (state * b1);
-        return state;
-    }
-
-private:
-    double a0; // Numerator coefficient
-    double b1; // Denominator coefficient
-    double state;
-};
-
-//==============================================================================
 // Static waveshaper
 
 // Faster hyperbolic tangent approximation

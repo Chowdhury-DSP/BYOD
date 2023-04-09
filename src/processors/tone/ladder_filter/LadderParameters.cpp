@@ -15,16 +15,6 @@ LadderParameters::LadderParameters (juce::AudioProcessorValueTreeState& _vts) : 
     filter_mode_norm = vts.getRawParameterValue ("FILTER_MODE");
 }
 
-//==============================================================================
-
-void LadderParameters::reset (const double sample_rate, const int samples_per_block)
-{
-    // Set cutoff smoothing time constants to 10 ms
-    drive_smooth.reset (0.8f, static_cast<float> (sample_rate), samples_per_block);
-    lp_cutoff_smooth.reset (0.8f, static_cast<float> (sample_rate), samples_per_block);
-    hp_cutoff_smooth.reset (0.8f, static_cast<float> (sample_rate), samples_per_block);
-}
-
 AudioProcessorValueTreeState::ParameterLayout LadderParameters::createParameterLayout()
 {
     using namespace ParameterHelpers;
@@ -47,9 +37,9 @@ AudioProcessorValueTreeState::ParameterLayout LadderParameters::createParameterL
 double LadderParameters::drive()
 {
     const double decibels = ladder_filter_utility::map_linear_normalized (static_cast<double> (*drive_norm), -24.0, 24.0);
-    double gain_factor = ladder_filter_utility::decibel_to_raw_gain (decibels);
+    const double gain_factor = ladder_filter_utility::decibel_to_raw_gain (decibels);
 
-    return drive_smooth.process (gain_factor);
+    return gain_factor;
 }
 
 double LadderParameters::drive_normalized()
@@ -60,9 +50,9 @@ double LadderParameters::drive_normalized()
 double LadderParameters::lp_cutoff()
 {
     const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (*lp_cutoff_norm), -5.0, 5.0);
-    double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
+    const double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
 
-    return lp_cutoff_smooth.process (cutoff);
+    return cutoff;
 }
 
 double LadderParameters::lp_resonance() const
@@ -79,9 +69,9 @@ double LadderParameters::lp_resonance() const
 double LadderParameters::hp_cutoff()
 {
     const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (*hp_cutoff_norm), -5.0, 5.0);
-    double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
+    const double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
 
-    return hp_cutoff_smooth.process (cutoff);
+    return cutoff;
 }
 
 double LadderParameters::hp_resonance() const

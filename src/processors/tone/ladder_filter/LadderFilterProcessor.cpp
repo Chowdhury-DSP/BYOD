@@ -22,9 +22,6 @@ void LadderFilterProcessor::prepare (double sampleRate, int samplesPerBlock)
         lp[channel].reset (sampleRate);
         hp[channel].reset (sampleRate);
     }
-
-    // Initialize parameter smoothing
-    p.reset (sampleRate, samplesPerBlock);
 }
 
 void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
