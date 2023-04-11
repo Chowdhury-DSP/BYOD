@@ -28,6 +28,14 @@ private:
     HighPassLadder hp[2];
     LowPassLadder lp[2];
 
+    // Parameter smoothing
+    chowdsp::SmoothedBufferValue<float> drive_smooth;
+    chowdsp::SmoothedBufferValue<float> drive_norm_smooth;
+    chowdsp::SmoothedBufferValue<float> hp_cutoff_smooth;
+    chowdsp::SmoothedBufferValue<float> hp_resonance_smooth;
+    chowdsp::SmoothedBufferValue<float> lp_cutoff_smooth;
+    chowdsp::SmoothedBufferValue<float> lp_resonance_smooth;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LadderFilterProcessor)
 };

@@ -17,21 +17,50 @@ public:
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
     //==============================================================================
-    // Methods used to access parameter values for audio processing
-    // Parameter denormalization is handled here
+    // Parameter denormalization functions / skews
 
-    double drive();
-    double drive_normalized();
+    static inline float drive (float val)
+    {
+        const double decibels = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -24.0, 24.0);
+        const double gain_factor = ladder_filter_utility::decibel_to_raw_gain (decibels);
 
-    double lp_cutoff();
-    double lp_resonance() const;
+        return gain_factor;
+    }
 
-    double hp_cutoff();
-    double hp_resonance() const;
+    static inline float lp_cutoff (float val)
+    {
+        const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -5.0, 5.0);
+        const double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
+
+        return cutoff;
+    }
+
+    static inline float lp_resonance (float val)
+    {
+        double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (val), 0.33);
+
+        return resonance;
+    }
+
+    static inline float hp_cutoff (float val)
+    {
+        const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -5.0, 5.0);
+        const double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
+
+        return cutoff;
+    }
+
+    static inline float hp_resonance (float val)
+    {
+        double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (val), 0.33);
+
+        return resonance;
+    }
 
 private:
     juce::AudioProcessorValueTreeState& vts;
 
+public:
     //==============================================================================
     // Atomic pointers to access raw (normalized) parameter values stored in the VTS
 
