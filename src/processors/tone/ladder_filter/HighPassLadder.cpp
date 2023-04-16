@@ -37,5 +37,5 @@ void HighPassLadder::set_cutoff (const double cutoff)
 
 void HighPassLadder::set_resonance (const double resonance)
 {
-    k = ladder_filter_utility::map_linear_normalized (resonance, 0.0, 4.0);
+    k = resonance;
 }

@@ -16,12 +16,57 @@ LadderFilterProcessor::LadderFilterProcessor (UndoManager* um) : BaseProcessor (
 
 void LadderFilterProcessor::prepare (double sampleRate, int samplesPerBlock)
 {
-    typedef LadderParameters params;
-    drive_smooth.mappingFunction = params::drive;
-    hp_cutoff_smooth.mappingFunction = params::hp_cutoff;
-    hp_resonance_smooth.mappingFunction = params::hp_resonance;
-    lp_cutoff_smooth.mappingFunction = params::lp_cutoff;
-    lp_resonance_smooth.mappingFunction = params::lp_resonance;
+    // Setup parameter denormalization / skew
+
+    drive_smooth.mappingFunction = [] (float val)
+    {
+        const double decibels = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -24.0, 24.0);
+        const double gain_factor = ladder_filter_utility::decibel_to_raw_gain (decibels);
+
+        return gain_factor;
+    };
+
+    hp_cutoff_smooth.mappingFunction = [] (float val)
+    {
+        const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -5.0, 5.0);
+        const double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
+
+        return cutoff;
+    };
+
+    hp_resonance_smooth.mappingFunction = [this] (float val)
+    {
+        if (*(p.filter_mode_norm) == 0.0f)
+        {
+            val = ladder_filter_utility::limit_upper (val, p.RESONANCE_LIMIT_NON_OSCILLATING);
+        }
+
+        double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (val), 0.33);
+        resonance = ladder_filter_utility::map_linear_normalized (resonance, 0.0, 4.0);
+
+        return resonance;
+    };
+
+    lp_cutoff_smooth.mappingFunction = [] (float val)
+    {
+        const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -5.0, 5.0);
+        const double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
+
+        return cutoff;
+    };
+
+    lp_resonance_smooth.mappingFunction = [this] (float val)
+    {
+        if (*(p.filter_mode_norm) == 0.0f)
+        {
+            val = ladder_filter_utility::limit_upper (val, p.RESONANCE_LIMIT_NON_OSCILLATING);
+        }
+
+        double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (val), 0.33);
+        resonance = ladder_filter_utility::map_linear_normalized (resonance, 0.0, 4.0);
+
+        return resonance;
+    };
 
     drive_smooth.setParameterHandle (p.drive_norm);
     drive_norm_smooth.setParameterHandle (p.drive_norm);
@@ -49,6 +94,14 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
 {
     const int num_samples = buffer.getNumSamples();
 
+    // Process parameter smoothers for current buffer
+    hp_cutoff_smooth.process (num_samples);
+    hp_resonance_smooth.process (num_samples);
+    lp_cutoff_smooth.process (num_samples);
+    lp_resonance_smooth.process (num_samples);
+    drive_smooth.process (num_samples);
+    drive_norm_smooth.process (num_samples);
+
     for (int channel = 0; channel < buffer.getNumChannels(); ++channel)
     {
         float* data = buffer.getWritePointer (channel);
@@ -56,8 +109,6 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
         // Process high-pass
 
         // If we need smoothing..
-        hp_cutoff_smooth.process (num_samples);
-        hp_resonance_smooth.process (num_samples);
         if (hp_cutoff_smooth.isSmoothing() || hp_resonance_smooth.isSmoothing())
         {
             // ..update filter parameters
@@ -89,8 +140,6 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
         // Process low-pass
 
         // If we need smoothing..
-        lp_cutoff_smooth.process (num_samples);
-        lp_resonance_smooth.process (num_samples);
         if (lp_cutoff_smooth.isSmoothing() || lp_resonance_smooth.isSmoothing())
         {
             // ..update filter parameters
@@ -120,11 +169,9 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
         }
 
         // apply drive
-        drive_smooth.process (num_samples);
         juce::FloatVectorOperations::multiply (data, drive_smooth.getSmoothedBuffer(), num_samples);
 
         // saturate and blend
-        drive_norm_smooth.process (num_samples);
         const float* drive_norm_smoothed = drive_norm_smooth.getSmoothedBuffer();
         for (int n = 0; n < num_samples; ++n)
         {

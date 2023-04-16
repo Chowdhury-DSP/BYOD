@@ -16,61 +16,23 @@ public:
     // Create parameter layout
     static AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-    //==============================================================================
-    // Parameter denormalization functions / skews
-
-    static inline float drive (float val)
-    {
-        const double decibels = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -24.0, 24.0);
-        const double gain_factor = ladder_filter_utility::decibel_to_raw_gain (decibels);
-
-        return gain_factor;
-    }
-
-    static inline float lp_cutoff (float val)
-    {
-        const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -5.0, 5.0);
-        const double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
-
-        return cutoff;
-    }
-
-    static inline float lp_resonance (float val)
-    {
-        double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (val), 0.33);
-
-        return resonance;
-    }
-
-    static inline float hp_cutoff (float val)
-    {
-        const double control_voltage = ladder_filter_utility::map_linear_normalized (static_cast<double> (val), -5.0, 5.0);
-        const double cutoff = ladder_filter_utility::volt_to_freq (control_voltage);
-
-        return cutoff;
-    }
-
-    static inline float hp_resonance (float val)
-    {
-        double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (val), 0.33);
-
-        return resonance;
-    }
-
 private:
     juce::AudioProcessorValueTreeState& vts;
 
 public:
+    // Limit of resonance setting to keep the filters from self-oscillating depending on filter mode
+    static constexpr double RESONANCE_LIMIT_NON_OSCILLATING = 0.96;
+
     //==============================================================================
     // Pointers to access raw (normalized) parameter values stored in the VTS
 
-    chowdsp::FloatParameter* drive_norm;
+    chowdsp::FloatParameter* drive_norm{nullptr};
 
-    chowdsp::FloatParameter* hp_cutoff_norm;
-    chowdsp::FloatParameter* hp_resonance_norm;
+    chowdsp::FloatParameter* hp_cutoff_norm{nullptr};
+    chowdsp::FloatParameter* hp_resonance_norm{nullptr};
 
-    chowdsp::FloatParameter* lp_cutoff_norm;
-    chowdsp::FloatParameter* lp_resonance_norm;
+    chowdsp::FloatParameter* lp_cutoff_norm{nullptr};
+    chowdsp::FloatParameter* lp_resonance_norm{nullptr};
 
     std::atomic<float>* filter_mode_norm{nullptr};
 
