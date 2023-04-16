@@ -72,7 +72,7 @@ public:
     chowdsp::FloatParameter* lp_cutoff_norm;
     chowdsp::FloatParameter* lp_resonance_norm;
 
-    chowdsp::FloatParameter* filter_mode_norm;
+    std::atomic<float>* filter_mode_norm{nullptr};
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LadderParameters)

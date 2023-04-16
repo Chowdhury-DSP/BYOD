@@ -12,7 +12,7 @@ LadderParameters::LadderParameters (juce::AudioProcessorValueTreeState& _vts) : 
     loadParameterPointer (lp_cutoff_norm, vts, "LP_CUTOFF");
     loadParameterPointer (lp_resonance_norm, vts, "LP_RESONANCE");
 
-    loadParameterPointer (filter_mode_norm, vts, "FILTER_MODE");
+    filter_mode_norm = vts.getRawParameterValue("FILTER_MODE");
 }
 
 AudioProcessorValueTreeState::ParameterLayout LadderParameters::createParameterLayout()
