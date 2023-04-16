@@ -2,17 +2,17 @@
 
 LadderParameters::LadderParameters (juce::AudioProcessorValueTreeState& _vts) : vts (_vts)
 {
-    // Get nomralized parameter values from the Apvts
+    using namespace ParameterHelpers;
 
-    drive_norm = vts.getRawParameterValue ("DRIVE");
+    loadParameterPointer (drive_norm, vts, "DRIVE");
 
-    hp_cutoff_norm = vts.getRawParameterValue ("HP_CUTOFF");
-    hp_resonance_norm = vts.getRawParameterValue ("HP_RESONANCE");
+    loadParameterPointer (hp_cutoff_norm, vts, "HP_CUTOFF");
+    loadParameterPointer (hp_resonance_norm, vts, "HP_RESONANCE");
 
-    lp_cutoff_norm = vts.getRawParameterValue ("LP_CUTOFF");
-    lp_resonance_norm = vts.getRawParameterValue ("LP_RESONANCE");
+    loadParameterPointer (lp_cutoff_norm, vts, "LP_CUTOFF");
+    loadParameterPointer (lp_resonance_norm, vts, "LP_RESONANCE");
 
-    filter_mode_norm = vts.getRawParameterValue ("FILTER_MODE");
+    loadParameterPointer (filter_mode_norm, vts, "FILTER_MODE");
 }
 
 AudioProcessorValueTreeState::ParameterLayout LadderParameters::createParameterLayout()
@@ -26,7 +26,6 @@ AudioProcessorValueTreeState::ParameterLayout LadderParameters::createParameterL
     createPercentParameter (params, "LP_CUTOFF", "LP CUT", 1.0f);
     createPercentParameter (params, "DRIVE", "DRIVE", 0.5f);
 
-    // emplace_param<AudioParameterChoice> (params, modeTag, "Mode", StringArray { "Traditional", "Neural" }, 0);
     emplace_param<AudioParameterChoice> (params, "FILTER_MODE", "FILTER MODE", StringArray { "Normal", "Oscillating" }, 0);
 
     return { params.begin(), params.end() };

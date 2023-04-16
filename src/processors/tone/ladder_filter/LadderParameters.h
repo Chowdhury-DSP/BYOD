@@ -62,17 +62,17 @@ private:
 
 public:
     //==============================================================================
-    // Atomic pointers to access raw (normalized) parameter values stored in the VTS
+    // Pointers to access raw (normalized) parameter values stored in the VTS
 
-    std::atomic<float>* drive_norm;
+    chowdsp::FloatParameter* drive_norm;
 
-    std::atomic<float>* hp_cutoff_norm;
-    std::atomic<float>* hp_resonance_norm;
+    chowdsp::FloatParameter* hp_cutoff_norm;
+    chowdsp::FloatParameter* hp_resonance_norm;
 
-    std::atomic<float>* lp_cutoff_norm;
-    std::atomic<float>* lp_resonance_norm;
+    chowdsp::FloatParameter* lp_cutoff_norm;
+    chowdsp::FloatParameter* lp_resonance_norm;
 
-    std::atomic<float>* filter_mode_norm;
+    chowdsp::FloatParameter* filter_mode_norm;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LadderParameters)
