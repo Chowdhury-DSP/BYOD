@@ -61,6 +61,10 @@ inline double limit_upper (const double value_to_limit, const double limit)
     {
         return limit;
     }
+    else
+    {
+        return value_to_limit;
+    }
 }
 
 // Convert control-voltage to requency
