@@ -38,7 +38,7 @@ void LadderFilterProcessor::prepare (double sampleRate, int samplesPerBlock)
     {
         if (*(p.filter_mode_norm) == 0.0f)
         {
-            val = ladder_filter_utility::limit_upper (val, p.RESONANCE_LIMIT_NON_OSCILLATING);
+            val = static_cast<float> (ladder_filter_utility::limit_upper (val, p.RESONANCE_LIMIT_NON_OSCILLATING));
         }
 
         double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (val), 0.33);
@@ -59,7 +59,7 @@ void LadderFilterProcessor::prepare (double sampleRate, int samplesPerBlock)
     {
         if (*(p.filter_mode_norm) == 0.0f)
         {
-            val = ladder_filter_utility::limit_upper (val, p.RESONANCE_LIMIT_NON_OSCILLATING);
+            val = static_cast<float> (ladder_filter_utility::limit_upper (val, p.RESONANCE_LIMIT_NON_OSCILLATING));
         }
 
         double resonance = ladder_filter_utility::skew_normalized (static_cast<double> (val), 0.33);
@@ -121,7 +121,7 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
                 hp[channel].set_resonance (resonance_smoothed[n]);
 
                 float& x = data[n];
-                x = hp[channel].process (x);
+                x = static_cast<float> (hp[channel].process (x));
             }
         }
         else
@@ -133,7 +133,7 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
             for (int n = 0; n < num_samples; ++n)
             {
                 float& x = data[n];
-                x = hp[channel].process (x);
+                x = static_cast<float> (hp[channel].process (x));
             }
         }
 
@@ -152,7 +152,7 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
                 lp[channel].set_resonance (resonance_smoothed[n]);
 
                 float& x = data[n];
-                x = lp[channel].process (x);
+                x = static_cast<float> (lp[channel].process (x));
             }
         }
         else
@@ -164,7 +164,7 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
             for (int n = 0; n < num_samples; ++n)
             {
                 float& x = data[n];
-                x = lp[channel].process (x);
+                x = static_cast<float> (lp[channel].process (x));
             }
         }
 
@@ -176,7 +176,7 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
         for (int n = 0; n < num_samples; ++n)
         {
             float& x = data[n];
-            x = drive_norm_smoothed[n] * ladder_filter_utility::fast_tanh_2 (x) + (1.0f - drive_norm_smoothed[n]) * x;
+            x = static_cast<double> (drive_norm_smoothed[n] * ladder_filter_utility::fast_tanh_2 (x) + (1.0f - drive_norm_smoothed[n]) * x);
         }
     }
 }
