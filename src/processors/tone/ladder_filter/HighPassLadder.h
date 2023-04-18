@@ -23,7 +23,7 @@ public:
     void set_cutoff (const double cutoff);
 
     // Set ladder filter resonance [1]
-    // Range: 0.0 to 1.0
+    // Range: 0.0 to 4.0
     void set_resonance (const double resonance);
 
     //==============================================================================
