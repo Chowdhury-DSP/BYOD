@@ -8,8 +8,8 @@ LadderFilterProcessor::LadderFilterProcessor (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "Resonant 4-pole ladder high-pass and low-pass,\n capable of self-oscillation. With nonlinear drive.";
     uiOptions.info.authors = StringArray { "Butch Warns" };
     uiOptions.info.infoLink = "https://butchwarns.de/";
-    uiOptions.backgroundColour = juce::Colour::fromRGB (0xBB, 0xE1, 0xC3);
-    uiOptions.powerColour = juce::Colour::fromRGB (0x99, 0x0B, 0x3C);
+    uiOptions.backgroundColour = juce::Colour::fromRGB (0x42, 0x6E, 0xB9);
+    uiOptions.powerColour = juce::Colour::fromRGB (0xD7, 0x33, 0x40);
 
     addPopupMenuParameter ("FILTER_MODE");
 }
