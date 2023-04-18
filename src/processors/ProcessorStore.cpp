@@ -34,6 +34,7 @@
 #include "tone/bassman/BassmanTone.h"
 #include "tone/baxandall/BaxandallEQ.h"
 #include "tone/tube_screamer_tone/TubeScreamerTone.h"
+#include "tone/ladder_filter/LadderFilterProcessor.h"
 
 #include "modulation/Chorus.h"
 #include "modulation/Flanger.h"
@@ -109,6 +110,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "SVF", &processorFactory<StateVariableFilter> },
     { "Treble Booster", &processorFactory<TrebleBooster> },
     { "TS-Tone", &processorFactory<TubeScreamerTone> },
+    { "Ladder Filter", &processorFactory<LadderFilterProcessor> },
 
     { "Chorus", &processorFactory<Chorus> },
     { "Flanger", &processorFactory<Flanger> },
