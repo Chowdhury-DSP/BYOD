@@ -22,7 +22,7 @@
 #include "drive/waveshaper/Waveshaper.h"
 #include "drive/zen_drive/ZenDrive.h"
 
-#include "tone/AmpIRs.h"
+#include "tone/amp_irs/AmpIRs.h"
 #include "tone/BassCleaner.h"
 #include "tone/BigMuffTone.h"
 #include "tone/BlondeTone.h"

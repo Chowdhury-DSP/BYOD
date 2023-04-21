@@ -91,7 +91,6 @@ target_sources(BYOD PRIVATE
     processors/drive/waveshaper/Waveshaper.cpp
     processors/drive/zen_drive/ZenDrive.cpp
 
-    processors/tone/AmpIRs.cpp
     processors/tone/BassCleaner.cpp
     processors/tone/BigMuffTone.cpp
     processors/tone/BlondeTone.cpp
@@ -100,6 +99,9 @@ target_sources(BYOD PRIVATE
     processors/tone/LofiIrs.cpp
     processors/tone/StateVariableFilter.cpp
     processors/tone/TrebleBooster.cpp
+    processors/tone/amp_irs/AmpIRs.cpp
+    processors/tone/amp_irs/AmpIRsSaveLoad.cpp
+    processors/tone/amp_irs/AmpIRsSelector.cpp
     processors/tone/bassman/BassmanTone.cpp
     processors/tone/bassman/BassmanToneStack.cpp
     processors/tone/baxandall/BaxandallEQ.cpp
