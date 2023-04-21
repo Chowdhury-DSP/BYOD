@@ -70,7 +70,7 @@ namespace
 const String irNameTag { "ir_custom_name" };
 const String irDataTag { "ir_custom_data" };
 const String irFileTag { "ir_custom_file" };
-}
+} // namespace
 
 std::unique_ptr<XmlElement> AmpIRs::toXML()
 {
