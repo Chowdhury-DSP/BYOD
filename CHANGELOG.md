@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 - Added "Flapjack" module.
 - Added AVX support (for PCs that support it) for neural network-based modules.
 - Added sample rate correction filter for GuitarML module.
+- Improved custom IR loading/saving for "Amp IRs" module.
 - Improved plugin RAM usage.
 - Fixed hardened runtime flags for standalone audio input on MacOS.
 
