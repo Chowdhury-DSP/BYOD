@@ -174,7 +174,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
     chowdsp::ScopedCallback onIRChanged;
 
     chowdsp::SharedPluginSettings pluginSettings;
-    std::vector<File> userIRFiles; // TODO: replace with a tree
+    std::vector<File> userIRFiles; // TODO: maybe replace with a tree?
 };
 
 bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)

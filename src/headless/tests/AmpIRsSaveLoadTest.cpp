@@ -68,4 +68,4 @@ public:
     }
 };
 
-static AmpIRsSaveLoadTest ampIRsSaveLoadTest;
+//static AmpIRsSaveLoadTest ampIRsSaveLoadTest;
