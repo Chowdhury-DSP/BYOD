@@ -16,6 +16,7 @@ target_sources(BYOD_headless PRIVATE
     ScreenshotGenerator.cpp
     GuitarMLFilterDesigner.cpp
 
+    tests/AmpIRsSaveLoadTest.cpp
     tests/ParameterSmoothTest.cpp
     tests/PreBufferTest.cpp
     tests/PresetsTest.cpp

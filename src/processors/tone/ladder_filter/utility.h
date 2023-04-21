@@ -84,11 +84,12 @@ inline double volt_to_freq (const double& volt)
 //
 // As proposed by Aleksey Vaneef:
 // https://www.kvraudio.com/forum/viewtopic.php?f=33&t=388650&start=45
-inline double fast_tanh_2 (const double x)
+template <typename T>
+inline T fast_tanh_2 (T x)
 {
-    const double ax = fabs (x);
-    const double x2 = x * x;
+    const auto ax = fabs (x);
+    const auto x2 = x * x;
 
-    return (x * (2.45550750702956 + 2.45550750702956 * ax + (0.893229853513558 + 0.821226666969744 * ax) * x2) / (2.44506634652299 + (2.44506634652299 + x2) * fabs (x + 0.814642734961073 * x * ax)));
+    return (x * ((T) 2.45550750702956 + (T) 2.45550750702956 * ax + ((T) 0.893229853513558 + (T) 0.821226666969744 * ax) * x2) / ((T) 2.44506634652299 + ((T) 2.44506634652299 + x2) * fabs (x + (T) 0.814642734961073 * x * ax)));
 }
 } // namespace ladder_filter_utility

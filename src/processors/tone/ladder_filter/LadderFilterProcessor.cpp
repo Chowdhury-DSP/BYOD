@@ -176,7 +176,7 @@ void LadderFilterProcessor::processAudio (AudioBuffer<float>& buffer)
         for (int n = 0; n < num_samples; ++n)
         {
             float& x = data[n];
-            x = static_cast<double> (drive_norm_smoothed[n] * ladder_filter_utility::fast_tanh_2 (x) + (1.0f - drive_norm_smoothed[n]) * x);
+            x = drive_norm_smoothed[n] * ladder_filter_utility::fast_tanh_2 (x) + (1.0f - drive_norm_smoothed[n]) * x;
         }
     }
 }

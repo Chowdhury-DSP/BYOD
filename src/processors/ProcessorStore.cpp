@@ -22,7 +22,6 @@
 #include "drive/waveshaper/Waveshaper.h"
 #include "drive/zen_drive/ZenDrive.h"
 
-#include "tone/AmpIRs.h"
 #include "tone/BassCleaner.h"
 #include "tone/BigMuffTone.h"
 #include "tone/BlondeTone.h"
@@ -31,10 +30,11 @@
 #include "tone/LofiIrs.h"
 #include "tone/StateVariableFilter.h"
 #include "tone/TrebleBooster.h"
+#include "tone/amp_irs/AmpIRs.h"
 #include "tone/bassman/BassmanTone.h"
 #include "tone/baxandall/BaxandallEQ.h"
-#include "tone/tube_screamer_tone/TubeScreamerTone.h"
 #include "tone/ladder_filter/LadderFilterProcessor.h"
+#include "tone/tube_screamer_tone/TubeScreamerTone.h"
 
 #include "modulation/Chorus.h"
 #include "modulation/Flanger.h"
