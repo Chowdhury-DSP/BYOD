@@ -112,7 +112,7 @@ void AmpIRs::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loa
     else // prior to v1.1.4, we were just saving the IR file path
     {
         auto irFile = File (xml->getStringAttribute ("ir_file"));
-        if (irFile.getFullPathName().isNotEmpty())
+        if (irFile.existsAsFile())
             loadIRFromStream (irFile.createInputStream());
     }
 }

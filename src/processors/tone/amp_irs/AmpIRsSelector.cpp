@@ -78,12 +78,14 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
         { loadIRFromFile(); };
         menu->addItem (std::move (fromFileItem));
 
+#if ! JUCE_IOS
         PopupMenu::Item selectUserFolderItem;
         selectUserFolderItem.text = "Select User IRs Directory";
         selectUserFolderItem.itemID = ++menuIdx;
         selectUserFolderItem.action = [this]
         { selectUserIRsDirectory(); };
         menu->addItem (std::move (selectUserFolderItem));
+#endif
     }
 
     void refreshUserIRs()
@@ -159,17 +161,10 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
         fileChooser->launchAsync (flags,
                                   [this] (const FileChooser& fc)
                                   {
-#if JUCE_IOS
-                                      if (fc.getURLResults().isEmpty())
+                                      if (fc.getResults().isEmpty())
                                           return;
-                                      const auto irFile = fc.getURLResult();
+                                      const auto irFile = fc.getResult();
                                       pluginSettings->setProperty (userIRFolderID, irFile.getFullPathName());
-#else
-                if (fc.getResults().isEmpty())
-                    return;
-                const auto irFile = fc.getResult();
-                pluginSettings->setProperty (userIRFolderID, irFile.getFullPathName());
-#endif
                                   });
     }
 
