@@ -18,6 +18,12 @@ public:
         auto minMax = FloatVectorOperations::findMinAndMax (buffer, testBlockSize);
         auto max = jmax (std::abs (minMax.getStart()), std::abs (minMax.getEnd()));
 
+        if (std::isnan (max))
+        {
+            jassertfalse;
+            return;
+        }
+
         expectGreaterThan (max, 1.0e-6f, "Max output value is too quiet!");
     }
 
