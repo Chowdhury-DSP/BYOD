@@ -3,6 +3,105 @@
 namespace
 {
 constexpr chowdsp::GlobalPluginSettings::SettingID userIRFolderID { "user_ir_folder" };
+
+struct IRFileTree : chowdsp::AbstractTree<File>
+{
+    File rootDirectory {};
+    void loadFilesFromDirectory (const File& rootDir, const AudioFormatManager& formatManager)
+    {
+        rootDirectory = rootDir;
+
+        std::vector<File> irFiles;
+        for (const DirectoryEntry& entry : RangedDirectoryIterator (rootDirectory, true, formatManager.getWildcardForAllFormats()))
+            irFiles.emplace_back (entry.getFile());
+
+        insertElements (std::move (irFiles));
+    }
+
+    File& insertElementInternal (File&& irFile, std::vector<Node>& topLevelNodes) override
+    {
+        std::vector<std::string> subPaths {};
+        File pathToRootDir { irFile.getParentDirectory() };
+        while (pathToRootDir != rootDirectory)
+        {
+            subPaths.emplace_back (pathToRootDir.getFileNameWithoutExtension().toStdString());
+            pathToRootDir = pathToRootDir.getParentDirectory();
+        }
+
+        return insertFile (std::move (irFile), subPaths, topLevelNodes);
+    }
+
+    File& insertFile (File&& file, std::vector<std::string>& subPaths, std::vector<Node>& nodes)
+    {
+        const auto nodeComparator = [] (const Node& el1, const Node& el2)
+        {
+            if (el1.leaf.has_value() && ! el2.leaf.has_value())
+                return false; // node 1 is a File, node 2 is a sub-dir
+
+            if (! el1.leaf.has_value() && el2.leaf.has_value())
+                return true; // node 1 is a sub-dir, node 2 is a leaf
+
+            if (! el1.leaf.has_value())
+                return el1.tag < el2.tag; // both nodes are sub-dirs
+
+            return el1.leaf < el2.leaf; // both nodes are files
+        };
+
+        if (subPaths.empty())
+        {
+            Node newFileNode {};
+            newFileNode.leaf = std::move (file);
+            return *chowdsp::VectorHelpers::insert_sorted (nodes, std::move (newFileNode), nodeComparator)->leaf;
+        }
+
+        const auto tag = subPaths.back();
+        subPaths.pop_back();
+        auto existingSubDirNode = std::find_if (nodes.begin(), nodes.end(), [&tag] (const Node& node)
+                                                { return node.tag == tag; });
+        if (existingSubDirNode != nodes.end())
+        {
+            return insertFile (std::move (file), subPaths, existingSubDirNode->subtree);
+        }
+
+        Node newSubDirNode {};
+        newSubDirNode.tag = tag;
+        auto& insertedSubDirNode = *chowdsp::VectorHelpers::insert_sorted (nodes,
+                                                                           std::move (newSubDirNode),
+                                                                           nodeComparator);
+        return insertFile (std::move (file), subPaths, insertedSubDirNode.subtree);
+    }
+
+    static PopupMenu createPopupMenu (int& menuIndex, const std::vector<Node>& nodes, AmpIRs& ampIRs, Component* topLevelComponent)
+    {
+        PopupMenu menu;
+
+        for (const auto& node : nodes)
+        {
+            if (node.leaf.has_value())
+            {
+                const auto irFile = *node.leaf;
+                if (! irFile.existsAsFile())
+                    continue;
+
+                PopupMenu::Item fileItem;
+                fileItem.text = irFile.getFileNameWithoutExtension();
+                fileItem.itemID = ++menuIndex;
+                fileItem.action = [&ampIRs, topLevelComponent, irFile]
+                {
+                    ampIRs.loadIRFromStream (irFile.createInputStream(), {}, topLevelComponent);
+                };
+                menu.addItem (std::move (fileItem));
+            }
+            else
+            {
+                auto subMenu = createPopupMenu (menuIndex, node.subtree, ampIRs, topLevelComponent);
+                menu.addSubMenu (node.tag, std::move (subMenu));
+            }
+        }
+
+        return menu;
+    }
+};
 } // namespace
 
 struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
@@ -66,8 +165,8 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
             menu->addItem (std::move (irItem));
         }
 
-        if (! userIRFiles.empty())
-            menu->addSubMenu ("User:", getUserIRsMenu());
+        if (userIRFiles.size() > 0)
+            menu->addSubMenu ("User:", IRFileTree::createPopupMenu (menuIdx, userIRFiles.getNodes(), ampIRs, getTopLevelComponent()));
 
         menu->addSeparator();
 
@@ -97,30 +196,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
         Logger::writeToLog ("Attempting to load user IRs from folder: " + userIRsFolder.getFullPathName());
 
         userIRFiles.clear();
-        for (const DirectoryEntry& entry : RangedDirectoryIterator (userIRsFolder, true, ampIRs.audioFormatManager.getWildcardForAllFormats()))
-            userIRFiles.emplace_back (entry.getFile());
-    }
-
-    PopupMenu getUserIRsMenu()
-    {
-        PopupMenu userIRsMenu;
-        int menuIdx = 4321;
-        for (const auto& irFile : userIRFiles)
-        {
-            if (! irFile.existsAsFile())
-                continue;
-
-            PopupMenu::Item fileItem;
-            fileItem.text = irFile.getFileNameWithoutExtension();
-            fileItem.itemID = menuIdx++;
-            fileItem.action = [this, irFile]
-            {
-                ampIRs.loadIRFromStream (irFile.createInputStream(), {}, getTopLevelComponent());
-            };
-            userIRsMenu.addItem (fileItem);
-        }
-
-        return userIRsMenu;
+        userIRFiles.loadFilesFromDirectory (userIRsFolder, ampIRs.audioFormatManager);
     }
 
     void loadIRFromFile()
@@ -174,7 +250,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
     chowdsp::ScopedCallback onIRChanged;
 
     chowdsp::SharedPluginSettings pluginSettings;
-    std::vector<File> userIRFiles; // TODO: maybe replace with a tree?
+    IRFileTree userIRFiles;
 };
 
 bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
