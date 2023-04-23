@@ -73,6 +73,7 @@ argument `-DCHOWDSP_ENABLE_OPENGL=<ON|OFF>` to the CMake configure step.
 - C++ Utilities:
   - [Magic Enum](https://github.com/Neargye/magic_enum)
   - [Surge Synth Team's cpputils](https://github.com/surge-synthesizer/sst-cpputils)
+  - [mpark/variant](https://github.com/mpark/variant)
 
 Credits for the individual processors are shown on
 the information page for each processor. Big thanks to all who
