@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Added "Flapjack" module.
+- Added "Ladder Filter" module.
 - Added AVX support (for PCs that support it) for neural network-based modules.
 - Added sample rate correction filter for GuitarML module.
 - Improved custom IR loading/saving for "Amp IRs" module.
