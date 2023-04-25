@@ -10,7 +10,10 @@ const String logFileNameRoot = "BYOD_Log_";
 } // namespace
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
-               logger (logFileSubDir, logFileNameRoot),
+               logger ({ .logFileSubDir = logFileSubDir,
+                         .logFileNameRoot = logFileNameRoot,
+                         .crashLogAnalysisCallback = [this] (const File& logFile)
+                         { crashLogFile.emplace (logFile); } }),
                procStore (&undoManager)
 {
     Logger::writeToLog (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (*this));
@@ -84,6 +87,12 @@ AudioProcessorEditor* BYOD::createEditor()
     auto* editor = new BYODPluginEditor (*this);
     stateManager->getUIState().attachToComponent (*editor);
     openGLHelper->setComponent (editor);
+
+    if (crashLogFile.has_value())
+    {
+        ErrorMessageView::showCrashLogView (*crashLogFile, editor);
+        crashLogFile.reset();
+    }
 
     return editor;
 }

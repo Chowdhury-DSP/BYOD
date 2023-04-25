@@ -16,6 +16,12 @@ void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const Stri
         return File {};
     }();
 
+    if (stream == nullptr)
+    {
+        failToLoad ("The following IR file was not valid: " + file.getFullPathName());
+        return;
+    }
+
     MemoryBlock irData;
     stream->readIntoMemoryBlock (irData);
     std::unique_ptr<AudioFormatReader> formatReader (audioFormatManager.createReaderFor (std::move (stream)));

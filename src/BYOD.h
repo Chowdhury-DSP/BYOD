@@ -37,6 +37,7 @@ private:
     void processBypassDelay (AudioBuffer<float>& buffer);
     void updateSampleLatency (int latencySamples);
 
+    std::optional<File> crashLogFile;
     chowdsp::PluginLogger logger;
     chowdsp::SharedPluginSettings pluginSettings;
     [[maybe_unused]] chowdsp::SharedLNFAllocator lnfAllocator; // keep alive!

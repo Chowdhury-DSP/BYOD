@@ -27,6 +27,9 @@ ErrorMessageView::ErrorMessageView()
         result = 0;
         setVisible (false);
     };
+
+    addAndMakeVisible (custom1Button);
+    addAndMakeVisible (custom2Button);
 }
 
 BYODPluginEditor* findTopLevelEditor (Component* currentComponent)
@@ -85,6 +88,45 @@ bool ErrorMessageView::showYesNoBox (const juce::String& title, const juce::Stri
     return false;
 }
 
+void ErrorMessageView::showCrashLogView (File logFile, Component* comp) // NOLINT
+{
+    ErrorMessageView::showCustomMessage (
+        "Crash detected!",
+        "A previous instance of this plugin has crashed! Would you like to view the logs?",
+#if JUCE_IOS
+        "Copy Logs",
+        [logFile]
+        {
+            SystemClipboard::copyTextToClipboard (logFile.loadFileAsString());
+        },
+#else
+        "Show Log File",
+        [logFile]
+        {
+            logFile.startAsProcess();
+        },
+#endif
+        "Cancel",
+        [] {},
+        comp);
+}
+
+void ErrorMessageView::showCustomMessage (const String& titleText,
+                                          const String& messageText,
+                                          const String& button1Text,
+                                          std::function<void()>&& button1Action,
+                                          const String& button2Text,
+                                          std::function<void()>&& button2Action,
+                                          Component* comp)
+{
+    if (auto* topLevelEditor = findTopLevelEditor (comp))
+    {
+        auto& errorMessageView = topLevelEditor->getErrorMessageView();
+        errorMessageView.setParametersCustom (titleText, messageText, button1Text, std::move (button1Action), button2Text, std::move (button2Action));
+        errorMessageView.setVisible (true);
+    }
+}
+
 void ErrorMessageView::setParameters (const juce::String& titleText,
                                       const juce::String& messageText,
                                       const juce::String& buttonText)
@@ -97,6 +139,8 @@ void ErrorMessageView::setParameters (const juce::String& titleText,
     closeButton.setVisible (true);
     yesButton.setVisible (false);
     noButton.setVisible (false);
+    custom1Button.setVisible (false);
+    custom2Button.setVisible (false);
 }
 
 void ErrorMessageView::setParametersYesNo (const String& titleText, const String& messageText)
@@ -109,6 +153,41 @@ void ErrorMessageView::setParametersYesNo (const String& titleText, const String
     closeButton.setVisible (false);
     yesButton.setVisible (true);
     noButton.setVisible (true);
+    custom1Button.setVisible (false);
+    custom2Button.setVisible (false);
+}
+
+void ErrorMessageView::setParametersCustom (const String& titleText,
+                                            const String& messageText,
+                                            const String& button1Text,
+                                            std::function<void()>&& button1Action,
+                                            const String& button2Text,
+                                            std::function<void()>&& button2Action)
+{
+    result = -1;
+    setAlwaysOnTop (true);
+    title.setText (titleText, juce::dontSendNotification);
+    message.setText (messageText, juce::dontSendNotification);
+
+    closeButton.setVisible (false);
+    yesButton.setVisible (false);
+    noButton.setVisible (false);
+    custom1Button.setVisible (true);
+    custom2Button.setVisible (true);
+
+    custom1Button.setButtonText (button1Text);
+    custom1Button.onClick = [this, func = std::move (button1Action)]
+    {
+        func();
+        setVisible (false);
+    };
+
+    custom2Button.setButtonText (button2Text);
+    custom2Button.onClick = [this, func = std::move (button2Action)]
+    {
+        func();
+        setVisible (false);
+    };
 }
 
 void ErrorMessageView::paint (Graphics& g)
@@ -143,4 +222,7 @@ void ErrorMessageView::resized()
 
     const auto noX = proportionOfWidth (0.525f);
     noButton.setBounds (noX, buttonY, buttonWidth, buttonHeight);
+
+    custom1Button.setBounds (yesButton.getBoundsInParent());
+    custom2Button.setBounds (noButton.getBoundsInParent());
 }
