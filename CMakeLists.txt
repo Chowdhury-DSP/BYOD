@@ -3,7 +3,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ta
 if(WIN32)
     set(CMAKE_SYSTEM_VERSION 7.1 CACHE STRING INTERNAL FORCE) # Windows SDK for Windows 7 and up
 endif()
-project(BYOD VERSION 1.1.4)
+project(BYOD VERSION 1.1.5)
 set(CMAKE_CXX_STANDARD 20)
 
 if (NOT IOS)
