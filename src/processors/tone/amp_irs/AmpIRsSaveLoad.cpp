@@ -15,7 +15,7 @@ void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const Stri
             return fileStream->getFile();
         return File {};
     }();
-    
+
     if (stream == nullptr)
     {
         failToLoad ("The following IR file was not valid: " + file.getFullPathName());
