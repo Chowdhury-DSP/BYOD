@@ -18,7 +18,7 @@ void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const Stri
 
     if (stream == nullptr)
     {
-        failToLoad ("The following IR file was not valid: " + file.getFullPathName());
+        failToLoad ("The following IR file was not valid: " + file.getFullPathName() + " (invalid stream)");
         return;
     }
 
@@ -28,7 +28,7 @@ void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const Stri
 
     if (formatReader == nullptr)
     {
-        failToLoad ("The following IR file was not valid: " + file.getFullPathName());
+        failToLoad ("The following IR file was not valid: " + file.getFullPathName() + " (invalid format)");
         return;
     }
 
@@ -40,7 +40,7 @@ void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const Stri
                               0,
                               resultBuffer.getNumSamples()))
     {
-        failToLoad ("Unable to read from IR file: " + file.getFullPathName());
+        failToLoad ("Unable to read data from IR file: " + file.getFullPathName());
         return;
     }
 
