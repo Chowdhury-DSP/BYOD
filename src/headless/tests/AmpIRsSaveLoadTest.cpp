@@ -15,6 +15,8 @@ public:
 
     static void process (AudioBuffer<float>& buffer, AmpIRs& irs)
     {
+        buffer.clear();
+
         chowdsp::SawtoothWave<float> tone;
         tone.setFrequency (100.0f);
         tone.prepare ({ sampleRate, bufferSize, 1 });
@@ -47,6 +49,7 @@ public:
             AmpIRs irs;
             irs.loadIRFromStream (testIRFile.createInputStream());
             irs.prepare (sampleRate, bufferSize);
+            MessageManager::getInstance()->runDispatchLoopUntil (50);
             process (refSignal, irs);
             state = irs.toXML();
         }
@@ -58,6 +61,7 @@ public:
             AmpIRs irs;
             irs.fromXML (state.get(), "1.1.4"_v, false);
             irs.prepare (sampleRate, bufferSize);
+            MessageManager::getInstance()->runDispatchLoopUntil (50);
             process (testSignal, irs);
         }
 
@@ -68,4 +72,4 @@ public:
     }
 };
 
-//static AmpIRsSaveLoadTest ampIRsSaveLoadTest;
+static AmpIRsSaveLoadTest ampIRsSaveLoadTest;

@@ -23,7 +23,9 @@ void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const Stri
     }
 
     MemoryBlock irData;
+    const auto originalStreamPosition = stream->getPosition();
     stream->readIntoMemoryBlock (irData);
+    stream->setPosition (originalStreamPosition);
     std::unique_ptr<AudioFormatReader> formatReader (audioFormatManager.createReaderFor (std::move (stream)));
 
     if (formatReader == nullptr)
