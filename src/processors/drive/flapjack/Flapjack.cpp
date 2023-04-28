@@ -52,7 +52,7 @@ ParamLayout Flapjack::createParameterLayout()
     createPercentParameter (params, presenceTag, "Presence", 0.5f);
     createFreqParameter (params, lowCutTag, "Low Cut", 20.0f, 750.0f, 100.0f, 100.0f);
     createPercentParameter (params, levelTag, "Level", 0.5f);
-    emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", StringArray { "Op-Amp Clip", "Bluesberry", "Peachy" }, 0);
+    emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", StringArray { "Fizzy", "Bluesberry", "Peachy" }, 1);
 
     return { params.begin(), params.end() };
 }
