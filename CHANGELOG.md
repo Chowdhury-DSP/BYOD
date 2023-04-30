@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Improved custom IR loading/saving for "Amp IRs" module.
 - Improved plugin RAM usage.
 - Fixed hardened runtime flags for standalone audio input on MacOS.
+- Fixed crash when scrolling presets in Loopy Pro.
 
 ## [1.1.3] - 2023-01-13
 - Added "Muff Clipper" module.
