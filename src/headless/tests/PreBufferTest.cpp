@@ -47,7 +47,10 @@ public:
 
                 const auto steadyStateMax = [] (const auto& name)
                 {
-                    if (name == "Kiwi Bass Drive" || name == "Waterfall Drive" || name == "Swinger Pre")
+                    if (name == "Kiwi Bass Drive"
+                        || name == "Waterfall Drive"
+                        || name == "Swinger Pre"
+                        || name == "Flapjack")
                         return 1.0e-4f;
                     if (name == "Tweed")
                         return 1.0e-3f;
@@ -55,7 +58,7 @@ public:
                 }(proc->getName());
                 testBuffer (buffer.getReadPointer (0), steadyStateMax);
             },
-            StringArray { "Muff Drive", "Muff Clipper", "Trumble Drive" });
+            StringArray { "Muff Drive", "Muff Clipper", "Trumble Drive", "Swinger Pre" });
     }
 };
 

@@ -362,5 +362,6 @@ void PresetsComp::savePreset (const PresetSaveInfo& saveInfo)
 
 void PresetsComp::selectedPresetChanged()
 {
+    const juce::MessageManagerLock mml;
     presetListUpdated();
 }
