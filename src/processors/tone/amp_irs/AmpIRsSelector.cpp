@@ -18,7 +18,7 @@ struct IRFileTree : chowdsp::AbstractTree<File>
         insertElements (std::move (irFiles));
     }
 
-    File& insertElementInternal (File&& irFile, std::vector<Node>& topLevelNodes) override
+    File& insertElementInternal (File&& irFile, NodeVector& topLevelNodes) override
     {
         std::vector<std::string> subPaths {};
         File pathToRootDir { irFile.getParentDirectory() };
@@ -31,7 +31,7 @@ struct IRFileTree : chowdsp::AbstractTree<File>
         return insertFile (std::move (irFile), subPaths, topLevelNodes);
     }
 
-    File& insertFile (File&& file, std::vector<std::string>& subPaths, std::vector<Node>& nodes)
+    File& insertFile (File&& file, std::vector<std::string>& subPaths, NodeVector& nodes)
     {
         const auto nodeComparator = [] (const Node& el1, const Node& el2)
         {
@@ -49,7 +49,7 @@ struct IRFileTree : chowdsp::AbstractTree<File>
 
         if (subPaths.empty())
         {
-            Node newFileNode {};
+            Node newFileNode { nodeArena };
             newFileNode.leaf = std::move (file);
             return *chowdsp::VectorHelpers::insert_sorted (nodes, std::move (newFileNode), nodeComparator)->leaf;
         }
@@ -63,7 +63,7 @@ struct IRFileTree : chowdsp::AbstractTree<File>
             return insertFile (std::move (file), subPaths, existingSubDirNode->subtree);
         }
 
-        Node newSubDirNode {};
+        Node newSubDirNode { nodeArena };
         newSubDirNode.tag = tag;
         auto& insertedSubDirNode = *chowdsp::VectorHelpers::insert_sorted (nodes,
                                                                            std::move (newSubDirNode),
@@ -71,7 +71,7 @@ struct IRFileTree : chowdsp::AbstractTree<File>
         return insertFile (std::move (file), subPaths, insertedSubDirNode.subtree);
     }
 
-    static PopupMenu createPopupMenu (int& menuIndex, const std::vector<Node>& nodes, AmpIRs& ampIRs, Component* topLevelComponent)
+    static PopupMenu createPopupMenu (int& menuIndex, const NodeVector& nodes, AmpIRs& ampIRs, Component* topLevelComponent)
     {
         PopupMenu menu;
 
