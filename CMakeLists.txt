@@ -6,6 +6,9 @@ endif()
 project(BYOD VERSION 1.1.6)
 set(CMAKE_CXX_STANDARD 20)
 
+# Useful for testing with address sanitizer:
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
+
 if (NOT IOS)
     option(BYOD_BUILD_CLAP "Create a CLAP target for BYOD" ON)
 else()
