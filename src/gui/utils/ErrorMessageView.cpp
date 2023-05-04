@@ -61,7 +61,7 @@ void ErrorMessageView::showErrorMessage (const String& title, const String& mess
     //                                 nullptr);
 
     juce::Logger::writeToLog ("ERROR MESSAGE REPORTED: " + title + "(" + message + ")");
-    
+
     if (auto* topLevelEditor = findTopLevelEditor (comp))
     {
         auto& errorMessageView = topLevelEditor->getErrorMessageView();
