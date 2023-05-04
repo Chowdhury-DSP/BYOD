@@ -12,10 +12,25 @@ public:
     void prepare (double fs)
     {
         C1.prepare ((float) fs);
+        C1.incident (-4.83726311f);
+        C1.reflected();
+
         C2.prepare ((float) fs);
+        C2.incident (4.83662891f);
+        C2.reflected();
+
         C6.prepare ((float) fs);
+        C6.incident (-5.02740574f);
+        C6.reflected();
+
         C7.prepare ((float) fs);
+        C7.incident (5.07801962f);
+        C7.reflected();
+
         C8_C9.prepare ((float) fs);
+        C8_C9.incident (5.0518117f);
+        C8_C9.reflected();
+
         Vb.setVoltage (4.9f);
     }
 
