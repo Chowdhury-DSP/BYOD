@@ -81,6 +81,8 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
             knobs.setColours (contrastColour, procUI.powerColour);
             powerButton.setupPowerButton (procUI.powerColour);
         });
+
+    baseProc.setEditor (this);
 }
 
 ProcessorEditor::~ProcessorEditor() = default;

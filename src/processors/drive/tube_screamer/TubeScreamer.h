@@ -15,6 +15,8 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
+    void addToPopupMenu (PopupMenu& menu) override;
+
 private:
     chowdsp::FloatParameter* gainParam = nullptr;
     std::atomic<float>* diodeTypeParam = nullptr;
@@ -22,6 +24,8 @@ private:
 
     TubeScreamerWDF wdf[2];
     DCBlocker dcBlocker;
+
+    std::unique_ptr<Component> netlistWindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TubeScreamer)
 };

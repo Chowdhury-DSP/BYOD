@@ -27,6 +27,7 @@ struct ProcessorUIOptions
 };
 
 class BaseProcessor;
+class ProcessorEditor;
 struct ConnectionInfo
 {
     BaseProcessor* startProc;
@@ -85,6 +86,9 @@ public:
 
     /** add options to the processor's popup menu */
     virtual void addToPopupMenu (PopupMenu& menu);
+
+    /** Called by the editor ONLY! */
+    void setEditor (ProcessorEditor* procEditor);
 
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
@@ -150,6 +154,7 @@ protected:
     Array<int> inputsConnected;
 
     chowdsp::SharedLNFAllocator lnfAllocator;
+    Component::SafePointer<ProcessorEditor> editor {};
 
     /**
      * If your processor uses convolution, you can use this shared

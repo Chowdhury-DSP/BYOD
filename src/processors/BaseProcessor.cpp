@@ -1,4 +1,5 @@
 #include "BaseProcessor.h"
+#include "gui/pedalboard/editors/ProcessorEditor.h"
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
@@ -256,6 +257,11 @@ void BaseProcessor::addToPopupMenu (PopupMenu& menu)
 
         menu.addSeparator();
     }
+}
+
+void BaseProcessor::setEditor (ProcessorEditor* procEditor)
+{
+    editor = procEditor;
 }
 
 void BaseProcessor::setPosition (juce::Point<int> pos, Rectangle<int> parentBounds)
