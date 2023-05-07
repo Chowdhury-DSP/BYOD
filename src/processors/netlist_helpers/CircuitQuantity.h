@@ -12,14 +12,20 @@ struct CircuitQuantity
         Capacitance,
     };
 
-    float value;
+    using Setter = juce::dsp::FixedSizeFunction<128, void (const CircuitQuantity&, void*)>;
+
+    CircuitQuantity (CircuitQuantity&& other) noexcept;
+    CircuitQuantity (float defaultVal, float minVal, float maxVal, Type qType, const std::string& name, Setter&& setterFunc);
+
+    std::atomic<float> value;
+    std::atomic_bool needsUpdate { false };
+
     const float defaultValue;
     const float minValue;
     const float maxValue;
     const Type type;
     const std::string name;
 
-    using Setter = juce::dsp::FixedSizeFunction<128, void (const CircuitQuantity&, void*)>;
     Setter setter;
 };
 

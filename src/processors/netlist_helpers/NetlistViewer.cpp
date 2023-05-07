@@ -34,6 +34,7 @@ NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
         valueLabel.onTextChange = [&vl = valueLabel, &el = element]
         {
             el.value = netlist::fromString (vl.getText(), el);
+            el.needsUpdate = true;
             vl.setText (toString (el), juce::dontSendNotification);
         };
         addAndMakeVisible (valueLabel);

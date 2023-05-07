@@ -28,6 +28,8 @@ void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
 {
     prepare (sampleRate, numSamples);
 
+    // @TODO: load circuit components
+
     for (auto& b : inputBuffers)
     {
         b.setSize (2, numSamples);
@@ -158,7 +160,7 @@ void BaseProcessor::fromXML (XmlElement* xml, const chowdsp::Version&, bool load
                 quantity.value = quantity.defaultValue;
         }
 
-        // load circuit quantities
+        // @TODO: load circuit quantities
     }
 }
 

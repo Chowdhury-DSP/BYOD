@@ -2,6 +2,34 @@
 
 namespace netlist
 {
+CircuitQuantity::CircuitQuantity (CircuitQuantity&& other) noexcept
+    : value (other.value.load()),
+      needsUpdate (other.needsUpdate.load()),
+      defaultValue (other.defaultValue),
+      minValue (other.minValue),
+      maxValue (other.maxValue),
+      type (other.type),
+      name (other.name),
+      setter (std::move (other.setter))
+{
+}
+
+CircuitQuantity::CircuitQuantity (float defaultVal,
+                                  float minVal,
+                                  float maxVal,
+                                  Type qType,
+                                  const std::string& name,
+                                  Setter&& setterFunc)
+    : value (defaultVal),
+      defaultValue (defaultVal),
+      minValue (minVal),
+      maxValue (maxVal),
+      type (qType),
+      name (name),
+      setter (std::move (setterFunc))
+{
+}
+
 namespace MetricUnit = chowdsp::Units::Metric;
 template <typename Metric = MetricUnit::Unit>
 juce::String getStringForValue (float value)
@@ -72,7 +100,8 @@ float fromString (const juce::String& str, const CircuitQuantity& q)
     }
 
     const auto baseNumber = justTheNumbers.getFloatValue();
-    const auto multiplier = [] (const juce::String& sfx) -> float {
+    const auto multiplier = [] (const juce::String& sfx) -> float
+    {
         if (sfx.containsAnyOf ("kK"))
             return 1.0e3f;
         if (sfx.containsAnyOf ("M"))
@@ -93,27 +122,21 @@ float fromString (const juce::String& str, const CircuitQuantity& q)
 
 void CircuitQuantityList::addResistor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal, float maxVal)
 {
-    quantities.emplace_back (CircuitQuantity {
-        .value = defaultValue,
-        .defaultValue = defaultValue,
-        .minValue = minVal,
-        .maxValue = maxVal,
-        .type = netlist::CircuitQuantity::Resistance,
-        .name = name,
-        .setter = std::move (setter),
-    });
+    quantities.emplace_back (defaultValue,
+                             minVal,
+                             maxVal,
+                             netlist::CircuitQuantity::Resistance,
+                             name,
+                             std::move (setter));
 }
 
 void CircuitQuantityList::addCapacitor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal, float maxVal)
 {
-    quantities.emplace_back (CircuitQuantity {
-        .value = defaultValue,
-        .defaultValue = defaultValue,
-        .minValue = minVal,
-        .maxValue = maxVal,
-        .type = netlist::CircuitQuantity::Capacitance,
-        .name = name,
-        .setter = std::move (setter),
-    });
+    quantities.emplace_back (defaultValue,
+                             minVal,
+                             maxVal,
+                             netlist::CircuitQuantity::Capacitance,
+                             name,
+                             std::move (setter));
 }
 } // namespace netlist

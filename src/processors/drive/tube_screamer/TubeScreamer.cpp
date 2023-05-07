@@ -16,13 +16,43 @@ TubeScreamer::TubeScreamer (UndoManager* um)
     uiOptions.info.description = "Virtual analog emulation of the clipping stage from the Tube Screamer overdrive pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
+    // @TODO: set more meaningful component value limits.
     netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
-    netlistCircuitQuantities->addResistor (1.0e3f, "R5", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
-                                           { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
-    netlistCircuitQuantities->addResistor (1.0e5f, "R10", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
-                                           { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
-    netlistCircuitQuantities->addCapacitor (1.0e-6f, "C4", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
-                                            { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
+    netlistCircuitQuantities->addResistor (4.7e3f,
+                                           "R4",
+                                           [] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                           {
+                                               auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF);
+                                               wdfCast.R4.setResistanceValue (self.value.load());
+                                           });
+    netlistCircuitQuantities->addResistor (10.0e3f,
+                                           "R5",
+                                           [] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                           {
+                                               auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF);
+                                               wdfCast.R5.setResistanceValue (self.value.load());
+                                           });
+    netlistCircuitQuantities->addCapacitor (1.0e-6f,
+                                            "C2",
+                                            [] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                            {
+                                                auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF);
+                                                wdfCast.C2.setCapacitanceValue (self.value.load());
+                                            });
+    netlistCircuitQuantities->addCapacitor (0.047e-6f,
+                                            "C3",
+                                            [] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                            {
+                                                auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF);
+                                                wdfCast.C3.setCapacitanceValue (self.value.load());
+                                            });
+    netlistCircuitQuantities->addCapacitor (51.0e-12f,
+                                            "C4",
+                                            [] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                            {
+                                                auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF);
+                                                wdfCast.C4.setCapacitanceValue (self.value.load());
+                                            });
 }
 
 ParamLayout TubeScreamer::createParameterLayout()
@@ -60,6 +90,15 @@ void TubeScreamer::prepare (double sampleRate, int samplesPerBlock)
 
 void TubeScreamer::processAudio (AudioBuffer<float>& buffer)
 {
+    for (auto& quantity : *netlistCircuitQuantities)
+    {
+        if (chowdsp::AtomicHelpers::compareNegate (quantity.needsUpdate))
+        {
+            for (auto& wdfModel : wdf)
+                quantity.setter (quantity, &wdfModel);
+        }
+    }
+
     buffer.applyGain (Decibels::decibelsToGain (-6.0f));
 
     int diodeType = static_cast<int> (*diodeTypeParam);
