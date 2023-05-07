@@ -13,11 +13,11 @@ struct CircuitQuantity
     };
 
     float value;
-    float defaultValue;
-    float minValue;
-    float maxValue;
-    Type type;
-    std::string name;
+    const float defaultValue;
+    const float minValue;
+    const float maxValue;
+    const Type type;
+    const std::string name;
 
     using Setter = juce::dsp::FixedSizeFunction<128, void (const CircuitQuantity&, void*)>;
     Setter setter;

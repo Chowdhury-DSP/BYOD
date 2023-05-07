@@ -1,7 +1,7 @@
 #include "TubeScreamer.h"
 #include "../diode_circuits/DiodeParameter.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
-#include "processors/netlist_helpers/NetlistViewer.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 TubeScreamer::TubeScreamer (UndoManager* um)
     : BaseProcessor ("Tube Screamer", createParameterLayout(), um)
@@ -73,10 +73,4 @@ void TubeScreamer::processAudio (AudioBuffer<float>& buffer)
     dcBlocker.processAudio (buffer);
 
     buffer.applyGain (Decibels::decibelsToGain (-6.0f));
-}
-
-void TubeScreamer::addToPopupMenu (PopupMenu& menu)
-{
-    menu.addItem (netlist::createNetlistViewerPopupMenuItem (*this));
-    menu.addSeparator();
 }

@@ -1,6 +1,6 @@
 #include "BaseProcessor.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
-#include "processors/netlist_helpers/CircuitQuantity.h"
+#include "processors/netlist_helpers/NetlistViewer.h"
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
@@ -113,6 +113,16 @@ std::unique_ptr<XmlElement> BaseProcessor::toXML()
     xml->setAttribute ("x_pos", (double) editorPosition.x);
     xml->setAttribute ("y_pos", (double) editorPosition.y);
 
+    if (netlistCircuitQuantities != nullptr)
+    {
+        auto circuitXML = std::make_unique<XmlElement> ("circuit_elements");
+
+        for (const auto& quantity : *netlistCircuitQuantities)
+            circuitXML->setAttribute (juce::String { quantity.name }, (double) quantity.value);
+
+        xml->addChildElement (circuitXML.release());
+    }
+
     return std::move (xml);
 }
 
@@ -128,6 +138,28 @@ void BaseProcessor::fromXML (XmlElement* xml, const chowdsp::Version&, bool load
 
     if (loadPosition)
         loadPositionInfoFromXML (xml);
+
+    if (netlistCircuitQuantities != nullptr)
+    {
+        if (auto* circuitXML = xml->getChildByName ("circuit_elements"))
+        {
+            for (auto& quantity : *netlistCircuitQuantities)
+            {
+                const auto name = juce::String { quantity.name };
+                if (circuitXML->hasAttribute (name))
+                    quantity.value = (float) circuitXML->getDoubleAttribute (name, (double) quantity.defaultValue);
+                else
+                    quantity.value = quantity.defaultValue;
+            }
+        }
+        else
+        {
+            for (auto& quantity : *netlistCircuitQuantities)
+                quantity.value = quantity.defaultValue;
+        }
+
+        // load circuit quantities
+    }
 }
 
 void BaseProcessor::loadPositionInfoFromXML (XmlElement* xml)
@@ -260,6 +292,12 @@ void BaseProcessor::addToPopupMenu (PopupMenu& menu)
 
         menu.addSeparator();
     }
+
+    if (netlistCircuitQuantities != nullptr)
+    {
+        menu.addItem (netlist::createNetlistViewerPopupMenuItem (*this));
+        menu.addSeparator();
+    }
 }
 
 void BaseProcessor::setEditor (ProcessorEditor* procEditor)
@@ -308,7 +346,7 @@ bool BaseProcessor::isOutputModulationPortConnected()
     if (getProcessorType() != Modulation)
         return false;
 
-    for (auto connections : outputConnections)
+    for (const auto& connections : outputConnections)
     {
         for (auto info : connections)
         {

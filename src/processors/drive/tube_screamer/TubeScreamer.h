@@ -15,8 +15,6 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
-    void addToPopupMenu (PopupMenu& menu) override;
-
 private:
     chowdsp::FloatParameter* gainParam = nullptr;
     std::atomic<float>* diodeTypeParam = nullptr;
