@@ -142,6 +142,9 @@ target_sources(BYOD PRIVATE
     processors/utility/StereoMerger.cpp
     processors/utility/StereoSplitter.cpp
     processors/utility/Tuner.cpp
+
+    processors/netlist_helpers/CircuitQuantity.cpp
+    processors/netlist_helpers/NetlistViewer.cpp
 )
 
 target_precompile_headers(BYOD PRIVATE pch.h)

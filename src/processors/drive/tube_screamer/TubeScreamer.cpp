@@ -1,8 +1,10 @@
 #include "TubeScreamer.h"
 #include "../diode_circuits/DiodeParameter.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
+#include "processors/netlist_helpers/NetlistViewer.h"
 
-TubeScreamer::TubeScreamer (UndoManager* um) : BaseProcessor ("Tube Screamer", createParameterLayout(), um)
+TubeScreamer::TubeScreamer (UndoManager* um)
+    : BaseProcessor ("Tube Screamer", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (gainParam, vts, "gain");
@@ -13,6 +15,13 @@ TubeScreamer::TubeScreamer (UndoManager* um) : BaseProcessor ("Tube Screamer", c
     uiOptions.powerColour = Colours::cyan.brighter (0.2f);
     uiOptions.info.description = "Virtual analog emulation of the clipping stage from the Tube Screamer overdrive pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    circuitQuantities.addResistor (1.0e3f, "R5", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                   { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
+    circuitQuantities.addResistor (1.0e5f, "R10", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                   { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
+    circuitQuantities.addCapacitor (1.0e-6f, "C4", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                    { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
 }
 
 ParamLayout TubeScreamer::createParameterLayout()
@@ -67,68 +76,6 @@ void TubeScreamer::processAudio (AudioBuffer<float>& buffer)
 
 void TubeScreamer::addToPopupMenu (PopupMenu& menu)
 {
-    static constexpr int rowHeight = 25;
-    struct NetlistWindow : Component
-    {
-        NetlistWindow()
-        {
-            componentLabel.setText ("R5", juce::dontSendNotification);
-            componentLabel.setJustificationType (Justification::centred);
-            componentLabel.setColour (Label::textColourId, Colours::black);
-            addAndMakeVisible (componentLabel);
-
-            valueLabel.setText ("4.5 kOhms", juce::dontSendNotification);
-            valueLabel.setJustificationType (Justification::centred);
-            valueLabel.setColour (Label::textColourId, Colours::black);
-            valueLabel.setColour (Label::textWhenEditingColourId, Colours::black);
-            valueLabel.setColour (TextEditor::highlightColourId, Colours::black.withAlpha (0.2f));
-            valueLabel.setColour (TextEditor::highlightedTextColourId, Colours::black);
-            valueLabel.setColour (CaretComponent::caretColourId, Colours::black);
-            valueLabel.setEditable (true);
-            valueLabel.onEditorShow = [this] {
-                if (auto* ed = valueLabel.getCurrentTextEditor())
-                    ed->setJustification (Justification::centred);
-            };
-            valueLabel.onTextChange = [] {};
-            addAndMakeVisible (valueLabel);
-
-            setSize (300, 2 * rowHeight);
-        }
-
-        void paint (Graphics& g) override
-        {
-            g.fillAll (Colours::white);
-
-            g.setColour (Colours::black);
-            g.drawLine (juce::Line<float> { 0.5f * (float) getWidth(),
-                                            0.0f,
-                                            0.5f * (float) getWidth(),
-                                            (float) getHeight() },
-                        2.0f);
-
-            g.drawLine (juce::Line<float> { 0.0f,
-                                            0.5f * (float) getHeight(),
-                                            (float) getWidth(),
-                                            0.5f * (float) getHeight() },
-                        2.0f);
-
-            g.setFont (Font { 20.0f }.boldened());
-            const auto halfWidth = proportionOfWidth (0.5f);
-            g.drawFittedText ("Component", { 0, 0, halfWidth, rowHeight }, Justification::centred, 1);
-            g.drawFittedText ("Value", { halfWidth, 0, halfWidth, rowHeight }, Justification::centred, 1);
-        }
-
-        void resized() override
-        {
-            const auto halfWidth = proportionOfWidth (0.5f);
-            componentLabel.setBounds (0, rowHeight, halfWidth, rowHeight);
-            valueLabel.setBounds (halfWidth, rowHeight, halfWidth, rowHeight);
-        }
-
-        Label componentLabel;
-        Label valueLabel;
-    };
-
     PopupMenu::Item item;
     item.itemID = 99091;
     item.text = "Show netlist";
@@ -155,8 +102,10 @@ void TubeScreamer::addToPopupMenu (PopupMenu& menu)
         if (topLevelEditor == nullptr)
             return;
 
-        netlistWindow = std::make_unique<chowdsp::WindowInPlugin<NetlistWindow>> (*topLevelEditor);
-        auto* netlistWindowCast = static_cast<chowdsp::WindowInPlugin<NetlistWindow>*> (netlistWindow.get()); // NOLINT
+        using NetlistWindow = chowdsp::WindowInPlugin<netlist::NetlistViewer>;
+        netlistWindow = std::make_unique<NetlistWindow> (*topLevelEditor, circuitQuantities);
+        auto* netlistWindowCast = static_cast<NetlistWindow*> (netlistWindow.get()); // NOLINT
+//        netlistWindowCast->setTitle()
         netlistWindowCast->setResizable (false, false);
         netlistWindowCast->show();
     };

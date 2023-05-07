@@ -3,6 +3,7 @@
 #include "../../utility/DCBlocker.h"
 #include "TubeScreamerWDF.h"
 #include "processors/BaseProcessor.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 class TubeScreamer : public BaseProcessor
 {
@@ -26,6 +27,8 @@ private:
     DCBlocker dcBlocker;
 
     std::unique_ptr<Component> netlistWindow;
+
+    netlist::CircuitQuantityList circuitQuantities;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TubeScreamer)
 };
