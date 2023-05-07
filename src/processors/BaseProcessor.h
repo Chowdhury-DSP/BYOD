@@ -28,6 +28,10 @@ struct ProcessorUIOptions
 
 class BaseProcessor;
 class ProcessorEditor;
+namespace netlist
+{
+struct CircuitQuantityList;
+}
 struct ConnectionInfo
 {
     BaseProcessor* startProc;
@@ -46,6 +50,7 @@ public:
                    UndoManager* um = nullptr,
                    int nInputs = 1,
                    int nOutputs = 1);
+    ~BaseProcessor();
 
     // metadata
     virtual ProcessorType getProcessorType() const = 0;
@@ -87,8 +92,23 @@ public:
     /** add options to the processor's popup menu */
     virtual void addToPopupMenu (PopupMenu& menu);
 
-    /** Called by the editor ONLY! */
+    /**
+     * Sets the editor that is controlling this processor.
+     * Called by the editor ONLY!
+     */
     void setEditor (ProcessorEditor* procEditor);
+
+    /** Returns the editor as a Component::SafePointer */
+    const auto& getEditor() const { return editor; }
+
+    /**
+     * Sets the netlist window to use for the processor.
+     * INTERNAL USE ONLY
+     */
+    void setNetlistWindow (std::unique_ptr<Component>&& window) { netlistWindow = std::move (window); }
+
+    /** Returns the netlist circuit quantities, or nullptr if the processor has no circuit quantities. */
+    auto* getNetlistCircuitQuantities() { return netlistCircuitQuantities.get(); }
 
     AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
@@ -155,6 +175,9 @@ protected:
 
     chowdsp::SharedLNFAllocator lnfAllocator;
     Component::SafePointer<ProcessorEditor> editor {};
+
+    std::unique_ptr<Component> netlistWindow {};
+    std::unique_ptr<netlist::CircuitQuantityList> netlistCircuitQuantities {};
 
     /**
      * If your processor uses convolution, you can use this shared

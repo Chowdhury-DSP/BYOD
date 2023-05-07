@@ -2,8 +2,11 @@
 
 #include "CircuitQuantity.h"
 
+class BaseProcessor;
 namespace netlist
 {
+juce::PopupMenu::Item createNetlistViewerPopupMenuItem (BaseProcessor& processor);
+
 struct NetlistViewer : Component
 {
     explicit NetlistViewer (CircuitQuantityList& quantities);

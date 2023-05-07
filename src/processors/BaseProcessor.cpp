@@ -1,5 +1,6 @@
 #include "BaseProcessor.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
@@ -20,6 +21,8 @@ BaseProcessor::BaseProcessor (const String& name,
     inputsConnected.resize (0);
     portMagnitudes.resize (numInputs);
 }
+
+BaseProcessor::~BaseProcessor() = default;
 
 void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
 {

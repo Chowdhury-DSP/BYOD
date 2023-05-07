@@ -1,4 +1,6 @@
 #include "NetlistViewer.h"
+#include "processors/BaseProcessor.h"
+#include "gui/pedalboard/editors/ProcessorEditor.h"
 
 namespace netlist
 {
@@ -71,5 +73,43 @@ void NetlistViewer::resized()
         componentLabel.setBounds (0, yCoord, halfWidth, rowHeight);
         valueLabel.setBounds (halfWidth, yCoord, halfWidth, rowHeight);
     }
+}
+
+juce::PopupMenu::Item createNetlistViewerPopupMenuItem (BaseProcessor& processor)
+{
+    PopupMenu::Item item;
+    item.itemID = 99091;
+    item.text = "Show netlist";
+    item.action = [&processor]
+    {
+        juce::Logger::writeToLog ("Showing netlist for module: " + processor.getName());
+
+        if (processor.getEditor() == nullptr)
+            return;
+
+        auto* topLevelEditor = [&processor]() -> AudioProcessorEditor*
+        {
+            Component* tlEditor = processor.getEditor()->getParentComponent();
+            while (tlEditor != nullptr)
+            {
+                if (auto* editorCast = dynamic_cast<AudioProcessorEditor*> (tlEditor))
+                    return editorCast;
+
+                tlEditor = tlEditor->getParentComponent();
+            }
+            return nullptr;
+        }();
+
+        if (topLevelEditor == nullptr)
+            return;
+
+        using NetlistWindow = chowdsp::WindowInPlugin<netlist::NetlistViewer>;
+        auto netlistWindow = std::make_unique<NetlistWindow> (*topLevelEditor, *processor.getNetlistCircuitQuantities());
+        auto* netlistWindowCast = static_cast<NetlistWindow*> (netlistWindow.get()); // NOLINT
+        netlistWindowCast->setResizable (false, false);
+        netlistWindowCast->show();
+        processor.setNetlistWindow (std::move (netlistWindow));
+    };
+    return item;
 }
 }

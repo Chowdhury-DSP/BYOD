@@ -16,12 +16,13 @@ TubeScreamer::TubeScreamer (UndoManager* um)
     uiOptions.info.description = "Virtual analog emulation of the clipping stage from the Tube Screamer overdrive pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    circuitQuantities.addResistor (1.0e3f, "R5", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
-                                   { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
-    circuitQuantities.addResistor (1.0e5f, "R10", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
-                                   { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
-    circuitQuantities.addCapacitor (1.0e-6f, "C4", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
-                                    { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
+    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
+    netlistCircuitQuantities->addResistor (1.0e3f, "R5", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                           { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
+    netlistCircuitQuantities->addResistor (1.0e5f, "R10", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                           { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
+    netlistCircuitQuantities->addCapacitor (1.0e-6f, "C4", [this] (const netlist::CircuitQuantity& self, void* voidWDF)
+                                            { auto& wdfCast = *static_cast<TubeScreamerWDF*> (voidWDF); });
 }
 
 ParamLayout TubeScreamer::createParameterLayout()
@@ -76,42 +77,6 @@ void TubeScreamer::processAudio (AudioBuffer<float>& buffer)
 
 void TubeScreamer::addToPopupMenu (PopupMenu& menu)
 {
-    PopupMenu::Item item;
-    item.itemID = 99091;
-    item.text = "Show netlist";
-    item.action = [this]
-    {
-        juce::Logger::writeToLog ("Showing netlist for module: " + BaseProcessor::getName());
-
-        if (editor == nullptr)
-            return;
-
-        auto* topLevelEditor = [this]() -> AudioProcessorEditor*
-        {
-            Component* tlEditor = editor->getParentComponent();
-            while (tlEditor != nullptr)
-            {
-                if (auto* editorCast = dynamic_cast<AudioProcessorEditor*> (tlEditor))
-                    return editorCast;
-
-                tlEditor = tlEditor->getParentComponent();
-            }
-            return nullptr;
-        }();
-
-        if (topLevelEditor == nullptr)
-            return;
-
-        using NetlistWindow = chowdsp::WindowInPlugin<netlist::NetlistViewer>;
-        netlistWindow = std::make_unique<NetlistWindow> (*topLevelEditor, circuitQuantities);
-        auto* netlistWindowCast = static_cast<NetlistWindow*> (netlistWindow.get()); // NOLINT
-//        netlistWindowCast->setTitle()
-        netlistWindowCast->setResizable (false, false);
-        netlistWindowCast->show();
-    };
-
-    menu.addItem (std::move (item));
+    menu.addItem (netlist::createNetlistViewerPopupMenuItem (*this));
     menu.addSeparator();
 }
-
-// TODO: integrate units: https://github.com/LLNL/units
