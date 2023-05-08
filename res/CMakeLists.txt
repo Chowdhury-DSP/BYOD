@@ -43,8 +43,11 @@ set(binary_data_files
 
 file(GLOB PRESET_FILES presets/*.chowpreset)
 list(APPEND binary_data_files ${PRESET_FILES})
+
+file(GLOB SCHEMATIC_FILES schematics/*.svg)
+list(APPEND binary_data_files ${SCHEMATIC_FILES})
+
 juce_add_binary_data(BinaryData SOURCES ${binary_data_files})
 
 # Need to build BinaryData with -fPIC flag on Linux
-set_target_properties(BinaryData PROPERTIES
-    POSITION_INDEPENDENT_CODE TRUE)
+set_target_properties(BinaryData PROPERTIES POSITION_INDEPENDENT_CODE TRUE)

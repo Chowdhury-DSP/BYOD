@@ -28,8 +28,6 @@ void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
 {
     prepare (sampleRate, numSamples);
 
-    // @TODO: load circuit components
-
     for (auto& b : inputBuffers)
     {
         b.setSize (2, numSamples);
@@ -84,6 +82,15 @@ void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
         }
     }
 
+    if (netlistCircuitQuantities != nullptr)
+    {
+        for (auto& quantity : *netlistCircuitQuantities)
+        {
+            if (chowdsp::AtomicHelpers::compareNegate (quantity.needsUpdate))
+                quantity.setter (quantity);
+        }
+    }
+
     if (isBypassed())
         processAudioBypassed (buffer);
     else
@@ -124,6 +131,7 @@ std::unique_ptr<XmlElement> BaseProcessor::toXML()
 
         xml->addChildElement (circuitXML.release());
     }
+    std::cout << xml->toString() << std::endl;
 
     return std::move (xml);
 }
@@ -141,6 +149,7 @@ void BaseProcessor::fromXML (XmlElement* xml, const chowdsp::Version&, bool load
     if (loadPosition)
         loadPositionInfoFromXML (xml);
 
+    std::cout << xml->toString() << std::endl;
     if (netlistCircuitQuantities != nullptr)
     {
         if (auto* circuitXML = xml->getChildByName ("circuit_elements"))
@@ -160,7 +169,11 @@ void BaseProcessor::fromXML (XmlElement* xml, const chowdsp::Version&, bool load
                 quantity.value = quantity.defaultValue;
         }
 
-        // @TODO: load circuit quantities
+        for (auto& quantity : *netlistCircuitQuantities)
+        {
+            quantity.setter (quantity);
+            quantity.needsUpdate = false;
+        }
     }
 }
 

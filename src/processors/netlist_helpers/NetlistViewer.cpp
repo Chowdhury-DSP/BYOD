@@ -1,10 +1,12 @@
 #include "NetlistViewer.h"
-#include "processors/BaseProcessor.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
+#include "processors/BaseProcessor.h"
 
 namespace netlist
 {
 constexpr int rowHeight = 27;
+constexpr int schematicPad = 10;
+
 NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
 {
     juce::Component::setName ("Circuit Netlist");
@@ -40,37 +42,51 @@ NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
         addAndMakeVisible (valueLabel);
     }
 
-    setSize (300, ((int) quantities.size() + 1) * rowHeight);
+    schematicSVG = juce::Drawable::createFromImageData (quantities.schematicSVG.data, quantities.schematicSVG.size);
+    addAndMakeVisible (schematicSVG.get());
+
+    setSize (300 + schematicSVG->getWidth() + 2 * schematicPad,
+             juce::jmax (((int) quantities.size() + 1) * rowHeight,
+                         schematicSVG->getHeight() + 2 * schematicPad));
 }
 
 void NetlistViewer::paint (Graphics& g)
 {
     g.fillAll (Colours::white);
 
-    g.setColour (Colours::black);
-    const auto xCoord = 0.5f * (float) getWidth();
-    g.drawLine (juce::Line<float> { xCoord, 0.0f, xCoord, (float) getHeight() }, 2.0f);
+    auto bounds = getLocalBounds();
+    bounds.removeFromRight (schematicSVG->getWidth() + 2 * schematicPad);
 
-    for (int i = 1; i <= labelPairs.size(); ++i)
+    g.setColour (Colours::black);
+    const auto xCoord = 0.5f * (float) bounds.getWidth();
+    g.drawLine (juce::Line<float> { xCoord, 0.0f, xCoord, (float) getHeight() }, 2.0f);
+    g.drawLine (juce::Line<float> { (float) bounds.getWidth(), 0.0f, (float) bounds.getWidth(), (float) getHeight() }, 2.0f);
+
+    for (int i = 0; i <= labelPairs.size(); ++i)
     {
-        const auto yCoord = (float) getHeight() * (float) i / float (labelPairs.size() + 1);
-        g.drawLine (juce::Line<float> { 0.0f, yCoord, (float) getWidth(), yCoord }, 2.0f);
+        const auto yCoord = float (rowHeight * (i + 1));
+        g.drawLine (juce::Line<float> { 0.0f, yCoord, (float) bounds.getWidth(), yCoord }, 2.0f);
     }
 
     g.setFont (Font { 20.0f }.boldened());
-    const auto halfWidth = proportionOfWidth (0.5f);
+    const auto halfWidth = bounds.proportionOfWidth (0.5f);
     g.drawFittedText ("Component", { 0, 0, halfWidth, rowHeight }, Justification::centred, 1);
     g.drawFittedText ("Value", { halfWidth, 0, halfWidth, rowHeight }, Justification::centred, 1);
 }
 
 void NetlistViewer::resized()
 {
-    const auto halfWidth = proportionOfWidth (0.5f);
+    auto bounds = getLocalBounds();
+    const auto svgBounds = bounds.removeFromRight (schematicSVG->getWidth() + 2 * schematicPad)
+                               .removeFromTop (schematicSVG->getHeight() + 2 * schematicPad);
+    schematicSVG->setBounds (svgBounds.reduced (schematicPad));
+
+    const auto halfWidth = bounds.proportionOfWidth (0.5f);
 
     for (auto [i, labelPair] : chowdsp::enumerate (labelPairs))
     {
         auto& [componentLabel, valueLabel] = *labelPair;
-        const auto yCoord = roundToInt ((float) getHeight() * (float) (i + 1) / float (labelPairs.size() + 1));
+        const auto yCoord = rowHeight * int (i + 1);
         componentLabel.setBounds (0, yCoord, halfWidth, rowHeight);
         valueLabel.setBounds (halfWidth, yCoord, halfWidth, rowHeight);
     }
@@ -113,4 +129,4 @@ juce::PopupMenu::Item createNetlistViewerPopupMenuItem (BaseProcessor& processor
     };
     return item;
 }
-}
+} // namespace netlist

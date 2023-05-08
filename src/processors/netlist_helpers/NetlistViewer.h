@@ -15,5 +15,6 @@ struct NetlistViewer : Component
     void resized() override;
 
     OwnedArray<std::pair<Label, Label>> labelPairs;
+    std::unique_ptr<juce::Drawable> schematicSVG;
 };
 }

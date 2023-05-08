@@ -2,6 +2,7 @@
 
 #include <pch.h>
 
+class BaseProcessor;
 namespace netlist
 {
 struct CircuitQuantity
@@ -12,7 +13,7 @@ struct CircuitQuantity
         Capacitance,
     };
 
-    using Setter = juce::dsp::FixedSizeFunction<128, void (const CircuitQuantity&, void*)>;
+    using Setter = juce::dsp::FixedSizeFunction<32, void (const CircuitQuantity&)>;
 
     CircuitQuantity (CircuitQuantity&& other) noexcept;
     CircuitQuantity (float defaultVal, float minVal, float maxVal, Type qType, const std::string& name, Setter&& setterFunc);
@@ -44,5 +45,10 @@ struct CircuitQuantityList
     void addCapacitor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal = 0.1e-12f, float maxVal = 10.0f);
 
     std::vector<CircuitQuantity> quantities;
+    struct SchematicSVGData
+    {
+        const char* data = nullptr;
+        int size = 0;
+    } schematicSVG;
 };
 } // namespace netlist
