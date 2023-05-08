@@ -131,7 +131,6 @@ std::unique_ptr<XmlElement> BaseProcessor::toXML()
 
         xml->addChildElement (circuitXML.release());
     }
-    std::cout << xml->toString() << std::endl;
 
     return std::move (xml);
 }
@@ -149,7 +148,6 @@ void BaseProcessor::fromXML (XmlElement* xml, const chowdsp::Version&, bool load
     if (loadPosition)
         loadPositionInfoFromXML (xml);
 
-    std::cout << xml->toString() << std::endl;
     if (netlistCircuitQuantities != nullptr)
     {
         if (auto* circuitXML = xml->getChildByName ("circuit_elements"))

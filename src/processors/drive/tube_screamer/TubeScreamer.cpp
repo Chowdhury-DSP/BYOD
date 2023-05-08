@@ -1,6 +1,5 @@
 #include "TubeScreamer.h"
 #include "../diode_circuits/DiodeParameter.h"
-#include "gui/pedalboard/editors/ProcessorEditor.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
 TubeScreamer::TubeScreamer (UndoManager* um)
