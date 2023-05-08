@@ -17,4 +17,4 @@ struct NetlistViewer : Component
     OwnedArray<std::pair<Label, Label>> labelPairs;
     std::unique_ptr<juce::Drawable> schematicSVG;
 };
-}
+} // namespace netlist
