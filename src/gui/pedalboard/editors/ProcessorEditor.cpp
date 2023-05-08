@@ -1,6 +1,7 @@
 #include "ProcessorEditor.h"
 #include "../BoardComponent.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 namespace
 {
@@ -81,6 +82,8 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
             knobs.setColours (contrastColour, procUI.powerColour);
             powerButton.setupPowerButton (procUI.powerColour);
         });
+
+    baseProc.setEditor (this);
 }
 
 ProcessorEditor::~ProcessorEditor() = default;
@@ -132,6 +135,15 @@ void ProcessorEditor::resetProcParameters()
                 continue;
 
             rangedParam->setValueNotifyingHost (rangedParam->getDefaultValue());
+        }
+    }
+
+    if (auto* netlistQuantities = proc.getNetlistCircuitQuantities())
+    {
+        for (auto& element : *netlistQuantities)
+        {
+            element.value = element.defaultValue;
+            element.needsUpdate = true;
         }
     }
 }

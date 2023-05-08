@@ -65,7 +65,6 @@ public:
             buffer[n] = processSample (buffer[n]);
     }
 
-private:
     // Port B
     wdft::ResistiveVoltageSourceT<float> Vin;
     wdft::CapacitorT<float> C2 { 1.0e-6f };
@@ -122,5 +121,6 @@ private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> gainSmooth;
     float curDiodeIs = 1.0e-9f;
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TubeScreamerWDF)
 };

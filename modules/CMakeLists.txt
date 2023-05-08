@@ -37,6 +37,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_reverb
         chowdsp::chowdsp_presets
         chowdsp::chowdsp_serialization
+        chowdsp::chowdsp_units
         chowdsp::chowdsp_wdf
         RTNeural
         rapidfuzz::rapidfuzz
