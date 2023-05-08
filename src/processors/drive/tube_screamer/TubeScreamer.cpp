@@ -1,7 +1,9 @@
 #include "TubeScreamer.h"
 #include "../diode_circuits/DiodeParameter.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
-TubeScreamer::TubeScreamer (UndoManager* um) : BaseProcessor ("Tube Screamer", createParameterLayout(), um)
+TubeScreamer::TubeScreamer (UndoManager* um)
+    : BaseProcessor ("Tube Screamer", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (gainParam, vts, "gain");
@@ -12,6 +14,52 @@ TubeScreamer::TubeScreamer (UndoManager* um) : BaseProcessor ("Tube Screamer", c
     uiOptions.powerColour = Colours::cyan.brighter (0.2f);
     uiOptions.info.description = "Virtual analog emulation of the clipping stage from the Tube Screamer overdrive pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
+    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::tube_screamer_schematic_svg,
+                                               .size = BinaryData::tube_screamer_schematic_svgSize };
+    netlistCircuitQuantities->addResistor (
+        4.7e3f,
+        "R4",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.R4.setResistanceValue (self.value.load());
+        },
+        100.0f,
+        25.0e3f);
+    netlistCircuitQuantities->addResistor (10.0e3f,
+                                           "R5",
+                                           [this] (const netlist::CircuitQuantity& self)
+                                           {
+                                               for (auto& wdfModel : wdf)
+                                                   wdfModel.R5.setResistanceValue (self.value.load());
+                                           });
+    netlistCircuitQuantities->addCapacitor (
+        1.0e-6f,
+        "C2",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.C2.setCapacitanceValue (self.value.load());
+        },
+        100.0e-12f);
+    netlistCircuitQuantities->addCapacitor (
+        0.047e-6f,
+        "C3",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.C3.setCapacitanceValue (self.value.load());
+        },
+        1.0e-9f);
+    netlistCircuitQuantities->addCapacitor (51.0e-12f,
+                                            "C4",
+                                            [this] (const netlist::CircuitQuantity& self)
+                                            {
+                                                for (auto& wdfModel : wdf)
+                                                    wdfModel.C4.setCapacitanceValue (self.value.load());
+                                            });
 }
 
 ParamLayout TubeScreamer::createParameterLayout()
