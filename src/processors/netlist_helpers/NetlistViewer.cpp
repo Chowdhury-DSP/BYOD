@@ -13,11 +13,17 @@ NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
 
     for (auto [idx, element] : chowdsp::enumerate (quantities))
     {
-        auto& [componentLabel, valueLabel] = *labelPairs.add (std::make_unique<std::pair<Label, Label>>());
+        auto& [componentLabel, valueLabel] = *labelPairs.add (std::make_unique<std::pair<ComponentLabel, Label>>());
 
         componentLabel.setText (element.name, juce::dontSendNotification);
         componentLabel.setJustificationType (Justification::centred);
         componentLabel.setColour (Label::textColourId, Colours::black);
+        componentLabel.onDoubleClick = [&vl = valueLabel, &el = element]
+        {
+            el.value = el.defaultValue;
+            el.needsUpdate = true;
+            vl.setText (toString (el), juce::dontSendNotification);
+        };
         addAndMakeVisible (componentLabel);
 
         valueLabel.setText (toString (element), juce::dontSendNotification);

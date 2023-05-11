@@ -16,15 +16,15 @@ TubeScreamer::TubeScreamer (UndoManager* um)
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
     netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
-    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::tube_screamer_schematic_svg,
-                                               .size = BinaryData::tube_screamer_schematic_svgSize };
+    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::tube_screamer_drive_schematic_svg,
+                                               .size = BinaryData::tube_screamer_drive_schematic_svgSize };
     netlistCircuitQuantities->addResistor (
         4.7e3f,
         "R4",
         [this] (const netlist::CircuitQuantity& self)
         {
             for (auto& wdfModel : wdf)
-                wdfModel.R4.setResistanceValue (self.value.load());
+                wdfModel.R4_ser_C3.setResistanceValue (self.value.load());
         },
         100.0f,
         25.0e3f);
@@ -50,7 +50,7 @@ TubeScreamer::TubeScreamer (UndoManager* um)
         [this] (const netlist::CircuitQuantity& self)
         {
             for (auto& wdfModel : wdf)
-                wdfModel.C3.setCapacitanceValue (self.value.load());
+                wdfModel.R4_ser_C3.setCapacitanceValue (self.value.load());
         },
         1.0e-9f);
     netlistCircuitQuantities->addCapacitor (51.0e-12f,
@@ -58,7 +58,7 @@ TubeScreamer::TubeScreamer (UndoManager* um)
                                             [this] (const netlist::CircuitQuantity& self)
                                             {
                                                 for (auto& wdfModel : wdf)
-                                                    wdfModel.C4.setCapacitanceValue (self.value.load());
+                                                    wdfModel.R6_P1_par_C4.setCapacitanceValue (self.value.load());
                                             });
 }
 
