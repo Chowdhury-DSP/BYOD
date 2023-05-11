@@ -41,7 +41,8 @@ ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain,
 void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml,
                                                const chowdsp::Version& stateVersion,
                                                bool loadingPreset,
-                                               Component* associatedComponent)
+                                               Component* associatedComponent,
+                                               WaitableEvent* waiter)
 {
     if (xml == nullptr)
     {
@@ -49,8 +50,18 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml,
         return;
     }
 
-    mainThreadStateLoader.call ([this, stateVersion, loadingPreset, xmlState = *xml, safeComp = Component::SafePointer { associatedComponent }]
-                                { loadProcChainInternal (&xmlState, stateVersion, loadingPreset, safeComp.getComponent()); });
+    mainThreadStateLoader.call (
+        [this,
+         stateVersion,
+         loadingPreset,
+         xmlState = *xml,
+         safeComp = Component::SafePointer { associatedComponent },
+         waiter]
+        {
+            loadProcChainInternal (&xmlState, stateVersion, loadingPreset, safeComp.getComponent());
+            if (waiter != nullptr)
+                waiter->signal();
+        });
 }
 
 std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()

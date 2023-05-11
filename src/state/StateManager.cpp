@@ -51,13 +51,23 @@ void StateManager::loadState (XmlElement* xmlState)
     if (procChainXml == nullptr) // invalid procChain XML
         return;
 
-    presetManager.loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
-    const auto presetWasDirty = presetManager.getIsDirty();
+    const auto [presetWasDirty, pluginVersion] = [&]
+    {
+        const MessageManagerLock mml;
+        presetManager.loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
+        const auto presetWasDirty = presetManager.getIsDirty();
+        
+        const auto pluginVersion = getPluginVersionFromXML (xmlState);
+        vts.replaceState (ValueTree::fromXml (*vtsXml));
+        
+        return std::make_tuple (presetWasDirty, pluginVersion);
+    }();
 
-    const auto pluginVersion = getPluginVersionFromXML (xmlState);
-    vts.replaceState (ValueTree::fromXml (*vtsXml));
-    procChain.getStateHelper().loadProcChain (procChainXml, pluginVersion);
+    WaitableEvent waiter;
+    procChain.getStateHelper().loadProcChain (procChainXml, pluginVersion, false, nullptr, &waiter);
+    waiter.wait (1000);
 
+    const MessageManagerLock mml;
     presetManager.setIsDirty (presetWasDirty);
 
     if (auto* um = vts.undoManager)

@@ -11,7 +11,8 @@ public:
     void loadProcChain (const XmlElement* xml,
                         const chowdsp::Version& stateVersion,
                         bool loadingPreset = false,
-                        Component* associatedComponent = nullptr);
+                        Component* associatedComponent = nullptr,
+                        WaitableEvent* waiter = nullptr);
 
     bool validateProcChainState (const XmlElement* xml) const;
 
