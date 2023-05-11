@@ -10,8 +10,8 @@ public:
     void prepare (double fs)
     {
         C5.prepare ((float) fs);
-        C6.prepare ((float) fs);
-        C7.prepare ((float) fs);
+        R8_C6.prepare ((float) fs);
+        R12_C7.prepare ((float) fs);
 
         Vplus_R9.setVoltage (VplusVal);
     }
@@ -33,7 +33,6 @@ public:
         return wdft::voltage<float> (P3);
     }
 
-private:
     static constexpr float P2val = 20.0e3f;
     static constexpr float VplusVal = 4.5f;
 
@@ -45,9 +44,7 @@ private:
     wdft::WDFParallelT<float, decltype (Vplus_R9), decltype (P1)> P2 { Vin_R7, P1 };
 
     // Port B
-    wdft::ResistorT<float> R8 { 220.0f };
-    wdft::CapacitorT<float> C6 { 0.22e-6f };
-    wdft::WDFSeriesT<float, decltype (R8), decltype (C6)> S1 { R8, C6 };
+    wdft::ResistorCapacitorSeriesT<float> R8_C6 { 220.0f, 0.22e-6f };
 
     // Port C
     wdft::ResistorT<float> P2_low { P2val * 0.5f };
@@ -59,11 +56,9 @@ private:
     wdft::ResistorT<float> R11 { 1.0e3f };
 
     // Port F
-    wdft::CapacitorT<float> C7 { 1.0e-6f };
-    wdft::ResistorT<float> R12 { 1.0e3f };
-    wdft::WDFSeriesT<float, decltype (C7), decltype (R12)> S2 { C7, R12 };
+    wdft::ResistorCapacitorSeriesT<float> R12_C7 { 1.0e3f, 1.0e-6f };
     wdft::ResistorT<float> P3 { 100.0e3f };
-    wdft::WDFSeriesT<float, decltype (P3), decltype (S2)> S3 { P3, S2 };
+    wdft::WDFSeriesT<float, decltype (P3), decltype (R12_C7)> S3 { P3, R12_C7 };
 
     struct ImpedanceCalc
     {
@@ -87,8 +82,9 @@ private:
         }
     };
 
-    using RType = wdft::RootRtypeAdaptor<float, ImpedanceCalc, decltype (P1), decltype (S1), decltype (P2_low), decltype (P2_high), decltype (R11), decltype (S3)>;
-    RType R { P1, S1, P2_low, P2_high, R11, S3 };
+    using RType = wdft::RootRtypeAdaptor<float, ImpedanceCalc, decltype (P1), decltype (R8_C6), decltype (P2_low), decltype (P2_high), decltype (R11), decltype (S3)>;
+    RType R { P1, R8_C6, P2_low, P2_high, R11, S3 };
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TubeScreamerToneWDF)
 };

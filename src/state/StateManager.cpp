@@ -56,10 +56,10 @@ void StateManager::loadState (XmlElement* xmlState)
         const MessageManagerLock mml;
         presetManager.loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
         const auto presetWasDirty = presetManager.getIsDirty();
-        
+
         const auto pluginVersion = getPluginVersionFromXML (xmlState);
         vts.replaceState (ValueTree::fromXml (*vtsXml));
-        
+
         return std::make_tuple (presetWasDirty, pluginVersion);
     }();
 
