@@ -26,7 +26,7 @@
 	<line x1="230" y1="70" x2="235" y2="70" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
 	<line x1="275" y1="70" x2="280" y2="70" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
 	<path d="M 235,70 L 237,70 L 240,63 L 246,77 L 252,63 L 258,77 L 264,63 L 270,77 L 273,70 L 275,70" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
-	<text x="255" y="46" style="font-family:Arial;font-size:11px;text-anchor:middle" dominant-baseline="baseline" transform="rotate(0, 255, 46)">Rdrive</text>
+	<text x="255" y="46" style="font-family:Arial;font-size:11px;text-anchor:middle" dominant-baseline="baseline" transform="rotate(0, 255, 46)">R_drive</text>
 	<path d="M 255,70 M 248,87 L 262,53 M 257,55 L 262,53 L 264,58" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
 	<line x1="320" y1="110" x2="320" y2="150" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
 	<line x1="270" y1="110" x2="320" y2="110" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />

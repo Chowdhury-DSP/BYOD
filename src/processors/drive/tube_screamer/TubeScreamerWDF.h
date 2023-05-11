@@ -10,8 +10,8 @@ public:
     void prepare (double sampleRate)
     {
         C2.prepare ((float) sampleRate);
-        C3.prepare ((float) sampleRate);
-        C4.prepare ((float) sampleRate);
+        R4_ser_C3.prepare ((float) sampleRate);
+        R6_P1_par_C4.prepare ((float) sampleRate);
 
         nDiodesSmooth.reset (sampleRate, 0.01);
         gainSmooth.reset (sampleRate, 0.01);
@@ -25,7 +25,7 @@ public:
             nDiodesSmooth.setCurrentAndTargetValue (nDiodes);
             gainSmooth.setCurrentAndTargetValue (gainParam);
 
-            R6_P1.setResistanceValue (Pot1 * gainSmooth.getTargetValue() + R6);
+            R6_P1_par_C4.setResistanceValue (Pot1 * gainSmooth.getTargetValue() + R6);
             dp.setDiodeParameters (curDiodeIs, Vt, nDiodesSmooth.getTargetValue());
         }
         else
@@ -51,7 +51,7 @@ public:
         {
             for (int n = 0; n < numSamples; ++n)
             {
-                R6_P1.setResistanceValue (Pot1 * gainSmooth.getNextValue() + R6);
+                R6_P1_par_C4.setResistanceValue (Pot1 * gainSmooth.getNextValue() + R6);
                 dp.setDiodeParameters (curDiodeIs, Vt, nDiodesSmooth.getNextValue());
 
                 buffer[n] = processSample (buffer[n]);
@@ -59,7 +59,7 @@ public:
             return;
         }
 
-        R6_P1.setResistanceValue (Pot1 * gainSmooth.getNextValue() + R6);
+        R6_P1_par_C4.setResistanceValue (Pot1 * gainSmooth.getNextValue() + R6);
         dp.setDiodeParameters (curDiodeIs, Vt, nDiodesSmooth.getNextValue());
         for (int n = 0; n < numSamples; ++n)
             buffer[n] = processSample (buffer[n]);
@@ -74,9 +74,7 @@ public:
     wdft::WDFParallelT<float, decltype (S1), decltype (R5)> P1 { S1, R5 };
 
     // Port C
-    wdft::ResistorT<float> R4 { 4.7e3f };
-    wdft::CapacitorT<float> C3 { 0.047e-6f };
-    wdft::WDFSeriesT<float, decltype (R4), decltype (C3)> S2 { R4, C3 };
+    wdft::ResistorCapacitorSeriesT<float> R4_ser_C3 { 4.7e3f, 0.047e-6f };
 
     // Port D
     wdft::ResistorT<float> RL { 1.0e6f };
@@ -104,16 +102,14 @@ public:
         }
     };
 
-    wdft::RtypeAdaptor<float, 0, ImpedanceCalc, decltype (P1), decltype (S2), decltype (RL)> R { P1, S2, RL };
+    wdft::RtypeAdaptor<float, 0, ImpedanceCalc, decltype (P1), decltype (R4_ser_C3), decltype (RL)> R { P1, R4_ser_C3, RL };
 
     // Port A
     static constexpr float Vt = 0.02585f;
     static constexpr auto R6 = 51.0e3f;
     static constexpr auto Pot1 = 500.0e3f;
-    wdft::ResistorT<float> R6_P1 { R6 };
-    wdft::CapacitorT<float> C4 { 51.0e-12f };
-    wdft::WDFParallelT<float, decltype (R6_P1), decltype (C4)> P2 { R6_P1, C4 };
-    wdft::WDFParallelT<float, decltype (P2), decltype (R)> P3 { P2, R };
+    wdft::ResistorCapacitorParallelT<float> R6_P1_par_C4 { R6, 51.0e-12f };
+    wdft::WDFParallelT<float, decltype (R6_P1_par_C4), decltype (R)> P3 { R6_P1_par_C4, R };
 
     wdft::DiodePairT<float, decltype (P3)> dp { P3, 4.352e-9f, Vt, 1.906f }; // 1N4148
 
