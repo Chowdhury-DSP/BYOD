@@ -17,18 +17,7 @@ struct NetlistViewer : Component
     struct ComponentLabel : Label
     {
         using Label::Label;
-
-        void mouseDoubleClick (const MouseEvent& e) override
-        {
-            if (onDoubleClick != nullptr)
-            {
-                onDoubleClick();
-                return;
-            }
-
-            Label::mouseDoubleClick (e);
-        }
-
+        void mouseDoubleClick (const MouseEvent& e) override;
         std::function<void()> onDoubleClick = nullptr;
     };
 

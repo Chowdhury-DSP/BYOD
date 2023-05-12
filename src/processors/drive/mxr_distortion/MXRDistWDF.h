@@ -13,9 +13,9 @@ public:
     void prepare (double sampleRate)
     {
         C1.prepare ((float) sampleRate);
-        C2.prepare ((float) sampleRate);
-        C3.prepare ((float) sampleRate);
-        C4.prepare ((float) sampleRate);
+        R1_C2.prepare ((float) sampleRate);
+        ResDist_R3_C3.prepare ((float) sampleRate);
+        R5_C4.prepare ((float) sampleRate);
         C5.prepare ((float) sampleRate);
 
         Vb.setVoltage (4.5f);
@@ -23,7 +23,7 @@ public:
 
     void setParams (float distParam)
     {
-        ResDist_R3.setResistanceValue (distParam * rDistVal + R3Val);
+        ResDist_R3_C3.setResistanceValue (distParam * rDistVal + R3Val);
     }
 
     inline float processSample (float x)
@@ -36,7 +36,6 @@ public:
         return wdft::voltage<float> (Rout);
     }
 
-private:
     // Port A
     wdft::ResistorT<float> R4 { 1.0e6f };
 
@@ -45,20 +44,16 @@ private:
     wdft::CapacitorT<float> C1 { 1.0e-9f };
     wdft::WDFParallelT<float, decltype (Vin), decltype (C1)> P1 { Vin, C1 };
 
-    wdft::ResistorT<float> R1 { 10.0e3f };
-    wdft::CapacitorT<float> C2 { 10.0e-9f };
-    wdft::WDFSeriesT<float, decltype (R1), decltype (C2)> S1 { R1, C2 };
+    wdft::ResistorCapacitorSeriesT<float> R1_C2 { 10.0e3f, 10.0e-9f };
 
-    wdft::WDFSeriesT<float, decltype (S1), decltype (P1)> S2 { S1, P1 };
+    wdft::WDFSeriesT<float, decltype (R1_C2), decltype (P1)> S2 { R1_C2, P1 };
     wdft::ResistiveVoltageSourceT<float> Vb { 1.0e6f }; // encompasses R2
     wdft::WDFParallelT<float, decltype (Vb), decltype (S2)> P2 { Vb, S2 };
 
     // Port C
     static constexpr float R3Val = 4.7e3f;
     static constexpr float rDistVal = 1.0e6f;
-    wdft::ResistorT<float> ResDist_R3 { rDistVal + R3Val }; //distortion potentiometer
-    wdft::CapacitorT<float> C3 { 47.0e-9f };
-    wdft::WDFSeriesT<float, decltype (ResDist_R3), decltype (C3)> S4 { ResDist_R3, C3 };
+    wdft::ResistorCapacitorSeriesT<float> ResDist_R3_C3 { rDistVal + R3Val, 47.0e-9f };
 
     struct ImpedanceCalc
     {
@@ -83,13 +78,11 @@ private:
         }
     };
 
-    wdft::RtypeAdaptor<float, 3, ImpedanceCalc, decltype (R4), decltype (P2), decltype (S4)> R { R4, P2, S4 };
+    wdft::RtypeAdaptor<float, 3, ImpedanceCalc, decltype (R4), decltype (P2), decltype (ResDist_R3_C3)> R { R4, P2, ResDist_R3_C3 };
 
     // Port D
-    wdft::ResistorT<float> R5 { 10.0e3f };
-    wdft::CapacitorT<float> C4 { 1.0e-6f };
-    wdft::WDFSeriesT<float, decltype (R5), decltype (C4)> S6 { R5, C4 };
-    wdft::WDFSeriesT<float, decltype (S6), decltype (R)> S7 { S6, R };
+    wdft::ResistorCapacitorSeriesT<float> R5_C4 { 10.0e3f, 1.0e-6f };
+    wdft::WDFSeriesT<float, decltype (R5_C4), decltype (R)> S7 { R5_C4, R };
 
     wdft::ResistorT<float> Rout { 10.0e3f };
     wdft::WDFParallelT<float, decltype (Rout), decltype (S7)> P4 { Rout, S7 };
@@ -98,5 +91,6 @@ private:
 
     wdft::DiodePairT<float, decltype (P3), wdft::DiodeQuality::Best> DP { P3, 2.52e-9f, 25.85e-3f * 1.75f };
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MXRDistWDF)
 };

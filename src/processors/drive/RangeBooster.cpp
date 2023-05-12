@@ -1,5 +1,4 @@
 #include "RangeBooster.h"
-#include "../ParameterHelpers.h"
 
 namespace PNPHelper
 {
@@ -88,8 +87,8 @@ void RangeBooster::prepare (double sampleRate, int samplesPerBlock)
         c3State[ch] = 0.0;
     }
 
-    constexpr float C3 = 47e-6f;
-    constexpr float R3 = 3.9e3f;
+    static constexpr float C3 = 47e-6f;
+    static constexpr float R3 = 3.9e3f;
     c3Coefs[0] = double (C3 * fs + 1.0f / R3);
     c3Coefs[1] = double (C3 * fs);
 

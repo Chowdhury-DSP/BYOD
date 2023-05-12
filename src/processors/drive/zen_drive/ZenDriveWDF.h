@@ -15,8 +15,8 @@ public:
         R4.setVoltage (4.5f);
 
         C3.prepare ((float) sampleRate);
-        C4.prepare ((float) sampleRate);
-        C5.prepare ((float) sampleRate);
+        Rv9_C4.prepare ((float) sampleRate);
+        R5_R6_C5.prepare ((float) sampleRate);
     }
 
     void setParameters (float voiceParam, float gainParam, bool force = false)
@@ -27,8 +27,8 @@ public:
             voiceSmooth.setCurrentAndTargetValue (voiceParam);
             gainSmooth.setCurrentAndTargetValue (gainParam);
 
-            R5_R6.setResistanceValue (R5 + voiceSmooth.getTargetValue() * R6);
-            Rv9.setResistanceValue (R9 * gainSmooth.getTargetValue());
+            R5_R6_C5.setResistanceValue (R5 + voiceSmooth.getTargetValue() * R6);
+            Rv9_C4.setResistanceValue (R9 * gainSmooth.getTargetValue());
         }
         else
         {
@@ -53,16 +53,16 @@ public:
         {
             for (int n = 0; n < numSamples; ++n)
             {
-                R5_R6.setResistanceValue (R5 + voiceSmooth.getNextValue() * R6);
-                Rv9.setResistanceValue (R9 * gainSmooth.getNextValue());
+                R5_R6_C5.setResistanceValue (R5 + voiceSmooth.getNextValue() * R6);
+                Rv9_C4.setResistanceValue (R9 * gainSmooth.getNextValue());
 
                 buffer[n] = processSample (buffer[n]);
             }
             return;
         }
 
-        R5_R6.setResistanceValue (R5 + voiceSmooth.getNextValue() * R6);
-        Rv9.setResistanceValue (R9 * gainSmooth.getNextValue());
+        R5_R6_C5.setResistanceValue (R5 + voiceSmooth.getNextValue() * R6);
+        Rv9_C4.setResistanceValue (R9 * gainSmooth.getNextValue());
         for (int n = 0; n < numSamples; ++n)
             buffer[n] = processSample (buffer[n]);
     }
@@ -79,9 +79,7 @@ private:
     // Port C
     static constexpr auto R5 = 1.0e3f;
     static constexpr auto R6 = 10.0e3f;
-    wdft::ResistorT<float> R5_R6 { R5 + R6 };
-    wdft::CapacitorT<float> C5 { 100.0e-9f };
-    wdft::WDFSeriesT<float, decltype (R5_R6), decltype (C5)> S2 { R5_R6, C5 };
+    wdft::ResistorCapacitorSeriesT<float> R5_R6_C5 { R5 + R6, 100.0e-9f };
 
     // Port D
     wdft::ResistorT<float> RL { 1.0e6f };
@@ -109,14 +107,12 @@ private:
         }
     };
 
-    wdft::RtypeAdaptor<float, 0, ImpedanceCalc, decltype (P1), decltype (S2), decltype (RL)> R { P1, S2, RL };
+    wdft::RtypeAdaptor<float, 0, ImpedanceCalc, decltype (P1), decltype (R5_R6_C5), decltype (RL)> R { P1, R5_R6_C5, RL };
 
     // Port A
     static constexpr auto R9 = 500.0e3f;
-    wdft::ResistorT<float> Rv9 { R9 };
-    wdft::CapacitorT<float> C4 { 100.0e-12f };
-    wdft::WDFParallelT<float, decltype (Rv9), decltype (C4)> P2 { Rv9, C4 };
-    wdft::WDFParallelT<float, decltype (P2), decltype (R)> P3 { P2, R };
+    wdft::ResistorCapacitorParallelT<float> Rv9_C4 { R9, 100.0e-12f };
+    wdft::WDFParallelT<float, decltype (Rv9_C4), decltype (R)> P3 { Rv9_C4, R };
 
     wdft::DiodePairT<float, decltype (P1)> diodes { P1, 5.241435962608312e-10f, 0.07877217375325735f };
 

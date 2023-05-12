@@ -7,6 +7,17 @@ namespace netlist
 constexpr int rowHeight = 27;
 constexpr int schematicPad = 10;
 
+void NetlistViewer::ComponentLabel::mouseDoubleClick (const MouseEvent& e)
+{
+    if (onDoubleClick != nullptr)
+    {
+        onDoubleClick();
+        return;
+    }
+
+    Label::mouseDoubleClick (e);
+}
+
 NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
 {
     juce::Component::setName ("Circuit Netlist");

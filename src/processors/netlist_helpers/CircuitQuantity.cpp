@@ -139,4 +139,14 @@ void CircuitQuantityList::addCapacitor (float defaultValue, const std::string& n
                              name,
                              std::move (setter));
 }
+
+const CircuitQuantity* CircuitQuantityList::findQuantity (const std::string& name) const
+{
+    for (const auto& q : quantities)
+    {
+        if (q.name == name)
+            return &q;
+    }
+    return nullptr;
+}
 } // namespace netlist

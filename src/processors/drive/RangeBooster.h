@@ -23,9 +23,9 @@ private:
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> freqSmooth[2];
     chowdsp::FirstOrderHPF<float> inputFilter[2];
 
-    double veState[2];
-    double c3State[2];
-    double c3Coefs[2];
+    double veState[2] {};
+    double c3State[2] {};
+    double c3Coefs[2] {};
 
     DCBlocker dcBlocker;
     dsp::Gain<float> outGain;

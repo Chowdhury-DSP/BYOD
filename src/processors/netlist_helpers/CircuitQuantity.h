@@ -44,6 +44,8 @@ struct CircuitQuantityList
     void addResistor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal = 100.0f, float maxVal = 10.0e6f);
     void addCapacitor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal = 0.1e-12f, float maxVal = 10.0f);
 
+    [[nodiscard]] const CircuitQuantity* findQuantity (const std::string&) const;
+
     std::vector<CircuitQuantity> quantities;
     struct SchematicSVGData
     {
