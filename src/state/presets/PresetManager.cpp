@@ -10,7 +10,6 @@
 
 namespace
 {
-const String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
 const String presetTag = "preset";
 } // namespace
 
@@ -72,13 +71,13 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
     loadDefaultPreset();
     vts.undoManager->clearUndoHistory();
 
-    setUserPresetConfigFile (userPresetPath);
+    setUserPresetConfigFile (chowdsp::toString (userPresetPath));
 
 #if JUCE_IOS
     const auto groupDir = File::getContainerForSecurityApplicationGroupIdentifier ("group.com.chowdsp.BYOD");
     if (groupDir != File())
     {
-        auto userPresetFolder = groupDir.getChildFile (userPresetPath).getSiblingFile ("Presets");
+        auto userPresetFolder = groupDir.getChildFile (chowdsp::toString (userPresetPath)).getSiblingFile ("Presets");
         if (! userPresetFolder.isDirectory())
         {
             userPresetFolder.deleteFile();

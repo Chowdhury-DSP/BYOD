@@ -51,6 +51,8 @@ public:
     PresetUpdateList& getServerPresetUpdateList() { return serverSyncUpdatePresetsList; };
 #endif
 
+    static constexpr std::string_view userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
+
 private:
     std::vector<chowdsp::Preset> getFactoryPresets() const;
     void parameterChanged (const juce::String&, float) override {}
