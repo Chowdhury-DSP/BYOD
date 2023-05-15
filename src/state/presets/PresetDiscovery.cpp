@@ -81,7 +81,10 @@ struct UserPresetsProvider
             metadata_receiver->add_creator (metadata_receiver, preset.getVendor().toRawUTF8());
 
             if (preset.getCategory().isNotEmpty())
-            metadata_receiver->add_feature (metadata_receiver, preset.getCategory().toRawUTF8());
+                metadata_receiver->add_feature (metadata_receiver, preset.getCategory().toRawUTF8());
+            metadata_receiver->set_timestamps (metadata_receiver,
+                                               (clap_timestamp_t) userPresetFile.getCreationTime().toMilliseconds() / 1000,
+                                               (clap_timestamp_t) userPresetFile.getLastModificationTime().toMilliseconds() / 1000);
         }
 
         return true;
