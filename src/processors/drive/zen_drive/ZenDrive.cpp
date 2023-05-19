@@ -24,7 +24,7 @@ ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Yen Drive", createParamet
         },
         10.0e3f,
         2.0e6f);
-    netlistCircuitQuantities->addCapacitor(
+    netlistCircuitQuantities->addCapacitor (
         470.0e-9f,
         "C3",
         [this] (const netlist::CircuitQuantity& self)
@@ -34,7 +34,7 @@ ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Yen Drive", createParamet
         },
         1.0e-12f,
         1.0e-3f);
-    netlistCircuitQuantities->addCapacitor(
+    netlistCircuitQuantities->addCapacitor (
         100.0e-12f,
         "C4",
         [this] (const netlist::CircuitQuantity& self)
@@ -44,7 +44,7 @@ ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Yen Drive", createParamet
         },
         1.0e-15f,
         1.0e-3f);
-    netlistCircuitQuantities->addCapacitor(
+    netlistCircuitQuantities->addCapacitor (
         100.0e-9f,
         "C5",
         [this] (const netlist::CircuitQuantity& self)
