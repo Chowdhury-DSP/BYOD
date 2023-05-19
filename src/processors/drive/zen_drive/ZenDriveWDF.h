@@ -13,6 +13,7 @@ public:
         gainSmooth.reset (sampleRate, 0.02);
 
         R4.setVoltage (4.5f);
+        R5_R6_C5.setVoltage (4.5f);
 
         C3.prepare ((float) sampleRate);
         Rv9_C4.prepare ((float) sampleRate);
@@ -67,10 +68,9 @@ public:
             buffer[n] = processSample (buffer[n]);
     }
 
-private:
     // Port B
     wdft::ResistiveVoltageSourceT<float> Vin;
-    wdft::CapacitorT<float> C3 { 47.0e-9f };
+    wdft::CapacitorT<float> C3 { 470.0e-9f };
     wdft::WDFSeriesT<float, decltype (Vin), decltype (C3)> S1 { Vin, C3 };
 
     wdft::ResistiveVoltageSourceT<float> R4 { 470.0e3f };
@@ -79,7 +79,7 @@ private:
     // Port C
     static constexpr auto R5 = 1.0e3f;
     static constexpr auto R6 = 10.0e3f;
-    wdft::ResistorCapacitorSeriesT<float> R5_R6_C5 { R5 + R6, 100.0e-9f };
+    wdft::ResistiveCapacitiveVoltageSourceT<float> R5_R6_C5 { R5 + R6, 100.0e-9f };
 
     // Port D
     wdft::ResistorT<float> RL { 1.0e6f };
@@ -116,6 +116,7 @@ private:
 
     wdft::DiodePairT<float, decltype (P1)> diodes { P1, 5.241435962608312e-10f, 0.07877217375325735f };
 
+private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> voiceSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> gainSmooth;
 
