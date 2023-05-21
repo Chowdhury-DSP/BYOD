@@ -5,7 +5,12 @@
 MouseDrive::MouseDrive (UndoManager* um) : BaseProcessor ("Mouse Drive", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (distortionParam, vts, "distortion");
+    distortionParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, "distortion"));
+    distortionParam.setRampLength (0.025);
+    distortionParam.mappingFunction = [] (float x)
+    {
+        return 1.0f + MouseDriveWDF::Rdistortion * std::pow (x, 5.0f);
+    };
     loadParameterPointer (volumeParam, vts, "volume");
 
     uiOptions.backgroundColour = Colours::wheat;
@@ -140,6 +145,7 @@ ParamLayout MouseDrive::createParameterLayout()
 
 void MouseDrive::prepare (double sampleRate, int samplesPerBlock)
 {
+    distortionParam.prepare (sampleRate, samplesPerBlock);
     for (auto& model : wdf)
         model.prepare (sampleRate);
 
@@ -162,12 +168,24 @@ void MouseDrive::prepare (double sampleRate, int samplesPerBlock)
 
 void MouseDrive::processAudio (AudioBuffer<float>& buffer)
 {
-    const auto RdVal = MouseDriveWDF::Rdistortion * std::pow (distortionParam->getCurrentValue(), 5.0f);
+    distortionParam.process (buffer.getNumSamples());
     for (auto [ch, data] : chowdsp::buffer_iters::channels (buffer))
     {
-        wdf[ch].Rd_C4.setResistanceValue (RdVal);
-        for (auto& x : data)
-            x = wdf[ch].process (x);
+        if (distortionParam.isSmoothing())
+        {
+            const auto* distParamSmoothData = distortionParam.getSmoothedBuffer();
+            for (auto [n, x] : chowdsp::enumerate (data))
+            {
+                wdf[ch].Rd_C4.setResistanceValue (distParamSmoothData[n]);
+                x = wdf[ch].process (x);
+            }
+        }
+        else
+        {
+            wdf[ch].Rd_C4.setResistanceValue (distortionParam.getCurrentValue());
+            for (auto& x : data)
+                x = wdf[ch].process (x);
+        }
     }
 
     const auto volumeParamVal = volumeParam->getCurrentValue();

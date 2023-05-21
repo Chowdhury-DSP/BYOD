@@ -15,7 +15,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-    chowdsp::FloatParameter* distortionParam = nullptr;
+    chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> distortionParam;
     chowdsp::FloatParameter* volumeParam = nullptr;
 
     MouseDriveWDF wdf[2];
