@@ -80,6 +80,7 @@ target_sources(BYOD PRIVATE
     processors/drive/hysteresis/HysteresisProcessing.cpp
     processors/drive/junior_b/JuniorB.cpp
     processors/drive/king_of_tone/KingOfToneDrive.cpp
+    processors/drive/mouse_drive/MouseDrive.cpp
     processors/drive/muff_clipper/MuffClipper.cpp
     processors/drive/muff_clipper/MuffClipperStage.cpp
     processors/drive/mxr_distortion/MXRDistortion.cpp
