@@ -1,7 +1,7 @@
 #pragma once
 
-#include "processors/BaseProcessor.h"
 #include "MouseDriveWDF.h"
+#include "processors/BaseProcessor.h"
 
 class MouseDrive : public BaseProcessor
 {
