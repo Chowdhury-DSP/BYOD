@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="RAT" plugin="BYOD" vendor="CHOW" category="Pedals" version="1.1.7">
+  <proc_chain state_plugin_version="1.1.7">
+    <Mouse_Drive>
+      <Parameters x_pos="0.1959999948740005" y_pos="0.3188679218292236">
+        <PARAM id="distortion" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="volume" value="0.75"/>
+        <circuit_elements R2="1.0e6" R3="1000.0" R4="47.0" R5="560.0" R6="1000.0" C1="2.200000004393132e-8"
+                          C2="9.999999717180685e-10" C4="1.000000013351432e-10" C5="2.199999926233431e-6"
+                          C6="4.699999863078119e-6" C7="4.699999863078119e-6"/>
+        <circuit_elements R2="1.0e6" R3="1000.0" R4="47.0" R5="560.0" R6="1000.0" C1="2.200000004393132e-8"
+                          C2="9.999999717180685e-10" C4="1.000000013351432e-10" C5="2.199999926233431e-6"
+                          C6="4.699999863078119e-6" C7="4.699999863078119e-6"/>
+        <circuit_elements R2="1.0e6" R3="1000.0" R4="47.0" R5="560.0" R6="1000.0" C1="2.200000004393132e-8"
+                          C2="9.999999717180685e-10" C4="9.999999960041972e-13" C5="2.199999926233431e-6"
+                          C6="9.999999717180685e-10" C7="4.699999863078119e-6"/>
+        <circuit_elements R2="1.0e6" R3="1000.0" R4="47.0" R5="560.0" R6="1000.0" C1="2.200000004393132e-8"
+                          C2="9.999999717180685e-10" C4="1.000000013351432e-10" C5="2.199999926233431e-6"
+                          C6="4.699999863078119e-6" C7="4.699999863078119e-6"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Mouse_Drive>
+    <High_Cut>
+      <Parameters x_pos="0.5085049271583557" y_pos="0.328000009059906">
+        <PARAM id="cutoff" value="5000.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </High_Cut>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

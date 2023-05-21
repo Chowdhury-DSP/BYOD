@@ -15,6 +15,7 @@
 #include "drive/hysteresis/Hysteresis.h"
 #include "drive/junior_b/JuniorB.h"
 #include "drive/king_of_tone/KingOfToneDrive.h"
+#include "drive/mouse_drive/MouseDrive.h"
 #include "drive/muff_clipper/MuffClipper.h"
 #include "drive/mxr_distortion/MXRDistortion.h"
 #include "drive/tube_amp/TubeAmp.h"
@@ -89,6 +90,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Junior B", &processorFactory<JuniorB> },
     { "Tone King", &processorFactory<KingOfToneDrive> },
     { "Metal Face", &processorFactory<MetalFace> },
+    { "Mouse Drive", &processorFactory<MouseDrive> },
     { "Muff Clipper", &processorFactory<MuffClipper> },
     { "Muff Drive", &processorFactory<BigMuffDrive> },
     { "Range Booster", &processorFactory<RangeBooster> },
