@@ -1,5 +1,6 @@
 #include "BassmanTone.h"
-#include "../../ParameterHelpers.h"
+#include "processors/ParameterHelpers.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 BassmanTone::BassmanTone (UndoManager* um) : BaseProcessor ("Bassman Tone", createParameterLayout(), um)
 {
@@ -13,6 +14,50 @@ BassmanTone::BassmanTone (UndoManager* um) : BaseProcessor ("Bassman Tone", crea
     uiOptions.info.description = "Virtual analog emulation of the Fender Bassman tone stack.";
     uiOptions.info.authors = StringArray { "Samuel Schachter", "Jatin Chowdhury" };
     uiOptions.info.infoLink = "https://github.com/schachtersam32/WaveDigitalFilters_Sharc";
+
+    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
+    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::bassman_tone_schematic_svg,
+                                               .size = BinaryData::bassman_tone_schematic_svgSize };
+    netlistCircuitQuantities->addResistor (
+        56.0e3f,
+        "R4",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.Res4.setResistanceValue (self.value.load());
+        },
+        1.0e3f,
+        2.0e6f);
+    netlistCircuitQuantities->addCapacitor (
+        0.25e-9f,
+        "C1",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.Cap1.setCapacitanceValue (self.value.load());
+        },
+        1.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        20.0e-9f,
+        "C2",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.Cap2.setCapacitanceValue (self.value.load());
+        },
+        1.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        20.0e-9f,
+        "C3",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.Cap3.setCapacitanceValue (self.value.load());
+        },
+        1.0e-12f,
+        1.0e-3f);
 }
 
 ParamLayout BassmanTone::createParameterLayout()

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Circuit Diagram, cdlibrary.dll 4.0.0.0 -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" width="240" height="340" xmlns="http://www.w3.org/2000/svg">
+	<text x="208" y="110" style="font-family:Arial;font-size:12px;text-anchor:start" dominant-baseline="middle" transform="rotate(0, 208, 110)"></text>
+	<line x1="190" y1="110" x2="197" y2="110" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<ellipse cx="200" cy="110" rx="3" ry="3" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-width:2" />
+	<line x1="160" y1="290" x2="160" y2="292" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<path d="M 152,292 L 168,292 L 160,300 L 152,292" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="160" y1="280" x2="160" y2="290" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="70" y1="150" x2="70" y2="250" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="70" y1="250" x2="96" y2="250" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="104" y1="250" x2="130" y2="250" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="96" y1="236" x2="96" y2="264" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="104" y1="236" x2="104" y2="264" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<text x="100" y="230" style="font-family:Arial;font-size:11px;text-anchor:middle" dominant-baseline="baseline" transform="rotate(0, 100, 230)">C3</text>
+	<line x1="160" y1="220" x2="160" y2="230" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="160" y1="270" x2="160" y2="280" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<path d="M 160,230 L 160,232 L 167,235 L 153,241 L 167,247 L 153,253 L 167,259 L 153,265 L 160,268 L 160,270" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<text x="174" y="250" style="font-family:Arial;font-size:11px;text-anchor:start" dominant-baseline="middle" transform="rotate(0, 174, 250)">R_mid</text>
+	<path d="M 160,230 M 144,244 L 150,250 L 144,256 M 149,250 L 131,250" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="160" y1="150" x2="160" y2="170" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="160" y1="210" x2="160" y2="230" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<path d="M 160,170 L 160,172 L 153,175 L 167,181 L 153,187 L 167,193 L 153,199 L 167,205 L 160,208 L 160,210" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<text x="136" y="190" style="font-family:Arial;font-size:11px;text-anchor:end" dominant-baseline="middle" transform="rotate(0, 136, 190)">R_bass</text>
+	<path d="M 160,190 M 143,197 L 177,183 M 175,188 L 177,183 L 172,181" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="70" y1="150" x2="111" y2="150" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="119" y1="150" x2="160" y2="150" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="111" y1="136" x2="111" y2="164" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="119" y1="136" x2="119" y2="164" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<text x="115" y="130" style="font-family:Arial;font-size:11px;text-anchor:middle" dominant-baseline="baseline" transform="rotate(0, 115, 130)">C2</text>
+	<line x1="70" y1="60" x2="111" y2="60" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="119" y1="60" x2="160" y2="60" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="111" y1="46" x2="111" y2="74" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="119" y1="46" x2="119" y2="74" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<text x="115" y="40" style="font-family:Arial;font-size:11px;text-anchor:middle" dominant-baseline="baseline" transform="rotate(0, 115, 40)">C1</text>
+	<line x1="50" y1="60" x2="80" y2="60" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="70" y1="60" x2="70" y2="85" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="70" y1="125" x2="70" y2="150" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<path d="M 70,85 L 70,87 L 63,90 L 77,96 L 63,102 L 77,108 L 63,114 L 77,120 L 70,123 L 70,125" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<text x="56" y="105" style="font-family:Arial;font-size:11px;text-anchor:end" dominant-baseline="middle" transform="rotate(0, 56, 105)">R4</text>
+	<line x1="160" y1="60" x2="160" y2="90" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="160" y1="130" x2="160" y2="150" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<path d="M 160,90 L 160,92 L 153,95 L 167,101 L 153,107 L 167,113 L 153,119 L 167,125 L 160,128 L 160,130" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<text x="146" y="110" style="font-family:Arial;font-size:11px;text-anchor:end" dominant-baseline="middle" transform="rotate(0, 146, 110)">R_treble</text>
+	<path d="M 160,90 M 176,104 L 170,110 L 176,116 M 171,110 L 189,110" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="40" y1="80" x2="40" y2="82" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<path d="M 32,82 L 48,82 L 40,90 L 32,82" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="40" y1="70" x2="40" y2="80" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<line x1="30" y1="60" x2="28" y2="60" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<ellipse cx="40" cy="60" rx="12" ry="12" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-width:2" />
+	<line x1="52" y1="60" x2="50" y2="60" style="stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<path d="M 40,60 M 32,60 A 4,4 180 1 1 40,60 A 4,4 180 1 0 48,60" style="fill-opacity:0;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-linecap:square;stroke-width:2" />
+	<ellipse cx="70" cy="150" rx="2" ry="2" style="fill-opacity:1;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-width:2" />
+	<ellipse cx="160" cy="150" rx="2" ry="2" style="fill-opacity:1;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-width:2" />
+	<ellipse cx="70" cy="60" rx="2" ry="2" style="fill-opacity:1;fill:rgb(0, 0, 0);stroke:rgb(0, 0, 0);stroke-width:2" />
+</svg>
