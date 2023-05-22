@@ -13,6 +13,15 @@ public:
     void prepare (double sr);
     void process (float* buffer, const int numSamples) noexcept;
 
+    using Res = wdft::ResistorT<float>;
+    using ResVs = wdft::ResistiveVoltageSourceT<float>;
+    using Cap = wdft::CapacitorT<float>;
+
+    Cap Cap1 { 250e-12f };
+    Cap Cap2 { 20e-9f }; // Port D
+    Cap Cap3 { 20e-9f }; // Port F
+    Res Res4 { 56e3f }; // Port E
+
 private:
     inline float processSample (float inSamp) noexcept
     {
@@ -22,20 +31,11 @@ private:
         return wdft::voltage<float> (Res1m) + wdft::voltage<float> (S2) + wdft::voltage<float> (Res3m);
     }
 
-    using Res = wdft::ResistorT<float>;
-    using ResVs = wdft::ResistiveVoltageSourceT<float>;
-    using Cap = wdft::CapacitorT<float>;
-
-    Cap Cap1 { 250e-12f };
-    Cap Cap2 { 20e-9f }; // Port D
-    Cap Cap3 { 20e-9f }; // Port F
-
     Res Res1p { 1.0f };
     Res Res1m { 1.0f };
     Res Res2 { 1.0f };
     Res Res3p { 1.0f };
     Res Res3m { 1.0f };
-    Res Res4 { 56e3f }; // Port E
 
     ResVs Vres { 1.0f };
 
