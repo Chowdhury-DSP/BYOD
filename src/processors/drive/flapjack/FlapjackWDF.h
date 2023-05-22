@@ -65,7 +65,6 @@ public:
         return wdft::voltage<float> (Rlevel);
     }
 
-private:
     // Port A
     wdft::ResistiveVoltageSourceT<float> Vin;
     wdft::CapacitorT<float> C1 { 10.0e-9f };

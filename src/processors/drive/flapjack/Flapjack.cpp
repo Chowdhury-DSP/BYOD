@@ -1,5 +1,6 @@
 #include "Flapjack.h"
 #include "processors/ParameterHelpers.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 //https://aionfx.com/news/tracing-journal-crowther-hot-cake/
 // Mode 1:
@@ -41,6 +42,110 @@ Flapjack::Flapjack (UndoManager* um)
     uiOptions.powerColour = Colours::red.darker (0.2f);
     uiOptions.info.description = "Overdrive effect based on the \"Hot Cake\" overdrive pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
+    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::hot_cake_schematic_svg,
+                                               .size = BinaryData::hot_cake_schematic_svgSize };
+    netlistCircuitQuantities->addResistor (
+        1.0e6f,
+        "R1",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.Vb.setResistanceValue (self.value.load());
+        },
+        1.0e3f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        10.0e3f,
+        "R2",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.R2.setResistanceValue (self.value.load());
+        },
+        100.0f,
+        1.0e6f);
+    netlistCircuitQuantities->addResistor (
+        100.0e3f,
+        "R3",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.R3.setResistanceValue (self.value.load());
+        },
+        2.0e3f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        10.0e3f,
+        "R5",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.R5.setResistanceValue (self.value.load());
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        10.0e3f,
+        "R6",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.R6.setResistanceValue (self.value.load());
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        1.0e3f,
+        "R7",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.R7.setResistanceValue (self.value.load());
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addCapacitor (
+        10.0e-9f,
+        "C1",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.C1.setCapacitanceValue (self.value.load());
+        },
+        100.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        10.0e-6f,
+        "C2",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.C2.setCapacitanceValue (self.value.load());
+        },
+        1.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        22.0e-9f,
+        "C6",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.C6.setCapacitanceValue (self.value.load());
+        },
+        1.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        82.0e-9f,
+        "C7",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdfModel : wdf)
+                wdfModel.C7.setCapacitanceValue (self.value.load());
+        },
+        1.0e-12f,
+        1.0e-3f);
 }
 
 ParamLayout Flapjack::createParameterLayout()
