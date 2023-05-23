@@ -1,5 +1,6 @@
 #include "TrebleBooster.h"
-#include "../ParameterHelpers.h"
+#include "processors/ParameterHelpers.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 TrebleBooster::TrebleBooster (UndoManager* um) : BaseProcessor ("Treble Booster", createParameterLayout(), um)
 {
@@ -9,6 +10,55 @@ TrebleBooster::TrebleBooster (UndoManager* um) : BaseProcessor ("Treble Booster"
     uiOptions.powerColour = Colours::red.darker (0.1f);
     uiOptions.info.description = "A treble boosting filter based on the tone circuit in the Klon Centaur distortion pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
+    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::treble_booster_schematic_svg,
+                                               .size = BinaryData::treble_booster_schematic_svgSize };
+    netlistCircuitQuantities->addResistor (
+        1.8e3f,
+        "R21",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            R21 = self.value.load();
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        100.0e3f,
+        "R22",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            G1 = 1.0f / self.value.load();
+        },
+        10.0e3f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        4.7e3f,
+        "R23",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            R23 = self.value.load();
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        100.0e3f,
+        "R24",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            G4 = 1.0f / self.value.load();
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addCapacitor (
+        3.9e-9f,
+        "C14",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            C = self.value.load();
+        },
+        50.0e-12f,
+        1.0e-3f);
 }
 
 ParamLayout TrebleBooster::createParameterLayout()
