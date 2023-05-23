@@ -3,7 +3,7 @@
 #include <pch.h>
 
 /**
- * Implentation based on Werner et. al:
+ * Implementation based on Werner et. al:
  * https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8371321
  */
 class BaxandallWDF
@@ -13,6 +13,8 @@ public:
 
     void prepare (double fs);
     void setParams (float bassParam, float trebleParam);
+
+    static inline float parallel_resistors (float R_1, float R_2) noexcept { return (R_1 * R_2) / (R_1 + R_2); }
 
     inline float processSample (float x)
     {
@@ -24,42 +26,31 @@ public:
         return wdft::voltage<float> (Rl);
     }
 
-private:
     static constexpr auto Pt = 100.0e3f;
     static constexpr auto Pb = 100.0e3f;
 
     // Port A
-    wdft::ResistorT<float> Pt_plus { Pt * 0.5f };
-    wdft::ResistorT<float> Resd { 10.0e3f };
-    wdft::WDFParallelT<float, decltype (Pt_plus), decltype (Resd)> P4 { Pt_plus, Resd };
-    wdft::CapacitorT<float> Cd { 6.4e-9f };
-    wdft::WDFSeriesT<float, decltype (Cd), decltype (P4)> S4 { Cd, P4 };
+    float Resd = 10.0e3f;
+    wdft::ResistorCapacitorSeriesT<float> Pt_plus_Resd_Cd { parallel_resistors (Pt * 0.5f, Resd), 6.4e-9f };
 
     // Port B
-    wdft::ResistorT<float> Pt_minus { Pt * 0.5f };
-    wdft::ResistorT<float> Rese { 1.0e3f };
-    wdft::WDFParallelT<float, decltype (Pt_minus), decltype (Rese)> P5 { Pt_minus, Rese };
-    wdft::CapacitorT<float> Ce { 64.0e-9f };
-    wdft::WDFSeriesT<float, decltype (Ce), decltype (P5)> S5 { Ce, P5 };
+    float Rese = 1.0e3f;
+    wdft::ResistorCapacitorSeriesT<float> Pt_minus_Rese_Ce { parallel_resistors (Pt * 0.5f, Rese), 64.0e-9f };
     wdft::ResistorT<float> Rl { 1.0e6f };
-    wdft::WDFParallelT<float, decltype (Rl), decltype (S5)> P1 { Rl, S5 };
+    wdft::WDFParallelT<float, decltype (Rl), decltype (Pt_minus_Rese_Ce)> P1 { Rl, Pt_minus_Rese_Ce };
 
     // Port C
     wdft::ResistorT<float> Resc { 10.0e3f };
 
     // Port D
-    wdft::ResistorT<float> Pb_minus { Pb * 0.5f };
-    wdft::CapacitorT<float> Cc { 220.0e-9f };
-    wdft::WDFParallelT<float, decltype (Pb_minus), decltype (Cc)> P3 { Pb_minus, Cc };
+    wdft::ResistorCapacitorParallelT<float> Pb_minus_Cc { Pb * 0.5f, 220.0e-9f };
     wdft::ResistorT<float> Resb { 1.0e3f };
-    wdft::WDFSeriesT<float, decltype (Resb), decltype (P3)> S3 { Resb, P3 };
+    wdft::WDFSeriesT<float, decltype (Resb), decltype (Pb_minus_Cc)> S3 { Resb, Pb_minus_Cc };
 
     // Port E
-    wdft::ResistorT<float> Pb_plus { Pb * 0.5f };
-    wdft::CapacitorT<float> Cb { 22.0e-9f };
-    wdft::WDFParallelT<float, decltype (Pb_plus), decltype (Cb)> P2 { Pb_plus, Cb };
+    wdft::ResistorCapacitorParallelT<float> Pb_plus_Cb { Pb * 0.5f, 22.0e-9f };
     wdft::ResistorT<float> Resa { 10.0e3f };
-    wdft::WDFSeriesT<float, decltype (Resa), decltype (P2)> S2 { Resa, P2 };
+    wdft::WDFSeriesT<float, decltype (Resa), decltype (Pb_plus_Cb)> S2 { Resa, Pb_plus_Cb };
 
     struct ImpedanceCalc
     {
@@ -82,13 +73,14 @@ private:
         }
     };
 
-    using RType = wdft::RtypeAdaptor<float, 5, ImpedanceCalc, decltype (S4), decltype (P1), decltype (Resc), decltype (S3), decltype (S2)>;
-    RType R { S4, P1, Resc, S3, S2 };
+    using RType = wdft::RtypeAdaptor<float, 5, ImpedanceCalc, decltype (Pt_plus_Resd_Cd), decltype (P1), decltype (Resc), decltype (S3), decltype (S2)>;
+    RType R { Pt_plus_Resd_Cd, P1, Resc, S3, S2 };
 
     // Port F
     wdft::CapacitorT<float> Ca { 1.0e-6f };
     wdft::WDFSeriesT<float, decltype (R), decltype (Ca)> S1 { R, Ca };
     wdft::IdealVoltageSourceT<float, decltype (S1)> Vin { S1 };
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaxandallWDF)
 };
