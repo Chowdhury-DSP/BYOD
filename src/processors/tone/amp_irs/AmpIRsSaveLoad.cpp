@@ -1,20 +1,13 @@
 #include "AmpIRs.h"
 #include "gui/utils/ErrorMessageView.h"
 
-void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const String& name, Component* associatedComp)
+void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const String& name, const juce::File& file, Component* associatedComp)
 {
     auto failToLoad = [this, associatedComp] (const String& message)
     {
         ErrorMessageView::showErrorMessage ("Unable to load IR!", message, "OK", associatedComp);
         vts.getParameter (irTag)->setValueNotifyingHost (0.0f);
     };
-
-    const auto file = [&stream]
-    {
-        if (auto* fileStream = dynamic_cast<FileInputStream*> (stream.get()))
-            return fileStream->getFile();
-        return File {};
-    }();
 
     if (stream == nullptr)
     {
@@ -70,7 +63,7 @@ void AmpIRs::loadIRFromStream (std::unique_ptr<InputStream>&& stream, const Stri
 
 void AmpIRs::loadIRFromCurrentState()
 {
-    loadIRFromStream (std::make_unique<MemoryInputStream> (*irState.data, true), irState.name, nullptr);
+    loadIRFromStream (std::make_unique<MemoryInputStream> (*irState.data, true), irState.name, irState.file, nullptr);
 }
 
 namespace

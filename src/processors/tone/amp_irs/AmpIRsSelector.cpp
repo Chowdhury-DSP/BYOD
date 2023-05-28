@@ -88,7 +88,7 @@ struct IRFileTree : chowdsp::AbstractTree<File>
                 fileItem.itemID = ++menuIndex;
                 fileItem.action = [&ampIRs, topLevelComponent, irFile]
                 {
-                    ampIRs.loadIRFromStream (irFile.createInputStream(), {}, topLevelComponent);
+                    ampIRs.loadIRFromStream (irFile.createInputStream(), {}, irFile, topLevelComponent);
                 };
                 menu.addItem (std::move (fileItem));
             }
@@ -142,6 +142,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
     void refreshText()
     {
         setText (ampIRs.irState.name, sendNotification);
+        resized();
     }
 
     void refreshBox()
@@ -160,7 +161,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
             irItem.itemID = ++menuIdx;
             irItem.action = [this, index = (int) idx]
             {
-                vts.getParameter (ampIRs.irTag)->setValueNotifyingHost ((float) index / (float) ampIRs.irNames.size());
+                loadBuiltInIR (index);
             };
             menu->addItem (std::move (irItem));
         }
@@ -185,6 +186,121 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
         { selectUserIRsDirectory(); };
         menu->addItem (std::move (selectUserFolderItem));
 #endif
+    }
+
+    void loadBuiltInIR (int builtInIRParamIndex)
+    {
+        auto* param = vts.getParameter (ampIRs.irTag);
+        const auto newParamValue = param->convertTo0to1 ((float) builtInIRParamIndex);
+        param->setValueNotifyingHost (newParamValue);
+    }
+
+    bool keyPressed (const juce::KeyPress& key) override
+    {
+        if (key == juce::KeyPress::leftKey)
+        {
+            goToPreviousIR();
+            return true;
+        }
+
+        if (key == juce::KeyPress::rightKey)
+        {
+            goToNextIR();
+            return true;
+        }
+
+        return false;
+    }
+
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails& wheel) override
+    {
+        const auto isScrollingDown = wheel.deltaY < 0.0f;
+        if (isScrollingDown)
+            goToNextIR();
+        else
+            goToPreviousIR();
+    }
+
+    void goToNextIR()
+    {
+        // go to the next built-in IR:
+        if (ampIRs.irState.paramIndex < AmpIRs::customIRIndex - 1)
+        {
+            loadBuiltInIR (ampIRs.irState.paramIndex + 1);
+            return;
+        }
+
+        // go from the last built-in IR to the first user IR:
+        if (ampIRs.irState.paramIndex == AmpIRs::customIRIndex - 1)
+        {
+            // there are no user IRs, so we'll cycle back around to the first built-in IR:
+            if (userIRFiles.size() == 0)
+            {
+                loadBuiltInIR (0);
+                return;
+            }
+
+            const auto firstUserIR = userIRFiles.getElementByIndex (0);
+            jassert (firstUserIR != nullptr); // we checked that the tree isn't empty, so this should not be null!
+            ampIRs.loadIRFromStream (firstUserIR->createInputStream(), {}, *firstUserIR, getTopLevelComponent());
+            return;
+        }
+
+        // go to next user IR:
+        const auto currentUserIRIndex = userIRFiles.getIndexForElement (ampIRs.irState.file);
+        if (currentUserIRIndex >= 0)
+        {
+            const auto nextIRFile = userIRFiles.getElementByIndex (currentUserIRIndex + 1);
+            if (nextIRFile != nullptr)
+            {
+                ampIRs.loadIRFromStream (nextIRFile->createInputStream(), {}, *nextIRFile, getTopLevelComponent());
+                return;
+            }
+        }
+
+        // failed to get current or next user IR from tree, so we'll go back to the first built-in IR:
+        loadBuiltInIR (0);
+    }
+
+    void goToPreviousIR()
+    {
+        // go to the previous built-in IR:
+        if (ampIRs.irState.paramIndex != AmpIRs::customIRIndex && ampIRs.irState.paramIndex > 0)
+        {
+            loadBuiltInIR (ampIRs.irState.paramIndex - 1);
+            return;
+        }
+
+        // go from the first built-in IR to the last user IR:
+        if (ampIRs.irState.paramIndex == 0)
+        {
+            // there are no user IRs, so we'll cycle back around to the first built-in IR:
+            if (userIRFiles.size() == 0)
+            {
+                loadBuiltInIR (AmpIRs::customIRIndex - 1);
+                return;
+            }
+
+            const auto lastUserIR = userIRFiles.getElementByIndex (userIRFiles.size() - 1);
+            jassert (lastUserIR != nullptr); // we checked that the tree isn't empty, so this should not be null!
+            ampIRs.loadIRFromStream (lastUserIR->createInputStream(), {}, *lastUserIR, getTopLevelComponent());
+            return;
+        }
+
+        // go to previous user IR:
+        const auto currentUserIRIndex = userIRFiles.getIndexForElement (ampIRs.irState.file);
+        if (currentUserIRIndex > 0)
+        {
+            const auto prevIRFile = userIRFiles.getElementByIndex (currentUserIRIndex - 1);
+            if (prevIRFile != nullptr)
+            {
+                ampIRs.loadIRFromStream (prevIRFile->createInputStream(), {}, *prevIRFile, getTopLevelComponent());
+                return;
+            }
+        }
+
+        // failed to get current or previous user IR from tree, so we'll go back to the last built-in IR:
+        loadBuiltInIR (AmpIRs::customIRIndex - 1);
     }
 
     void refreshUserIRs()
@@ -218,6 +334,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
                                       Logger::writeToLog ("AmpIRs attempting to load IR from local file: " + irFile.getLocalFile().getFullPathName());
                                       ampIRs.loadIRFromStream (irFile.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)),
                                                                {},
+                                                               irFile,
                                                                safeParent.getComponent());
 #else
                 if (fc.getResults().isEmpty())
@@ -225,7 +342,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
                 const auto irFile = fc.getResult();
 
                 Logger::writeToLog ("AmpIRs attempting to load IR from local file: " + irFile.getFullPathName());
-                ampIRs.loadIRFromStream (irFile.createInputStream(), {}, safeParent.getComponent());
+                ampIRs.loadIRFromStream (irFile.createInputStream(), {}, irFile, safeParent.getComponent());
 #endif
                                   });
     }
