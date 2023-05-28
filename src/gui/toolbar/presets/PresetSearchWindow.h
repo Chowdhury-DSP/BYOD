@@ -1,7 +1,7 @@
 #pragma once
 
-#include "gui/utils/LabelWithCentredEditor.h"
 #include "PresetSearchHelpers.h"
+#include "gui/utils/LabelWithCentredEditor.h"
 
 class PresetSearchWindow : public Component
 {
