@@ -18,9 +18,6 @@
 #include <Eigen/Dense>
 #include <RTNeural/RTNeural.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
-#include <rapidfuzz/fuzz.hpp>
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include <FuzzySearchDatabase.hpp>
 #include <mpark/variant.hpp>
 #include <sst/cpputils.h>
