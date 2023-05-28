@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui/utils/LabelWithCentredEditor.h"
+#include "PresetSearchHelpers.h"
 
 class PresetSearchWindow : public Component
 {
@@ -11,13 +12,13 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-    using ResultsVec = std::vector<std::pair<const chowdsp::Preset*, double>>;
+    void updatePresetSearchDatabase();
 
 private:
     void updateSearchResults (const String& searchQuery);
-    void setUpListModel (ResultsVec&& results);
 
     chowdsp::PresetManager& presetManager;
+    preset_search::Database searchDatabase;
 
     struct SearchLabel;
     std::unique_ptr<SearchLabel> searchEntryBox;
