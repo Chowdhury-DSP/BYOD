@@ -84,6 +84,7 @@ target_include_directories(juce_plugin_modules
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/xsimd/include
         $<TARGET_PROPERTY:sst-cpputils,INTERFACE_INCLUDE_DIRECTORIES>
         ${CMAKE_SOURCE_DIR}/modules/rapidfuzz-cpp
+        ${CMAKE_SOURCE_DIR}/modules/fuzzysearchdatabase/src
 )
 
 set_target_properties(juce_plugin_modules PROPERTIES

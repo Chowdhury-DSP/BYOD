@@ -25,3 +25,6 @@
 [submodule "modules/variant"]
 	path = modules/variant
 	url = https://github.com/mpark/variant
+[submodule "modules/fuzzysearchdatabase"]
+	path = modules/fuzzysearchdatabase
+	url = https://bitbucket.org/j_norberg/fuzzysearchdatabase.git

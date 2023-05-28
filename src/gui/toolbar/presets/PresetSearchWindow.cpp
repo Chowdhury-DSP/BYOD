@@ -8,9 +8,7 @@ constexpr int itemHeight = rowHeight + 20;
 
 struct PresetSearchWindow::ResultsListModel : public ListBoxModel
 {
-    using ConstResultsVec = const PresetSearchWindow::ResultsVec;
-
-    explicit ResultsListModel (PresetSearchWindow::ResultsVec&& results) : searchResults (std::move (results))
+    explicit ResultsListModel (preset_search::Results&& results) : searchResults (std::move (results))
     {
     }
 
@@ -26,7 +24,7 @@ struct PresetSearchWindow::ResultsListModel : public ListBoxModel
 
     void loadPresetForRow (int rowNumber)
     {
-        const auto* result = searchResults[(int) rowNumber].first;
+        const auto* result = searchResults[(int) rowNumber];
         if (result == nullptr)
         {
             jassertfalse;
@@ -50,7 +48,7 @@ struct PresetSearchWindow::ResultsListModel : public ListBoxModel
         if (rowNumber >= (int) searchResults.size() - 1)
             g.drawLine (Line { bounds.getBottomLeft(), bounds.getBottomRight() }.toFloat(), 1.0f);
 
-        const auto* result = searchResults[(int) rowNumber].first;
+        const auto* result = searchResults[(int) rowNumber];
         if (result == nullptr)
         {
             jassertfalse;
@@ -73,7 +71,7 @@ struct PresetSearchWindow::ResultsListModel : public ListBoxModel
         g.drawFittedText (category, categoryBounds, Justification::right, 1);
     }
 
-    ConstResultsVec searchResults;
+    const preset_search::Results searchResults;
 };
 
 struct PresetSearchWindow::SearchLabel : LabelWithCentredEditor
@@ -88,7 +86,7 @@ struct PresetSearchWindow::SearchLabel : LabelWithCentredEditor
 
 PresetSearchWindow::PresetSearchWindow (chowdsp::PresetManager& presetMgr) : presetManager (presetMgr)
 {
-    setName ("Presets Search");
+    juce::Component::setName ("Presets Search");
 
     auto setupLabel = [&] (auto& label)
     {
@@ -117,8 +115,6 @@ PresetSearchWindow::PresetSearchWindow (chowdsp::PresetManager& presetMgr) : pre
     numResultsLabel.setJustificationType (Justification::left);
     addAndMakeVisible (numResultsLabel);
 
-    updateSearchResults (String());
-
     setSize (600, 400);
 }
 
@@ -140,38 +136,16 @@ void PresetSearchWindow::resized()
     numResultsLabel.setBounds (footer.reduced (10, 1));
 }
 
-void PresetSearchWindow::updateSearchResults (const String& searchQuery)
+void PresetSearchWindow::updatePresetSearchDatabase()
 {
-    if (searchQuery.isEmpty())
-    {
-        ResultsVec resultsVector;
-        resultsVector.reserve ((size_t) presetManager.getNumPresets());
-        for (const auto& [_, preset] : presetManager.getPresetMap())
-            resultsVector.emplace_back (&preset, 0.0);
-
-        setUpListModel (std::move (resultsVector));
-        return;
-    }
-
-    ResultsVec resultsVector;
-    const auto searchQueryStr = searchQuery.toStdString();
-    constexpr double scoreThreshold = 35.0;
-    auto searchScorer = rapidfuzz::fuzz::CachedRatio<char> (searchQueryStr);
-    for (const auto& [_, preset] : presetManager.getPresetMap())
-    {
-        auto score = searchScorer.similarity (preset.getName().toStdString());
-        if (score > scoreThreshold)
-            resultsVector.emplace_back (&preset, score);
-    }
-
-    std::sort (resultsVector.begin(), resultsVector.end(), [] (const auto& a, const auto& b)
-               { return a.second > b.second; });
-    setUpListModel (std::move (resultsVector));
+    preset_search::initialiseDatabase (presetManager, searchDatabase);
+    searchEntryBox->setText ({}, juce::sendNotification);
+    updateSearchResults ({});
 }
 
-void PresetSearchWindow::setUpListModel (ResultsVec&& results)
+void PresetSearchWindow::updateSearchResults (const String& searchQuery)
 {
-    resultsBoxModel = std::make_unique<ResultsListModel> (std::move (results));
+    resultsBoxModel = std::make_unique<ResultsListModel> (preset_search::getSearchResults (presetManager, searchDatabase, searchQuery));
     resultsBox.setModel (resultsBoxModel.get());
     numResultsLabel.setText ("Found: " + String (resultsBoxModel->getNumRows()) + " presets", sendNotificationSync);
 
