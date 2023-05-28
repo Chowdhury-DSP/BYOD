@@ -69,7 +69,7 @@ argument `-DCHOWDSP_ENABLE_OPENGL=<ON|OFF>` to the CMake configure step.
 ## Credits:
 
 - Extra Icons - [FontAwesome](https://fontawesome.com/)
-- Fuzzy String Searching - [RapidFuzz](https://github.com/maxbachmann/rapidfuzz-cpp)
+- Fuzzy Searching - [fuuzysearch](https://bitbucket.org/j_norberg/fuzzysearchdatabase)
 - C++ Utilities:
   - [Magic Enum](https://github.com/Neargye/magic_enum)
   - [Surge Synth Team's cpputils](https://github.com/surge-synthesizer/sst-cpputils)
