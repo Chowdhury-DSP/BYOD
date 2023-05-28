@@ -214,8 +214,14 @@ int PresetsComp::addBasicPresetOptions (PopupMenu* menu, int optionID)
                                       });
     }
 
-    return addPresetMenuItem (menu, optionID, "Search", [&]
-                              { searchWindow.show(); });
+    return addPresetMenuItem (menu,
+                              optionID,
+                              "Search",
+                              [this]
+                              {
+                                  searchWindow.getViewComponent().updatePresetSearchDatabase();
+                                  searchWindow.show();
+                              });
 }
 
 int PresetsComp::addPresetShareOptions (PopupMenu* menu, int optionID)

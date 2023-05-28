@@ -29,6 +29,7 @@ target_sources(BYOD PRIVATE
     gui/toolbar/presets/PresetsLoginDialog.cpp
     gui/toolbar/presets/PresetsSaveDialog.cpp
     gui/toolbar/presets/PresetSearchWindow.cpp
+    gui/toolbar/presets/PresetSearchHelpers.cpp
     gui/toolbar/presets/PresetsSyncDialog.cpp
 
     gui/utils/HostContextProvider.cpp

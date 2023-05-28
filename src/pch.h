@@ -16,11 +16,9 @@
 
 // Any other widely used headers that don't change...
 #include <Eigen/Dense>
+#include <FuzzySearchDatabase.hpp>
 #include <RTNeural/RTNeural.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
-#include <rapidfuzz/fuzz.hpp>
-JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include <mpark/variant.hpp>
 #include <sst/cpputils.h>
 
