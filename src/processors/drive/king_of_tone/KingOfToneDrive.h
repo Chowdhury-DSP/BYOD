@@ -16,6 +16,22 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
+    struct Components
+    {
+        float C3 = 0.01e-6f;
+        float C4 = 100e-12f;
+        float C5 = 0.01e-6f;
+        float C6 = 0.01e-6f;
+        float C7 = 0.1e-6f;
+        float R4 = 1.0e6f;
+        float R6 = 10e3f;
+        float R7 = 33e3f;
+        float R8 = 27e3f;
+        float R9 = 10e3f;
+        float R10 = 220e3f;
+        static constexpr auto Rp = 100e3f;
+    } components;
+
 private:
     void doPreBuffering();
 

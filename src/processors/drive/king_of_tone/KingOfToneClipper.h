@@ -20,10 +20,10 @@ public:
         }
     }
 
-private:
     wdft::ResistiveVoltageSourceT<float> R12_Vs { 1.0e3f };
     wdft::PolarityInverterT<float, decltype (R12_Vs)> S1 { R12_Vs };
     wdft::DiodePairT<float, decltype (S1)> dp { S1, 2.52e-9f, 25.85e-3f, 1.752f };
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KingOfToneClipper)
 };

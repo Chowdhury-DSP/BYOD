@@ -9,7 +9,7 @@ public:
 
     void prepare (float sampleRate)
     {
-        C7.prepare (sampleRate);
+        R9_C7_Vin.prepare (sampleRate);
         Vbias.setVoltage (4.5f);
     }
 
@@ -17,7 +17,7 @@ public:
     {
         for (int n = 0; n < numSamples; ++n)
         {
-            R9_Vin.setVoltage (x[n]);
+            R9_C7_Vin.setVoltage (x[n]);
 
             dp.incident (S2.reflected());
             S2.incident (dp.reflected());
@@ -26,11 +26,8 @@ public:
         }
     }
 
-private:
     // Port A:
-    wdft::ResistiveVoltageSourceT<float> R9_Vin { 10.0e3f };
-    wdft::CapacitorT<float> C7 { 0.1e-6f };
-    wdft::WDFSeriesT<float, decltype (R9_Vin), decltype (C7)> S1 { R9_Vin, C7 };
+    wdft::ResistiveCapacitiveVoltageSourceT<float> R9_C7_Vin { 10.0e3f, 0.1e-6f };
 
     // Port B:
     wdft::ResistiveVoltageSourceT<float> Vbias { 1.0e6f };
@@ -62,8 +59,8 @@ private:
         }
     };
 
-    using RType = wdft::RtypeAdaptor<float, 3, ImpedanceCalc, decltype (S1), decltype (Vbias), decltype (RL)>;
-    RType R { S1, Vbias, RL };
+    using RType = wdft::RtypeAdaptor<float, 3, ImpedanceCalc, decltype (R9_C7_Vin), decltype (Vbias), decltype (RL)>;
+    RType R { R9_C7_Vin, Vbias, RL };
 
     // Port D:
     wdft::ResistorT<float> R10 { 220.0e3f };
@@ -72,5 +69,6 @@ private:
     wdft::WDFSeriesT<float, decltype (R11), decltype (P1)> S2 { R11, P1 };
     wdft::DiodePairT<float, decltype (S2)> dp { S2, 2.9849127806230505e-10f, 25.85e-3f, 3.187726462543485f };
 
+private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KingOfToneOverdrive)
 };
