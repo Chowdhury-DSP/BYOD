@@ -1,39 +1,22 @@
 #include "KingOfToneDrive.h"
-#include "../../ParameterHelpers.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 namespace
 {
-namespace Components
-{
-    constexpr auto C3 = 0.01e-6f;
-    constexpr auto C4 = 100e-12f;
-    constexpr auto C5 = 0.01e-6f;
-    constexpr auto C6 = 0.01e-6f;
-    constexpr auto C7 = 0.1e-6f;
-    constexpr auto R4 = 1.0e6f;
-    constexpr auto R6 = 10e3f;
-    constexpr auto R7 = 33e3f;
-    constexpr auto R8 = 27e3f;
-    constexpr auto R9 = 10e3f;
-    constexpr auto R10 = 220e3f;
-    constexpr auto Rp = 100e3f;
-} // namespace Components
-
 template <typename FilterType>
-void calcDriveAmpCoefs (FilterType& filter, float driveParam, float fs)
+void calcDriveAmpCoefs (FilterType& filter, float driveParam, float fs, const KingOfToneDrive::Components& components)
 {
-    using namespace Components;
-    const auto Rd = R6 + Rp * std::pow (driveParam, 1.5f);
+    const auto Rd = components.R6 + components.Rp * std::pow (driveParam, 1.5f);
 
-    constexpr auto R1_b2 = C5 * C6 * R7 * R8;
-    constexpr auto R1_b1 = C5 * R7 + C6 * R8;
-    constexpr auto R1_b0 = 1.0f;
-    constexpr auto R1_a2 = C5 * C6 * (R7 + R8);
-    constexpr auto R1_a1 = 0.0f;
-    constexpr auto R1_a0 = C5 + C6;
+    const auto R1_b2 = components.C5 * components.C6 * components.R7 * components.R8;
+    const auto R1_b1 = components.C5 * components.R7 + components.C6 * components.R8;
+    const auto R1_b0 = 1.0f;
+    const auto R1_a2 = components.C5 * components.C6 * (components.R7 + components.R8);
+    const auto R1_a1 = 0.0f;
+    const auto R1_a0 = components.C5 + components.C6;
 
     const auto R2_b0 = Rd;
-    const auto R2_a1 = C4 * Rd;
+    const auto R2_a1 = components.C4 * Rd;
     constexpr auto R2_a0 = 1.0f;
 
     float a_s[4] {};
@@ -56,11 +39,10 @@ void calcDriveAmpCoefs (FilterType& filter, float driveParam, float fs)
 }
 
 template <typename FilterType>
-void calcDriveaStageBypassedCoefs (FilterType& filter, float fs)
+void calcDriveStageBypassedCoefs (FilterType& filter, float fs, const KingOfToneDrive::Components& components)
 {
-    using namespace Components;
-    float b_s[2] { C7 * (R9 + R10), 1.0f };
-    float a_s[2] { C7 * R9, 1.0f };
+    float b_s[2] { components.C7 * (components.R9 + components.R10), 1.0f };
+    float a_s[2] { components.C7 * components.R9, 1.0f };
 
     using namespace chowdsp::ConformalMaps;
     float b_z[2] {};
@@ -79,6 +61,149 @@ KingOfToneDrive::KingOfToneDrive (UndoManager* um) : BaseProcessor ("Tone King",
     uiOptions.powerColour = Colour (0xFFEBD05B);
     uiOptions.info.description = "Virtual analog emulation of the drive stages from the Analogman \"King of Tone\" pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
+    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::king_of_tone_schematic_svg,
+                                               .size = BinaryData::king_of_tone_schematic_svgSize };
+    netlistCircuitQuantities->addResistor (
+        1.0e6f,
+        "R4",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.R4 = self.value.load();
+            const auto inputFilterFreq = 1.0f / (MathConstants<float>::twoPi * components.C3 * components.R4);
+            for (auto& filt : inputFilter)
+            {
+                filt.calcCoefs (inputFilterFreq, fs);
+            }
+        },
+        1.0e3f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        10.0e3f,
+        "R6",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.R6 = self.value.load();
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        33.0e3f,
+        "R7",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.R7 = self.value.load();
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        27.0e3f,
+        "R8",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.R8 = self.value.load();
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        10.0e3f,
+        "R9",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.R9 = self.value.load();
+            for (auto& filt : overdriveStageBypass)
+                calcDriveStageBypassedCoefs (filt, fs, components);
+            for (auto& wdf : overdrive)
+                wdf.R9_C7_Vin.setResistanceValue (components.R9);
+        },
+        100.0f,
+        25.0e3f);
+    netlistCircuitQuantities->addResistor (
+        220.0e3f,
+        "R10",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.R10 = self.value.load();
+            for (auto& filt : overdriveStageBypass)
+                calcDriveStageBypassedCoefs (filt, fs, components);
+            for (auto& wdf : overdrive)
+                wdf.R10.setResistanceValue (components.R10);
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        6.8e3f,
+        "R11",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdf : overdrive)
+                wdf.R11.setResistanceValue (self.value.load());
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addResistor (
+        1.0e3f,
+        "R12",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            for (auto& wdf : clipper)
+                wdf.R12_Vs.setResistanceValue (self.value.load());
+        },
+        100.0f,
+        2.0e6f);
+    netlistCircuitQuantities->addCapacitor (
+        0.01e-6f,
+        "C3",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.R4 = self.value.load();
+            const auto inputFilterFreq = 1.0f / (MathConstants<float>::twoPi * components.C3 * components.R4);
+            for (auto& filt : inputFilter)
+                filt.calcCoefs (inputFilterFreq, fs);
+        },
+        10.0e-9f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        100.0e-12f,
+        "C4",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.C4 = self.value.load();
+        },
+        1.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        0.01e-6f,
+        "C5",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.C5 = self.value.load();
+        },
+        1.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        0.01e-6f,
+        "C6",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.C6 = self.value.load();
+        },
+        1.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        0.1e-6f,
+        "C7",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            components.C7 = self.value.load();
+            for (auto& filt : overdriveStageBypass)
+                calcDriveStageBypassedCoefs (filt, fs, components);
+            for (auto& wdf : overdrive)
+                wdf.R9_C7_Vin.setCapacitanceValue (components.C7);
+        },
+        1.0e-9f,
+        1.0e-3f);
 }
 
 ParamLayout KingOfToneDrive::createParameterLayout()
@@ -96,7 +221,7 @@ void KingOfToneDrive::prepare (double sampleRate, int samplesPerBlock)
 {
     fs = (float) sampleRate;
 
-    const auto inputFilterFreq = 1.0f / (MathConstants<float>::twoPi * Components::C3 * Components::R4);
+    const auto inputFilterFreq = 1.0f / (MathConstants<float>::twoPi * components.C3 * components.R4);
     for (auto& filt : inputFilter)
     {
         filt.reset();
@@ -106,7 +231,7 @@ void KingOfToneDrive::prepare (double sampleRate, int samplesPerBlock)
     for (auto& filt : driveAmp)
     {
         filt.reset();
-        calcDriveAmpCoefs (filt, *driveParam, fs);
+        calcDriveAmpCoefs (filt, *driveParam, fs, components);
     }
 
     for (auto& driveParamSm : driveParamSmooth)
@@ -121,7 +246,7 @@ void KingOfToneDrive::prepare (double sampleRate, int samplesPerBlock)
     for (auto& filt : overdriveStageBypass)
     {
         filt.reset();
-        calcDriveaStageBypassedCoefs (filt, fs);
+        calcDriveStageBypassedCoefs (filt, fs, components);
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
@@ -170,14 +295,14 @@ void KingOfToneDrive::processAudio (AudioBuffer<float>& buffer)
         driveParamSmooth[ch].setTargetValue (*driveParam);
         if (! driveParamSmooth[ch].isSmoothing())
         {
-            calcDriveAmpCoefs (driveAmp[ch], driveParamSmooth[ch].getNextValue(), fs);
+            calcDriveAmpCoefs (driveAmp[ch], driveParamSmooth[ch].getNextValue(), fs, components);
             driveAmp[ch].processBlock (x, numSamples);
         }
         else
         {
             for (int n = 0; n < numSamples; ++n)
             {
-                calcDriveAmpCoefs (driveAmp[ch], driveParamSmooth[ch].getNextValue(), fs);
+                calcDriveAmpCoefs (driveAmp[ch], driveParamSmooth[ch].getNextValue(), fs, components);
                 x[n] = driveAmp[ch].processSample (x[n]);
             }
         }
