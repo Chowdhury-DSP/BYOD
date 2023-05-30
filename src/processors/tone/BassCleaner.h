@@ -30,9 +30,9 @@ private:
             filt.setCoefs (b, a);
     }
 
-    static constexpr float C3 = 1.0e-6f;
-    static constexpr float C4 = 47.0e-9f;
-    static constexpr float R4 = 3.3e3f;
+    float C3 = 1.0e-6f;
+    float C4 = 47.0e-9f;
+    float R4 = 3.3e3f;
     static constexpr float Rv1Value = 50.0e3f;
 
     chowdsp::FloatParameter* cleanParam = nullptr;

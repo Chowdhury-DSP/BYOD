@@ -1,5 +1,6 @@
 #include "BassCleaner.h"
-#include "../ParameterHelpers.h"
+#include "processors/ParameterHelpers.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 BassCleaner::BassCleaner (UndoManager* um) : BaseProcessor ("Bass Cleaner", createParameterLayout(), um)
 {
@@ -9,6 +10,37 @@ BassCleaner::BassCleaner (UndoManager* um) : BaseProcessor ("Bass Cleaner", crea
     uiOptions.powerColour = Colours::red.brighter (0.1f);
     uiOptions.info.description = "A filter to smooth and dampen bass frequencies.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
+    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::bass_cleaner_schematic_svg,
+                                               .size = BinaryData::bass_cleaner_schematic_svgSize };
+    netlistCircuitQuantities->addResistor (
+        3.3e3f,
+        "R4",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            R4 = self.value.load();
+        },
+        100.0f,
+        100.0e3f);
+    netlistCircuitQuantities->addCapacitor (
+        1.0e-6f,
+        "C3",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            C3 = self.value.load();
+        },
+        1.0e-12f,
+        1.0e-3f);
+    netlistCircuitQuantities->addCapacitor (
+        47.0e-9f,
+        "C4",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            C4 = self.value.load();
+        },
+        1.0e-12f,
+        10.0e-6f);
 }
 
 ParamLayout BassCleaner::createParameterLayout()
