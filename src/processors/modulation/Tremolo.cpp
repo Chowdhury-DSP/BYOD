@@ -21,6 +21,7 @@ static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& bl
 }
 
 const String stereoTag = "stereo";
+const String v1WaveTag = "v1_wave";
 
 } // namespace
 
@@ -35,8 +36,10 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
     loadParameterPointer (waveParam, vts, "wave");
     loadParameterPointer (depthParam, vts, "depth");
     loadParameterPointer (stereoParam, vts, stereoTag);
+    loadParameterPointer (v1WaveParam, vts, v1WaveTag);
 
     addPopupMenuParameter (stereoTag);
+    addPopupMenuParameter (v1WaveTag);
 
     uiOptions.backgroundColour = Colours::orange.darker (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter();
@@ -56,6 +59,7 @@ ParamLayout Tremolo::createParameterLayout()
     createPercentParameter (params, "depth", "Depth", 0.5f);
 
     emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
+    emplace_param<chowdsp::BoolParameter> (params, v1WaveTag, "V1 Wave", false);
 
     return { params.begin(), params.end() };
 }
@@ -69,24 +73,32 @@ void Tremolo::prepare (double sampleRate, int samplesPerBlock)
 
     modOutBuffer.setSize (1, samplesPerBlock);
     audioOutBuffer.setSize (2, samplesPerBlock);
-    phaseSmooth.reset (sampleRate, 0.01);
-    waveSmooth.reset (sampleRate, 0.01);
-    depthGainSmooth.reset (sampleRate, 0.01);
-    depthAddSmooth.reset (sampleRate, 0.01);
+
+    phaseSmooth.setRampLength (0.01);
+    waveSmooth.setRampLength (0.01);
+    depthGainSmooth.setRampLength (0.01);
+    depthAddSmooth.setRampLength (0.01);
+
+    phaseSmooth.prepare (sampleRate, samplesPerBlock);
+    waveSmooth.prepare (sampleRate, samplesPerBlock);
+    depthGainSmooth.prepare (sampleRate, samplesPerBlock);
+    depthAddSmooth.prepare (sampleRate, samplesPerBlock);
 
     fs = (float) sampleRate;
     phase = 0.0f;
 }
 
-void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
+void Tremolo::fillWaveBuffer_old (float* waveBuff, const int numSamples, float& p)
 {
     bool isSmoothing = phaseSmooth.isSmoothing() || waveSmooth.isSmoothing();
 
     if (isSmoothing)
     {
+        const auto* phaseSmoothData = phaseSmooth.getSmoothedBuffer();
+        const auto* waveSmoothData = waveSmooth.getSmoothedBuffer();
         for (int n = 0; n < numSamples; ++n)
         {
-            auto curWave = waveSmooth.getNextValue();
+            auto curWave = waveSmoothData[n];
             auto sineGain = 1.0f - jmin (2.0f * curWave, 1.0f);
             auto squareGain = jmax (2.0f * (curWave - 0.5f), 0.0f);
             auto triGain = 1.0f - 2.0f * std::abs (0.5f - curWave);
@@ -95,14 +107,14 @@ void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
             waveBuff[n] += triGain * p / MathConstants<float>::pi; // triangle
             waveBuff[n] += squareGain * (p > 0.0f ? 1.0f : -1.0f); // square
 
-            p += phaseSmooth.getNextValue();
+            p += phaseSmoothData[n];
             p = p > MathConstants<float>::pi ? p - MathConstants<float>::twoPi : p;
         }
     }
     else
     {
-        auto phaseInc = phaseSmooth.getNextValue();
-        auto curWave = waveSmooth.getNextValue();
+        auto phaseInc = phaseSmooth.getCurrentValue();
+        auto curWave = waveSmooth.getCurrentValue();
         if (curWave <= 0.5f)
         {
             auto sineGain = 1.0f - jmin (2.0f * curWave, 1.0f);
@@ -132,13 +144,52 @@ void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
     }
 }
 
+void Tremolo::fillWaveBuffer (float* waveBuff, const int numSamples, float& p)
+{
+    const auto triangle_saw = [] (float p_o_pi, float s)
+    {
+        const auto b = p_o_pi + 1.0f - s;
+        return (2.0f * std::abs (b)) / (1.0f - chowdsp::Math::sign (b) * (s - 1.0f)) - 1.0f;
+    };
+
+    const auto saw_square = [] (float p_o_pi, float s)
+    {
+        return std::clamp (p_o_pi / (1.0f - s), -1.0f, 1.0f);
+    };
+
+    const auto* phaseSmoothData = phaseSmooth.getSmoothedBuffer();
+    const auto* waveSmoothData = waveSmooth.getSmoothedBuffer();
+    for (int n = 0; n < numSamples; ++n)
+    {
+        const auto curWave = waveSmoothData[n];
+        const auto p_over_pi = p / juce::MathConstants<float>::pi;
+
+        if (curWave < 1.0f / 3.0f)
+        {
+            const auto mixTriangle = std::min (3.0f * curWave, 1.0f);
+            waveBuff[n] = mixTriangle * triangle_saw (p_over_pi, 1.0f) + (1.0f - mixTriangle) * std::sin (p - juce::MathConstants<float>::halfPi);
+        }
+        else if (curWave < 2.0f / 3.0f)
+        {
+            waveBuff[n] = triangle_saw (p_over_pi, 1.0f - std::min (3.0f * curWave - 1.0f, 1.0f));
+        }
+        else
+        {
+            waveBuff[n] = saw_square (p_over_pi, std::min (3.0f * curWave - 2.0f, 1.0f));
+        }
+
+        p += phaseSmoothData[n];
+        p = p > MathConstants<float>::pi ? p - MathConstants<float>::twoPi : p;
+    }
+}
+
 void Tremolo::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     modOutBuffer.setSize (1, numSamples, false, false, true);
 
-    phaseSmooth.setTargetValue (*rateParam * MathConstants<float>::pi / fs);
-    waveSmooth.setTargetValue (*waveParam);
+    phaseSmooth.process (*rateParam * MathConstants<float>::pi / fs, numSamples);
+    waveSmooth.process (*waveParam, numSamples);
 
     if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
     {
@@ -149,7 +200,10 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
     else // create our own modulation signal
     {
         // fill modulation buffer (-1, 1)
-        fillWaveBuffer (modOutBuffer.getWritePointer (0), numSamples, phase);
+        if (! v1WaveParam->get())
+            fillWaveBuffer (modOutBuffer.getWritePointer (0), numSamples, phase);
+        else
+            fillWaveBuffer_old (modOutBuffer.getWritePointer (0), numSamples, phase);
 
         // smooth out modulation signal
         auto&& modBlock = dsp::AudioBlock<float> { modOutBuffer };
@@ -173,10 +227,10 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         {
             auto&& waveBlock = dsp::AudioBlock<float> { audioOutBuffer }.getSingleChannelBlock (0);
             auto depthVal = std::pow (depthParam->getCurrentValue(), 0.33f);
-            depthGainSmooth.setTargetValue (depthVal);
-            waveBlock.multiplyBy (depthGainSmooth);
-            depthAddSmooth.setTargetValue (1.0f - depthVal);
-            addSmoothed (waveBlock, depthAddSmooth);
+            depthGainSmooth.process (depthVal, numSamples);
+            juce::FloatVectorOperations::multiply (waveBlock.getChannelPointer (0), depthGainSmooth.getSmoothedBuffer(), numSamples);
+            depthAddSmooth.process (1.0f - depthVal, numSamples);
+            juce::FloatVectorOperations::add (waveBlock.getChannelPointer (0), depthAddSmooth.getSmoothedBuffer(), numSamples);
         }
 
         // copy modulation data into all the channels
@@ -242,4 +296,18 @@ void Tremolo::processAudioBypassed (AudioBuffer<float>& buffer)
 
     outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
     outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+}
+
+void Tremolo::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)
+{
+    BaseProcessor::fromXML (xml, version, loadPosition);
+
+    using namespace std::string_view_literals;
+    if (version <= chowdsp::Version { "1.1.7"sv })
+    {
+        // In Version 1.1.8 we made some changes to how the LFO shape interacts with the
+        // "Wave" parameter. So for versions 1.1.7 and earlier, we need to revert to the
+        // v1 behaviour.
+        v1WaveParam->setValueNotifyingHost (1.0f);
+    }
 }
