@@ -247,11 +247,14 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
             PopupMenu::Item item;
             item.itemID = ++menuID;
             item.text = procName;
-            item.colour =
+            if (procToReplace != nullptr)
+                item.isEnabled = procName != procToReplace->getName();
 #if BYOD_ENABLE_ADD_ON_MODULES
-                ModuleStatus == AddOnProcessorStore::ModuleStatus::AddOnModuleUnlocked ? Colours::gold :
+            item.colour = ModuleStatus == AddOnProcessorStore::ModuleStatus::AddOnModuleUnlocked ? Colours::gold : Colours::white;
+#else
+            item.colour = Colours::white;
 #endif
-                                                                                       Colours::white;
+
             item.action = [&store, &procCreator = procCreator, procToReplace, connectionInfo]
             {
                 if (connectionInfo != nullptr)
@@ -291,11 +294,10 @@ void ProcessorStore::createProcReplaceList (PopupMenu& menu, int& menuID, BasePr
         *this,
         menu,
         menuID,
-        [procToReplace] (const String& name, const ProcInfo& procInfo)
+        [procToReplace] ([[maybe_unused]] const String& name, const ProcInfo& procInfo)
         {
             return procInfo.numInputs == procToReplace->getNumInputs()
-                   && procInfo.numOutputs == procToReplace->getNumOutputs()
-                   && name != procToReplace->getName();
+                   && procInfo.numOutputs == procToReplace->getNumOutputs();
         },
         procToReplace);
 }

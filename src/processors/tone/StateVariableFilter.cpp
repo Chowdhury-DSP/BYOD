@@ -162,6 +162,7 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
             const auto* modeChoiceParam = getParameterPointer<AudioParameterChoice*> (vts, modeTag);
             modeSelector.addItemList (modeChoiceParam->choices, 1);
             modeSelector.setSelectedItemIndex (0);
+            modeSelector.setScrollWheelEnabled (true);
             hcp.registerParameterComponent (modeSelector, *modeChoiceParam);
 
             hcp.registerParameterComponent (multiModeSlider, multiModeSlider.getParameter());

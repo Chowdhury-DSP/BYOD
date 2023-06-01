@@ -48,6 +48,7 @@ KnobsComponent::KnobsComponent (BaseProcessor& baseProc,
         newBox->setName (param->name);
         newBox->addItemList (param->choices, 1);
         newBox->setSelectedItemIndex (0);
+        newBox->setScrollWheelEnabled (true);
         newBox->attachment = std::make_unique<ComboBoxAttachment> (vts, param->paramID, *newBox);
         boxes.add (std::move (newBox));
     };
