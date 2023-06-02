@@ -20,6 +20,7 @@ target_sources(BYOD PRIVATE
     gui/pedalboard/editors/KnobsComponent.cpp
     gui/pedalboard/editors/Port.cpp
     gui/pedalboard/editors/ProcessorEditor.cpp
+    gui/pedalboard/editors/EditorSelector.cpp
 
     gui/toolbar/ToolBar.cpp
     gui/toolbar/UndoRedoComponent.cpp

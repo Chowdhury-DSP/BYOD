@@ -27,10 +27,12 @@ juce::Point<int> getRandomPosition (const Component& comp)
 }
 } // namespace
 
-BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvider& hostCP) : Component ("Board"),
-                                                                                               procChain (procs),
-                                                                                               cableView (*this),
-                                                                                               hostContextProvider (hostCP)
+BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvider& hostCP)
+    : Component ("Board"),
+      procChain (procs),
+      cableView (*this),
+      hostContextProvider (hostCP),
+      editorSelector (*this)
 {
     newProcButton.setButtonText ("+");
     newProcButton.setColour (TextButton::buttonColourId, Colours::azure.darker (0.8f).withAlpha (0.75f));
@@ -75,11 +77,15 @@ BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvi
         menu.addSeparator();
         showNewProcMenu (menu, options);
     };
+
+    selectorLasso.setColour (LassoComponent<ProcessorEditor*>::lassoOutlineColourId, Colours::red);
+    selectorLasso.setColour (LassoComponent<ProcessorEditor*>::lassoFillColourId, Colours::red.withAlpha (0.35f));
 }
 
 BoardComponent::~BoardComponent()
 {
     removeMouseListener (&cableView);
+    removeChildComponent (&selectorLasso);
 }
 
 void BoardComponent::setScaleFactor (float newScaleFactor)
@@ -118,6 +124,16 @@ void BoardComponent::resized()
     repaint();
 }
 
+void BoardComponent::paintOverChildren (Graphics& g)
+{
+    RectangleList<int> rectangles;
+    for (auto& editor : editorSelector.getLassoSelection())
+        rectangles.add (editor->getBoundsInParent());
+
+    g.setColour (selectorLasso.findColour (LassoComponent<ProcessorEditor*>::lassoFillColourId));
+    g.fillRectList (rectangles);
+}
+
 void BoardComponent::processorAdded (BaseProcessor* newProc)
 {
     if (! procChain.getProcessors().contains (newProc))
@@ -143,6 +159,7 @@ void BoardComponent::processorRemoved (const BaseProcessor* proc)
 
     if (auto* editor = findEditorForProcessor (proc))
     {
+        editorSelector.getLassoSelection().deselect (editor);
         processorEditors.removeObject (editor);
     }
     repaint();
@@ -167,6 +184,22 @@ void BoardComponent::showInfoComp (const BaseProcessor& proc)
     infoComp.toFront (true);
 }
 
+void BoardComponent::editorDeleteRequested (ProcessorEditor& editor)
+{
+    if (editorSelector.getLassoSelection().isSelected (&editor))
+    {
+        Array<BaseProcessor*> procsToRemove;
+        procsToRemove.ensureStorageAllocated (editorSelector.getLassoSelection().getNumSelected());
+        for (auto& selectedEditor : editorSelector.getLassoSelection())
+            procsToRemove.add (selectedEditor->getProcPtr());
+        procChain.getActionHelper().removeProcessorBatch (procsToRemove);
+    }
+    else
+    {
+        procChain.getActionHelper().removeProcessor (editor.getProcPtr());
+    }
+}
+
 void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e, const juce::Point<int>& mouseOffset, bool dragEnded)
 {
     if (dragEnded)
@@ -179,9 +212,23 @@ void BoardComponent::editorDragged (ProcessorEditor& editor, const MouseEvent& e
     const auto relE = e.getEventRelativeTo (this);
     const auto bounds = getBounds();
 
-    auto* proc = editor.getProcPtr();
-    proc->setPosition (relE.getPosition() - mouseOffset, bounds);
-    editor.setTopLeftPosition (proc->getPosition (bounds));
+    if (editorSelector.getLassoSelection().isSelected (&editor))
+    {
+        const auto distanceToMove = (relE.getPosition() - mouseOffset) - editor.getPosition();
+        for (auto& selectedEditor : editorSelector.getLassoSelection())
+        {
+            auto* proc = selectedEditor->getProcPtr();
+            proc->setPosition (selectedEditor->getPosition() + distanceToMove, bounds);
+            selectedEditor->setTopLeftPosition (proc->getPosition (bounds));
+        }
+    }
+    else
+    {
+        auto* proc = editor.getProcPtr();
+        proc->setPosition (relE.getPosition() - mouseOffset, bounds);
+        editor.setTopLeftPosition (proc->getPosition (bounds));
+    }
+
     cableView.updateCablePositions();
     repaint();
 }
@@ -269,4 +316,26 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> 
 
         editor->setBounds (bounds.withPosition (position));
     }
+}
+
+void BoardComponent::mouseDown (const MouseEvent& e)
+{
+    editorSelector.getLassoSelection().deselectAll();
+    addChildComponent (selectorLasso);
+    selectorLasso.beginLasso (e, &editorSelector);
+    repaint();
+}
+
+void BoardComponent::mouseDrag (const MouseEvent& e)
+{
+    selectorLasso.toFront (false);
+    selectorLasso.dragLasso (e);
+    repaint();
+}
+
+void BoardComponent::mouseUp ([[maybe_unused]] const MouseEvent& e)
+{
+    selectorLasso.endLasso();
+    removeChildComponent (&selectorLasso);
+    repaint();
 }
