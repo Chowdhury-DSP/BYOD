@@ -32,8 +32,6 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
     xSvg->replaceColour (Colours::white, contrastColour);
     xButton.setImages (xSvg.get());
     addAndMakeVisible (xButton);
-    xButton.onClick = [this]
-    { procChain.getActionHelper().removeProcessor (&proc); };
 
     if (proc.getNumInputs() != 0 && proc.getNumOutputs() != 0)
     {
@@ -95,6 +93,9 @@ void ProcessorEditor::addToBoard (BoardComponent* boardComp)
         editorDraggedBroadcaster.connect<&BoardComponent::editorDragged> (boardComp),
         duplicateProcessorBroadcaster.connect<&BoardComponent::duplicateProcessor> (boardComp),
     };
+
+    xButton.onClick = [this, boardComp]
+    { boardComp->editorDeleteRequested (*this); };
 }
 
 void ProcessorEditor::processorSettingsCallback (PopupMenu& menu, PopupMenu::Options& options)
