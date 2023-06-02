@@ -41,35 +41,52 @@ void ProcessorChainActionHelper::replaceConnectionWithProcessor (BaseProcessor::
     um->perform (new AddOrRemoveConnection (chain, { newProcRaw, 0, connectionInfo.endProc, connectionInfo.endPort }));
 }
 
+static void removeConnections (BaseProcessor* startProc, const BaseProcessor* endProc, UndoManager* um, ProcessorChain& chain)
+{
+    for (int portIdx = 0; portIdx < startProc->getNumOutputs(); ++portIdx)
+    {
+        int numConnections = startProc->getNumOutputConnections (portIdx);
+        for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
+        {
+            auto connection = startProc->getOutputConnection (portIdx, cIdx);
+            if (connection.endProc == endProc)
+                um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
+        }
+    }
+}
+
 void ProcessorChainActionHelper::removeProcessor (BaseProcessor* procToRemove)
 {
     um->beginNewTransaction();
-
-    auto removeConnections = [this, procToRemove] (BaseProcessor* proc)
-    {
-        for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
-        {
-            int numConnections = proc->getNumOutputConnections (portIdx);
-            for (int cIdx = numConnections - 1; cIdx >= 0; --cIdx)
-            {
-                auto connection = proc->getOutputConnection (portIdx, cIdx);
-                if (connection.endProc == procToRemove)
-                    um->perform (new AddOrRemoveConnection (chain, std::move (connection), true));
-            }
-        }
-    };
 
     for (auto* proc : chain.procs)
     {
         if (proc == procToRemove)
             continue;
-
-        removeConnections (proc);
+        removeConnections (proc, procToRemove, um, chain);
     }
-
-    removeConnections (&chain.inputProcessor);
+    removeConnections (&chain.inputProcessor, procToRemove, um, chain);
 
     um->perform (new AddOrRemoveProcessor (chain, procToRemove));
+}
+
+void ProcessorChainActionHelper::removeProcessorBatch (const Array<BaseProcessor*>& procsToRemove)
+{
+    um->beginNewTransaction();
+
+    for (auto* proc : chain.procs)
+    {
+        if (procsToRemove.contains (proc))
+            continue;
+        for (auto* procToRemove : procsToRemove)
+            removeConnections (proc, procToRemove, um, chain);
+    }
+
+    for (auto* procToRemove : procsToRemove)
+    {
+        removeConnections (&chain.inputProcessor, procToRemove, um, chain);
+        um->perform (new AddOrRemoveProcessor (chain, procToRemove));
+    }
 }
 
 void ProcessorChainActionHelper::replaceProcessor (BaseProcessor::Ptr newProc, BaseProcessor* procToReplace)
