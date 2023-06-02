@@ -127,6 +127,7 @@ void BoardComponent::resized()
 void BoardComponent::paintOverChildren (Graphics& g)
 {
     RectangleList<int> rectangles;
+    rectangles.ensureStorageAllocated (editorSelector.getLassoSelection().getNumSelected());
     for (auto& editor : editorSelector.getLassoSelection())
         rectangles.add (editor->getBoundsInParent());
 
