@@ -6,7 +6,7 @@ class BoardComponent;
 class EditorSelector : public LassoSource<ProcessorEditor*>
 {
 public:
-    explicit EditorSelector(const BoardComponent&);
+    explicit EditorSelector (const BoardComponent&);
 
     void findLassoItemsInArea (Array<ProcessorEditor*>& results, const Rectangle<int>& area) override;
     SelectedItemSet<ProcessorEditor*>& getLassoSelection() override { return selectedEditorSet; }
