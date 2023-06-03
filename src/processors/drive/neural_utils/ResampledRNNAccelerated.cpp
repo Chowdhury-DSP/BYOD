@@ -21,9 +21,8 @@ void ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::initialise
     MemoryInputStream jsonInputStream (modelData, (size_t) modelDataSize, false);
     auto weightsJson = nlohmann::json::parse (jsonInputStream.readEntireStreamAsString().toStdString());
 
-    mpark::visit ([&weightsJson] (auto& model)
-                  { model.initialise (weightsJson); },
-                  model_variant);
+    model_variant.visit ([&weightsJson] (auto& model)
+                         { model.initialise (weightsJson); });
 }
 
 template <int numIns, int hiddenSize, int RecurrentLayerType>
@@ -47,18 +46,16 @@ void ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::prepare (d
     needsResampling = resampleRatio != 1.0;
     resampler.prepareWithTargetSampleRate ({ sampleRate, (uint32) samplesPerBlock, 1 }, sampleRate * resampleRatio);
 
-    mpark::visit ([delaySamples = rnnDelaySamples] (auto& model)
-                  { model.prepare (delaySamples); },
-                  model_variant);
+    model_variant.visit ([delaySamples = rnnDelaySamples] (auto& model)
+                         { model.prepare (delaySamples); });
 }
 
 template <int numIns, int hiddenSize, int RecurrentLayerType>
 void ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::reset()
 {
     resampler.reset();
-    mpark::visit ([] (auto& model)
-                  { model.reset(); },
-                  model_variant);
+    model_variant.visit ([] (auto& model)
+                         { model.reset(); });
 }
 
 //=======================================================

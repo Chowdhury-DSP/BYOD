@@ -19,9 +19,9 @@
 [submodule "modules/chowdsp_wdf"]
 	path = modules/chowdsp_wdf
 	url = https://github.com/Chowdhury-DSP/chowdsp_wdf
-[submodule "modules/variant"]
-	path = modules/variant
-	url = https://github.com/mpark/variant
 [submodule "modules/fuzzysearchdatabase"]
 	path = modules/fuzzysearchdatabase
 	url = https://bitbucket.org/j_norberg/fuzzysearchdatabase.git
+[submodule "modules/ea_variant"]
+	path = modules/ea_variant
+	url = https://github.com/eyalamirmusic/Variant

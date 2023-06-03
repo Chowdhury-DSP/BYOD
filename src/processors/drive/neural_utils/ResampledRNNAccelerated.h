@@ -21,20 +21,21 @@ public:
     {
         auto processNNInternal = [this, &condition_data] (const chowdsp::BufferView<float>& bufferView)
         {
-            mpark::visit ([&bufferView, &condition_data] (auto& model)
-                          {
-                              if constexpr (numIns == 1)
-                              {
-                                  jassert (condition_data.empty());
-                                  juce::ignoreUnused (condition_data);
-                                  model.process (bufferView.getWriteSpan (0), useResiduals);
-                              }
-                              else
-                              {
-                                  jassert ((int) condition_data.size() == bufferView.getNumSamples());
-                                  model.process_conditioned (bufferView.getWriteSpan (0), condition_data, useResiduals);
-                              } },
-                          model_variant);
+            model_variant.visit (
+                [&bufferView, &condition_data] (auto& model)
+                {
+                    if constexpr (numIns == 1)
+                    {
+                        jassert (condition_data.empty());
+                        juce::ignoreUnused (condition_data);
+                        model.process (bufferView.getWriteSpan (0), useResiduals);
+                    }
+                    else
+                    {
+                        jassert ((int) condition_data.size() == bufferView.getNumSamples());
+                        model.process_conditioned (bufferView.getWriteSpan (0), condition_data, useResiduals);
+                    }
+                });
         };
 
         if (! needsResampling)
@@ -52,11 +53,11 @@ public:
 
 private:
 #if JUCE_INTEL
-    mpark::variant<rnn_sse::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>,
-                   rnn_avx::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>>
+    EA::Variant<rnn_sse::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>,
+                rnn_avx::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>>
         model_variant;
 #elif JUCE_ARM
-    mpark::variant<rnn_arm::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>> model_variant;
+    EA::Variant<rnn_arm::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType, (int) RTNeural::SampleRateCorrectionMode::NoInterp>> model_variant;
 #endif
 
     using ResamplerType = chowdsp::ResamplingTypes::LanczosResampler<8192, 8>;

@@ -42,12 +42,12 @@ private:
 
 #if JUCE_INTEL
     template <int numIns, int hiddenSize>
-    using GuitarML_LSTM = mpark::variant<
+    using GuitarML_LSTM = EA::Variant<
         rnn_sse::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>,
         rnn_avx::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>;
 #else
     template <int numIns, int hiddenSize>
-    using GuitarML_LSTM = mpark::variant<
+    using GuitarML_LSTM = EA::Variant<
         rnn_arm::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>;
 #endif
 
