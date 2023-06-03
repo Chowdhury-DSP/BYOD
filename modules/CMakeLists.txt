@@ -15,7 +15,7 @@ add_subdirectory(RTNeural)
 
  # add other C++ libraries
 add_subdirectory(sst-cpputils)
-add_subdirectory(variant)
+add_subdirectory(ea_variant)
 
 include(cmake/WarningFlags.cmake)
 include(cmake/ConfigFlags.cmake)
@@ -39,7 +39,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_units
         chowdsp::chowdsp_wdf
         RTNeural
-        mpark_variant
+        ea_variant
     PUBLIC
         config_flags
         juce::juce_recommended_lto_flags

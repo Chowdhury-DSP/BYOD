@@ -87,11 +87,12 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
         SpinLock::ScopedLockType modelChangingLock { modelChangingMutex };
         for (auto& modelVariant : lstm40NoCondModels)
         {
-            mpark::visit ([rnnDelaySamples, &modelJson] (auto& model)
-                          {
-                              model.initialise (modelJson);
-                              model.prepare ((float) rnnDelaySamples); },
-                          modelVariant);
+            modelVariant.visit (
+                [rnnDelaySamples, &modelJson] (auto& model)
+                {
+                    model.initialise (modelJson);
+                    model.prepare ((float) rnnDelaySamples);
+                });
         }
 
         modelArch = ModelArch::LSTM40NoCond;
@@ -101,11 +102,12 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
         SpinLock::ScopedLockType modelChangingLock { modelChangingMutex };
         for (auto& modelVariant : lstm40CondModels)
         {
-            mpark::visit ([rnnDelaySamples, &modelJson] (auto& model)
-                          {
-                              model.initialise (modelJson);
-                              model.prepare ((float) rnnDelaySamples); },
-                          modelVariant);
+            modelVariant.visit (
+                [rnnDelaySamples, &modelJson] (auto& model)
+                {
+                    model.initialise (modelJson);
+                    model.prepare ((float) rnnDelaySamples);
+                });
         }
 
         modelArch = ModelArch::LSTM40Cond;
@@ -243,9 +245,8 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         for (int ch = 0; ch < numChannels; ++ch)
         {
             auto* x = buffer.getWritePointer (ch);
-            mpark::visit ([x, numSamples] (auto& model)
-                          { model.process ({ x, (size_t) numSamples }, true); },
-                          lstm40NoCondModels[ch]);
+            lstm40NoCondModels[ch].visit ([x, numSamples] (auto& model)
+                                          { model.process ({ x, (size_t) numSamples }, true); });
         }
     }
     else if (modelArch == ModelArch::LSTM40Cond)
@@ -256,9 +257,8 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
         for (int ch = 0; ch < numChannels; ++ch)
         {
             auto* x = buffer.getWritePointer (ch);
-            mpark::visit ([x, conditionData, numSamples] (auto& model)
-                          { model.process_conditioned ({ x, (size_t) numSamples }, { conditionData, (size_t) numSamples }, true); },
-                          lstm40CondModels[ch]);
+            lstm40CondModels[ch].visit ([x, conditionData, numSamples] (auto& model)
+                                        { model.process_conditioned ({ x, (size_t) numSamples }, { conditionData, (size_t) numSamples }, true); });
         }
     }
 

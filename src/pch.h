@@ -19,7 +19,7 @@
 #include <FuzzySearchDatabase.hpp>
 #include <RTNeural/RTNeural.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>
-#include <mpark/variant.hpp>
+#include <ea_variant/ea_variant.h>
 #include <sst/cpputils.h>
 
 // global definitions
