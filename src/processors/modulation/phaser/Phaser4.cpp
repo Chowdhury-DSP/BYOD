@@ -1,6 +1,7 @@
 #include "Phaser4.h"
 #include "processors/BufferHelpers.h"
 #include "processors/ParameterHelpers.h"
+#include "processors/netlist_helpers/CircuitQuantity.h"
 
 namespace
 {
@@ -46,6 +47,40 @@ Phaser4::Phaser4 (UndoManager* um) : BaseProcessor ("Phaser4",
     uiOptions.powerColour = Colours::cyan.brighter (0.1f);
     uiOptions.info.description = "A phaser effect based on a classic 4-stage phaser pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
+    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::phase90_schematic_svg,
+                                               .size = BinaryData::phase90_schematic_svgSize };
+    netlistCircuitQuantities->addResistor (
+        24.0e3f,
+        "R6",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            const auto newValue = self.value.load();
+            for (int ch = 0; ch < 2; ++ch)
+            {
+                fb4Filter[ch].setResistor (newValue);
+                fb3Filter[ch].setResistor (newValue);
+                fb2Filter[ch].setResistor (newValue);
+            }
+        },
+        100.0f,
+        40.0e3f);
+    netlistCircuitQuantities->addCapacitor (
+        47.0e-9f,
+        "C1",
+        [this] (const netlist::CircuitQuantity& self)
+        {
+            const auto newValue = self.value.load();
+            for (int ch = 0; ch < 2; ++ch)
+            {
+                fb4Filter[ch].setCapacitor (newValue);
+                fb3Filter[ch].setCapacitor (newValue);
+                fb2Filter[ch].setCapacitor (newValue);
+            }
+        },
+        1.0e-12f,
+        80.0e-9f);
 }
 
 ParamLayout Phaser4::createParameterLayout()

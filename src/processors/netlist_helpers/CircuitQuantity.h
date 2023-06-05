@@ -52,5 +52,7 @@ struct CircuitQuantityList
         const char* data = nullptr;
         int size = 0;
     } schematicSVG;
+
+    std::string extraNote;
 };
 } // namespace netlist
