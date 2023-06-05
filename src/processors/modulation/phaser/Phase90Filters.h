@@ -133,7 +133,6 @@ struct Phase90_3Stage : chowdsp::IIRFilter<3>
         K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
     }
 
-
     void processStage (const float* input,
                        float* output,
                        const float* modulation01,
