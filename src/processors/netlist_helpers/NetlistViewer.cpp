@@ -59,6 +59,14 @@ NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
         addAndMakeVisible (valueLabel);
     }
 
+    if (! quantities.extraNote.empty())
+    {
+        noteLabel.setText ("Note: " + quantities.extraNote, juce::dontSendNotification);
+        noteLabel.setJustificationType (Justification::topLeft);
+        noteLabel.setColour (Label::textColourId, Colours::black);
+        addAndMakeVisible (noteLabel);
+    }
+
     schematicSVG = juce::Drawable::createFromImageData (quantities.schematicSVG.data, quantities.schematicSVG.size);
     addAndMakeVisible (schematicSVG.get());
 
@@ -76,7 +84,8 @@ void NetlistViewer::paint (Graphics& g)
 
     g.setColour (Colours::black);
     const auto xCoord = 0.5f * (float) bounds.getWidth();
-    g.drawLine (juce::Line<float> { xCoord, 0.0f, xCoord, (float) getHeight() }, 2.0f);
+    const auto length = noteLabel.isVisible() ? float (rowHeight * (labelPairs.size() + 1)) : (float) getHeight();
+    g.drawLine (juce::Line<float> { xCoord, 0.0f, xCoord, length }, 2.0f);
     g.drawLine (juce::Line<float> { (float) bounds.getWidth(), 0.0f, (float) bounds.getWidth(), (float) getHeight() }, 2.0f);
 
     for (int i = 0; i <= labelPairs.size(); ++i)
@@ -106,6 +115,12 @@ void NetlistViewer::resized()
         const auto yCoord = rowHeight * int (i + 1);
         componentLabel.setBounds (0, yCoord, halfWidth, rowHeight);
         valueLabel.setBounds (halfWidth, yCoord, halfWidth, rowHeight);
+    }
+
+    if (noteLabel.isVisible())
+    {
+        const auto yPos = labelPairs.getLast()->second.getBottom();
+        noteLabel.setBounds (0, yPos, bounds.getWidth(), getHeight() - yPos);
     }
 }
 
