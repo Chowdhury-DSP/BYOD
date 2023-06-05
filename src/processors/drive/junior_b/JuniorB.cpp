@@ -1,5 +1,5 @@
 #include "JuniorB.h"
-#include "../../ParameterHelpers.h"
+#include "processors/ParameterHelpers.h"
 
 namespace
 {

@@ -13,8 +13,8 @@ struct JuniorBWDF
         R.prepare (sampleRate);
 
         C24.prepare (sampleRate);
-        C22.prepare (sampleRate);
-        C2.prepare (sampleRate);
+        R4_C22.prepare (sampleRate);
+        R5_C2.prepare (sampleRate);
         C1.prepare (sampleRate);
 
         Vbb.setVoltage ((Float) 232.0);
@@ -40,17 +40,13 @@ struct JuniorBWDF
     wdft::WDFParallelT<Float, decltype (S0), decltype (R2)> P1 { S0, R2 };
 
     // cathode
-    wdft::ResistorT<Float> R4 { (Float) 1.5e3 };
-    wdft::CapacitorT<Float> C22 { (Float) 47.0e-6 };
-    wdft::WDFParallelT<Float, decltype (R4), decltype (C22)> P2 { R4, C22 };
+    wdft::ResistorCapacitorParallelT<float> R4_C22 { (Float) 1.5e3, (Float) 47.0e-6 };
 
     // plate
-    wdft::CapacitorT<Float> C2 { (Float) 22.0e-12 };
-    wdft::ResistorT<Float> R5 { (Float) 470.0e3 };
-    wdft::WDFParallelT<Float, decltype (C2), decltype (R5)> P4 { C2, R5 };
+    wdft::ResistorCapacitorParallelT<float> R5_C2 { (Float) 470.0e3, (Float) 22.0e-12 };
 
     wdft::ResistorT<Float> R6 { (Float) 22.0e3 };
-    wdft::WDFSeriesT<Float, decltype (P4), decltype (R6)> S2 { P4, R6 };
+    wdft::WDFSeriesT<Float, decltype (R5_C2), decltype (R6)> S2 { R5_C2, R6 };
 
     wdft::CapacitorT<Float> C1 { (Float) 0.022e-6 };
     wdft::WDFSeriesT<Float, decltype (C1), decltype (S2)> S1 { C1, S2 };
@@ -85,8 +81,8 @@ struct JuniorBWDF
         }
     };
 
-    using RType = wdft::RtypeAdaptorMultN<Float, 2, ImpedanceCalc, decltype (P1), decltype (P2), decltype (P3)>;
-    RType R { P1, P2, P3 };
+    using RType = wdft::RtypeAdaptorMultN<Float, 2, ImpedanceCalc, decltype (P1), decltype (R4_C22), decltype (P3)>;
+    RType R { P1, R4_C22, P3 };
 
     TriodeModelType& triode_model;
 };

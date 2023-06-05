@@ -15,20 +15,31 @@ namespace detail
 template <bool withFeedback = false>
 struct Phase90_1Stage : chowdsp::IIRFilter<1>
 {
-    static constexpr float C1 = 47.0e-9f;
-    static constexpr float R6 = 24.0e3f;
-    static constexpr auto wc = 1.0f / (C1 * R6);
-
     void prepare (float sampleRate)
     {
-        K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        fs = sampleRate;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
         reset();
     }
 
-    void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
+    void setResistor (float newR6)
     {
-        juce::ignoreUnused (feedback);
+        R6 = newR6;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
+    }
 
+    void setCapacitor (float newC1)
+    {
+        C1 = newC1;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
+    }
+
+    void processStage (const float* input,
+                       float* output,
+                       const float* modulation01,
+                       [[maybe_unused]] const float* feedback,
+                       int numSamples) noexcept
+    {
         chowdsp::ScopedValue z1 { z[0][1] };
         for (int n = 0; n < numSamples; ++n)
         {
@@ -44,26 +55,40 @@ struct Phase90_1Stage : chowdsp::IIRFilter<1>
     }
 
 private:
+    float fs = 48000.0f;
     float K = 1.0f;
+    float C1 = 47.0e-9f;
+    float R6 = 24.0e3f;
 };
 
 template <bool withFeedback = false>
 struct Phase90_2Stage : chowdsp::IIRFilter<2>
 {
-    static constexpr float C1 = 47.0e-9f;
-    static constexpr float R6 = 24.0e3f;
-    static constexpr auto wc = 1.0f / (C1 * R6);
-
     void prepare (float sampleRate)
     {
-        K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        fs = sampleRate;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
         reset();
     }
 
-    void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
+    void setResistor (float newR6)
     {
-        juce::ignoreUnused (feedback);
+        R6 = newR6;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
+    }
 
+    void setCapacitor (float newC1)
+    {
+        C1 = newC1;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
+    }
+
+    void processStage (const float* input,
+                       float* output,
+                       const float* modulation01,
+                       [[maybe_unused]] const float* feedback,
+                       int numSamples) noexcept
+    {
         chowdsp::ScopedValue z1 { z[0][1] };
         chowdsp::ScopedValue z2 { z[0][2] };
         for (int n = 0; n < numSamples; ++n)
@@ -80,26 +105,40 @@ struct Phase90_2Stage : chowdsp::IIRFilter<2>
     }
 
 private:
+    float fs = 48000.0f;
     float K = 1.0f;
+    float C1 = 47.0e-9f;
+    float R6 = 24.0e3f;
 };
 
 template <bool withFeedback = false>
 struct Phase90_3Stage : chowdsp::IIRFilter<3>
 {
-    static constexpr float C1 = 47.0e-9f;
-    static constexpr float R6 = 24.0e3f;
-    static constexpr auto wc = 1.0f / (C1 * R6);
-
     void prepare (float sampleRate)
     {
-        K = chowdsp::ConformalMaps::computeKValueAngular (wc, sampleRate);
+        fs = sampleRate;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
         reset();
     }
 
-    void processStage (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
+    void setResistor (float newR6)
     {
-        juce::ignoreUnused (feedback);
+        R6 = newR6;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
+    }
 
+    void setCapacitor (float newC1)
+    {
+        C1 = newC1;
+        K = chowdsp::ConformalMaps::computeKValueAngular (1.0f / (C1 * R6), fs);
+    }
+
+    void processStage (const float* input,
+                       float* output,
+                       const float* modulation01,
+                       [[maybe_unused]] const float* feedback,
+                       int numSamples) noexcept
+    {
         for (int n = 0; n < numSamples; ++n)
         {
             const auto k = C1 * R6 * modulation01[n];
@@ -118,7 +157,10 @@ struct Phase90_3Stage : chowdsp::IIRFilter<3>
     }
 
 private:
+    float fs = 48000.0f;
     float K = 1.0f;
+    float C1 = 47.0e-9f;
+    float R6 = 24.0e3f;
 };
 
 struct Phase90_FB2
@@ -127,6 +169,18 @@ struct Phase90_FB2
     {
         stage1.prepare (sampleRate);
         stage2_4.prepare (sampleRate);
+    }
+
+    void setResistor (float newR6)
+    {
+        stage1.setResistor (newR6);
+        stage2_4.setResistor (newR6);
+    }
+
+    void setCapacitor (float newC1)
+    {
+        stage1.setCapacitor (newC1);
+        stage2_4.setCapacitor (newC1);
     }
 
     void processBlock (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
@@ -148,6 +202,18 @@ struct Phase90_FB3
         stage3_4.prepare (sampleRate);
     }
 
+    void setResistor (float newR6)
+    {
+        stage1_2.setResistor (newR6);
+        stage3_4.setResistor (newR6);
+    }
+
+    void setCapacitor (float newC1)
+    {
+        stage1_2.setCapacitor (newC1);
+        stage3_4.setCapacitor (newC1);
+    }
+
     void processBlock (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept
     {
         stage1_2.processStage (input, output, modulation01, feedback, numSamples);
@@ -165,6 +231,18 @@ struct Phase90_FB4
     {
         stage1_3.prepare (sampleRate);
         stage4.prepare (sampleRate);
+    }
+
+    void setResistor (float newR6)
+    {
+        stage1_3.setResistor (newR6);
+        stage4.setResistor (newR6);
+    }
+
+    void setCapacitor (float newC1)
+    {
+        stage1_3.setCapacitor (newC1);
+        stage4.setCapacitor (newC1);
     }
 
     void processBlock (const float* input, float* output, const float* modulation01, const float* feedback, int numSamples) noexcept

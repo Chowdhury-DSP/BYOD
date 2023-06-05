@@ -18,15 +18,15 @@ public:
         const std::string_view name;
 
         // default values: Ram's Head '75
-        const float R8 = 39.0e3f;
-        const float C8 = 10.0e-9f;
-        const float C9 = 4.0e-9f;
+        float R8 = 39.0e3f;
+        float C8 = 10.0e-9f;
+        float C9 = 4.0e-9f;
 
-        const float R5 = 22.0e3f;
-        const float R5_1 = 0.35f * R5;
-        const float R5_2 = 2.0f * (R5 - R5_1); // so that 50% = R5
+        float R5 = 22.0e3f;
+        float R5_1 = 0.35f * R5;
+        float R5_2 = 2.0f * (R5 - R5_1); // so that 50% = R5
 
-        const float RT = 100.0e3f;
+        float RT = 100.0e3f;
     };
 
 private:
@@ -65,7 +65,9 @@ private:
     float fs = 48000.0f;
     chowdsp::IIRFilter<2, float> iir[2];
 
-    const Components* comps;
+    static constexpr size_t numComponentSets = 11;
+    std::array<Components, numComponentSets> componentSets;
+
     SmoothedValue<float, ValueSmoothingTypes::Linear> toneSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> midsSmooth;
 
