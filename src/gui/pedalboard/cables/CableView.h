@@ -18,9 +18,9 @@ public:
 
     void mouseMove (const MouseEvent& e) override;
     void mouseExit (const MouseEvent& e) override;
-    void mouseDown (const MouseEvent& e) override;
-    void mouseDrag (const MouseEvent& e) override;
-    void mouseUp (const MouseEvent& e) override;
+    bool performMouseDown (const MouseEvent& e);
+    bool performMouseDrag (const MouseEvent& e);
+    bool performMouseUp (const MouseEvent& e);
 
     auto* getConnectionHelper() { return connectionHelper.get(); }
     auto* getPortLocationHelper() { return portLocationHelper.get(); }

@@ -93,14 +93,14 @@ void CableView::mouseExit (const MouseEvent&)
     mousePosition = std::nullopt;
 }
 
-void CableView::mouseDown (const MouseEvent& e)
+bool CableView::performMouseDown (const MouseEvent& e)
 {
     if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || e.eventComponent == nullptr)
-        return; // not a valid mouse event
+        return false; // not a valid mouse event
 
     const auto nearestPort = portLocationHelper->getNearestPort (e.getEventRelativeTo (this).getMouseDownPosition(), e.source.getComponentUnderMouse());
     if (nearestPort.editor == nullptr)
-        return; // no nearest port
+        return false; // no nearest port
 
     if (nearestPort.isInput)
     {
@@ -111,16 +111,22 @@ void CableView::mouseDown (const MouseEvent& e)
         connectionHelper->createCable ({ nearestPort.editor->getProcPtr(), nearestPort.portIndex, nullptr, 0 });
         isDraggingCable = true;
     }
+    return true;
 }
 
-void CableView::mouseDrag (const MouseEvent& e)
+bool CableView::performMouseDrag (const MouseEvent& e)
 {
     if (e.eventComponent == nullptr)
-        return;
+        return false;
 
     const auto eventCompName = e.eventComponent->getName();
-    if (sst::cpputils::contains (std::array<String, 3> { "Port", "Board", Cable::componentName.data() }, eventCompName))
+    if (sst::cpputils::contains (std::initializer_list<std::string_view> { "Port", "Board", Cable::componentName },
+                                 std::string_view { eventCompName.getCharPointer(), (size_t) eventCompName.length() }))
+    {
         mousePosition = e.getEventRelativeTo (this).getPosition();
+        return isDraggingCable;
+    }
+    return false;
 }
 
 bool CableView::cableBeingDragged() const
@@ -133,14 +139,16 @@ juce::Point<float> CableView::getCableMousePosition() const
     return mousePosition.value_or (juce::Point<int> {}).toFloat();
 }
 
-void CableView::mouseUp (const MouseEvent& e)
+bool CableView::performMouseUp (const MouseEvent& e)
 {
     if (isDraggingCable)
     {
         if (connectionHelper->releaseCable (e))
             cables.getLast()->updateEndPoint();
         isDraggingCable = false;
+        return true;
     }
+    return false;
 }
 
 void CableView::timerCallback()

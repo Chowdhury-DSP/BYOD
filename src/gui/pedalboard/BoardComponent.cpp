@@ -321,6 +321,9 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> 
 
 void BoardComponent::mouseDown (const MouseEvent& e)
 {
+    if (cableView.performMouseDown (e))
+        return;
+
     editorSelector.getLassoSelection().deselectAll();
     addChildComponent (selectorLasso);
     selectorLasso.beginLasso (e, &editorSelector);
@@ -329,13 +332,19 @@ void BoardComponent::mouseDown (const MouseEvent& e)
 
 void BoardComponent::mouseDrag (const MouseEvent& e)
 {
+    if (cableView.performMouseDrag (e))
+        return;
+
     selectorLasso.toFront (false);
     selectorLasso.dragLasso (e);
     repaint();
 }
 
-void BoardComponent::mouseUp ([[maybe_unused]] const MouseEvent& e)
+void BoardComponent::mouseUp (const MouseEvent& e)
 {
+    if (cableView.performMouseUp (e))
+        return;
+
     selectorLasso.endLasso();
     removeChildComponent (&selectorLasso);
     repaint();
