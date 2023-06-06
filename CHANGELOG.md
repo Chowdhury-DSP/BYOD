@@ -4,12 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Added "Flapjack" module.
+- Added "Mouse Drive" module.
+- Added "Solo-Vibe" module.
 - Added "Ladder Filter" module.
+- Added "netlist view" to allow for customization of some circuit-modelled modules.
 - Added AVX support (for PCs that support it) for neural network-based modules.
+- Added mouse interactions for selecting and moving/deleting multiple modules at once.
 - Added sample rate correction filter for GuitarML module.
+- Improved preset search results.
 - Improved custom IR loading/saving for "Amp IRs" module.
+- Improved IR menu UX with mouse and keyboard interactions.
 - Improved plugin RAM usage.
 - Fixed hardened runtime flags for standalone audio input on MacOS.
+- Fixed LFO waveform in Tremolo module.
 - Fixed crash when scrolling presets in Loopy Pro.
 
 ## [1.1.3] - 2023-01-13
