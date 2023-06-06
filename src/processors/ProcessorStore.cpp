@@ -45,6 +45,7 @@
 #include "modulation/phaser/Phaser4.h"
 #include "modulation/phaser/Phaser8.h"
 #include "modulation/scanner_vibrato/ScannerVibrato.h"
+#include "modulation/uni_vibe/UniVibe.h"
 
 #include "other/Compressor.h"
 #include "other/Delay.h"
@@ -121,6 +122,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Phaser8", &processorFactory<Phaser8> },
     { "Rotary", &processorFactory<Rotary> },
     { "Scanner Vibrato", &processorFactory<ScannerVibrato> },
+    { "Solo-Vibe", &processorFactory<UniVibe> },
     { "Tremolo", &processorFactory<Tremolo> },
 
     { "Clean Gain", &processorFactory<CleanGain> },
