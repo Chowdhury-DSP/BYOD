@@ -9,7 +9,7 @@ class BoardViewport : public Viewport,
 public:
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
-    BoardViewport (ProcessorChain& procChain, chowdsp::HostContextProvider& hostContextProvider);
+    BoardViewport (AudioProcessorValueTreeState& vts, ProcessorChain& procChain, chowdsp::HostContextProvider& hostContextProvider);
 
     void resized() override;
 
@@ -26,8 +26,7 @@ private:
     DrawableButton minusButton { "", DrawableButton::ImageOnButtonBackground };
 
     Label scaleLabel;
-
-    float scaleFactor = 1.0f;
+    Value scaleFactor { 1.0f };
 
     chowdsp::SharedPluginSettings pluginSettings;
 

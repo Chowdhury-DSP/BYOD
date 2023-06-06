@@ -1,9 +1,20 @@
 #include "BoardViewport.h"
 
-BoardViewport::BoardViewport (ProcessorChain& procChain, chowdsp::HostContextProvider& hostContextProvider) : comp (procChain, hostContextProvider)
+namespace
+{
+const juce::Identifier zoomLevelTag { "zoom_level" };
+}
+
+BoardViewport::BoardViewport (AudioProcessorValueTreeState& vts,
+                              ProcessorChain& procChain,
+                              chowdsp::HostContextProvider& hostContextProvider)
+    : comp (procChain, hostContextProvider)
 {
     pluginSettings->addProperties<&BoardViewport::globalSettingChanged> ({ { defaultZoomSettingID, 1.0 } }, *this);
-    setScaleFactor ((float) pluginSettings->getProperty<double> (defaultZoomSettingID));
+    if (! vts.state.hasProperty (zoomLevelTag))
+        vts.state.setProperty (zoomLevelTag, pluginSettings->getProperty<double> (defaultZoomSettingID), nullptr);
+    scaleFactor = vts.state.getPropertyAsValue (zoomLevelTag, nullptr, true);
+    setScaleFactor ((float) scaleFactor.getValue());
 
     setViewedComponent (&comp, false);
 
@@ -18,7 +29,7 @@ BoardViewport::BoardViewport (ProcessorChain& procChain, chowdsp::HostContextPro
     addAndMakeVisible (plusButton);
     plusButton.onClick = [this]
     {
-        setScaleFactor (scaleFactor * 1.1f);
+        setScaleFactor ((float) scaleFactor.getValue() * 1.1f);
         resized();
     };
 
@@ -28,7 +39,7 @@ BoardViewport::BoardViewport (ProcessorChain& procChain, chowdsp::HostContextPro
     addAndMakeVisible (minusButton);
     minusButton.onClick = [this]
     {
-        setScaleFactor (scaleFactor / 1.1f);
+        setScaleFactor ((float) scaleFactor.getValue() / 1.1f);
         resized();
     };
 
@@ -40,10 +51,9 @@ void BoardViewport::globalSettingChanged (SettingID settingID)
     if (settingID != defaultZoomSettingID)
         return;
 
+    Logger::writeToLog ("Default zoom level set to: " + scaleLabel.getText());
     setScaleFactor ((float) pluginSettings->getProperty<double> (settingID));
     resized();
-
-    Logger::writeToLog ("Default zoom level set to: " + scaleLabel.getText());
 }
 
 void BoardViewport::setScaleFactor (float newScaleFactor)
@@ -52,7 +62,7 @@ void BoardViewport::setScaleFactor (float newScaleFactor)
         return; // limits for zoom level
 
     scaleFactor = newScaleFactor;
-    scaleLabel.setText (String (int (scaleFactor * 100.0f)) + "%", dontSendNotification);
+    scaleLabel.setText (String (int ((float) scaleFactor.getValue() * 100.0f)) + "%", dontSendNotification);
 }
 
 void BoardViewport::resized()
@@ -60,7 +70,7 @@ void BoardViewport::resized()
     const auto width = getWidth();
     const auto height = getHeight();
 
-    comp.setScaleFactor (scaleFactor);
+    comp.setScaleFactor ((float) scaleFactor.getValue());
     comp.setBounds (0, 0, width, height);
 
     constexpr int buttonDim = 34;
