@@ -61,7 +61,7 @@ ParamLayout UniVibe::createParameterLayout()
         params,
         numStagesTag,
         "# Stages",
-        createNormalisableRange (1.0f, (float) maxNumStages, 5.0f),
+        NormalisableRange { 1.0f, (float) maxNumStages },
         4,
         [] (float val)
         {
