@@ -37,7 +37,7 @@ UniVibe::UniVibe (UndoManager* um) : BaseProcessor ("Solo-Vibe",
     };
     const auto randInLogRange = [&rand] (const juce::Range<float>& range)
     {
-        return range.getStart() * std::pow(range.getEnd() / range.getStart(), rand.nextFloat());
+        return range.getStart() * std::pow (range.getEnd() / range.getStart(), rand.nextFloat());
     };
 
     for (auto& stage : stages)
