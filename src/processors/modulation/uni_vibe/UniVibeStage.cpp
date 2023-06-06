@@ -49,7 +49,7 @@ void UniVibeStage::process (const AudioBuffer<float>& bufferIn,
     static constexpr auto driveGain = 3.0f;
     static constexpr auto driveGainRecip = 1.0f / driveGain;
     static constexpr auto driveBias = 0.33f;
-    static const auto driveBiasInv = algebraicSigmoid (driveBias);
+    const auto driveBiasInv = algebraicSigmoid (driveBias);
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
