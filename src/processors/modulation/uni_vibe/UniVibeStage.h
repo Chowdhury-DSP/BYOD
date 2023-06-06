@@ -5,6 +5,7 @@
 struct UniVibeStage
 {
     void prepare (double sampleRate, int samplesPerBlock);
+    void reset();
     void process (const AudioBuffer<float>& bufferIn,
                   AudioBuffer<float>& bufferOut,
                   const float* modData,
@@ -25,7 +26,7 @@ struct UniVibeStage
     float R6 = 4.7e3f;
     float alpha = 1.0f;
     float beta = 1.1f;
-    float fs = 48000.0f;
+    float T = 1.0f / 48000.0f;
 
     chowdsp::IIRFilter<1> H_c;
     chowdsp::IIRFilter<1> H_e;

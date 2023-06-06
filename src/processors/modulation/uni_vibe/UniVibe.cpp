@@ -1,20 +1,14 @@
 #include "UniVibe.h"
-#include "processors/ParameterHelpers.h"
 #include "processors/BufferHelpers.h"
+#include "processors/ParameterHelpers.h"
 
 namespace
 {
 const String speedTag = "speed";
 const String intensityTag = "intensity";
+const String numStagesTag = "num_stages";
 const String mixTag = "mix";
-}
-
-// TODO:
-// - fix DSP in its current form
-// - more stage customization
-// - variable number of stages
-// - nonlinearities
-// - circuit customization
+} // namespace
 
 UniVibe::UniVibe (UndoManager* um) : BaseProcessor ("Solo-Vibe",
                                                     createParameterLayout(),
@@ -25,6 +19,8 @@ UniVibe::UniVibe (UndoManager* um) : BaseProcessor ("Solo-Vibe",
     using namespace ParameterHelpers;
     speedParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, speedTag));
     intensityParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, intensityTag));
+    loadParameterPointer (numStagesParam, vts, numStagesTag);
+    loadParameterPointer (mixParam, vts, mixTag);
 
     uiOptions.backgroundColour = Colours::darkgrey.darker (0.1f);
     uiOptions.powerColour = Colours::lightgrey.brighter();
@@ -34,28 +30,25 @@ UniVibe::UniVibe (UndoManager* um) : BaseProcessor ("Solo-Vibe",
     routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ speedTag }, ModulationInput);
 
-    stages[0].alpha = 1.01f;
-    stages[0].beta = 1.11f;
-    stages[0].C_p = 0.015e-6f;
-    stages[1].alpha = 0.98f;
-    stages[1].beta = 1.09f;
-    stages[1].C_p = 0.22e-6f;
-    stages[2].alpha = 0.97f;
-    stages[2].beta = 1.1f;
-    stages[2].C_p = 470.0e-12f;
-    stages[3].alpha = 0.95f;
-    stages[3].beta = 1.09f;
-    stages[3].C_p = 0.0047e-6f;
+    juce::Random rand { 0x1234321 };
+    const auto randInRange = [&rand] (const juce::Range<float>& range)
+    {
+        return juce::jmap (rand.nextFloat(), range.getStart(), range.getEnd());
+    };
+    const auto randInLogRange = [&rand] (const juce::Range<float>& range)
+    {
+        return range.getStart() * std::pow(range.getEnd() / range.getStart(), rand.nextFloat());
+    };
 
-//    stages[1].ldrMap.A = -21.0e3f;
-//    stages[1].ldrMap.B = 350.0e3f;
-//    stages[1].ldrMap.C = 2.1f;
-//    stages[2].ldrMap.A = -22.0e3f;
-//    stages[2].ldrMap.B = 315.0e3f;
-//    stages[2].ldrMap.C = 2.0f;
-//    stages[3].ldrMap.A = -19.0e3f;
-//    stages[3].ldrMap.B = 300.0e3f;
-//    stages[3].ldrMap.C = 2.5f;
+    for (auto& stage : stages)
+    {
+        stage.alpha = randInRange ({ 0.9f, 1.01f });
+        stage.beta = randInRange ({ 1.0f, 1.1f });
+        stage.C_p = randInLogRange ({ 100.0e-12f, 1.0e-6f });
+        stage.ldrMap.A = randInRange ({ -22.0e3f, -18.0e3f });
+        stage.ldrMap.B = randInRange ({ 300.0e3f, 350.0e3f });
+        stage.ldrMap.C = randInRange ({ 2.0f, 2.5f });
+    }
 }
 
 ParamLayout UniVibe::createParameterLayout()
@@ -64,6 +57,17 @@ ParamLayout UniVibe::createParameterLayout()
     auto params = createBaseParams();
     createFreqParameter (params, speedTag, "Speed", 0.5f, 20.0f, 5.0f, 5.0f);
     createPercentParameter (params, intensityTag, "Intensity", 0.5f);
+    emplace_param<chowdsp::FloatParameter> (
+        params,
+        numStagesTag,
+        "# Stages",
+        createNormalisableRange (1.0f, (float) maxNumStages, 5.0f),
+        4,
+        [] (float val)
+        {
+            return String { (int) val };
+        },
+        &stringToFloatVal);
     createPercentParameter (params, mixTag, "Mix", 0.5f);
 
     return { params.begin(), params.end() };
@@ -71,7 +75,7 @@ ParamLayout UniVibe::createParameterLayout()
 
 void UniVibe::prepare (double sampleRate, int samplesPerBlock)
 {
-    dsp::ProcessSpec monoSpec { sampleRate, (uint32) samplesPerBlock, 1 };
+    const auto monoSpec = dsp::ProcessSpec { sampleRate, (uint32) samplesPerBlock, 1 };
 
     speedParamSmooth.setRampLength (0.01);
     speedParamSmooth.prepare (sampleRate, samplesPerBlock);
@@ -81,6 +85,11 @@ void UniVibe::prepare (double sampleRate, int samplesPerBlock)
 
     for (auto& stage : stages)
         stage.prepare (sampleRate, samplesPerBlock);
+
+    dryWetMixer.prepare ({ sampleRate, (uint32) samplesPerBlock, 2 });
+    dryWetMixer.setMixingRule (juce::dsp::DryWetMixingRule::sin3dB);
+    dryWetMixerMono.prepare (monoSpec);
+    dryWetMixerMono.setMixingRule (juce::dsp::DryWetMixingRule::sin3dB);
 
     modOutBuffer.setSize (1, samplesPerBlock);
     audioOutBuffer.setSize (2, samplesPerBlock);
@@ -105,7 +114,7 @@ void UniVibe::processAudio (AudioBuffer<float>& buffer)
         // fill modulation buffer (-1, 1)
         if (speedParamSmooth.isSmoothing())
         {
-            const auto* speedParamSmoothData  = speedParamSmooth.getSmoothedBuffer();
+            const auto* speedParamSmoothData = speedParamSmooth.getSmoothedBuffer();
             auto* modData = modOutBuffer.getWritePointer (0);
             for (int n = 0; n < numSamples; ++n)
             {
@@ -125,10 +134,20 @@ void UniVibe::processAudio (AudioBuffer<float>& buffer)
         const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numChannels = audioInBuffer.getNumChannels();
         audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        audioOutBuffer.clear();
 
+        auto& dryWet = numChannels == 1 ? dryWetMixerMono : dryWetMixer;
+        dryWet.pushDrySamples (audioInBuffer);
+
+        const auto numStagesToProcess = (int) *numStagesParam;
         stages[0].process (audioInBuffer, audioOutBuffer, modOutBuffer.getReadPointer (0), intensityParamSmooth.getSmoothedBuffer());
-        for (int stageIdx = 0; stageIdx < (int) std::size (stages); ++stageIdx)
+        for (int stageIdx = 1; stageIdx < numStagesToProcess; ++stageIdx)
             stages[stageIdx].process (audioOutBuffer, audioOutBuffer, modOutBuffer.getReadPointer (0), intensityParamSmooth.getSmoothedBuffer());
+        for (int stageIdx = numStagesToProcess; stageIdx < (int) maxNumStages; ++stageIdx)
+            stages[stageIdx].reset();
+
+        dryWet.setWetMixProportion (*mixParam);
+        dryWet.mixWetSamples (audioOutBuffer);
     }
     else
     {

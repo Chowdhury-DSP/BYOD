@@ -18,10 +18,15 @@ public:
 private:
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> speedParamSmooth;
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Linear> intensityParamSmooth;
+    chowdsp::FloatParameter* numStagesParam = nullptr;
     chowdsp::FloatParameter* mixParam = nullptr;
 
     chowdsp::SineWave<float> lfo;
-    UniVibeStage stages[4];
+    static constexpr size_t maxNumStages = 20;
+    std::array<UniVibeStage, maxNumStages> stages;
+
+    dsp::DryWetMixer<float> dryWetMixer;
+    dsp::DryWetMixer<float> dryWetMixerMono;
 
     AudioBuffer<float> modOutBuffer;
     AudioBuffer<float> audioOutBuffer;
