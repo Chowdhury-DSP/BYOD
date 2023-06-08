@@ -93,6 +93,11 @@ void Phaser8::processModulation (int numSamples)
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
         BufferHelpers::collapseToMonoBuffer (modInputBuffer, modOutBuffer);
+        FloatVectorOperations::clip (modOutBuffer.getWritePointer (0),
+                                     modOutBuffer.getReadPointer (0),
+                                     -1.0f,
+                                     1.0f,
+                                     numSamples);
     }
     else
     {

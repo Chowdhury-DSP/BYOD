@@ -98,6 +98,11 @@ void Rotary::processModulation (int numSamples)
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
         BufferHelpers::collapseToMonoBuffer (modInputBuffer, modulationBuffer);
+        FloatVectorOperations::clip (modulationBuffer.getWritePointer (0),
+                                     modulationBuffer.getReadPointer (0),
+                                     -1.0f,
+                                     1.0f,
+                                     numSamples);
     }
     else
     {

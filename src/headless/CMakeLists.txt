@@ -17,6 +17,7 @@ target_sources(BYOD_headless PRIVATE
     GuitarMLFilterDesigner.cpp
 
     tests/AmpIRsSaveLoadTest.cpp
+    tests/BadModulationTest.cpp
     tests/ParameterSmoothTest.cpp
     tests/PreBufferTest.cpp
     tests/PresetsTest.cpp
