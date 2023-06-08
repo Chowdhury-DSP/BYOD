@@ -178,7 +178,7 @@ void Flapjack::prepare (double sampleRate, int samplesPerBlock)
 
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 10000; i += samplesPerBlock)
+    for (int i = 0; i < 12000; i += samplesPerBlock)
     {
         buffer.clear();
         processAudio (buffer);
@@ -197,20 +197,23 @@ void Flapjack::processAudio (AudioBuffer<float>& buffer)
         [this, &buffer] (auto modeVal)
         {
             static constexpr FlapjackClipMode mode = modeVal;
-            for (auto [channelIndex, channelData] : chowdsp::buffer_iters::channels (buffer))
+            if (driveParam.isSmoothing() || presenceParam.isSmoothing() || lowCutParam.isSmoothing())
             {
-                if (driveParam.isSmoothing() || presenceParam.isSmoothing() || lowCutParam.isSmoothing())
+                const auto* driveSmooth = driveParam.getSmoothedBuffer();
+                const auto* presenceSmooth = presenceParam.getSmoothedBuffer();
+                const auto lowCutSmooth = lowCutParam.getSmoothedBuffer();
+                for (auto [channelIndex, sampleIndex, subBlockData] : chowdsp::buffer_iters::sub_blocks<16> (buffer))
                 {
-                    const auto* driveSmooth = driveParam.getSmoothedBuffer();
-                    const auto* presenceSmooth = presenceParam.getSmoothedBuffer();
-                    const auto lowCutSmooth = lowCutParam.getSmoothedBuffer();
-                    for (auto [n, x] : chowdsp::enumerate (channelData))
-                    {
-                        wdf[channelIndex].setParams (driveSmooth[n], presenceSmooth[n], lowCutSmooth[n]);
+                    wdf[channelIndex].setParams (driveSmooth[sampleIndex],
+                                                 presenceSmooth[sampleIndex],
+                                                 lowCutSmooth[sampleIndex]);
+                    for (auto& x : subBlockData)
                         x = wdf[channelIndex].template processSample<mode> (x);
-                    }
                 }
-                else
+            }
+            else
+            {
+                for (auto [channelIndex, channelData] : chowdsp::buffer_iters::channels (buffer))
                 {
                     wdf[channelIndex].setParams (driveParam.getCurrentValue(), presenceParam.getCurrentValue(), lowCutParam.getCurrentValue());
                     for (auto& x : channelData)
