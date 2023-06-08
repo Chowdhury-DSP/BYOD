@@ -1,5 +1,6 @@
 #include "NetlistViewer.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
+#include "gui/utils/ErrorMessageView.h"
 #include "processors/BaseProcessor.h"
 
 namespace netlist
@@ -73,6 +74,35 @@ NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
     setSize (300 + schematicSVG->getWidth() + 2 * schematicPad,
              juce::jmax (((int) quantities.size() + 1) * rowHeight,
                          schematicSVG->getHeight() + 2 * schematicPad));
+
+    pluginSettings->addProperties ({ { netlistWarningShownID, false } });
+}
+
+bool NetlistViewer::showWarningView()
+{
+    if (! pluginSettings->getProperty<bool> (netlistWarningShownID))
+    {
+        static constexpr std::string_view netlistViewWarning = "The netlist view allows you to customise the internal parameters "
+                                                               "of the circuit model. While we have attempted to constrain the "
+                                                               "parameters to a reasonably safe range, please take care when editing "
+                                                               "the parameters, by using a safety limiter and avoiding the use of "
+                                                               "headphones.\n\n"
+                                                               "Are you sure you want to continue?";
+
+        if (ErrorMessageView::showYesNoBox ("Warning",
+                                            chowdsp::toString (netlistViewWarning),
+                                            this))
+        {
+            pluginSettings->setProperty (netlistWarningShownID, true);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void NetlistViewer::paint (Graphics& g)
@@ -156,8 +186,11 @@ juce::PopupMenu::Item createNetlistViewerPopupMenuItem (BaseProcessor& processor
         auto netlistWindow = std::make_unique<NetlistWindow> (*topLevelEditor, *processor.getNetlistCircuitQuantities());
         auto* netlistWindowCast = static_cast<NetlistWindow*> (netlistWindow.get()); // NOLINT
         netlistWindowCast->setResizable (false, false);
-        netlistWindowCast->show();
-        processor.setNetlistWindow (std::move (netlistWindow));
+        if (netlistWindow->getViewComponent().showWarningView())
+        {
+            netlistWindowCast->show();
+            processor.setNetlistWindow (std::move (netlistWindow));
+        }
     };
     return item;
 }

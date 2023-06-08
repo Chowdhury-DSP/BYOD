@@ -13,6 +13,7 @@ struct NetlistViewer : Component
 
     void paint (Graphics& g) override;
     void resized() override;
+    bool showWarningView();
 
     struct ComponentLabel : Label
     {
@@ -24,5 +25,8 @@ struct NetlistViewer : Component
     OwnedArray<std::pair<ComponentLabel, Label>> labelPairs;
     std::unique_ptr<juce::Drawable> schematicSVG;
     Label noteLabel;
+
+    static constexpr chowdsp::GlobalPluginSettings::SettingID netlistWarningShownID { "has_shown_netlist_warning" };
+    chowdsp::SharedPluginSettings pluginSettings;
 };
 } // namespace netlist
