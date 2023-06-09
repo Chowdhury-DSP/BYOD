@@ -12,8 +12,8 @@ static inline void runTestForAllProcessors (UnitTest* ut, const std::function<vo
 
         auto proc = factory (nullptr);
         ut->beginTest (proc->getName() + " Test");
-
         testFunc (proc.get());
+        proc->freeInternalMemory();
     }
 }
 

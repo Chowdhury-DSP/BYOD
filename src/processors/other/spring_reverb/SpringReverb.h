@@ -28,8 +28,8 @@ private:
     void processDownsampledBuffer (AudioBuffer<float>& buffer);
 
     using AAFilter = chowdsp::ButterworthFilter<8>;
-    chowdsp::Downsampler<float, AAFilter> downsample;
-    chowdsp::Upsampler<float, AAFilter> upsample;
+    chowdsp::Downsampler<float, AAFilter, false> downsample;
+    chowdsp::Upsampler<float, AAFilter, false> upsample;
     AudioBuffer<float> downsampledBuffer;
 
     chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange3rd> delay { 1 << 18 };

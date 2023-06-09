@@ -30,7 +30,7 @@ public:
 
         BaseProcessor* newProcPtr = nullptr;
         {
-            SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
+            SpinLock::ScopedLockType scopedProcessingLock { chain.processingLock };
             newProcPtr = chain.procs.add (std::move (newProc));
         }
 
@@ -58,7 +58,7 @@ public:
         }
 
         {
-            SpinLock::ScopedLockType scopedProcessingLock (chain.processingLock);
+            SpinLock::ScopedLockType scopedProcessingLock { chain.processingLock };
             saveProc.reset (chain.procs.removeAndReturn (chain.procs.indexOf (procToRemove)));
         }
         saveProc->freeInternalMemory();
@@ -70,7 +70,10 @@ public:
                             + String (info.startPort) + " to " + info.endProc->getName() + " port #"
                             + String (info.endPort));
 
-        info.startProc->addConnection (ConnectionInfo (info));
+        {
+            SpinLock::ScopedLockType scopedProcessingLock { chain.processingLock };
+            info.startProc->addConnection (ConnectionInfo (info));
+        }
         chain.connectionAddedBroadcaster (info);
     }
 
@@ -80,7 +83,10 @@ public:
                             + String (info.startPort) + " to " + info.endProc->getName() + " port #"
                             + String (info.endPort));
 
-        info.startProc->removeConnection (info);
+        {
+            SpinLock::ScopedLockType scopedProcessingLock { chain.processingLock };
+            info.startProc->removeConnection (info);
+        }
         chain.connectionRemovedBroadcaster (info);
     }
 
