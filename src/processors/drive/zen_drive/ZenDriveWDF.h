@@ -15,7 +15,7 @@ public:
         R4.setVoltage (4.5f);
         R5_R6_C5.setVoltage (4.5f);
 
-        C3.prepare ((float) sampleRate);
+        Vin_C3.prepare ((float) sampleRate);
         Rv9_C4.prepare ((float) sampleRate);
         R5_R6_C5.prepare ((float) sampleRate);
     }
@@ -40,7 +40,7 @@ public:
 
     inline float processSample (float x) noexcept
     {
-        Vin.setVoltage (x);
+        Vin_C3.setVoltage (x);
 
         diodes.incident (P3.reflected());
         P3.incident (diodes.reflected());
@@ -69,12 +69,9 @@ public:
     }
 
     // Port B
-    wdft::ResistiveVoltageSourceT<float> Vin;
-    wdft::CapacitorT<float> C3 { 470.0e-9f };
-    wdft::WDFSeriesT<float, decltype (Vin), decltype (C3)> S1 { Vin, C3 };
-
+    wdft::CapacitiveVoltageSourceT<float> Vin_C3 { 470.0e-9f };
     wdft::ResistiveVoltageSourceT<float> R4 { 470.0e3f };
-    wdft::WDFParallelT<float, decltype (S1), decltype (R4)> P1 { S1, R4 };
+    wdft::WDFParallelT<float, decltype (Vin_C3), decltype (R4)> P1 { Vin_C3, R4 };
 
     // Port C
     static constexpr auto R5 = 1.0e3f;

@@ -76,7 +76,7 @@ MouseDrive::MouseDrive (UndoManager* um) : BaseProcessor ("Mouse Drive", createP
         [this] (const netlist::CircuitQuantity& self)
         {
             for (auto& wdfModel : wdf)
-                wdfModel.C1.setCapacitanceValue (self.value.load());
+                wdfModel.Vin_C1.setCapacitanceValue (self.value.load());
         },
         100.0e-12f,
         1.0e-3f);

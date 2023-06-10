@@ -9,7 +9,7 @@ public:
 
     void prepare (double sampleRate)
     {
-        C2.prepare ((float) sampleRate);
+        Vin_C2.prepare ((float) sampleRate);
         R4_ser_C3.prepare ((float) sampleRate);
         R6_P1_par_C4.prepare ((float) sampleRate);
 
@@ -37,7 +37,7 @@ public:
 
     inline float processSample (float x) noexcept
     {
-        Vin.setVoltage (x);
+        Vin_C2.setVoltage (x);
 
         dp.incident (P3.reflected());
         P3.incident (dp.reflected());
@@ -66,12 +66,9 @@ public:
     }
 
     // Port B
-    wdft::ResistiveVoltageSourceT<float> Vin;
-    wdft::CapacitorT<float> C2 { 1.0e-6f };
-    wdft::WDFSeriesT<float, decltype (Vin), decltype (C2)> S1 { Vin, C2 };
-
+    wdft::CapacitiveVoltageSourceT<float> Vin_C2 { 1.0e-6f };
     wdft::ResistorT<float> R5 { 10.0e3f };
-    wdft::WDFParallelT<float, decltype (S1), decltype (R5)> P1 { S1, R5 };
+    wdft::WDFParallelT<float, decltype (Vin_C2), decltype (R5)> P1 { Vin_C2, R5 };
 
     // Port C
     wdft::ResistorCapacitorSeriesT<float> R4_ser_C3 { 4.7e3f, 0.047e-6f };

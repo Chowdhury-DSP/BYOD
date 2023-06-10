@@ -11,9 +11,9 @@ public:
 
     void prepare (double fs)
     {
-        C1.prepare ((float) fs);
-        C1.incident (-4.83726311f);
-        C1.reflected();
+        Vin_C1.prepare ((float) fs);
+        Vin_C1.incident (-4.83726311f);
+        Vin_C1.reflected();
 
         C2.prepare ((float) fs);
         C2.incident (4.83662891f);
@@ -36,7 +36,7 @@ public:
 
     void reset()
     {
-        C1.reset();
+        Vin_C1.reset();
         C2.reset();
         C6.reset();
         C7.reset();
@@ -59,18 +59,16 @@ public:
     template <FlapjackClipMode clipMode>
     inline float processSample (float x)
     {
-        Vin.setVoltage (x);
+        Vin_C1.setVoltage (x);
         R.compute<clipMode>();
 
         return wdft::voltage<float> (Rlevel);
     }
 
     // Port A
-    wdft::ResistiveVoltageSourceT<float> Vin;
-    wdft::CapacitorT<float> C1 { 10.0e-9f };
-    wdft::WDFSeriesT<float, decltype (Vin), decltype (C1)> Sin { Vin, C1 };
+    wdft::CapacitiveVoltageSourceT<float> Vin_C1 { 10.0e-9f };
     wdft::ResistiveVoltageSourceT<float> Vb { 1.0e6f };
-    wdft::WDFParallelT<float, decltype (Sin), decltype (Vb)> Pin { Sin, Vb };
+    wdft::WDFParallelT<float, decltype (Vin_C1), decltype (Vb)> Pin { Vin_C1, Vb };
     wdft::ResistorT<float> R2 { 10.0e3f };
     wdft::WDFSeriesT<float, decltype (R2), decltype (Pin)> Sa { R2, Pin };
 

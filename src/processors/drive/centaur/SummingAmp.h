@@ -1,28 +1,27 @@
-#ifndef SUMMINGAMP_H_INCLUDED
-#define SUMMINGAMP_H_INCLUDED
+#pragma once
 
 #include <pch.h>
 
-namespace GainStageSpace
+namespace gain_stage
 {
 class SummingAmp : public chowdsp::IIRFilter<1>
 {
 public:
     SummingAmp() = default;
 
-    void prepare (float sampleRate)
+    void prepare (float sampleRate, int num_channels)
     {
-        chowdsp::IIRFilter<1>::reset();
-        fs = (float) sampleRate;
+        chowdsp::IIRFilter<1>::prepare (num_channels);
+        fs = sampleRate;
 
-        calcCoefs();
+        calc_coefs();
     }
 
-    void calcCoefs()
-    {
-        constexpr auto R20 = 392e3f;
-        constexpr auto C13 = 820e-12f;
+    float R20 = 392e3f;
+    float C13 = 820e-12f;
 
+    void calc_coefs()
+    {
         // analog coefficients
         float as[2], bs[2];
         bs[0] = 0.0f;
@@ -39,6 +38,4 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SummingAmp)
 };
-} // namespace GainStageSpace
-
-#endif // SUMMINGAMP_H_INCLUDED
+} // namespace gain_stage

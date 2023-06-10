@@ -14,6 +14,7 @@ struct NetlistViewer : Component
     void paint (Graphics& g) override;
     void resized() override;
     bool showWarningView();
+    bool needsTwoColumns() const;
 
     struct ComponentLabel : Label
     {
