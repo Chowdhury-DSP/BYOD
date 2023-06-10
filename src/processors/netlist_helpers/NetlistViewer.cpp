@@ -7,6 +7,7 @@ namespace netlist
 {
 constexpr int rowHeight = 27;
 constexpr int schematicPad = 10;
+constexpr int maxItemsPerColumn = 16;
 
 void NetlistViewer::ComponentLabel::mouseDoubleClick (const MouseEvent& e)
 {
@@ -71,11 +72,30 @@ NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
     schematicSVG = juce::Drawable::createFromImageData (quantities.schematicSVG.data, quantities.schematicSVG.size);
     addAndMakeVisible (schematicSVG.get());
 
-    setSize (300 + schematicSVG->getWidth() + 2 * schematicPad,
-             juce::jmax (((int) quantities.size() + 1) * rowHeight,
-                         schematicSVG->getHeight() + 2 * schematicPad));
+    if (needsTwoColumns())
+    {
+        const auto nextEvenNumber = [] (int n)
+        {
+            return n + (n % 2);
+        };
+
+        setSize (450 + schematicSVG->getWidth() + 2 * schematicPad,
+                 juce::jmax ((maxItemsPerColumn + 1) * rowHeight,
+                             schematicSVG->getHeight() + 2 * schematicPad));
+    }
+    else
+    {
+        setSize (250 + schematicSVG->getWidth() + 2 * schematicPad,
+                 juce::jmax (((int) quantities.size() + 1) * rowHeight,
+                             schematicSVG->getHeight() + 2 * schematicPad));
+    }
 
     pluginSettings->addProperties ({ { netlistWarningShownID, false } });
+}
+
+bool NetlistViewer::needsTwoColumns() const
+{
+    return labelPairs.size() > maxItemsPerColumn;
 }
 
 bool NetlistViewer::showWarningView()
@@ -113,21 +133,51 @@ void NetlistViewer::paint (Graphics& g)
     bounds.removeFromRight (schematicSVG->getWidth() + 2 * schematicPad);
 
     g.setColour (Colours::black);
-    const auto xCoord = 0.5f * (float) bounds.getWidth();
-    const auto length = noteLabel.isVisible() ? float (rowHeight * (labelPairs.size() + 1)) : (float) getHeight();
-    g.drawLine (juce::Line<float> { xCoord, 0.0f, xCoord, length }, 2.0f);
-    g.drawLine (juce::Line<float> { (float) bounds.getWidth(), 0.0f, (float) bounds.getWidth(), (float) getHeight() }, 2.0f);
-
-    for (int i = 0; i <= labelPairs.size(); ++i)
-    {
-        const auto yCoord = float (rowHeight * (i + 1));
-        g.drawLine (juce::Line<float> { 0.0f, yCoord, (float) bounds.getWidth(), yCoord }, 2.0f);
-    }
-
     g.setFont (Font { 20.0f }.boldened());
-    const auto halfWidth = bounds.proportionOfWidth (0.5f);
-    g.drawFittedText ("Component", { 0, 0, halfWidth, rowHeight }, Justification::centred, 1);
-    g.drawFittedText ("Value", { halfWidth, 0, halfWidth, rowHeight }, Justification::centred, 1);
+    if (needsTwoColumns())
+    {
+        const auto halfWidth = bounds.proportionOfWidth (0.5f);
+        for (int i = 0; i < maxItemsPerColumn; ++i)
+        {
+            const auto yCoord = float (rowHeight * (i + 1));
+            g.drawLine (juce::Line<float> { 0.0f, yCoord, (float) halfWidth, yCoord }, 2.0f);
+        }
+        for (int i = maxItemsPerColumn; i <= labelPairs.size(); ++i)
+        {
+            const auto yCoord = float (rowHeight * (i - maxItemsPerColumn + 1));
+            g.drawLine (juce::Line<float> { (float) halfWidth, yCoord, (float) bounds.getWidth(), yCoord }, 2.0f);
+        }
+
+        const auto xCoord = 0.25f * (float) bounds.getWidth();
+        const auto length = noteLabel.isVisible() ? float (rowHeight * (labelPairs.size() - maxItemsPerColumn + 1)) : (float) getHeight();
+        g.drawLine (juce::Line<float> { xCoord, 0.0f, xCoord, (float) getHeight() }, 2.0f);
+        g.drawLine (juce::Line<float> { 2.0f * xCoord, 0.0f, 2.0f * xCoord, (float) getHeight() }, 2.0f);
+        g.drawLine (juce::Line<float> { 3.0f * xCoord, 0.0f, 3.0f * xCoord, length }, 2.0f);
+        g.drawLine (juce::Line<float> { (float) bounds.getWidth(), 0.0f, (float) bounds.getWidth(), (float) getHeight() }, 2.0f);
+
+        const auto quarterWidth = bounds.proportionOfWidth (0.25f);
+        g.drawFittedText ("Component", { 0, 0, quarterWidth, rowHeight }, Justification::centred, 1);
+        g.drawFittedText ("Value", { quarterWidth, 0, quarterWidth, rowHeight }, Justification::centred, 1);
+        g.drawFittedText ("Component", { 2 * quarterWidth, 0, quarterWidth, rowHeight }, Justification::centred, 1);
+        g.drawFittedText ("Value", { 3 * quarterWidth, 0, quarterWidth, rowHeight }, Justification::centred, 1);
+    }
+    else
+    {
+        for (int i = 0; i <= labelPairs.size(); ++i)
+        {
+            const auto yCoord = float (rowHeight * (i + 1));
+            g.drawLine (juce::Line<float> { 0.0f, yCoord, (float) bounds.getWidth(), yCoord }, 2.0f);
+        }
+
+        const auto xCoord = 0.5f * (float) bounds.getWidth();
+        const auto length = noteLabel.isVisible() ? float (rowHeight * (labelPairs.size() + 1)) : (float) getHeight();
+        g.drawLine (juce::Line<float> { xCoord, 0.0f, xCoord, length }, 2.0f);
+        g.drawLine (juce::Line<float> { (float) bounds.getWidth(), 0.0f, (float) bounds.getWidth(), (float) getHeight() }, 2.0f);
+
+        const auto halfWidth = bounds.proportionOfWidth (0.5f);
+        g.drawFittedText ("Component", { 0, 0, halfWidth, rowHeight }, Justification::centred, 1);
+        g.drawFittedText ("Value", { halfWidth, 0, halfWidth, rowHeight }, Justification::centred, 1);
+    }
 }
 
 void NetlistViewer::resized()
@@ -137,20 +187,42 @@ void NetlistViewer::resized()
                                .removeFromTop (schematicSVG->getHeight() + 2 * schematicPad);
     schematicSVG->setBounds (svgBounds.reduced (schematicPad));
 
-    const auto halfWidth = bounds.proportionOfWidth (0.5f);
-
-    for (auto [i, labelPair] : chowdsp::enumerate (labelPairs))
+    if (needsTwoColumns())
     {
-        auto& [componentLabel, valueLabel] = *labelPair;
-        const auto yCoord = rowHeight * int (i + 1);
-        componentLabel.setBounds (0, yCoord, halfWidth, rowHeight);
-        valueLabel.setBounds (halfWidth, yCoord, halfWidth, rowHeight);
+        const auto quarterWidth = bounds.proportionOfWidth (0.25f);
+        for (int i = 0; i < maxItemsPerColumn; ++i)
+        {
+            auto& [componentLabel, valueLabel] = *labelPairs[i];
+            const auto yCoord = rowHeight * int (i + 1);
+            componentLabel.setBounds (0, yCoord, quarterWidth, rowHeight);
+            valueLabel.setBounds (quarterWidth, yCoord, quarterWidth, rowHeight);
+        }
+        for (int i = maxItemsPerColumn; i < labelPairs.size(); ++i)
+        {
+            auto& [componentLabel, valueLabel] = *labelPairs[i];
+            const auto yCoord = rowHeight * int (i - maxItemsPerColumn + 1);
+            componentLabel.setBounds (2 * quarterWidth, yCoord, quarterWidth, rowHeight);
+            valueLabel.setBounds (3 * quarterWidth, yCoord, quarterWidth, rowHeight);
+        }
+    }
+    else
+    {
+        const auto halfWidth = bounds.proportionOfWidth (0.5f);
+        for (auto [i, labelPair] : chowdsp::enumerate (labelPairs))
+        {
+            auto& [componentLabel, valueLabel] = *labelPair;
+            const auto yCoord = rowHeight * int (i + 1);
+            componentLabel.setBounds (0, yCoord, halfWidth, rowHeight);
+            valueLabel.setBounds (halfWidth, yCoord, halfWidth, rowHeight);
+        }
     }
 
     if (noteLabel.isVisible())
     {
+        const auto width = 2 * labelPairs.getLast()->second.getWidth();
+        const auto xPos = labelPairs.getLast()->second.getX() - width / 2;
         const auto yPos = labelPairs.getLast()->second.getBottom();
-        noteLabel.setBounds (0, yPos, bounds.getWidth(), getHeight() - yPos);
+        noteLabel.setBounds (xPos, yPos, width, getHeight() - yPos);
     }
 }
 

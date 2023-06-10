@@ -30,7 +30,7 @@ ZenDrive::ZenDrive (UndoManager* um) : BaseProcessor ("Yen Drive", createParamet
         [this] (const netlist::CircuitQuantity& self)
         {
             for (auto& wdfModel : wdf)
-                wdfModel.C3.setCapacitanceValue (self.value.load());
+                wdfModel.Vin_C3.setCapacitanceValue (self.value.load());
         },
         1.0e-12f,
         1.0e-3f);

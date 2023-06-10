@@ -18,12 +18,13 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
+    chowdsp::FloatParameter* gainParam = nullptr;
     chowdsp::FloatParameter* levelParam = nullptr;
     std::atomic<float>* modeParam = nullptr;
 
-    InputBufferProcessor inProc[2];
-    OutputStageProc outProc[2];
-    std::unique_ptr<GainStageProc> gainStageProc;
+    InputBufferProcessor inputBuffer;
+    OutputStageProcessor outputStage;
+    GainStageProcessor gainStage;
     GainStageML gainStageML;
 
     bool useMLPrev = false;

@@ -41,7 +41,7 @@ TubeScreamer::TubeScreamer (UndoManager* um)
         [this] (const netlist::CircuitQuantity& self)
         {
             for (auto& wdfModel : wdf)
-                wdfModel.C2.setCapacitanceValue (self.value.load());
+                wdfModel.Vin_C2.setCapacitanceValue (self.value.load());
         },
         100.0e-12f);
     netlistCircuitQuantities->addCapacitor (

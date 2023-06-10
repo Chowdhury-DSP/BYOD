@@ -1,67 +1,56 @@
 #include "GainStageProc.h"
 
-using namespace GainStageSpace;
-
-GainStageProc::GainStageProc (AudioProcessorValueTreeState& vts, double sampleRate) : preAmpL (sampleRate),
-                                                                                      preAmpR (sampleRate),
-                                                                                      clipL (sampleRate),
-                                                                                      clipR (sampleRate),
-                                                                                      ff2L (sampleRate),
-                                                                                      ff2R (sampleRate)
+void GainStageProcessor::prepare (double sample_rate, int samples_per_block, int num_channels)
 {
-    chowdsp::ParamUtils::loadParameterPointer (gainParam, vts, "gain");
+    ff1_buffer.setMaxSize (num_channels, samples_per_block);
+    ff2_buffer.setMaxSize (num_channels, samples_per_block);
+
+    for (auto& wdf : preamp_wdf)
+        wdf.prepare ((float) sample_rate, samples_per_block);
+
+    amp_stage.prepare ((float) sample_rate, samples_per_block, num_channels);
+
+    for (auto& wdf : clipping_wdf)
+        wdf.prepare ((float) sample_rate);
+
+    for (auto& wdf : ff2_wdf)
+        wdf.prepare ((float) sample_rate, samples_per_block);
+
+    summing_amp.prepare ((float) sample_rate, num_channels);
 }
 
-void GainStageProc::reset (double sampleRate, int samplesPerBlock)
+void GainStageProcessor::process (const chowdsp::BufferView<float>& buffer, float gain_param) noexcept
 {
-    for (int ch = 0; ch < 2; ++ch)
-    {
-        amp[ch].prepare ((float) sampleRate);
-        sumAmp[ch].prepare ((float) sampleRate);
-    }
+    const auto num_channels = buffer.getNumChannels();
+    const auto num_samples = buffer.getNumSamples();
 
-    ff1Buff.setSize (2, samplesPerBlock);
-    ff2Buff.setSize (2, samplesPerBlock);
-}
+    ff1_buffer.setCurrentSize (num_channels, num_samples);
+    ff2_buffer.setCurrentSize (num_channels, num_samples);
 
-void GainStageProc::processBlock (AudioBuffer<float>& buffer)
-{
-    const auto numSamples = buffer.getNumSamples();
-    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
-    {
-        auto* x = buffer.getWritePointer (ch);
-        auto* x1 = ff1Buff.getWritePointer (ch);
-        auto* x2 = ff2Buff.getWritePointer (ch);
+    // side chain buffers
+    chowdsp::BufferMath::copyBufferData (buffer, ff2_buffer);
 
-        // side chain buffers
-        FloatVectorOperations::copy (x2, x, numSamples);
+    // Gain stage
+    for (int ch = 0; ch < num_channels; ++ch)
+        preamp_wdf[ch].process (buffer.getWriteSpan (ch), ff1_buffer.getWriteSpan (ch), gain_param);
 
-        // Gain stage
-        preAmp[ch]->setGain (*gainParam);
-        for (int n = 0; n < numSamples; ++n)
-        {
-            x[n] = preAmp[ch]->processSample (x[n]);
-            x1[n] = preAmp[ch]->getFF1();
-        }
+    // amp stage
+    amp_stage.process_block (buffer, gain_param);
+    for (int ch = 0; ch < num_channels; ++ch)
+        juce::FloatVectorOperations::clip (buffer.getWritePointer (ch), buffer.getReadPointer (ch), -4.5f, 4.5f, num_samples);
 
-        // amp stage
-        amp[ch].setGain (*gainParam);
-        amp[ch].processBlock (x, numSamples);
-        FloatVectorOperations::clip (x, x, -4.5f, 4.5f, numSamples);
+    // clipping stage
+    for (int ch = 0; ch < num_channels; ++ch)
+        clipping_wdf[ch].process (buffer.getWriteSpan (ch));
 
-        // clipping stage
-        for (int n = 0; n < numSamples; ++n)
-            x[n] = clip[ch]->processSample (x[n]);
+    // feed-forward network 2
+    for (int ch = 0; ch < num_channels; ++ch)
+        ff2_wdf[ch].process (ff2_buffer.getWriteSpan (ch), gain_param);
 
-        // Feed forward network 2
-        ff2[ch]->setGain (*gainParam);
-        for (int n = 0; n < numSamples; ++n)
-            x2[n] = ff2[ch]->processSample (x2[n]);
-
-        // summing amp
-        FloatVectorOperations::add (x, x1, numSamples);
-        FloatVectorOperations::add (x, x2, numSamples);
-        sumAmp[ch].processBlock (x, numSamples);
-        FloatVectorOperations::clip (x, x, -13.1f, 11.7f, numSamples);
-    }
+    // summing amp
+    chowdsp::BufferMath::addBufferData (ff1_buffer, buffer);
+    chowdsp::BufferMath::addBufferData (ff2_buffer, buffer);
+    summing_amp.processBlock (buffer);
+    for (int ch = 0; ch < num_channels; ++ch)
+        juce::FloatVectorOperations::clip (buffer.getWritePointer (ch), buffer.getReadPointer (ch), -13.1f, 11.7f, num_samples);
 }
