@@ -9,7 +9,7 @@ public:
 
     void prepare (double sampleRate)
     {
-        C1.prepare ((float) sampleRate);
+        Vin_C1.prepare ((float) sampleRate);
         C2.prepare ((float) sampleRate);
         Rd_C4.prepare ((float) sampleRate);
         R4_C5.prepare ((float) sampleRate);
@@ -21,7 +21,7 @@ public:
 
     inline float process (float x) noexcept
     {
-        Vin.setVoltage (x);
+        Vin_C1.setVoltage (x);
         diodes.incident (Sd.reflected());
         const auto y = wdft::voltage<float> (diodes);
         Sd.incident (diodes.reflected());
@@ -29,12 +29,9 @@ public:
     }
 
     // Port A
-    wdft::ResistiveVoltageSourceT<float> Vin;
-    wdft::CapacitorT<float> C1 { 22.0e-9f };
-    wdft::WDFSeriesT<float, decltype (Vin), decltype (C1)> S1 { Vin, C1 };
-
+    wdft::CapacitiveVoltageSourceT<float> Vin_C1 { 22.0e-9f };
     wdft::ResistiveVoltageSourceT<float> R2 { 1.0e6f };
-    wdft::WDFParallelT<float, decltype (S1), decltype (R2)> P1 { S1, R2 };
+    wdft::WDFParallelT<float, decltype (Vin_C1), decltype (R2)> P1 { Vin_C1, R2 };
 
     wdft::ResistorT<float> R3 { 1.0e3f };
     wdft::WDFSeriesT<float, decltype (P1), decltype (R3)> S2 { P1, R3 };

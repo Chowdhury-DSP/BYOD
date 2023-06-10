@@ -1,5 +1,4 @@
-#ifndef GAINSTAGEPROC_H_INCLUDED
-#define GAINSTAGEPROC_H_INCLUDED
+#pragma once
 
 #include "AmpStage.h"
 #include "ClippingStage.h"
@@ -7,31 +6,23 @@
 #include "PreAmpStage.h"
 #include "SummingAmp.h"
 
-class GainStageProc
+class GainStageProcessor
 {
 public:
-    GainStageProc (AudioProcessorValueTreeState& vts, double sampleRate);
+    GainStageProcessor() = default;
 
-    void reset (double sampleRate, int samplesPerBlock);
-    void processBlock (AudioBuffer<float>& buffer);
+    void prepare (double sample_rate, int samples_per_block, int num_channels);
+    void process (const chowdsp::BufferView<float>& buffer, float gain_param) noexcept;
+
+    gain_stage::PreAmpWDF preamp_wdf[2];
+    gain_stage::AmpStage amp_stage;
+    gain_stage::ClippingStageWDF clipping_wdf[2];
+    gain_stage::FeedForward2WDF ff2_wdf[2];
+    gain_stage::SummingAmp summing_amp;
 
 private:
-    chowdsp::FloatParameter* gainParam = nullptr;
+    chowdsp::Buffer<float> ff1_buffer;
+    chowdsp::Buffer<float> ff2_buffer;
 
-    AudioBuffer<float> ff1Buff;
-    AudioBuffer<float> ff2Buff;
-
-    GainStageSpace::PreAmpWDF preAmpL, preAmpR;
-    GainStageSpace::PreAmpWDF* preAmp[2] { &preAmpL, &preAmpR };
-
-    GainStageSpace::ClippingWDF clipL, clipR;
-    GainStageSpace::ClippingWDF* clip[2] { &clipL, &clipR };
-
-    GainStageSpace::FeedForward2WDF ff2L, ff2R;
-    GainStageSpace::FeedForward2WDF* ff2[2] { &ff2L, &ff2R };
-
-    GainStageSpace::AmpStage amp[2];
-    GainStageSpace::SummingAmp sumAmp[2];
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainStageProcessor)
 };
-
-#endif // GAINSTAGEPROC_H_INCLUDED

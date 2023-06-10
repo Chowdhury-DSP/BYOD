@@ -1,63 +1,78 @@
-#ifndef PREAMPSTAGE_H_INCLUDED
-#define PREAMPSTAGE_H_INCLUDED
+#pragma once
 
 #include <pch.h>
 
-namespace GainStageSpace
+namespace gain_stage
 {
 using namespace chowdsp::wdft;
-
-class PreAmpWDF
+struct PreAmpWDF
 {
-public:
-    explicit PreAmpWDF (double sampleRate);
-
-    void setGain (float gain);
-    void reset();
-
-    inline float getFF1() noexcept
+    void prepare (float sample_rate, int max_block_size)
     {
-        return (float) current<double> (Vbias2);
+        C5.prepare (sample_rate);
+        C3.prepare (sample_rate);
+        C16.prepare (sample_rate);
+
+        Vbias.setVoltage (0.0f);
+        Vbias2.setVoltage (0.0f);
+
+        Rbias_smooth.mappingFunction = [] (float x)
+        { return 100.0e3f * x; };
+        Rbias_smooth.setRampLength (0.05);
+        Rbias_smooth.prepare ((double) sample_rate, max_block_size);
     }
 
-    inline float processSample (float x)
+    void process (nonstd::span<float> buffer, nonstd::span<float> ff1_buffer, float gain_param) noexcept
     {
-        Vin.setVoltage ((double) x);
+        Rbias_smooth.process (gain_param, (int) buffer.size());
 
-        Vin.incident (I1.reflected());
-        auto y = voltage<double> (Vbias) + voltage<double> (R6);
-        I1.incident (Vin.reflected());
-
-        return (float) y;
+        if (Rbias_smooth.isSmoothing())
+        {
+            const auto Rbias_smooth_data = Rbias_smooth.getSmoothedBuffer();
+            for (auto [n, sample] : chowdsp::enumerate (buffer))
+            {
+                Vbias.setResistanceValue (Rbias_smooth_data[n]);
+                Vin.setVoltage (sample);
+                Vin.incident (I1.reflected());
+                sample = voltage<float> (Vbias) + voltage<float> (R6);
+                I1.incident (Vin.reflected());
+                ff1_buffer[n] = current<float> (Vbias2);
+            }
+        }
+        else
+        {
+            Vbias.setResistanceValue (Rbias_smooth.getCurrentValue());
+            for (auto [n, sample] : chowdsp::enumerate (buffer))
+            {
+                Vin.setVoltage (sample);
+                Vin.incident (I1.reflected());
+                sample = voltage<float> (Vbias) + voltage<float> (R6);
+                I1.incident (Vin.reflected());
+                ff1_buffer[n] = current<float> (Vbias2);
+            }
+        }
     }
 
-private:
-    using Capacitor = CapacitorT<double>;
-    using Resistor = ResistorT<double>;
-    using ResVs = ResistiveVoltageSourceT<double>;
+    chowdsp::SmoothedBufferValue<float> Rbias_smooth;
 
-    Capacitor C3;
-    Capacitor C5;
-    Capacitor C16;
+    ResistorT<float> R6 { 10.0e3f };
+    CapacitorT<float> C5 { 68.0e-9f };
+    WDFParallelT<float, decltype (R6), decltype (C5)> P1 { R6, C5 };
+    ResistiveVoltageSourceT<float> Vbias;
+    WDFSeriesT<float, decltype (P1), decltype (Vbias)> S1 { P1, Vbias };
 
-    Resistor R6 { 10000.0 };
-    Resistor R7 { 1500.0 };
+    ResistiveVoltageSourceT<float> Vbias2 { 15.0e3f };
+    CapacitorT<float> C16 { 1.0e-6f };
+    WDFParallelT<float, decltype (Vbias2), decltype (C16)> P2 { Vbias2, C16 };
 
-    ResVs Vbias2 { 15000.0 };
-    ResVs Vbias;
+    ResistorT<float> R7 { 1.5e3f };
+    WDFSeriesT<float, decltype (P2), decltype (R7)> S2 { P2, R7 };
+    WDFParallelT<float, decltype (S1), decltype (S2)> P3 { S1, S2 };
 
-    WDFParallelT<double, Capacitor, Resistor> P1 { C5, R6 };
-    WDFSeriesT<double, decltype (P1), ResVs> S1 { P1, Vbias };
+    CapacitorT<float> C3 { 0.1e-6f };
+    WDFSeriesT<float, decltype (P3), decltype (C3)> S3 { P3, C3 };
+    PolarityInverterT<float, decltype (S3)> I1 { S3 };
 
-    WDFParallelT<double, ResVs, Capacitor> P2 { Vbias2, C16 };
-    WDFSeriesT<double, decltype (P2), Resistor> S2 { P2, R7 };
-    WDFParallelT<double, decltype (S1), decltype (S2)> P3 { S1, S2 };
-
-    WDFSeriesT<double, decltype (P3), Capacitor> S3 { P3, C3 };
-    PolarityInverterT<double, decltype (S3)> I1 { S3 };
-
-    IdealVoltageSourceT<double, decltype (I1)> Vin { I1 };
+    IdealVoltageSourceT<float, decltype (I1)> Vin { I1 };
 };
-} // namespace GainStageSpace
-
-#endif // PREAMPSTAGE_H_INCLUDED
+} // namespace gain_stage
