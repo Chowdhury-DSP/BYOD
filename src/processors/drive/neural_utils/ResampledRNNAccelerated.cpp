@@ -3,7 +3,7 @@
 template <int numIns, int hiddenSize, int RecurrentLayerType>
 ResampledRNNAccelerated<numIns, hiddenSize, RecurrentLayerType>::ResampledRNNAccelerated()
 {
-#if JUCE_INTEL
+#if 0 // JUCE_INTEL
     if (juce::SystemStats::hasAVX() && juce::SystemStats::hasFMA3())
     {
         juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
