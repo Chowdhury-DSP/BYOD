@@ -54,6 +54,7 @@
 #include "other/Octaver.h"
 #include "other/ShimmerReverb.h"
 #include "other/SmoothReverb.h"
+#include "other/cry_baby/CryBaby.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "utility/CleanGain.h"
@@ -136,6 +137,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Tuner", &processorFactory<Tuner> },
 
     { "Compressor", &processorFactory<Compressor> },
+    { "Crying Child", &processorFactory<CryBaby> },
     { "Delay", &processorFactory<DelayModule> },
     { "Envelope Filter", &processorFactory<EnvelopeFilter> },
     { "Gate", &processorFactory<Gate> },

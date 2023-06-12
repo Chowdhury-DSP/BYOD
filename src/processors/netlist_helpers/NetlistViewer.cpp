@@ -74,11 +74,6 @@ NetlistViewer::NetlistViewer (CircuitQuantityList& quantities)
 
     if (needsTwoColumns())
     {
-        const auto nextEvenNumber = [] (int n)
-        {
-            return n + (n % 2);
-        };
-
         setSize (450 + schematicSVG->getWidth() + 2 * schematicPad,
                  juce::jmax ((maxItemsPerColumn + 1) * rowHeight,
                              schematicSVG->getHeight() + 2 * schematicPad));

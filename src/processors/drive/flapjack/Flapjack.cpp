@@ -26,8 +26,10 @@ Flapjack::Flapjack (UndoManager* um)
 
     driveParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, driveTag));
     driveParam.setRampLength (0.025);
-    driveParam.mappingFunction = [] (float x)
+    driveParam.mappingFunction = [this] (float x)
     {
+        if (magic_enum::enum_value<FlapjackClipMode> (modeParam->getIndex()) == FlapjackClipMode::LightFold)
+            x *= 0.9f;
         return chowdsp::Power::ipow<2> (1.0f - x);
     };
     presenceParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, presenceTag));
@@ -193,8 +195,9 @@ void Flapjack::processAudio (AudioBuffer<float>& buffer)
     lowCutParam.process (numSamples);
 
     const auto clipMode = magic_enum::enum_value<FlapjackClipMode> (modeParam->getIndex());
+    float makeupGainOffsetDB = 0.0f;
     magic_enum::enum_switch (
-        [this, &buffer] (auto modeVal)
+        [this, &buffer, makeupGainOffsetDB] (auto modeVal) mutable
         {
             static constexpr FlapjackClipMode mode = modeVal;
             if (driveParam.isSmoothing() || presenceParam.isSmoothing() || lowCutParam.isSmoothing())
@@ -220,10 +223,17 @@ void Flapjack::processAudio (AudioBuffer<float>& buffer)
                         x = wdf[channelIndex].template processSample<mode> (x);
                 }
             }
+
+            if constexpr (mode == FlapjackClipMode::HardClip)
+                makeupGainOffsetDB = 3.0f;
+            else if constexpr (mode == FlapjackClipMode::AlgSigmoid)
+                makeupGainOffsetDB = 4.5f;
+            else if constexpr (mode == FlapjackClipMode::LightFold)
+                makeupGainOffsetDB = 5.5f;
         },
         clipMode);
 
-    const auto makeupGain = Decibels::decibelsToGain (-12.0f);
+    const auto makeupGain = Decibels::decibelsToGain (-12.0f + makeupGainOffsetDB);
     level.setGainLinear (chowdsp::Power::ipow<2> (levelParam->getCurrentValue()) * -makeupGain);
     level.process (buffer);
     dcBlocker.processBlock (buffer);
