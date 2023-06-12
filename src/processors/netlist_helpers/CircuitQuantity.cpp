@@ -74,6 +74,8 @@ juce::String getPostFixForQuantity (CircuitQuantity::Type type)
             return juce::String::fromUTF8 ("Ω");
         case CircuitQuantity::Capacitance:
             return "F";
+        case CircuitQuantity::Inductance:
+            return "H";
     }
     return {};
 }
@@ -139,6 +141,17 @@ void CircuitQuantityList::addCapacitor (float defaultValue, const std::string& n
                              name,
                              std::move (setter));
 }
+
+void CircuitQuantityList::addInductor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal, float maxVal)
+{
+    quantities.emplace_back (defaultValue,
+                             minVal,
+                             maxVal,
+                             netlist::CircuitQuantity::Inductance,
+                             name,
+                             std::move (setter));
+}
+
 
 const CircuitQuantity* CircuitQuantityList::findQuantity (const std::string& name) const
 {

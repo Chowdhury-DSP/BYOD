@@ -6,7 +6,7 @@ enum class FlapjackClipMode
 {
     HardClip = 1,
     AlgSigmoid,
-    Asymm,
+    LightFold,
 };
 
 template <typename T, typename ImpedanceCalculator, typename... PortTypes>
@@ -78,13 +78,9 @@ public:
             {
                 voltage = sigmoid (voltage, 4.5f);
             }
-            else if constexpr (clipMode == FlapjackClipMode::Asymm)
+            else if constexpr (clipMode == FlapjackClipMode::LightFold)
             {
-                //                static constexpr auto A = -3.7f;
-                //                static constexpr auto O = gcem::tanh (A);
-                //                static constexpr auto K = 200.0f / (O + 1.0f);
-                //                voltage = K * (chowdsp::Math::algebraicSigmoid (chowdsp::PowApprox::exp (0.1f * voltage - 4.5f) - A) + O);
-                voltage = sigmoid (voltage, 4.9f);
+                voltage = 8.0f * xsimd::sin (0.125f * voltage);
             }
 
             xsimd::store_aligned (b_vec.data() + i, -2.0f * voltage - a_batch);
