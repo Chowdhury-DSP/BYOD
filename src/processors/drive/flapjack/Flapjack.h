@@ -13,6 +13,7 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+
 private:
     chowdsp::SmoothedBufferValue<float> driveParam;
     chowdsp::SmoothedBufferValue<float> presenceParam;

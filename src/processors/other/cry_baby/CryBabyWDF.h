@@ -24,7 +24,7 @@ struct CryBabyActiveStageWDF
         C2_Vfb.setVoltage (Vfb);
 
         const auto a_b = R.reflected();
-//        const auto b_b = -a_b; // 0.5f * std::tanh (std::exp (-a_b) - 2.0f); // Optimize me!
+        //        const auto b_b = -a_b; // 0.5f * std::tanh (std::exp (-a_b) - 2.0f); // Optimize me!
         const auto b_b = 5.0f * std::tanh (1.0f - std::exp (0.33333f * a_b));
         R.incident (b_b);
 

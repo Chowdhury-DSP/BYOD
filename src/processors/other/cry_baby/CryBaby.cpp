@@ -179,7 +179,7 @@ void CryBaby::processAudio (AudioBuffer<float>& buffer)
     chowdsp::BufferMath::applyGain (buffer, Decibels::decibelsToGain (37.0f));
 
     vr1Smooth.process (controlFreqParam->getCurrentValue(), numSamples);
-//    if (vr1Smooth.isSmoothing())
+    //    if (vr1Smooth.isSmoothing())
     {
         const auto* vr1SmoothData = vr1Smooth.getSmoothedBuffer();
         for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
@@ -191,13 +191,13 @@ void CryBaby::processAudio (AudioBuffer<float>& buffer)
             }
         }
     }
-//    else
-//    {
-//        for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
-//        {
-//            wdf[ch].setWahAmount (vr1Smooth.getCurrentValue());
-//            for (auto& sample : channelData)
-//                sample = wdf[ch].processSample (sample);
-//        }
-//    }
+    //    else
+    //    {
+    //        for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
+    //        {
+    //            wdf[ch].setWahAmount (vr1Smooth.getCurrentValue());
+    //            for (auto& sample : channelData)
+    //                sample = wdf[ch].processSample (sample);
+    //        }
+    //    }
 }

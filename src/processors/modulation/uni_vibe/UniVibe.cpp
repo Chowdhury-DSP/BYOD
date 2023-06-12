@@ -139,7 +139,7 @@ void UniVibe::processAudio (AudioBuffer<float>& buffer)
     if (inputsConnected.contains (AudioInput))
     {
         const auto useStereoMode = stereoParam->get();
-        const auto [audioInBuffer, numChannels] = [this, numSamples, useStereoMode] () -> std::pair<const AudioBuffer<float>, int>
+        const auto [audioInBuffer, numChannels] = [this, numSamples, useStereoMode]() -> std::pair<const AudioBuffer<float>, int>
         {
             const auto& inBuffer = getInputBuffer (AudioInput);
             const auto nChannels = inBuffer.getNumChannels();

@@ -152,7 +152,6 @@ void CircuitQuantityList::addInductor (float defaultValue, const std::string& na
                              std::move (setter));
 }
 
-
 const CircuitQuantity* CircuitQuantityList::findQuantity (const std::string& name) const
 {
     for (const auto& q : quantities)
