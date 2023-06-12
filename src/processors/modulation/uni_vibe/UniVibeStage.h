@@ -9,7 +9,8 @@ struct UniVibeStage
     void process (const AudioBuffer<float>& bufferIn,
                   AudioBuffer<float>& bufferOut,
                   const float* modData,
-                  const float* intensityData) noexcept;
+                  const float* intensityData,
+                  bool stereoMode) noexcept;
 
     /** Map an LFO signal [-1,1] to an LDR resistance value (Ohms) */
     struct LDRMap

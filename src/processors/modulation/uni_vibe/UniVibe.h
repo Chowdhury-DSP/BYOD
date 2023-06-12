@@ -19,6 +19,7 @@ private:
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Multiplicative> speedParamSmooth;
     chowdsp::SmoothedBufferValue<float, juce::ValueSmoothingTypes::Linear> intensityParamSmooth;
     chowdsp::FloatParameter* numStagesParam = nullptr;
+    chowdsp::BoolParameter* stereoParam = nullptr;
     chowdsp::FloatParameter* mixParam = nullptr;
 
     chowdsp::SineWave<float> lfo;
@@ -30,6 +31,9 @@ private:
 
     AudioBuffer<float> modOutBuffer;
     AudioBuffer<float> audioOutBuffer;
+
+    AudioBuffer<float> fadeBuffer;
+    int prevNumStages = 1;
 
     enum InputPort
     {

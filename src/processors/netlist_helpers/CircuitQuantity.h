@@ -11,6 +11,7 @@ struct CircuitQuantity
     {
         Resistance,
         Capacitance,
+        Inductance,
     };
 
     using Setter = juce::dsp::FixedSizeFunction<32, void (const CircuitQuantity&)>;
@@ -43,6 +44,7 @@ struct CircuitQuantityList
 
     void addResistor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal = 100.0f, float maxVal = 10.0e6f);
     void addCapacitor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal = 0.1e-12f, float maxVal = 10.0f);
+    void addInductor (float defaultValue, const std::string& name, CircuitQuantity::Setter&& setter, float minVal = 1.0e-3f, float maxVal = 100.0f);
 
     [[nodiscard]] const CircuitQuantity* findQuantity (const std::string&) const;
 

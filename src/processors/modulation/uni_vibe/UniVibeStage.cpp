@@ -15,20 +15,30 @@ void UniVibeStage::reset()
     H_e.reset();
 }
 
-static void fillLDRData (const float* modData, const float* intensityData, float* ldrData, int numSamples, const UniVibeStage::LDRMap& map)
+static void fillLDRData (const float* modData, const float* intensityData, float* ldrData, int numSamples, const UniVibeStage::LDRMap& map, bool invert)
 {
-    for (int n = 0; n < numSamples; ++n)
-        ldrData[n] = map.B * chowdsp::PowApprox::exp (map.C * modData[n] * intensityData[n]) + map.A;
+    if (! invert)
+    {
+        for (int n = 0; n < numSamples; ++n)
+            ldrData[n] = map.B * chowdsp::PowApprox::exp (map.C * modData[n] * intensityData[n]) + map.A;
+    }
+    else
+    {
+        for (int n = 0; n < numSamples; ++n)
+            ldrData[n] = map.B * chowdsp::PowApprox::exp (map.C * -modData[n] * intensityData[n]) + map.A;
+    }
 }
 
 void UniVibeStage::process (const AudioBuffer<float>& bufferIn,
                             AudioBuffer<float>& bufferOut,
                             const float* modData,
-                            const float* intensityData) noexcept
+                            const float* intensityData,
+                            bool stereoMode) noexcept
 {
     const auto numChannels = bufferIn.getNumChannels();
     const auto numSamples = bufferIn.getNumSamples();
-    fillLDRData (modData, intensityData, ldrLFOData.data(), numSamples, ldrMap);
+    if (! stereoMode)
+        fillLDRData (modData, intensityData, ldrLFOData.data(), numSamples, ldrMap, false);
 
     const auto kappa_c = C_p / (C_dc + C_p);
     const auto kappa_e = C_dc / (C_dc + C_p);
@@ -46,13 +56,16 @@ void UniVibeStage::process (const AudioBuffer<float>& bufferIn,
     };
 
     using chowdsp::Math::algebraicSigmoid;
-    static constexpr auto driveGain = 3.0f;
+    static constexpr auto driveGain = 1.0f;
     static constexpr auto driveGainRecip = 1.0f / driveGain;
     static constexpr auto driveBias = 0.33f;
     const auto driveBiasInv = algebraicSigmoid (driveBias);
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
+        if (stereoMode)
+            fillLDRData (modData, intensityData, ldrLFOData.data(), numSamples, ldrMap, ch == 1);
+
         const auto* xData = bufferIn.getReadPointer (ch);
         auto* yData = bufferOut.getWritePointer (ch);
         for (int n = 0; n < numSamples; ++n)
@@ -76,4 +89,6 @@ void UniVibeStage::process (const AudioBuffer<float>& bufferIn,
             yData[n] = alpha * H_e.processSample (x_drive_m, ch) - beta * H_c.processSample (x_drive_p, ch);
         }
     }
+
+    chowdsp::BufferMath::applyGain (bufferOut, 1.25f);
 }
