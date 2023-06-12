@@ -13,7 +13,7 @@ CryBaby::CryBaby (UndoManager* um)
     using namespace ParameterHelpers;
     loadParameterPointer (controlFreqParam, vts, controlFreqTag);
 
-    vr1Smooth.setRampLength (0.025);
+    vr1Smooth.setRampLength (0.005);
     vr1Smooth.mappingFunction = [] (float x)
     { return 0.64f * std::pow (x, 0.5f); };
 
