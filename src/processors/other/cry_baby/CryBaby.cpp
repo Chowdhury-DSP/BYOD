@@ -170,6 +170,17 @@ void CryBaby::prepare (double sampleRate, int samplesPerBlock)
 
     for (auto& wdfModel : wdf)
         wdfModel.prepare ((float) sampleRate);
+
+    dcBlocker.prepare (2);
+    dcBlocker.calcCoefs (30.0f, (float) sampleRate);
+
+    // pre-buffering
+    AudioBuffer<float> buffer (2, samplesPerBlock);
+    for (int i = 0; i < 40000; i += samplesPerBlock)
+    {
+        buffer.clear();
+        processAudio (buffer);
+    }
 }
 
 void CryBaby::processAudio (AudioBuffer<float>& buffer)
@@ -179,7 +190,7 @@ void CryBaby::processAudio (AudioBuffer<float>& buffer)
     chowdsp::BufferMath::applyGain (buffer, Decibels::decibelsToGain (37.0f));
 
     vr1Smooth.process (controlFreqParam->getCurrentValue(), numSamples);
-    //    if (vr1Smooth.isSmoothing())
+    if (vr1Smooth.isSmoothing())
     {
         const auto* vr1SmoothData = vr1Smooth.getSmoothedBuffer();
         for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
@@ -191,13 +202,15 @@ void CryBaby::processAudio (AudioBuffer<float>& buffer)
             }
         }
     }
-    //    else
-    //    {
-    //        for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
-    //        {
-    //            wdf[ch].setWahAmount (vr1Smooth.getCurrentValue());
-    //            for (auto& sample : channelData)
-    //                sample = wdf[ch].processSample (sample);
-    //        }
-    //    }
+    else
+    {
+        for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
+        {
+            wdf[ch].setWahAmount (vr1Smooth.getCurrentValue());
+            for (auto& sample : channelData)
+                sample = wdf[ch].processSample (sample);
+        }
+    }
+
+    dcBlocker.processBlock (buffer);
 }
