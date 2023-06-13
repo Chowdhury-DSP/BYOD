@@ -52,6 +52,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvi
     addAndMakeVisible (outputEditor.get());
     outputEditor->addToBoard (this);
 
+    infoComp.setAlwaysOnTop (true);
     addChildComponent (infoComp);
     addAndMakeVisible (cableView);
     cableView.toBack();
