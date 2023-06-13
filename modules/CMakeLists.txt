@@ -78,7 +78,6 @@ target_include_directories(juce_plugin_modules
         $<TARGET_PROPERTY:juce_plugin_modules,INCLUDE_DIRECTORIES>
     PUBLIC
         ${CMAKE_SOURCE_DIR}/modules/magic_enum/include
-        ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/Eigen
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/xsimd/include
         $<TARGET_PROPERTY:sst-cpputils,INTERFACE_INCLUDE_DIRECTORIES>
         ${CMAKE_SOURCE_DIR}/modules/fuzzysearchdatabase/src

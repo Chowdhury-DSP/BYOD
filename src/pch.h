@@ -15,7 +15,6 @@
 #include <JuceHeader.h>
 
 // Any other widely used headers that don't change...
-#include <Eigen/Dense>
 #include <FuzzySearchDatabase.hpp>
 #include <RTNeural/RTNeural.h>
 #include <chowdsp_wdf/chowdsp_wdf.h>
