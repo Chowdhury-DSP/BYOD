@@ -57,10 +57,12 @@ void CryBaby::prepare (double sampleRate, int samplesPerBlock)
 
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 2000; i += samplesPerBlock)
+    float level = 100.0f;
+    while (level > 1.0e-4f)
     {
         buffer.clear();
         processAudio (buffer);
+        level = buffer.getMagnitude (0, samplesPerBlock);
     }
 }
 
