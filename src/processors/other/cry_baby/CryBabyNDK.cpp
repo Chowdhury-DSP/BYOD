@@ -129,13 +129,13 @@ void CryBabyNDK::prepare (double fs, double initial_alpha)
     for (size_t ch = 0; ch < 2; ++ch)
     {
         x_n[ch].setZero();
-//        v_n[ch].setZero();
-//        x_n[ch] = Eigen::Vector<double, 6> { -0.00129042068087091,
-//                                         0.6066797237167123,
-//                                         -0.0064893267388429644,
-//                                         -0.19469253168118281,
-//                                         -0.19741507823194129,
-//                                         -1.5319085469643699E-7 };
+        //        v_n[ch].setZero();
+        //        x_n[ch] = Eigen::Vector<double, 6> { -0.00129042068087091,
+        //                                         0.6066797237167123,
+        //                                         -0.0064893267388429644,
+        //                                         -0.19469253168118281,
+        //                                         -0.19741507823194129,
+        //                                         -1.5319085469643699E-7 };
         v_n[ch] = Eigen::Vector<double, 4> { 3.9271560942528319, 4.524363916506168, 3.9262980403171812, 4.5429223634080538 };
     }
 }
@@ -192,10 +192,10 @@ void CryBabyNDK::process_channel (std::span<float> x, size_t ch) noexcept
         double exp_mv2;
         const auto calc_currents = [&]
         {
-            exp_v1_v0 = std::exp ((v_n[ch] (1) - v_n[ch] (0)) / Vt);
-            exp_mv0 = std::exp (-v_n[ch] (0) / Vt);
-            exp_v3_v2 = std::exp ((v_n[ch] (3) - v_n[ch] (2)) / Vt);
-            exp_mv2 = std::exp (-v_n[ch] (2) / Vt);
+            exp_v1_v0 = std::exp ((v_n[ch](1) - v_n[ch](0)) / Vt);
+            exp_mv0 = std::exp (-v_n[ch](0) / Vt);
+            exp_v3_v2 = std::exp ((v_n[ch](3) - v_n[ch](2)) / Vt);
+            exp_mv2 = std::exp (-v_n[ch](2) / Vt);
 
             i_n (0) = Is * ((exp_v1_v0 - 1.0) / BetaF + (exp_mv0 - 1.0) / BetaR);
             i_n (1) = -Is * (-(exp_mv0 - 1.0) + alphaF * (exp_v1_v0 - 1.0));
