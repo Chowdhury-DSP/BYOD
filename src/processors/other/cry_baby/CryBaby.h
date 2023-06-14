@@ -3,10 +3,12 @@
 #include "CryBabyWDF.h"
 #include "processors/BaseProcessor.h"
 
+struct CryBabyNDK;
 class CryBaby : public BaseProcessor
 {
 public:
     explicit CryBaby (UndoManager* um = nullptr);
+    ~CryBaby() override;
 
     ProcessorType getProcessorType() const override { return Other; }
     static ParamLayout createParameterLayout();
@@ -16,10 +18,16 @@ public:
 
 private:
     chowdsp::FloatParameter* controlFreqParam = nullptr;
-    chowdsp::SmoothedBufferValue<float> vr1Smooth;
+    chowdsp::SmoothedBufferValue<float> alphaSmooth;
 
-    CryBabyWDF wdf[2];
+    std::unique_ptr<CryBabyNDK> ndk_model;
+
     chowdsp::FirstOrderHPF<float> dcBlocker;
+
+    using AAFilter = chowdsp::EllipticFilter<4>;
+    chowdsp::Upsampler<float, AAFilter> upsampler;
+    chowdsp::Downsampler<float, AAFilter, false> downsampler;
+    bool needsOversampling = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CryBaby)
 };
