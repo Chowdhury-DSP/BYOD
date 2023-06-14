@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [UNRELEASED]
 - Added "Flapjack" module.
 - Added "Mouse Drive" module.
+- Added "Crying Child" module.
 - Added "Solo-Vibe" module.
 - Added "Ladder Filter" module.
 - Added "netlist view" to allow for customization of some circuit-modelled modules.
