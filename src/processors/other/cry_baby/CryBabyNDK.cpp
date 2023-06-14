@@ -128,12 +128,14 @@ void CryBabyNDK::prepare (double fs, double initial_alpha)
     // reset state
     for (size_t ch = 0; ch < 2; ++ch)
     {
-        x_n[ch] = Eigen::Vector<double, 6> { -0.00129042068087091,
-                                         0.6066797237167123,
-                                         -0.0064893267388429644,
-                                         -0.19469253168118281,
-                                         -0.19741507823194129,
-                                         -1.5319085469643699E-7 };
+        x_n[ch].setZero();
+//        v_n[ch].setZero();
+//        x_n[ch] = Eigen::Vector<double, 6> { -0.00129042068087091,
+//                                         0.6066797237167123,
+//                                         -0.0064893267388429644,
+//                                         -0.19469253168118281,
+//                                         -0.19741507823194129,
+//                                         -1.5319085469643699E-7 };
         v_n[ch] = Eigen::Vector<double, 4> { 3.9271560942528319, 4.524363916506168, 3.9262980403171812, 4.5429223634080538 };
     }
 }
@@ -167,15 +169,21 @@ void CryBabyNDK::process_channel (std::span<float> x, size_t ch) noexcept
 {
     Eigen::Vector<double, 2> u_n { 0.0, Vcc };
 
+    Eigen::Vector<double, 4> p_n;
+    Eigen::Matrix<double, 4, 4> Jac;
+    Jac.setZero();
+    Eigen::Vector<double, 4> i_n;
+    Eigen::Vector<double, 4> F_min;
+    Eigen::Matrix<double, 4, 4> A_solve;
+    const Eigen::Matrix<double, 4, 4> eye4 = Eigen::Matrix<double, 4, 4>::Identity();
+    Eigen::Vector<double, 4> delta_v;
+    Eigen::Vector<double, 1> y_n;
+
     for (auto& sample : x)
     {
         u_n (0) = (double) sample;
 
-        const Eigen::Vector<double, 4> p_n = G_mat * x_n[ch] + H_mat * u_n;
-
-        Eigen::Matrix<double, 4, 4> Jac;
-        Jac.setZero();
-        Eigen::Vector<double, 4> i_n;
+        p_n.noalias() = G_mat * x_n[ch] + H_mat * u_n;
 
         static constexpr auto alphaF = (1 + BetaF) / BetaF;
         double exp_v1_v0;
@@ -214,17 +222,17 @@ void CryBabyNDK::process_channel (std::span<float> x, size_t ch) noexcept
             calc_currents();
             calc_jacobian();
 
-            const Eigen::Vector<double, 4> F_min = p_n + K_mat * i_n - v_n[ch];
-            const Eigen::Matrix<double, 4, 4> A_solve = K_mat * Jac - Eigen::Matrix<double, 4, 4>::Identity();
-            const Eigen::Vector<double, 4> delta_v = A_solve.householderQr().solve (F_min);
+            F_min.noalias() = p_n + K_mat * i_n - v_n[ch];
+            A_solve.noalias() = K_mat * Jac - eye4;
+            delta_v.noalias() = A_solve.householderQr().solve (F_min);
             v_n[ch] -= delta_v;
 
             delta = delta_v.array().abs().sum();
-        } while (delta > 1.0e-5 && ++nIters < 100);
+        } while (delta > 1.0e-2 && ++nIters < 8);
 
         calc_currents();
 
-        const Eigen::Vector<double, 1> y_n = D_mat * x_n[ch] + E_mat * u_n + F_mat * i_n;
+        y_n.noalias() = D_mat * x_n[ch] + E_mat * u_n + F_mat * i_n;
         sample = (float) y_n (0);
 
         x_n[ch] = A_mat * x_n[ch] + B_mat * u_n + C_mat * i_n;

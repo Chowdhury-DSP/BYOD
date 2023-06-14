@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CryBabyWDF.h"
 #include "processors/BaseProcessor.h"
 
 struct CryBabyNDK;
