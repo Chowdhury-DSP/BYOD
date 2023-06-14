@@ -1,11 +1,15 @@
 #include "CryBaby.h"
+#include "CryBabyNDK.h"
 #include "processors/ParameterHelpers.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
 namespace
 {
 const String controlFreqTag = "control_freq";
-}
+
+// this module needs some extra oversampling to help the Newton-Raphson solver converge
+constexpr int oversampleRatio = 2;
+} // namespace
 
 CryBaby::CryBaby (UndoManager* um)
     : BaseProcessor ("Crying Child", createParameterLayout(), um)
@@ -13,147 +17,17 @@ CryBaby::CryBaby (UndoManager* um)
     using namespace ParameterHelpers;
     loadParameterPointer (controlFreqParam, vts, controlFreqTag);
 
-    vr1Smooth.setRampLength (0.005);
-    vr1Smooth.mappingFunction = [] (float x)
-    { return 0.64f * std::pow (x, 0.5f); };
+    alphaSmooth.setRampLength (0.001);
+    alphaSmooth.mappingFunction = [] (float x)
+    { return juce::jmap (std::pow (x, 0.5f), 0.1f, 0.99f); };
 
     uiOptions.backgroundColour = Colours::whitesmoke.darker (0.1f);
     uiOptions.powerColour = Colours::red.darker (0.2f);
     uiOptions.info.description = "\"Wah\" effect based on the Dunlop Cry Baby pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
-
-    netlistCircuitQuantities = std::make_unique<netlist::CircuitQuantityList>();
-    netlistCircuitQuantities->schematicSVG = { .data = BinaryData::cry_baby_schematic_svg,
-                                               .size = BinaryData::cry_baby_schematic_svgSize };
-    netlistCircuitQuantities->addResistor (
-        68.0e3f,
-        "R1",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.Vin_R1_C1.setResistanceValue (self.value.load());
-        },
-        2.0e3f,
-        2.0e6f);
-    netlistCircuitQuantities->addResistor (
-        1.5e3f,
-        "R2",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.R2.setResistanceValue (self.value.load());
-        },
-        100.0f,
-        2.0e6f);
-    netlistCircuitQuantities->addResistor (
-        22.0e3f,
-        "R3",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.R3.setResistanceValue (self.value.load());
-        },
-        100.0f,
-        2.0e6f);
-    netlistCircuitQuantities->addResistor (
-        470.0e3f,
-        "R5",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.outputStage.R5.setResistanceValue (self.value.load());
-        },
-        100.0f,
-        2.0e6f);
-    netlistCircuitQuantities->addResistor (
-        470.0e3f,
-        "R6",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.R6.setResistanceValue (self.value.load());
-        },
-        100.0f,
-        2.0e6f);
-    netlistCircuitQuantities->addResistor (
-        33.0e3f,
-        "R7",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.R7.setResistanceValue (self.value.load());
-        },
-        100.0f,
-        2.0e6f);
-    netlistCircuitQuantities->addResistor (
-        82.0e3f,
-        "R8",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.R8_C3.setResistanceValue (self.value.load());
-        },
-        100.0f,
-        2.0e6f);
-    netlistCircuitQuantities->addCapacitor (
-        0.01e-6f,
-        "C1",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.Vin_R1_C1.setCapacitanceValue (self.value.load());
-        },
-        100.0e-12f,
-        100.0e-3f);
-    netlistCircuitQuantities->addCapacitor (
-        0.1e-6f,
-        "C2",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.C2_Vfb.setCapacitanceValue (self.value.load());
-        },
-        100.0e-12f,
-        100.0e-3f);
-    netlistCircuitQuantities->addCapacitor (
-        4.7e-6f,
-        "C3",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.R8_C3.setCapacitanceValue (self.value.load());
-        },
-        1.0e-12f,
-        100.0e-3f);
-    netlistCircuitQuantities->addCapacitor (
-        0.22e-6f,
-        "C4",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.outputStage.C4.setCapacitanceValue (self.value.load());
-        },
-        1.0e-12f,
-        100.0e-3f);
-    netlistCircuitQuantities->addCapacitor (
-        0.22e-6f,
-        "C5",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.outputStage.C5.setCapacitanceValue (self.value.load());
-        },
-        100.0e-12f,
-        100.0e-3f);
-    netlistCircuitQuantities->addInductor (
-        1.0f,
-        "L1",
-        [this] (const netlist::CircuitQuantity& self)
-        {
-            for (auto& wdfModel : wdf)
-                wdfModel.activeStage.L1.setInductanceValue (self.value.load());
-        });
 }
+
+CryBaby::~CryBaby() = default;
 
 ParamLayout CryBaby::createParameterLayout()
 {
@@ -166,20 +40,29 @@ ParamLayout CryBaby::createParameterLayout()
 
 void CryBaby::prepare (double sampleRate, int samplesPerBlock)
 {
-    vr1Smooth.prepare (sampleRate, samplesPerBlock);
-
-    for (auto& wdfModel : wdf)
-        wdfModel.prepare ((float) sampleRate);
+    alphaSmooth.prepare (sampleRate, samplesPerBlock);
 
     dcBlocker.prepare (2);
     dcBlocker.calcCoefs (30.0f, (float) sampleRate);
 
+    needsOversampling = sampleRate < 88'200.0f;
+    if (needsOversampling)
+    {
+        upsampler.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 }, oversampleRatio);
+        downsampler.prepare ({ oversampleRatio * sampleRate, oversampleRatio * (uint32_t) samplesPerBlock, 2 }, oversampleRatio);
+    }
+
+    ndk_model = std::make_unique<CryBabyNDK>();
+    ndk_model->prepare ((needsOversampling ? oversampleRatio : 1.0) * sampleRate, 0.5);
+
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);
-    for (int i = 0; i < 40000; i += samplesPerBlock)
+    float level = 100.0f;
+    while (level > 1.0e-4f)
     {
         buffer.clear();
         processAudio (buffer);
+        level = buffer.getMagnitude (0, samplesPerBlock);
     }
 }
 
@@ -187,30 +70,44 @@ void CryBaby::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
 
-    chowdsp::BufferMath::applyGain (buffer, Decibels::decibelsToGain (37.0f));
+    alphaSmooth.process (controlFreqParam->getCurrentValue(), numSamples);
 
-    vr1Smooth.process (controlFreqParam->getCurrentValue(), numSamples);
-    if (vr1Smooth.isSmoothing())
+    dcBlocker.processBlock (buffer);
+
+    const auto processBlockNDK = [this] (const chowdsp::BufferView<float>& block, int smootherDivide = 1)
     {
-        const auto* vr1SmoothData = vr1Smooth.getSmoothedBuffer();
-        for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
+        if (alphaSmooth.isSmoothing())
         {
-            for (auto [n, sample] : chowdsp::enumerate (channelData))
+            const auto alphaSmoothData = alphaSmooth.getSmoothedBuffer();
+            for (int sample = 0; sample < block.getNumSamples();)
             {
-                wdf[ch].setWahAmount (vr1SmoothData[n]);
-                sample = wdf[ch].processSample (sample);
+                const auto samplesToProcess = juce::jmin (32, block.getNumSamples() - sample);
+
+                const auto subBufferView = chowdsp::BufferView<float> { block, sample, samplesToProcess };
+
+                ndk_model->set_alpha ((double) alphaSmoothData[sample / smootherDivide]);
+                for (auto [ch, data] : chowdsp::buffer_iters::channels (subBufferView))
+                    ndk_model->process_channel (data, ch);
+
+                sample += samplesToProcess;
             }
         }
+        else
+        {
+            ndk_model->set_alpha ((double) alphaSmooth.getCurrentValue());
+            for (auto [ch, channelData] : chowdsp::buffer_iters::channels (block))
+                ndk_model->process_channel (channelData, ch);
+        }
+    };
+
+    if (needsOversampling)
+    {
+        const auto osBufferView = upsampler.process (buffer);
+        processBlockNDK (osBufferView, oversampleRatio);
+        downsampler.process (osBufferView, buffer);
     }
     else
     {
-        for (auto [ch, channelData] : chowdsp::buffer_iters::channels (buffer))
-        {
-            wdf[ch].setWahAmount (vr1Smooth.getCurrentValue());
-            for (auto& sample : channelData)
-                sample = wdf[ch].processSample (sample);
-        }
+        processBlockNDK (buffer);
     }
-
-    dcBlocker.processBlock (buffer);
 }
