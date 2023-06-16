@@ -53,7 +53,9 @@ void CryBaby::prepare (double sampleRate, int samplesPerBlock)
     }
 
     ndk_model = std::make_unique<CryBabyNDK>();
-    ndk_model->prepare ((needsOversampling ? oversampleRatio : 1.0) * sampleRate, 0.5);
+    ndk_model->reset ((needsOversampling ? oversampleRatio : 1.0) * sampleRate);
+    const auto alpha = (double) alphaSmooth.getCurrentValue();
+    ndk_model->update_pots ({ (1.0 - alpha) * CryBabyNDK::VR1, alpha * CryBabyNDK::VR1 });
 
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);
@@ -79,24 +81,21 @@ void CryBaby::processAudio (AudioBuffer<float>& buffer)
         if (alphaSmooth.isSmoothing())
         {
             const auto alphaSmoothData = alphaSmooth.getSmoothedBuffer();
-            for (int sample = 0; sample < block.getNumSamples();)
+            for (auto [ch, n, data] : chowdsp::buffer_iters::sub_blocks<32, true> (block))
             {
-                const auto samplesToProcess = juce::jmin (32, block.getNumSamples() - sample);
+                if (ch == 0)
+                {
+                    const auto alpha = (double) alphaSmoothData[n / smootherDivide];
+                    ndk_model->update_pots ({ (1.0 - alpha) * CryBabyNDK::VR1, alpha * CryBabyNDK::VR1 });
+                }
 
-                const auto subBufferView = chowdsp::BufferView<float> { block, sample, samplesToProcess };
-
-                ndk_model->set_alpha ((double) alphaSmoothData[sample / smootherDivide]);
-                for (auto [ch, data] : chowdsp::buffer_iters::channels (subBufferView))
-                    ndk_model->process_channel (data, ch);
-
-                sample += samplesToProcess;
+                ndk_model->process (data, ch);
             }
         }
         else
         {
-            ndk_model->set_alpha ((double) alphaSmooth.getCurrentValue());
             for (auto [ch, channelData] : chowdsp::buffer_iters::channels (block))
-                ndk_model->process_channel (channelData, ch);
+                ndk_model->process (channelData, ch);
         }
     };
 
