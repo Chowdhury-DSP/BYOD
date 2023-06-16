@@ -39,6 +39,8 @@ elseif((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQU
         # For XSIMD
         -Wno-cast-align -Wno-shadow -Wno-implicit-int-conversion
         -Wno-zero-as-null-pointer-constant -Wno-sign-conversion
+        # For Eigen
+        -Wno-deprecated-anon-enum-enum-conversion
         # Needed for ARM processor, OSX versions below 10.14
         -fno-aligned-allocation
     )
