@@ -1,6 +1,6 @@
 /*
- * This file was generated on 2023-06-15 22:18:56.182984
- * using the command: `generate_ndk_cpp.py cry_baby_config.json`
+ * This file was generated on 2023-06-16 16:46:49.109814
+ * using the command: `/Users/jatin/ChowDSP/Research/NDK-Framework/generate_ndk_cpp.py cry_baby_ndk_config.json`
  */
 #include "CryBabyNDK.h"
 
@@ -137,19 +137,25 @@ void CryBabyNDK::update_pots (const std::array<T, num_pots>& pot_values)
     Eigen::Matrix<T, num_pots, num_pots> Rv_Q_inv = (Rv + Q).inverse();
 
     A_mat = A0_mat - (two_Z_Gx * (Ux * (Rv_Q_inv * Ux.transpose())));
-    B_mat = B0_mat - (two_Z_Gx * (Ux * (Rv_Q_inv * Uu.transpose())));
+    Eigen::Matrix<T, num_states, num_voltages> B_mat = B0_mat - (two_Z_Gx * (Ux * (Rv_Q_inv * Uu.transpose())));
+    B_mat_var = B_mat.leftCols<num_voltages_variable>();
+    B_u_fix = B_mat.rightCols<num_voltages_constant>() * Eigen::Vector<T, num_voltages_constant> { Vcc };
     C_mat = C0_mat - (two_Z_Gx * (Ux * (Rv_Q_inv * Un.transpose())));
     D_mat = D0_mat - (Uo * (Rv_Q_inv * Ux.transpose()));
-    E_mat = E0_mat - (Uo * (Rv_Q_inv * Uu.transpose()));
+    Eigen::Matrix<T, num_outputs, num_voltages> E_mat = E0_mat - (Uo * (Rv_Q_inv * Uu.transpose()));
+    E_mat_var = E_mat.leftCols<num_voltages_variable>();
+    E_u_fix = E_mat.rightCols<num_voltages_constant>() * Eigen::Vector<T, num_voltages_constant> { Vcc };
     F_mat = F0_mat - (Uo * (Rv_Q_inv * Un.transpose()));
     G_mat = G0_mat - (Un * (Rv_Q_inv * Ux.transpose()));
-    H_mat = H0_mat - (Un * (Rv_Q_inv * Uu.transpose()));
+    Eigen::Matrix<T, num_nl_ports, num_voltages> H_mat = H0_mat - (Un * (Rv_Q_inv * Uu.transpose()));
+    H_mat_var = H_mat.leftCols<num_voltages_variable>();
+    H_u_fix = H_mat.rightCols<num_voltages_constant>() * Eigen::Vector<T, num_voltages_constant> { Vcc };
     K_mat = K0_mat - (Un * (Rv_Q_inv * Un.transpose()));
 }
 
 void CryBabyNDK::process (std::span<float> channel_data, size_t ch) noexcept
 {
-    Eigen::Vector<T, num_voltages> u_n { (T) 0, Vcc };
+    Eigen::Vector<T, num_voltages_variable> u_n_var;
     Eigen::Vector<T, num_nl_ports> p_n;
     Eigen::Matrix<T, num_nl_ports, num_nl_ports> Jac = Eigen::Matrix<T, num_nl_ports, num_nl_ports>::Zero();
     Eigen::Vector<T, num_nl_ports> i_n;
@@ -161,8 +167,8 @@ void CryBabyNDK::process (std::span<float> channel_data, size_t ch) noexcept
 
     for (auto& sample : channel_data)
     {
-        u_n (0) = (T) sample;
-        p_n.noalias() = G_mat * x_n[ch] + H_mat * u_n;
+        u_n_var (0) = (T) sample;
+        p_n.noalias() = G_mat * x_n[ch] + H_mat_var * u_n_var + H_u_fix;
 
         T exp_v1_v0;
         T exp_mv0;
@@ -209,8 +215,8 @@ void CryBabyNDK::process (std::span<float> channel_data, size_t ch) noexcept
         } while (delta > 1.0e-2 && ++nIters < 8);
         calc_currents();
 
-        y_n.noalias() = D_mat * x_n[ch] + E_mat * u_n + F_mat * i_n;
+        y_n.noalias() = D_mat * x_n[ch] + E_mat_var * u_n_var + E_u_fix + F_mat * i_n;
         sample = (float) y_n (0);
-        x_n[ch] = A_mat * x_n[ch] + B_mat * u_n + C_mat * i_n;
+        x_n[ch] = A_mat * x_n[ch] + B_mat_var * u_n_var + B_u_fix + C_mat * i_n;
     }
 }

@@ -1,8 +1,12 @@
 /*
- * This file was generated on 2023-06-15 22:16:44.057122
- * using the command: `generate_ndk_cpp.py cry_baby_config.json`
+ * This file was generated on 2023-06-16 16:46:49.109563
+ * using the command: `/Users/jatin/ChowDSP/Research/NDK-Framework/generate_ndk_cpp.py cry_baby_ndk_config.json`
  */
 #pragma once
+
+#include <array>
+#include <cmath>
+#include <span>
 
 // START USER INCLUDES
 #include <modules/Eigen/Eigen/Dense>
@@ -21,7 +25,9 @@ struct CryBabyNDK
     static constexpr int num_pots = 2;
     static constexpr int num_states = 6;
     static constexpr int num_nl_ports = 4;
-    static constexpr int num_voltages = 2;
+    static constexpr int num_voltages_variable = 1;
+    static constexpr int num_voltages_constant = 1;
+    static constexpr int num_voltages = num_voltages_variable + num_voltages_constant;
     static constexpr int num_outputs = 1;
 
     // State Variables
@@ -30,13 +36,16 @@ struct CryBabyNDK
 
     // NDK Matrices
     Eigen::Matrix<T, num_states, num_states> A_mat;
-    Eigen::Matrix<T, num_states, num_voltages> B_mat;
+    Eigen::Matrix<T, num_states, num_voltages_variable> B_mat_var;
+    Eigen::Vector<T, num_states> B_u_fix;
     Eigen::Matrix<T, num_states, num_nl_ports> C_mat;
     Eigen::Matrix<T, num_outputs, num_states> D_mat;
-    Eigen::Matrix<T, num_outputs, num_voltages> E_mat;
+    Eigen::Matrix<T, num_outputs, num_voltages_variable> E_mat_var;
+    Eigen::Vector<T, num_outputs> E_u_fix;
     Eigen::Matrix<T, num_outputs, num_nl_ports> F_mat;
     Eigen::Matrix<T, num_nl_ports, num_states> G_mat;
-    Eigen::Matrix<T, num_nl_ports, num_voltages> H_mat;
+    Eigen::Matrix<T, num_nl_ports, num_voltages_variable> H_mat_var;
+    Eigen::Vector<T, num_nl_ports> H_u_fix;
     Eigen::Matrix<T, num_nl_ports, num_nl_ports> K_mat;
 
     // Intermediate matrices for NDK matrix updates;
