@@ -15,7 +15,8 @@ enum ProcessorType
 enum class PortType
 {
     audio = 0,
-    modulation
+    modulation,
+    level
 };
 
 struct ProcessorUIOptions
