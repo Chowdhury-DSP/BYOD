@@ -25,9 +25,7 @@ float ramp_down (float x, int off)
 
 ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor ("Scanner Vibrato",
                                                                   createParameterLayout(),
-                                                                  um,
-                                                                  magic_enum::enum_count<InputPort>(),
-                                                                  magic_enum::enum_count<OutputPort>())
+                                                                  um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateHzParam, vts, rateTag);

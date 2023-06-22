@@ -17,9 +17,7 @@ const String delayTypeTag = "delay_type";
 
 Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus",
                                                   createParameterLayout(),
-                                                  um,
-                                                  magic_enum::enum_count<InputPort>(),
-                                                  magic_enum::enum_count<OutputPort>())
+                                                  um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");

@@ -13,9 +13,7 @@ const String delayTypeTag = "delay_type";
 
 Flanger::Flanger (UndoManager* um) : BaseProcessor ("Flanger",
                                                     createParameterLayout(),
-                                                    um,
-                                                    magic_enum::enum_count<InputPort>(),
-                                                    magic_enum::enum_count<OutputPort>())
+                                                    um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");

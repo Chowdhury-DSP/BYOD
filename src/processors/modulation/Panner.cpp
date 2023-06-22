@@ -17,9 +17,7 @@ const String stereoModeTag = "stereo_mode";
 
 Panner::Panner (UndoManager* um) : BaseProcessor ("Panner",
                                                   createParameterLayout(),
-                                                  um,
-                                                  magic_enum::enum_count<InputPort>(),
-                                                  magic_enum::enum_count<OutputPort>())
+                                                  um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (mainPan, vts, mainPanTag);

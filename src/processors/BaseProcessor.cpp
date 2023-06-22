@@ -4,12 +4,13 @@
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
-                              UndoManager* um,
-                              int nInputs,
-                              int nOutputs) : JuceProcWrapper (name),
-                                              vts (*this, um, Identifier ("Parameters"), std::move (params)),
-                                              numInputs (nInputs),
-                                              numOutputs (nOutputs)
+                              UndoManager* um) : BaseProcessor (name,
+                                                             params,
+                                                             BasicInputPort{},
+                                                             BasicOutputPort{},
+                                                             um,
+                                                             [] (auto) { return PortType::audio; },
+                                                             [] (auto) { return PortType::audio; })
 {
     onOffParam = vts.getRawParameterValue ("on_off");
 
