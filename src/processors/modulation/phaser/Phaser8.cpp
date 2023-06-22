@@ -12,7 +12,21 @@ const String modulationTag = "modulation";
 
 Phaser8::Phaser8 (UndoManager* um) : BaseProcessor ("Phaser8",
                                                     createParameterLayout(),
-                                                    um)
+                                                    InputPort{},
+                                                    OutputPort{},
+                                                    um,
+                                                    [] (InputPort port)
+                                                    {
+                                                        if (port == InputPort::ModulationInput)
+                                                            return PortType::modulation;
+                                                        return PortType::audio;
+                                                    },
+                                                    [] (OutputPort port)
+                                                    {
+                                                        if (port == OutputPort::ModulationOutput)
+                                                            return PortType::modulation;
+                                                        return PortType::audio;
+                                                    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateHzParam, vts, rateTag);

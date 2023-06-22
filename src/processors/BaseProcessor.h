@@ -76,7 +76,7 @@ public:
               typename InputPortMapper = decltype (&defaultPortMapper<InputPort>),
               typename OutputPortMapper = decltype (&defaultPortMapper<OutputPort>)>
     BaseProcessor (const String& name,
-                   ParamLayout& params,
+                   ParamLayout params,
                    InputPort,
                    OutputPort,
                    UndoManager* um = nullptr,

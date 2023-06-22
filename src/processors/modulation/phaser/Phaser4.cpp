@@ -14,7 +14,21 @@ const String stereoTag = "stereo";
 
 Phaser4::Phaser4 (UndoManager* um) : BaseProcessor ("Phaser4",
                                                     createParameterLayout(),
-                                                    um)
+                                                    InputPort{},
+                                                    OutputPort{},
+                                                    um,
+                                                    [] (InputPort port)
+                                                    {
+                                                        if (port == InputPort::ModulationInput)
+                                                            return PortType::modulation;
+                                                        return PortType::audio;
+                                                    },
+                                                    [] (OutputPort port)
+                                                    {
+                                                        if (port == OutputPort::ModulationOutput)
+                                                            return PortType::modulation;
+                                                        return PortType::audio;
+                                                    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateHzParam, vts, rateTag);

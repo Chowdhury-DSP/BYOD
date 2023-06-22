@@ -5,7 +5,7 @@
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
                               UndoManager* um) : BaseProcessor (name,
-                                                             params,
+                                                             std::move(params),
                                                              BasicInputPort{},
                                                              BasicOutputPort{},
                                                              um,

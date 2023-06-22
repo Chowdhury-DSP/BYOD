@@ -27,7 +27,21 @@ const String v1WaveTag = "v1_wave";
 
 Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
                                                     createParameterLayout(),
-                                                    um)
+                                                    InputPort{},
+                                                    OutputPort{},
+                                                    um,
+                                                    [] (InputPort port)
+                                                    {
+                                                        if (port == InputPort::ModulationInput)
+                                                            return PortType::modulation;
+                                                        return PortType::audio;
+                                                    },
+                                                    [] (OutputPort port)
+                                                    {
+                                                        if (port == OutputPort::ModulationOutput)
+                                                            return PortType::modulation;
+                                                        return PortType::audio;
+                                                    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");
