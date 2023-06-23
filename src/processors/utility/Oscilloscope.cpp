@@ -6,7 +6,7 @@ namespace
 constexpr int scopeFps = 30;
 }
 
-Oscilloscope::Oscilloscope (UndoManager* um) : BaseProcessor ("Oscilloscope", createParameterLayout(), um, 1, 0)
+Oscilloscope::Oscilloscope (UndoManager* um) : BaseProcessor ("Oscilloscope", createParameterLayout(), um)
 {
     uiOptions.backgroundColour = Colours::silver.brighter (0.2f);
     uiOptions.powerColour = Colours::red;

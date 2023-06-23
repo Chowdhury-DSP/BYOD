@@ -1,7 +1,7 @@
 #include "OutputProcessor.h"
 #include "../ParameterHelpers.h"
 
-OutputProcessor::OutputProcessor (UndoManager* um) : BaseProcessor ("Output", createParameterLayout(), um, 1, 0)
+OutputProcessor::OutputProcessor (UndoManager* um) : BaseProcessor ("Output", createParameterLayout(), um)
 {
     uiOptions.backgroundColour = Colours::lightskyblue;
 }

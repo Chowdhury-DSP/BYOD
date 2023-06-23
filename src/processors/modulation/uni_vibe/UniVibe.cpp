@@ -13,9 +13,21 @@ const String mixTag = "mix";
 
 UniVibe::UniVibe (UndoManager* um) : BaseProcessor ("Solo-Vibe",
                                                     createParameterLayout(),
+                                                    InputPort{},
+                                                    OutputPort{},
                                                     um,
-                                                    magic_enum::enum_count<InputPort>(),
-                                                    magic_enum::enum_count<OutputPort>())
+                                                    [] (InputPort port)
+                                                    {
+                                                        if (port == InputPort::ModulationInput)
+                                                            return PortType::modulation;
+                                                        return PortType::audio;
+                                                    },
+                                                    [] (OutputPort port)
+                                                    {
+                                                        if (port == OutputPort::ModulationOutput)
+                                                            return PortType::modulation;
+                                                        return PortType::audio;
+                                                    })
 {
     using namespace ParameterHelpers;
     speedParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, speedTag));

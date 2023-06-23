@@ -9,9 +9,21 @@ const String stereoTag = "stereo";
 
 Rotary::Rotary (UndoManager* um) : BaseProcessor ("Rotary",
                                                   createParameterLayout(),
-                                                  um,
-                                                  magic_enum::enum_count<InputPort>(),
-                                                  magic_enum::enum_count<OutputPort>())
+                                                   InputPort{},
+                                                   OutputPort{},
+                                                   um,
+                                                  [] (InputPort port)
+                                                   {
+                                                       if (port == InputPort::ModulationInput)
+                                                           return PortType::modulation;
+                                                       return PortType::audio;
+                                                   },
+                                                  [] (OutputPort port)
+                                                   {
+                                                       if (port == OutputPort::ModulationOutput)
+                                                           return PortType::modulation;
+                                                       return PortType::audio;
+                                                   })
 {
     chowdsp::ParamUtils::loadParameterPointer (rateHzParam, vts, "rate");
     chowdsp::ParamUtils::loadParameterPointer (stereoParam, vts, stereoTag);
