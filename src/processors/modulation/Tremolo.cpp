@@ -25,23 +25,24 @@ const String v1WaveTag = "v1_wave";
 
 } // namespace
 
-Tremolo::Tremolo (UndoManager* um) : BaseProcessor ("Tremolo",
-                                                    createParameterLayout(),
-                                                    InputPort{},
-                                                    OutputPort{},
-                                                    um,
-                                                    [] (InputPort port)
-                                                    {
-                                                        if (port == InputPort::ModulationInput)
-                                                            return PortType::modulation;
-                                                        return PortType::audio;
-                                                    },
-                                                    [] (OutputPort port)
-                                                    {
-                                                        if (port == OutputPort::ModulationOutput)
-                                                            return PortType::modulation;
-                                                        return PortType::audio;
-                                                    })
+Tremolo::Tremolo (UndoManager* um) : BaseProcessor (
+    "Tremolo",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::ModulationInput)
+            return PortType::modulation;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::ModulationOutput)
+            return PortType::modulation;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");

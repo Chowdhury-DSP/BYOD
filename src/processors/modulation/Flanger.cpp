@@ -11,23 +11,24 @@ constexpr float delayMs = 0.001f;
 const String delayTypeTag = "delay_type";
 } // namespace
 
-Flanger::Flanger (UndoManager* um) : BaseProcessor ("Flanger",
-                                                    createParameterLayout(),
-                                                    InputPort{},
-                                                    OutputPort{},
-                                                    um,
-                                                    [] (InputPort port)
-                                                    {
-                                                        if (port == InputPort::ModulationInput)
-                                                            return PortType::modulation;
-                                                        return PortType::audio;
-                                                    },
-                                                    [] (OutputPort port)
-                                                    {
-                                                        if (port == OutputPort::ModulationOutput)
-                                                            return PortType::modulation;
-                                                        return PortType::audio;
-                                                    })
+Flanger::Flanger (UndoManager* um) : BaseProcessor (
+    "Flanger",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::ModulationInput)
+            return PortType::modulation;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::ModulationOutput)
+            return PortType::modulation;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");

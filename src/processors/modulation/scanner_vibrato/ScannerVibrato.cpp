@@ -23,23 +23,24 @@ float ramp_down (float x, int off)
 }
 } // namespace
 
-ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor ("Scanner Vibrato",
-                                                                  createParameterLayout(),
-                                                                   InputPort{},
-                                                                   OutputPort{},
-                                                                   um,
-                                                                   [] (InputPort port)
-                                                                   {
-                                                                       if (port == InputPort::ModulationInput)
-                                                                           return PortType::modulation;
-                                                                       return PortType::audio;
-                                                                   },
-                                                                   [] (OutputPort port)
-                                                                   {
-                                                                       if (port == OutputPort::ModulationOutput)
-                                                                           return PortType::modulation;
-                                                                       return PortType::audio;
-                                                                   })
+ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor (
+    "Scanner Vibrato",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::ModulationInput)
+            return PortType::modulation;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::ModulationOutput)
+            return PortType::modulation;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateHzParam, vts, rateTag);

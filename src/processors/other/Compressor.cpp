@@ -69,23 +69,24 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainComputer)
 };
 
-Compressor::Compressor (UndoManager* um) : BaseProcessor ("Compressor",
-                                                          createParameterLayout(),
-                                                           InputPort{},
-                                                           OutputPort{},
-                                                           um,
-                                                          [] (InputPort port)
-                                                           {
-                                                               if (port == InputPort::LevelInput)
-                                                                   return PortType::level;
-                                                               return PortType::audio;
-                                                           },
-                                                          [] (OutputPort port)
-                                                           {
-                                                               if (port == OutputPort::LevelOutput)
-                                                                   return PortType::level;
-                                                               return PortType::audio;
-                                                           })
+Compressor::Compressor (UndoManager* um) : BaseProcessor (
+    "Compressor",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::LevelInput)
+            return PortType::level;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::LevelOutput)
+            return PortType::level;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (threshDBParam, vts, "thresh");

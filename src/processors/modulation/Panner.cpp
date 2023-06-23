@@ -15,23 +15,24 @@ const String panModeTag = "pan_mode";
 const String stereoModeTag = "stereo_mode";
 } // namespace
 
-Panner::Panner (UndoManager* um) : BaseProcessor ("Panner",
-                                                  createParameterLayout(),
-                                                   InputPort{},
-                                                   OutputPort{},
-                                                   um,
-                                                  [] (InputPort port)
-                                                   {
-                                                       if (port == InputPort::ModulationInput)
-                                                           return PortType::modulation;
-                                                       return PortType::audio;
-                                                   },
-                                                  [] (OutputPort port)
-                                                  {
-                                                       if (port == OutputPort::ModulationOutput)
-                                                           return PortType::modulation;
-                                                       return PortType::audio;
-                                                  })
+Panner::Panner (UndoManager* um) : BaseProcessor (
+    "Panner",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::ModulationInput)
+            return PortType::modulation;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::ModulationOutput)
+            return PortType::modulation;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (mainPan, vts, mainPanTag);

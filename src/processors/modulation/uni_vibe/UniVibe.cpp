@@ -11,23 +11,24 @@ const String stereoTag = "stereo";
 const String mixTag = "mix";
 } // namespace
 
-UniVibe::UniVibe (UndoManager* um) : BaseProcessor ("Solo-Vibe",
-                                                    createParameterLayout(),
-                                                    InputPort{},
-                                                    OutputPort{},
-                                                    um,
-                                                    [] (InputPort port)
-                                                    {
-                                                        if (port == InputPort::ModulationInput)
-                                                            return PortType::modulation;
-                                                        return PortType::audio;
-                                                    },
-                                                    [] (OutputPort port)
-                                                    {
-                                                        if (port == OutputPort::ModulationOutput)
-                                                            return PortType::modulation;
-                                                        return PortType::audio;
-                                                    })
+UniVibe::UniVibe (UndoManager* um) : BaseProcessor (
+    "Solo-Vibe",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::ModulationInput)
+            return PortType::modulation;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::ModulationOutput)
+            return PortType::modulation;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     speedParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, speedTag));

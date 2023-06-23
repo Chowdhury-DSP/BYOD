@@ -62,7 +62,7 @@ static PortTypesVector initialisePortTypes (PortMapper mapper)
                                          portTypes[portIndex] = mapper ((Port) portType); });
     return portTypes;
 }
-}
+} // namespace base_processor_detail
 
 class BaseProcessor : private JuceProcWrapper
 {
@@ -70,7 +70,10 @@ public:
     using Ptr = std::unique_ptr<BaseProcessor>;
 
     template <typename Port>
-    static constexpr auto defaultPortMapper (Port) { return PortType::audio; }
+    static constexpr auto defaultPortMapper (Port)
+    {
+        return PortType::audio;
+    }
 
     template <typename InputPort,
               typename OutputPort,
@@ -84,12 +87,11 @@ public:
                    InputPortMapper inputPortMapper = &defaultPortMapper<InputPort>,
                    OutputPortMapper outputPortMapper = &defaultPortMapper<OutputPort>) : JuceProcWrapper (name),
                                                                                          vts (*this, um, Identifier ("Parameters"), std::move (params)),
-                                                                                         numInputs(magic_enum::enum_count<InputPort>()),
-                                                                                         numOutputs(magic_enum::enum_count<OutputPort>()),
+                                                                                         numInputs (magic_enum::enum_count<InputPort>()),
+                                                                                         numOutputs (magic_enum::enum_count<OutputPort>()),
                                                                                          inputPortTypes (base_processor_detail::initialisePortTypes<InputPort> (inputPortMapper)),
                                                                                          outputPortTypes (base_processor_detail::initialisePortTypes<OutputPort> (outputPortMapper))
     {
-
         std::cout << "Creating processor: " << name << std::endl;
         std::cout << "With input ports: " << std::endl;
         for (size_t i = 0; i < inputPortTypes.size(); ++i)

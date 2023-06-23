@@ -20,23 +20,24 @@ const String directControlTag = "direct_control";
 const String freqModTag = "freq_mod";
 } // namespace
 
-EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor ("Envelope Filter",
-                                                                  createParameterLayout(),
-                                                                   InputPort{},
-                                                                   OutputPort{},
-                                                                   um,
-                                                                  [] (InputPort port)
-                                                                  {
-                                                                       if (port == InputPort::LevelInput)
-                                                                           return PortType::level;
-                                                                       return PortType::audio;
-                                                                  },
-                                                                  [] (OutputPort port)
-                                                                  {
-                                                                       if (port == OutputPort::LevelOutput)
-                                                                           return PortType::level;
-                                                                       return PortType::audio;
-                                                                  })
+EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor (
+    "Envelope Filter",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::LevelInput)
+            return PortType::level;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::LevelOutput)
+            return PortType::level;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (freqParam, vts, "freq");

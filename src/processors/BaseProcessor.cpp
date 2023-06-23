@@ -4,13 +4,16 @@
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
-                              UndoManager* um) : BaseProcessor (name,
-                                                             std::move(params),
-                                                             BasicInputPort{},
-                                                             BasicOutputPort{},
-                                                             um,
-                                                             [] (auto) { return PortType::audio; },
-                                                             [] (auto) { return PortType::audio; })
+                              UndoManager* um) : BaseProcessor (
+    name,
+    std::move (params),
+    BasicInputPort {},
+    BasicOutputPort {},
+    um,
+    [] (auto)
+    { return PortType::audio; },
+    [] (auto)
+    { return PortType::audio; })
 {
     onOffParam = vts.getRawParameterValue ("on_off");
 
