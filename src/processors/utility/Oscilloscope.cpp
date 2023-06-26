@@ -8,8 +8,8 @@ constexpr int scopeFps = 30;
 
 Oscilloscope::Oscilloscope (UndoManager* um) : BaseProcessor ("Oscilloscope",
                                                               createParameterLayout(),
-                                                              BasicInputPort{},
-                                                              NullPort{},
+                                                              BasicInputPort {},
+                                                              NullPort {},
                                                               um)
 {
     uiOptions.backgroundColour = Colours::silver.brighter (0.2f);

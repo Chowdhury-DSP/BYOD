@@ -8,8 +8,8 @@ constexpr int tunerRefreshHz = 24;
 
 Tuner::Tuner (UndoManager* um) : BaseProcessor ("Tuner",
                                                 createParameterLayout(),
-                                                BasicInputPort{},
-                                                NullPort{},
+                                                BasicInputPort {},
+                                                NullPort {},
                                                 um)
 {
     uiOptions.backgroundColour = Colours::silver.brighter (0.2f);

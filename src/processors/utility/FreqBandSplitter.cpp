@@ -3,8 +3,8 @@
 
 FreqBandSplitter::FreqBandSplitter (UndoManager* um) : BaseProcessor ("Frequency Splitter",
                                                                       createParameterLayout(),
-                                                                      BasicInputPort{},
-                                                                      OutputPort{},
+                                                                      BasicInputPort {},
+                                                                      OutputPort {},
                                                                       um)
 {
     using namespace ParameterHelpers;

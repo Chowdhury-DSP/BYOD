@@ -3,8 +3,8 @@
 
 OutputProcessor::OutputProcessor (UndoManager* um) : BaseProcessor ("Output",
                                                                     createParameterLayout(),
-                                                                    BasicInputPort{},
-                                                                    NullPort{},
+                                                                    BasicInputPort {},
+                                                                    NullPort {},
                                                                     um)
 {
     uiOptions.backgroundColour = Colours::lightskyblue;

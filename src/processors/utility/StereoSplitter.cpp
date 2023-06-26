@@ -3,8 +3,8 @@
 
 StereoSplitter::StereoSplitter (UndoManager* um) : BaseProcessor ("Stereo Splitter",
                                                                   createParameterLayout(),
-                                                                  BasicInputPort{},
-                                                                  OutputPort{},
+                                                                  BasicInputPort {},
+                                                                  OutputPort {},
                                                                   um)
 {
     modeParam = vts.getRawParameterValue ("mode");
