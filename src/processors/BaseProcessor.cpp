@@ -4,22 +4,17 @@
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
-                              UndoManager* um,
-                              int nInputs,
-                              int nOutputs) : JuceProcWrapper (name),
-                                              vts (*this, um, Identifier ("Parameters"), std::move (params)),
-                                              numInputs (nInputs),
-                                              numOutputs (nOutputs)
+                              UndoManager* um) : BaseProcessor (
+    name,
+    std::move (params),
+    BasicInputPort {},
+    BasicOutputPort {},
+    um,
+    [] (auto)
+    { return PortType::audio; },
+    [] (auto)
+    { return PortType::audio; })
 {
-    onOffParam = vts.getRawParameterValue ("on_off");
-
-    outputBuffers.resize (jmax (1, numOutputs));
-    outputBuffers.fill (nullptr);
-    outputConnections.resize (numOutputs);
-
-    inputBuffers.resize (numInputs);
-    inputsConnected.resize (0);
-    portMagnitudes.resize (numInputs);
 }
 
 BaseProcessor::~BaseProcessor() = default;

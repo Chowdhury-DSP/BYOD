@@ -1,5 +1,6 @@
 #include "Port.h"
 #include "../cables/CableDrawingHelpers.h"
+#include "../src/processors/BaseProcessor.h"
 
 Port::Port (const Colour& processorColour, const PortType type) : Component ("Port"),
                                                                   procColour (processorColour),
