@@ -56,10 +56,13 @@ template <typename Port, typename PortMapper>
 static PortTypesVector initialisePortTypes (PortMapper mapper)
 {
     auto portTypes = PortTypesVector (magic_enum::enum_count<Port>(), PortType::audio);
-    magic_enum::enum_for_each<Port> ([&portTypes, &mapper] (auto portType)
-                                     {
-                                         const auto portIndex = *magic_enum::enum_index ((Port) portType);
-                                         portTypes[portIndex] = mapper ((Port) portType); });
+    if constexpr (magic_enum::enum_count<Port>() > 0)
+    {
+        magic_enum::enum_for_each<Port> ([&portTypes, &mapper] (auto portType)
+                                         {
+                                             const auto portIndex = *magic_enum::enum_index ((Port) portType);
+                                             portTypes[portIndex] = mapper ((Port) portType); });
+    }
     return portTypes;
 }
 } // namespace base_processor_detail
@@ -260,6 +263,8 @@ protected:
         AudioOutput,
     };
 
+    enum class NullPort;
+
 private:
     std::atomic<float>* onOffParam = nullptr;
 
@@ -295,8 +300,8 @@ private:
 
     juce::Array<int> inputModulationPorts {};
     juce::Array<int> outputModulationPorts {};
-    base_processor_detail::PortTypesVector inputPortTypes;
-    base_processor_detail::PortTypesVector outputPortTypes;
+    const base_processor_detail::PortTypesVector inputPortTypes;
+    const base_processor_detail::PortTypesVector outputPortTypes;
 
     std::unordered_map<int, std::vector<String>> paramsToDisableWhenInputConnected {};
 

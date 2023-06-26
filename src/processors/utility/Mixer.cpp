@@ -3,6 +3,8 @@
 
 Mixer::Mixer (UndoManager* um) : BaseProcessor ("Mixer",
                                                 createParameterLayout(),
+                                                InputPort{},
+                                                BasicOutputPort{},
                                                 um)
 {
     for (int i = 0; i < numIns; ++i)

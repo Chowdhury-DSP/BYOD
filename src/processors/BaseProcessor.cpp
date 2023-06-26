@@ -15,15 +15,6 @@ BaseProcessor::BaseProcessor (const String& name,
     [] (auto)
     { return PortType::audio; })
 {
-    onOffParam = vts.getRawParameterValue ("on_off");
-
-    outputBuffers.resize (jmax (1, numOutputs));
-    outputBuffers.fill (nullptr);
-    outputConnections.resize (numOutputs);
-
-    inputBuffers.resize (numInputs);
-    inputsConnected.resize (0);
-    portMagnitudes.resize (numInputs);
 }
 
 BaseProcessor::~BaseProcessor() = default;

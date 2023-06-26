@@ -1,7 +1,11 @@
 #include "StereoSplitter.h"
 #include "../ParameterHelpers.h"
 
-StereoSplitter::StereoSplitter (UndoManager* um) : BaseProcessor ("Stereo Splitter", createParameterLayout(), um)
+StereoSplitter::StereoSplitter (UndoManager* um) : BaseProcessor ("Stereo Splitter",
+                                                                  createParameterLayout(),
+                                                                  BasicInputPort{},
+                                                                  OutputPort{},
+                                                                  um)
 {
     modeParam = vts.getRawParameterValue ("mode");
 
