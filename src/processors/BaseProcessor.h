@@ -95,14 +95,6 @@ public:
                                                                                          inputPortTypes (base_processor_detail::initialisePortTypes<InputPort> (inputPortMapper)),
                                                                                          outputPortTypes (base_processor_detail::initialisePortTypes<OutputPort> (outputPortMapper))
     {
-        std::cout << "Creating processor: " << name << std::endl;
-        std::cout << "With input ports: " << std::endl;
-        for (size_t i = 0; i < inputPortTypes.size(); ++i)
-            std::cout << "    " << magic_enum::enum_name ((InputPort) i) << " (" << magic_enum::enum_name (inputPortTypes[i]) << ")" << std::endl;
-        std::cout << "With output ports: " << std::endl;
-        for (size_t i = 0; i < outputPortTypes.size(); ++i)
-            std::cout << "    " << magic_enum::enum_name ((OutputPort) i) << " (" << magic_enum::enum_name (outputPortTypes[i]) << ")" << std::endl;
-
         onOffParam = vts.getRawParameterValue ("on_off");
 
         outputBuffers.resize (jmax (1, numOutputs));
