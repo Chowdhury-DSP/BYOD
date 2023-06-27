@@ -3,9 +3,9 @@
 
 Mixer::Mixer (UndoManager* um) : BaseProcessor ("Mixer",
                                                 createParameterLayout(),
-                                                um,
-                                                numIns,
-                                                1)
+                                                InputPort {},
+                                                BasicOutputPort {},
+                                                um)
 {
     for (int i = 0; i < numIns; ++i)
         chowdsp::ParamUtils::loadParameterPointer (gainDBParams[i], vts, "gain" + String (i));

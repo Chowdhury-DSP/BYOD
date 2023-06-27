@@ -15,11 +15,24 @@ constexpr float delay2Ms = 0.2f;
 const String delayTypeTag = "delay_type";
 } // namespace
 
-Chorus::Chorus (UndoManager* um) : BaseProcessor ("Chorus",
-                                                  createParameterLayout(),
-                                                  um,
-                                                  magic_enum::enum_count<InputPort>(),
-                                                  magic_enum::enum_count<OutputPort>())
+Chorus::Chorus (UndoManager* um) : BaseProcessor (
+    "Chorus",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::ModulationInput)
+            return PortType::modulation;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::ModulationOutput)
+            return PortType::modulation;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateParam, vts, "rate");

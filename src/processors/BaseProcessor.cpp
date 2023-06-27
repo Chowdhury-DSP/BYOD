@@ -1,15 +1,33 @@
 #include "BaseProcessor.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
-#include "processors/netlist_helpers/NetlistViewer.h"
+#include "netlist_helpers/NetlistViewer.h"
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
-                              UndoManager* um,
-                              int nInputs,
-                              int nOutputs) : JuceProcWrapper (name),
-                                              vts (*this, um, Identifier ("Parameters"), std::move (params)),
-                                              numInputs (nInputs),
-                                              numOutputs (nOutputs)
+                              UndoManager* um) : BaseProcessor (
+    name,
+    std::move (params),
+    BasicInputPort {},
+    BasicOutputPort {},
+    um,
+    [] (auto)
+    { return PortType::audio; },
+    [] (auto)
+    { return PortType::audio; })
+{
+}
+
+BaseProcessor::BaseProcessor (const String& name,
+                              ParamLayout&& params,
+                              base_processor_detail::PortTypesVector&& inputPorts,
+                              base_processor_detail::PortTypesVector&& outputPorts,
+                              UndoManager* um)
+    : JuceProcWrapper (name),
+      vts (*this, um, Identifier ("Parameters"), std::move (params)),
+      numInputs ((int) inputPorts.size()),
+      numOutputs ((int) outputPorts.size()),
+      inputPortTypes (std::move (inputPorts)),
+      outputPortTypes (std::move (outputPorts))
 {
     onOffParam = vts.getRawParameterValue ("on_off");
 

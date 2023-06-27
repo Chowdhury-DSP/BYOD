@@ -1,7 +1,11 @@
 #include "FreqBandSplitter.h"
 #include "../ParameterHelpers.h"
 
-FreqBandSplitter::FreqBandSplitter (UndoManager* um) : BaseProcessor ("Frequency Splitter", createParameterLayout(), um, 1, numOuts)
+FreqBandSplitter::FreqBandSplitter (UndoManager* um) : BaseProcessor ("Frequency Splitter",
+                                                                      createParameterLayout(),
+                                                                      BasicInputPort {},
+                                                                      OutputPort {},
+                                                                      um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (crossLowParam, vts, "cross_low");

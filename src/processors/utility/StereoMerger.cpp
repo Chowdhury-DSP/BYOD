@@ -3,9 +3,9 @@
 
 StereoMerger::StereoMerger (UndoManager* um) : BaseProcessor ("Stereo Merger",
                                                               createParameterLayout(),
-                                                              um,
-                                                              magic_enum::enum_count<InputPort>(),
-                                                              1)
+                                                              InputPort {},
+                                                              BasicOutputPort {},
+                                                              um)
 {
     modeParam = vts.getRawParameterValue ("mode");
 

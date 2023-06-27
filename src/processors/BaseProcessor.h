@@ -11,6 +11,13 @@ enum ProcessorType
     Other,
 };
 
+enum class PortType
+{
+    audio = 0,
+    modulation,
+    level
+};
+
 struct ProcessorUIOptions
 {
     Colour backgroundColour = Colours::red;
@@ -40,17 +47,59 @@ struct ConnectionInfo
     int endPort;
 };
 
+namespace base_processor_detail
+{
+using PortTypesVector = chowdsp::SmallVector<PortType, 4>;
+
+template <typename Port, typename PortMapper>
+static PortTypesVector initialisePortTypes (PortMapper mapper)
+{
+    auto portTypes = PortTypesVector (magic_enum::enum_count<Port>(), PortType::audio);
+    if constexpr (magic_enum::enum_count<Port>() > 0)
+    {
+        magic_enum::enum_for_each<Port> ([&portTypes, &mapper] (auto portType)
+                                         {
+                                             const auto portIndex = *magic_enum::enum_index ((Port) portType);
+                                             portTypes[portIndex] = mapper ((Port) portType); });
+    }
+    return portTypes;
+}
+} // namespace base_processor_detail
+
 class BaseProcessor : private JuceProcWrapper
 {
 public:
     using Ptr = std::unique_ptr<BaseProcessor>;
 
+    template <typename Port>
+    static constexpr auto defaultPortMapper (Port)
+    {
+        return PortType::audio;
+    }
+
+    template <typename InputPort,
+              typename OutputPort,
+              typename InputPortMapper = decltype (&defaultPortMapper<InputPort>),
+              typename OutputPortMapper = decltype (&defaultPortMapper<OutputPort>)>
+    BaseProcessor (const String& name,
+                   ParamLayout&& params,
+                   InputPort,
+                   OutputPort,
+                   UndoManager* um = nullptr,
+                   InputPortMapper inputPortMapper = &defaultPortMapper<InputPort>,
+                   OutputPortMapper outputPortMapper = &defaultPortMapper<OutputPort>)
+        : BaseProcessor (name,
+                         std::move (params),
+                         base_processor_detail::initialisePortTypes<InputPort> (inputPortMapper),
+                         base_processor_detail::initialisePortTypes<OutputPort> (outputPortMapper),
+                         um)
+    {
+    }
+
     BaseProcessor (const String& name,
                    ParamLayout params,
-                   UndoManager* um = nullptr,
-                   int nInputs = 1,
-                   int nOutputs = 1);
-    ~BaseProcessor();
+                   UndoManager* um = nullptr);
+    ~BaseProcessor() override;
 
     // metadata
     virtual ProcessorType getProcessorType() const = 0;
@@ -186,7 +235,25 @@ protected:
      */
     auto& getSharedConvolutionMessageQueue() { return convolutionMessageQueue.get(); }
 
+    enum class BasicInputPort
+    {
+        AudioInput,
+    };
+
+    enum class BasicOutputPort
+    {
+        AudioOutput,
+    };
+
+    enum class NullPort;
+
 private:
+    BaseProcessor (const String& name,
+                   ParamLayout&& params,
+                   base_processor_detail::PortTypesVector&& inputPortTypes,
+                   base_processor_detail::PortTypesVector&& outputPortTypes,
+                   UndoManager* um);
+
     std::atomic<float>* onOffParam = nullptr;
 
     const int numInputs;
@@ -221,6 +288,8 @@ private:
 
     juce::Array<int> inputModulationPorts {};
     juce::Array<int> outputModulationPorts {};
+    const base_processor_detail::PortTypesVector inputPortTypes;
+    const base_processor_detail::PortTypesVector outputPortTypes;
 
     std::unordered_map<int, std::vector<String>> paramsToDisableWhenInputConnected {};
 

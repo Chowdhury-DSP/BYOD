@@ -30,5 +30,17 @@ private:
 
     dsp::Gain<float> makeupGain;
 
+    enum InputPort
+    {
+        AudioInput = 0,
+        LevelInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        LevelOutput,
+    };
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Compressor)
 };

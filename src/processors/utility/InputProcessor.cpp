@@ -1,7 +1,11 @@
 #include "InputProcessor.h"
 #include "../ParameterHelpers.h"
 
-InputProcessor::InputProcessor (UndoManager* um) : BaseProcessor ("Input", createParameterLayout(), um, 0, 1)
+InputProcessor::InputProcessor (UndoManager* um) : BaseProcessor ("Input",
+                                                                  createParameterLayout(),
+                                                                  NullPort {},
+                                                                  BasicOutputPort {},
+                                                                  um)
 {
     uiOptions.backgroundColour = Colours::orange;
 }

@@ -6,7 +6,11 @@ namespace
 constexpr int tunerRefreshHz = 24;
 }
 
-Tuner::Tuner (UndoManager* um) : BaseProcessor ("Tuner", createParameterLayout(), um, 1, 0)
+Tuner::Tuner (UndoManager* um) : BaseProcessor ("Tuner",
+                                                createParameterLayout(),
+                                                BasicInputPort {},
+                                                NullPort {},
+                                                um)
 {
     uiOptions.backgroundColour = Colours::silver.brighter (0.2f);
     uiOptions.powerColour = Colours::red;
