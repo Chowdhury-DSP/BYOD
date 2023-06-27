@@ -1,7 +1,6 @@
 #pragma once
 
 #include "JuceProcWrapper.h"
-#include "netlist_helpers/CircuitQuantity.h"
 
 enum ProcessorType
 {
@@ -83,33 +82,24 @@ public:
               typename InputPortMapper = decltype (&defaultPortMapper<InputPort>),
               typename OutputPortMapper = decltype (&defaultPortMapper<OutputPort>)>
     BaseProcessor (const String& name,
-                   ParamLayout params,
+                   ParamLayout&& params,
                    InputPort,
                    OutputPort,
                    UndoManager* um = nullptr,
                    InputPortMapper inputPortMapper = &defaultPortMapper<InputPort>,
-                   OutputPortMapper outputPortMapper = &defaultPortMapper<OutputPort>) : JuceProcWrapper (name),
-                                                                                         vts (*this, um, Identifier ("Parameters"), std::move (params)),
-                                                                                         numInputs (magic_enum::enum_count<InputPort>()),
-                                                                                         numOutputs (magic_enum::enum_count<OutputPort>()),
-                                                                                         inputPortTypes (base_processor_detail::initialisePortTypes<InputPort> (inputPortMapper)),
-                                                                                         outputPortTypes (base_processor_detail::initialisePortTypes<OutputPort> (outputPortMapper))
+                   OutputPortMapper outputPortMapper = &defaultPortMapper<OutputPort>)
+        : BaseProcessor (name,
+                         std::move (params),
+                         base_processor_detail::initialisePortTypes<InputPort> (inputPortMapper),
+                         base_processor_detail::initialisePortTypes<OutputPort> (outputPortMapper),
+                         um)
     {
-        onOffParam = vts.getRawParameterValue ("on_off");
-
-        outputBuffers.resize (jmax (1, numOutputs));
-        outputBuffers.fill (nullptr);
-        outputConnections.resize (numOutputs);
-
-        inputBuffers.resize (numInputs);
-        inputsConnected.resize (0);
-        portMagnitudes.resize (numInputs);
     }
 
     BaseProcessor (const String& name,
                    ParamLayout params,
                    UndoManager* um = nullptr);
-    ~BaseProcessor();
+    ~BaseProcessor() override;
 
     // metadata
     virtual ProcessorType getProcessorType() const = 0;
@@ -258,6 +248,12 @@ protected:
     enum class NullPort;
 
 private:
+    BaseProcessor (const String& name,
+                   ParamLayout&& params,
+                   base_processor_detail::PortTypesVector&& inputPortTypes,
+                   base_processor_detail::PortTypesVector&& outputPortTypes,
+                   UndoManager* um);
+
     std::atomic<float>* onOffParam = nullptr;
 
     const int numInputs;

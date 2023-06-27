@@ -1,6 +1,6 @@
 #include "BaseProcessor.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
-#include "processors/netlist_helpers/NetlistViewer.h"
+#include "netlist_helpers/NetlistViewer.h"
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
@@ -15,6 +15,29 @@ BaseProcessor::BaseProcessor (const String& name,
     [] (auto)
     { return PortType::audio; })
 {
+}
+
+BaseProcessor::BaseProcessor (const String& name,
+                              ParamLayout&& params,
+                              base_processor_detail::PortTypesVector&& inputPorts,
+                              base_processor_detail::PortTypesVector&& outputPorts,
+                              UndoManager* um)
+    : JuceProcWrapper (name),
+      vts (*this, um, Identifier ("Parameters"), std::move (params)),
+      numInputs ((int) inputPorts.size()),
+      numOutputs ((int) outputPorts.size()),
+      inputPortTypes (std::move (inputPorts)),
+      outputPortTypes (std::move (outputPorts))
+{
+    onOffParam = vts.getRawParameterValue ("on_off");
+
+    outputBuffers.resize (jmax (1, numOutputs));
+    outputBuffers.fill (nullptr);
+    outputConnections.resize (numOutputs);
+
+    inputBuffers.resize (numInputs);
+    inputsConnected.resize (0);
+    portMagnitudes.resize (numInputs);
 }
 
 BaseProcessor::~BaseProcessor() = default;
