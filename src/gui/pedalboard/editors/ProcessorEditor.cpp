@@ -56,7 +56,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
 
     for (int i = 0; i < baseProc.getNumInputs(); ++i)
     {
-        const auto portType = baseProc.isInputModulationPort (i) ? PortType::modulation : PortType::audio;
+        const auto portType = baseProc.getInputPortType (i);
         auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour, portType));
         newPort->setInputOutput (true);
         addAndMakeVisible (newPort);
@@ -64,7 +64,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
 
     for (int i = 0; i < baseProc.getNumOutputs(); ++i)
     {
-        const auto portType = baseProc.isOutputModulationPort (i) ? PortType::modulation : PortType::audio;
+        const auto portType = baseProc.getOutputPortType (i);
         auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour, portType));
         newPort->setInputOutput (false);
         addAndMakeVisible (newPort);

@@ -176,6 +176,8 @@ public:
 
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }
+    PortType getInputPortType (int portIndex) const;
+    PortType getOutputPortType (int portIndex) const;
 
     void setPosition (juce::Point<int> pos, Rectangle<int> parentBounds);
     void setPosition (const BaseProcessor& other) { editorPosition = other.editorPosition; }
@@ -183,8 +185,6 @@ public:
 
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
 
-    bool isInputModulationPort (int portIndex);
-    bool isOutputModulationPort (int portIndex);
     bool isOutputModulationPortConnected();
 
     const std::vector<String>* getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept;
@@ -214,7 +214,6 @@ protected:
      * All modulation signals should be in the range of [-1,1],
      * they can then be modified as needed by the individual module.
      */
-    void routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts);
 
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
@@ -286,8 +285,6 @@ private:
     StringArray popupMenuParameterIDs;
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
 
-    juce::Array<int> inputModulationPorts {};
-    juce::Array<int> outputModulationPorts {};
     const base_processor_detail::PortTypesVector inputPortTypes;
     const base_processor_detail::PortTypesVector outputPortTypes;
 

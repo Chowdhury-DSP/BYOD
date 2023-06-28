@@ -14,6 +14,10 @@ Colour Port::getPortColour() const
     {
         return Colours::rebeccapurple;
     }
+    else if (portType == PortType::level)
+    {
+        return Colours::orangered;
+    }
     else if (isInput)
     {
         return Colours::black;
