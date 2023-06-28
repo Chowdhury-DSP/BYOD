@@ -336,6 +336,16 @@ void BaseProcessor::setEditor (ProcessorEditor* procEditor)
     editor = procEditor;
 }
 
+PortType BaseProcessor::getInputPortType (int portIndex)
+{
+    return inputPortTypes[portIndex];
+}
+
+PortType BaseProcessor::getOutputPortType (int portIndex)
+{
+    return outputPortTypes[portIndex];
+}
+
 void BaseProcessor::setPosition (juce::Point<int> pos, Rectangle<int> parentBounds)
 {
     if (parentBounds.getWidth() <= 0 || parentBounds.getHeight() <= 0)

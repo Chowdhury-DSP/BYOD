@@ -176,6 +176,8 @@ public:
 
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }
+    PortType getInputPortType (int portIndex);
+    PortType getOutputPortType (int portIndex);
 
     void setPosition (juce::Point<int> pos, Rectangle<int> parentBounds);
     void setPosition (const BaseProcessor& other) { editorPosition = other.editorPosition; }
