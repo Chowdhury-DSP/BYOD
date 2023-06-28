@@ -59,7 +59,6 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "A simple tremolo effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ "rate", "wave" }, ModulationInput);
 }
 

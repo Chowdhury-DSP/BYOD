@@ -52,7 +52,6 @@ Panner::Panner (UndoManager* um) : BaseProcessor (
 
     addPopupMenuParameter (panModeTag);
     addPopupMenuParameter (stereoModeTag);
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ modRateHzTag }, ModulationInput);
 }
 

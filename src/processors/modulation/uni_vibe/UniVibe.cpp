@@ -42,7 +42,6 @@ UniVibe::UniVibe (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "A vibrato/chorus effect based on the Univox Uni-Vibe pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ speedTag }, ModulationInput);
     addPopupMenuParameter (stereoTag);
 
