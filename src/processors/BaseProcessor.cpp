@@ -375,7 +375,7 @@ bool BaseProcessor::isOutputModulationPortConnected()
     {
         for (auto info : connections)
         {
-            if (getOutputPortType(info.startPort) == PortType::modulation)
+            if (getOutputPortType (info.startPort) == PortType::modulation)
                 return true;
         }
     }
