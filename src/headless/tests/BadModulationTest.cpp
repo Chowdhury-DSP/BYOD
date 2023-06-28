@@ -16,7 +16,7 @@ public:
 
             bool hasModulationInputs = false;
             for (int i = 0; i < proc->getNumInputs(); ++i)
-                hasModulationInputs |= proc->getOutputPortType (i) == PortType::modulation;
+                hasModulationInputs |= proc->getInputPortType (i) == PortType::modulation;
 
             if (! hasModulationInputs)
                 processorsWithNoModulation.add (proc->getName());
