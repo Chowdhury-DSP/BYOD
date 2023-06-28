@@ -216,7 +216,6 @@ protected:
      * All modulation signals should be in the range of [-1,1],
      * they can then be modified as needed by the individual module.
      */
-    void routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts);
 
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
@@ -288,8 +287,6 @@ private:
     StringArray popupMenuParameterIDs;
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
 
-    juce::Array<int> inputModulationPorts {};
-    juce::Array<int> outputModulationPorts {};
     const base_processor_detail::PortTypesVector inputPortTypes;
     const base_processor_detail::PortTypesVector outputPortTypes;
 

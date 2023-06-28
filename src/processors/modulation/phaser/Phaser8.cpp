@@ -53,7 +53,6 @@ Phaser8::Phaser8 (UndoManager* um) : BaseProcessor (
                           1.0f,
                           2048);
 
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ rateTag }, ModulationInput);
 
     uiOptions.backgroundColour = Colour { 0xff00a8e9 };

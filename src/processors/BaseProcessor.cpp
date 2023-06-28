@@ -366,20 +366,14 @@ juce::Point<int> BaseProcessor::getPosition (Rectangle<int> parentBounds)
     return (editorPosition * juce::Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() }).toInt();
 }
 
-void BaseProcessor::routeExternalModulation (const std::initializer_list<int>& inputPorts, const std::initializer_list<int>& outputPorts)
-{
-    inputModulationPorts = inputPorts;
-    outputModulationPorts = outputPorts;
-}
-
 bool BaseProcessor::isInputModulationPort (int portIndex)
 {
-    return inputModulationPorts.contains (portIndex);
+    return inputPortTypes[portIndex] == PortType::modulation;
 }
 
 bool BaseProcessor::isOutputModulationPort (int portIndex)
 {
-    return outputModulationPorts.contains (portIndex);
+    return outputPortTypes[portIndex] == PortType::modulation;
 }
 
 bool BaseProcessor::isOutputModulationPortConnected()

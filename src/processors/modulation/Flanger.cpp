@@ -45,7 +45,6 @@ Flanger::Flanger (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "A flanger effect. Use the right-click menu to enable lo-fi mode.";
     uiOptions.info.authors = StringArray { "Kai Mikkelsen", "Jatin Chowdhury" };
 
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ "rate" }, ModulationInput);
 }
 
