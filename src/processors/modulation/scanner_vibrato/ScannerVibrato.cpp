@@ -85,7 +85,6 @@ ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "Virtual analog emulation of the scanner vibrato/chorus effect from the Hammond Organ.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ rateTag }, ModulationInput);
 }
 

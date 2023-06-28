@@ -41,7 +41,6 @@ Rotary::Rotary (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "A rotating speaker effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ "rate" }, ModulationInput);
 }
 

@@ -48,7 +48,6 @@ Chorus::Chorus (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "A multi-phase chorus effect. Use the right-click menu to enable lo-fi mode.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ "rate" }, ModulationInput);
 }
 

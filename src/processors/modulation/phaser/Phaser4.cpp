@@ -53,7 +53,6 @@ Phaser4::Phaser4 (UndoManager* um) : BaseProcessor (
                           2048);
 
     addPopupMenuParameter (stereoTag);
-    routeExternalModulation ({ ModulationInput }, { ModulationOutput });
     disableWhenInputConnected ({ rateTag }, ModulationInput);
 
     uiOptions.backgroundColour = Colour { 0xfffc7533 };
