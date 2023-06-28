@@ -176,8 +176,8 @@ public:
 
     int getNumInputs() const noexcept { return numInputs; }
     int getNumOutputs() const noexcept { return numOutputs; }
-    PortType getInputPortType (int portIndex);
-    PortType getOutputPortType (int portIndex);
+    PortType getInputPortType (int portIndex) const;
+    PortType getOutputPortType (int portIndex) const;
 
     void setPosition (juce::Point<int> pos, Rectangle<int> parentBounds);
     void setPosition (const BaseProcessor& other) { editorPosition = other.editorPosition; }
@@ -185,8 +185,6 @@ public:
 
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
 
-    bool isInputModulationPort (int portIndex);
-    bool isOutputModulationPort (int portIndex);
     bool isOutputModulationPortConnected();
 
     const std::vector<String>* getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept;

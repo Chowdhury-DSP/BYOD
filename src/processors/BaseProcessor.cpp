@@ -336,12 +336,12 @@ void BaseProcessor::setEditor (ProcessorEditor* procEditor)
     editor = procEditor;
 }
 
-PortType BaseProcessor::getInputPortType (int portIndex)
+PortType BaseProcessor::getInputPortType (int portIndex) const
 {
     return inputPortTypes[portIndex];
 }
 
-PortType BaseProcessor::getOutputPortType (int portIndex)
+PortType BaseProcessor::getOutputPortType (int portIndex) const
 {
     return outputPortTypes[portIndex];
 }
@@ -366,16 +366,6 @@ juce::Point<int> BaseProcessor::getPosition (Rectangle<int> parentBounds)
     return (editorPosition * juce::Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() }).toInt();
 }
 
-bool BaseProcessor::isInputModulationPort (int portIndex)
-{
-    return inputPortTypes[portIndex] == PortType::modulation;
-}
-
-bool BaseProcessor::isOutputModulationPort (int portIndex)
-{
-    return outputPortTypes[portIndex] == PortType::modulation;
-}
-
 bool BaseProcessor::isOutputModulationPortConnected()
 {
     if (getProcessorType() != Modulation)
@@ -385,7 +375,7 @@ bool BaseProcessor::isOutputModulationPortConnected()
     {
         for (auto info : connections)
         {
-            if (isOutputModulationPort (info.startPort))
+            if (getOutputPortType(info.startPort) == PortType::modulation)
                 return true;
         }
     }
