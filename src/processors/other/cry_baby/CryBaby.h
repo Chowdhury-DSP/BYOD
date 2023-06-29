@@ -19,7 +19,7 @@ public:
     bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
 private:
-    void processBlockNDK  (const chowdsp::BufferView<float>& block, int smootherDivide = 1);
+    void processBlockNDK (const chowdsp::BufferView<float>& block, int smootherDivide = 1);
 
     chowdsp::FloatParameter* controlFreqParam = nullptr;
     chowdsp::FloatParameter* attackParam = nullptr;
