@@ -44,13 +44,14 @@ public:
         plugin.getVTS().getParameter ("mono_mode")->setValueNotifyingHost (0.0f);
         MessageManager::getInstance()->runDispatchLoopUntil (100);
 
+        MidiBuffer midi;
         AudioBuffer<float> buffer (2, blockSize);
         buffer.clear();
-        chain.processAudio (buffer);
+        chain.processAudio (buffer, midi);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
         FloatVectorOperations::fill (buffer.getWritePointer (1), 1.0f, blockSize);
-        chain.processAudio (buffer);
+        chain.processAudio (buffer, midi);
 
         auto leftMinMax = FloatVectorOperations::findMinAndMax (buffer.getReadPointer (0) + blockSize / 2, blockSize / 2);
         auto rightMinMax = FloatVectorOperations::findMinAndMax (buffer.getReadPointer (1) + blockSize / 2, blockSize / 2);
@@ -99,13 +100,14 @@ public:
         plugin.getVTS().getParameter ("mono_mode")->setValueNotifyingHost (0.35f);
         MessageManager::getInstance()->runDispatchLoopUntil (100);
 
+        MidiBuffer midi;
         AudioBuffer<float> buffer (2, blockSize);
         buffer.clear();
-        chain.processAudio (buffer);
+        chain.processAudio (buffer, midi);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
         FloatVectorOperations::fill (buffer.getWritePointer (1), -1.0f, blockSize);
-        chain.processAudio (buffer);
+        chain.processAudio (buffer, midi);
 
         auto leftMinMax = FloatVectorOperations::findMinAndMax (buffer.getReadPointer (0) + blockSize / 2, blockSize / 2);
         auto rightMinMax = FloatVectorOperations::findMinAndMax (buffer.getReadPointer (1) + blockSize / 2, blockSize / 2);
@@ -138,13 +140,14 @@ public:
         plugin.getVTS().getParameter ("mono_mode")->setValueNotifyingHost (0.35f);
         MessageManager::getInstance()->runDispatchLoopUntil (100);
 
+        MidiBuffer midi;
         AudioBuffer<float> buffer (2, blockSize);
         buffer.clear();
-        chain.processAudio (buffer);
+        chain.processAudio (buffer, midi);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
         FloatVectorOperations::fill (buffer.getWritePointer (1), -1.0f, blockSize);
-        chain.processAudio (buffer);
+        chain.processAudio (buffer, midi);
 
         auto leftMinMax = FloatVectorOperations::findMinAndMax (buffer.getReadPointer (0) + blockSize / 2, blockSize / 2);
         auto rightMinMax = FloatVectorOperations::findMinAndMax (buffer.getReadPointer (1) + blockSize / 2, blockSize / 2);
@@ -177,13 +180,14 @@ public:
         plugin.getVTS().getParameter ("mono_mode")->setValueNotifyingHost (0.35f);
         MessageManager::getInstance()->runDispatchLoopUntil (100);
 
+        MidiBuffer midi;
         AudioBuffer<float> buffer (2, blockSize);
         buffer.clear();
-        chain.processAudio (buffer);
+        chain.processAudio (buffer, midi);
 
         FloatVectorOperations::fill (buffer.getWritePointer (0), 1.0f, blockSize);
         FloatVectorOperations::fill (buffer.getWritePointer (1), -1.0f, blockSize);
-        chain.processAudio (buffer);
+        chain.processAudio (buffer, midi);
 
         auto leftMinMax = FloatVectorOperations::findMinAndMax (buffer.getReadPointer (0) + blockSize / 2, blockSize / 2);
         auto rightMinMax = FloatVectorOperations::findMinAndMax (buffer.getReadPointer (1) + blockSize / 2, blockSize / 2);
