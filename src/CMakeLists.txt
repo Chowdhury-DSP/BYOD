@@ -171,3 +171,8 @@ endforeach()
 target_compile_definitions(rnn_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=16)
 target_compile_definitions(rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32)
 target_link_libraries(BYOD PRIVATE rnn_accelerated)
+
+if (MSVC)
+    target_compile_options(BYOD PRIVATE /bigobj)
+endif ()
+

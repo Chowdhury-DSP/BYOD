@@ -2,6 +2,11 @@
  * This file was generated on 2023-06-16 16:46:49.109814
  * using the command: `/Users/jatin/ChowDSP/Research/NDK-Framework/generate_ndk_cpp.py cry_baby_ndk_config.json`
  */
+
+#include <pch.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4459)
+
 #include "CryBabyNDK.h"
 
 namespace
@@ -220,3 +225,5 @@ void CryBabyNDK::process (std::span<float> channel_data, size_t ch) noexcept
         x_n[ch] = A_mat * x_n[ch] + B_mat_var * u_n_var + B_u_fix + C_mat * i_n;
     }
 }
+
+JUCE_END_IGNORE_WARNINGS_MSVC
