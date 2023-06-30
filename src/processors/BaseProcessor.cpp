@@ -243,9 +243,22 @@ const std::vector<String>* BaseProcessor::getParametersToDisableWhenInputIsConne
     return nullptr;
 }
 
+const std::vector<String>* BaseProcessor::getParametersToEnableWhenInputIsConnected (int portIndex) const noexcept
+{
+    if (auto iter = paramsToEnableWhenInputConnected.find (portIndex); iter != paramsToEnableWhenInputConnected.end())
+        return &(iter->second);
+
+    return nullptr;
+}
+
 void BaseProcessor::disableWhenInputConnected (const std::initializer_list<String>& paramIDs, int inputPortIndex)
 {
     paramsToDisableWhenInputConnected[inputPortIndex] = paramIDs;
+}
+
+void BaseProcessor::enableWhenInputConnected (const std::initializer_list<String>& paramIDs, int inputPortIndex)
+{
+    paramsToEnableWhenInputConnected[inputPortIndex] = paramIDs;
 }
 
 void BaseProcessor::addPopupMenuParameter (const String& paramID)

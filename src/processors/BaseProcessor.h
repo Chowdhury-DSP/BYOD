@@ -187,6 +187,7 @@ public:
 
     bool isOutputModulationPortConnected();
     const std::vector<String>* getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept;
+    const std::vector<String>* getParametersToEnableWhenInputIsConnected (int portIndex) const noexcept;
 
     /**
      * MIDI buffer that the processor may access during processAudio() or processAudioBypassed().
@@ -215,6 +216,12 @@ protected:
      * call this method in the module's constructor with the appropriate paramIDs.
      */
     void disableWhenInputConnected (const std::initializer_list<String>& paramIDs, int inputPortIndex);
+
+    /**
+     * If a parameter should be enabled when an input is connected, then
+     * call this method in the module's constructor with the appropriate paramIDs.
+     */
+    void enableWhenInputConnected (const std::initializer_list<String>& paramIDs, int inputPortIndex);
 
     /** 
      * All modulation signals should be in the range of [-1,1],
@@ -295,6 +302,7 @@ private:
     const base_processor_detail::PortTypesVector outputPortTypes;
 
     std::unordered_map<int, std::vector<String>> paramsToDisableWhenInputConnected {};
+    std::unordered_map<int, std::vector<String>> paramsToEnableWhenInputConnected {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };

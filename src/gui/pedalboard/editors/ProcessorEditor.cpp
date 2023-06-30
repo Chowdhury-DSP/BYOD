@@ -279,4 +279,7 @@ void ProcessorEditor::toggleParamsEnabledOnInputConnectionChange (int inputPortI
 {
     if (auto* toggleParamIDs = proc.getParametersToDisableWhenInputIsConnected (inputPortIndex))
         knobs.toggleParamsEnabled (*toggleParamIDs, ! isConnected);
+
+    if (auto* toggleParamIDs = proc.getParametersToEnableWhenInputIsConnected (inputPortIndex))
+        knobs.toggleParamsEnabled (*toggleParamIDs, isConnected);
 }
