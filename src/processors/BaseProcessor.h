@@ -186,8 +186,14 @@ public:
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
 
     bool isOutputModulationPortConnected();
-
     const std::vector<String>* getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept;
+
+    /**
+     * MIDI buffer that the processor may access during processAudio() or processAudioBypassed().
+     * While in those methods, the processor chain will ensure that the MIDI buffer is non-null.
+     * At all other times this will be null.
+     */
+    const MidiBuffer* midiBuffer = nullptr;
 
 protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;

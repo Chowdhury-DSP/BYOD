@@ -39,6 +39,7 @@
 
 #include "modulation/Chorus.h"
 #include "modulation/Flanger.h"
+#include "modulation/MIDIModulator.h"
 #include "modulation/Panner.h"
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
@@ -118,6 +119,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
 
     { "Chorus", &processorFactory<Chorus> },
     { "Flanger", &processorFactory<Flanger> },
+    { "MIDI Modulator", &processorFactory<MidiModulator> },
     { "Panner", &processorFactory<Panner> },
     { "Phaser4", &processorFactory<Phaser4> },
     { "Phaser8", &processorFactory<Phaser8> },
