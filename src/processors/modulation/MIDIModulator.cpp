@@ -5,7 +5,7 @@ namespace
 {
 const String bipolarTag = "bipolar";
 const String midiMapTag = "midi_map_cc";
-}
+} // namespace
 
 MidiModulator::MidiModulator (UndoManager* um)
     : BaseProcessor (
