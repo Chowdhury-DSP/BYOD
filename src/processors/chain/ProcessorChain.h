@@ -22,7 +22,7 @@ public:
 
     static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);
-    void processAudio (AudioBuffer<float>& buffer);
+    void processAudio (AudioBuffer<float>& buffer, const MidiBuffer& hostMidiBuffer);
 
     auto& getProcessors() { return procs; }
     const auto& getProcessors() const { return procs; }
@@ -76,6 +76,8 @@ private:
 
     chowdsp::DeferredAction mainThreadAction;
     std::unique_ptr<ParamForwardManager>& paramForwardManager;
+
+    MidiBuffer internalMidiBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

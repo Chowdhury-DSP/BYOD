@@ -15,7 +15,9 @@ public:
     static void addParameters (Parameters& params);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override {}
-    void processAudioBlock (AudioBuffer<float>& buffer) override;
+    bool acceptsMidi() const override { return true; }
+    void processAudioBlock (AudioBuffer<float>&) override {}
+    void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
     void processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 
     AudioProcessorEditor* createEditor() override;
