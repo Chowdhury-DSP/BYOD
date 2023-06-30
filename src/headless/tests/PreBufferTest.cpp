@@ -41,8 +41,10 @@ public:
             {
                 proc->prepareProcessing (testSampleRate, testBlockSize);
 
+                MidiBuffer midi;
                 AudioBuffer<float> buffer (1, testBlockSize);
                 buffer.clear();
+                proc->midiBuffer = &midi;
                 proc->processAudioBlock (buffer);
 
                 const auto steadyStateMax = [] (const auto& name)

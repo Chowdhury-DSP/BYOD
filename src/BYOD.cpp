@@ -46,8 +46,9 @@ void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
     bypassScratchBuffer.setSize (2, samplesPerBlock);
 }
 
-void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
+void BYOD::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
 {
+    const juce::ScopedNoDenormals noDenormals {};
     AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
     // push samples into bypass delay
@@ -55,7 +56,7 @@ void BYOD::processAudioBlock (AudioBuffer<float>& buffer)
     processBypassDelay (bypassScratchBuffer);
 
     // real processing here!
-    procs->processAudio (buffer);
+    procs->processAudio (buffer, midi);
 
     chowdsp::BufferMath::sanitizeBuffer<AudioBuffer<float>, float> (buffer);
 }

@@ -16,6 +16,18 @@ namespace
         std::cout << "Level for channel: " << ch << ": " << level << std::endl;
     }
 }
+
+const MidiBuffer& getMidiBufferToUse (const MidiBuffer& hostMidiBuffer, MidiBuffer& internalMidiBuffer, int osFactor)
+{
+    if (hostMidiBuffer.isEmpty() || osFactor == 1)
+        return hostMidiBuffer;
+
+    internalMidiBuffer.clear();
+    for (const auto& midiEvent : hostMidiBuffer)
+        internalMidiBuffer.addEvent (midiEvent.getMessage(), midiEvent.samplePosition * osFactor);
+
+    return internalMidiBuffer;
+}
 } // namespace
 
 ProcessorChain::ProcessorChain (ProcessorStore& store,
@@ -69,6 +81,9 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
     inputBuffer.setSize (2, samplesPerBlock * 16); // allocate extra space for upsampled buffers
 
     ioProcessor.prepare (sampleRate, samplesPerBlock);
+
+    internalMidiBuffer.clear();
+    internalMidiBuffer.ensureSize (256);
 
     SpinLock::ScopedLockType scopedProcessingLock (processingLock);
     initializeProcessors();
@@ -151,7 +166,7 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
     }
 }
 
-void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
+void ProcessorChain::processAudio (AudioBuffer<float>& buffer, const MidiBuffer& hostMidiBuffer)
 {
     SpinLock::ScopedTryLockType tryProcessingLock (processingLock);
     if (! tryProcessingLock.isLocked())
@@ -178,10 +193,15 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
             inputBuffer.copyFrom (ch, 0, osBlock.getChannelPointer ((size_t) ch), osNumSamples);
     }
 
-    // process standalone modulation ports
     bool outProcessed = false;
+    const auto& processMidiBuffer = getMidiBufferToUse (hostMidiBuffer, internalMidiBuffer, ioProcessor.getOversamplingFactor());
+
     for (auto* processor : procs)
     {
+        // set up MIDI buffer
+        processor->midiBuffer = &processMidiBuffer;
+
+        // process standalone modulation ports
         auto noInputsConnected = processor->getNumInputConnections() == 0;
         auto modOutputConnected = processor->isOutputModulationPortConnected();
         if (noInputsConnected && modOutputConnected)
@@ -192,7 +212,10 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer)
     runProcessor (&inputProcessor, inputBuffer, outProcessed);
 
     for (auto* processor : procs)
+    {
+        processor->midiBuffer = nullptr;
         processor->clearNumInputsReady();
+    }
 
     if (! outProcessed)
     {

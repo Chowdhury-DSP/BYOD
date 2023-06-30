@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Added "Crying Child" module.
 - Added "Solo-Vibe" module.
 - Added "Ladder Filter" module.
+- Added "MIDI Modulator" module.
 - Added "netlist view" to allow for customization of some circuit-modelled modules.
 - Added AVX support (for PCs that support it) for neural network-based modules.
 - Added mouse interactions for selecting and moving/deleting multiple modules at once.

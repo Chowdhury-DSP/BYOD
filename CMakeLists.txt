@@ -85,6 +85,7 @@ juce_add_plugin(BYOD
     FORMATS ${JUCE_FORMATS}
     ProductName "BYOD"
     ICON_BIG res/logo.png
+    NEEDS_MIDI_INPUT True
 
     VST2_CATEGORY kPlugCategEffect
     VST3_CATEGORIES Fx Distortion

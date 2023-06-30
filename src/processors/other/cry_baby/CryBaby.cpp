@@ -67,7 +67,7 @@ ParamLayout CryBaby::createParameterLayout()
 
     auto params = createBaseParams();
     createPercentParameter (params, controlFreqTag, "Freq", 0.5f);
-    createPercentParameter (params, depthTag, "Depth", 0.5f);
+    createBipolarPercentParameter (params, depthTag, "Depth", 0.5f);
     createTimeMsParameter (params, attackTag, "Attack", createNormalisableRange (0.1f, 20.0f, 2.0f), 1.0f);
     createTimeMsParameter (params, releaseTag, "Release", createNormalisableRange (1.0f, 200.0f, 20.0f), 25.0f);
     emplace_param<chowdsp::BoolParameter> (params, directControlTag, "Direct Control", false);
@@ -238,6 +238,7 @@ bool CryBaby::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::
             hcp.registerParameterComponent (internalSlider, internalSlider.getParameter());
 
             Slider::setName (tag + "__");
+            Slider::setComponentID (tag);
         }
 
         void colourChanged() override
