@@ -16,9 +16,11 @@ public:
     void globalSettingChanged (SettingID settingID);
 
     static constexpr SettingID defaultZoomSettingID = "default_zoom";
+    static constexpr SettingID portTooltipsSettingID = "port_tooltips";
 
 private:
     void setScaleFactor (float newScaleFactor);
+    void toggleTooltips (bool shouldShow);
 
     BoardComponent comp;
 
@@ -27,6 +29,8 @@ private:
 
     Label scaleLabel;
     Value scaleFactor { 1.0f };
+
+    std::optional<TooltipWindow> tooltips;
 
     chowdsp::SharedPluginSettings pluginSettings;
 

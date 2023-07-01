@@ -14,6 +14,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
+    String getTooltipForPort (int portIndex, bool isInput) override;
+
 private:
     enum OutputPort
     {
@@ -26,15 +28,7 @@ private:
     chowdsp::FloatParameter* crossLowParam = nullptr;
     chowdsp::FloatParameter* crossHighParam = nullptr;
 
-    chowdsp::SVFLowpass<float> lowCrossLPF1;
-    chowdsp::SVFLowpass<float> lowCrossLPF2;
-    chowdsp::SVFHighpass<float> lowCrossHPF1;
-    chowdsp::SVFHighpass<float> lowCrossHPF2;
-
-    chowdsp::SVFLowpass<float> highCrossLPF1;
-    chowdsp::SVFLowpass<float> highCrossLPF2;
-    chowdsp::SVFHighpass<float> highCrossHPF1;
-    chowdsp::SVFHighpass<float> highCrossHPF2;
+    chowdsp::ThreeWayCrossoverFilter<float, 4> crossover;
 
     std::array<AudioBuffer<float>, numOuts> buffers;
 

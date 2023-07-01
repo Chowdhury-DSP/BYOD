@@ -10,11 +10,15 @@ BoardViewport::BoardViewport (AudioProcessorValueTreeState& vts,
                               chowdsp::HostContextProvider& hostContextProvider)
     : comp (procChain, hostContextProvider)
 {
-    pluginSettings->addProperties<&BoardViewport::globalSettingChanged> ({ { defaultZoomSettingID, 1.0 } }, *this);
+    pluginSettings->addProperties<&BoardViewport::globalSettingChanged> ({ { defaultZoomSettingID, 1.0 },
+                                                                           { portTooltipsSettingID, true } },
+                                                                         *this);
     if (! vts.state.hasProperty (zoomLevelTag))
         vts.state.setProperty (zoomLevelTag, pluginSettings->getProperty<double> (defaultZoomSettingID), nullptr);
     scaleFactor = vts.state.getPropertyAsValue (zoomLevelTag, nullptr, true);
     setScaleFactor ((float) scaleFactor.getValue());
+
+    toggleTooltips (pluginSettings->getProperty<bool> (portTooltipsSettingID));
 
     setViewedComponent (&comp, false);
 
@@ -48,12 +52,18 @@ BoardViewport::BoardViewport (AudioProcessorValueTreeState& vts,
 
 void BoardViewport::globalSettingChanged (SettingID settingID)
 {
-    if (settingID != defaultZoomSettingID)
-        return;
-
-    Logger::writeToLog ("Default zoom level set to: " + scaleLabel.getText());
-    setScaleFactor ((float) pluginSettings->getProperty<double> (settingID));
-    resized();
+    if (settingID == defaultZoomSettingID)
+    {
+        setScaleFactor ((float) pluginSettings->getProperty<double> (settingID));
+        resized();
+        Logger::writeToLog ("Default zoom level set to: " + scaleLabel.getText());
+    }
+    else if (settingID == portTooltipsSettingID)
+    {
+        const auto shouldShowTooltips = pluginSettings->getProperty<bool> (portTooltipsSettingID);
+        Logger::writeToLog ("Showing port tooltips: " + String (shouldShowTooltips ? "TRUE" : "FALSE"));
+        toggleTooltips (shouldShowTooltips);
+    }
 }
 
 void BoardViewport::setScaleFactor (float newScaleFactor)
@@ -63,6 +73,15 @@ void BoardViewport::setScaleFactor (float newScaleFactor)
 
     scaleFactor = newScaleFactor;
     scaleLabel.setText (String (int ((float) scaleFactor.getValue() * 100.0f)) + "%", dontSendNotification);
+}
+
+void BoardViewport::toggleTooltips (bool shouldShow)
+{
+    if (shouldShow && ! tooltips.has_value())
+        tooltips.emplace (this, 1000);
+    else if (! shouldShow && tooltips.has_value())
+        tooltips.reset();
+
 }
 
 void BoardViewport::resized()

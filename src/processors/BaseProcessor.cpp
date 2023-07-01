@@ -394,3 +394,16 @@ bool BaseProcessor::isOutputModulationPortConnected()
     }
     return false;
 }
+
+String BaseProcessor::getTooltipForPort (int portIndex, bool isInput)
+{
+    const auto portType = isInput ? getInputPortType (portIndex) : getOutputPortType (portIndex);
+    String tooltip;
+    if (portType == PortType::audio)
+        tooltip = "Audio";
+    else if (portType == PortType::modulation)
+        tooltip = "Modulation";
+    else if (portType == PortType::level)
+        tooltip = "Level";
+    return tooltip + (isInput ? " Input" : " Output");
+}
