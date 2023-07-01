@@ -4,7 +4,8 @@
 
 enum class PortType;
 
-class Port : public Component
+class Port : public Component,
+             public SettableTooltipClient
 {
 public:
     Port (const Colour& processorColour, const PortType type);

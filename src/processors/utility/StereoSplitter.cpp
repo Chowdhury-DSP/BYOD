@@ -107,3 +107,17 @@ void StereoSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
     outputBuffers.getReference (LeftChannel) = &buffers[LeftChannel];
     outputBuffers.getReference (RightChannel) = &buffers[RightChannel];
 }
+
+String StereoSplitter::getTooltipForPort (int portIndex, bool isInput)
+{
+    if (isInput)
+        return BaseProcessor::getTooltipForPort (portIndex, isInput);
+
+    switch ((OutputPort) portIndex)
+    {
+        case OutputPort::LeftChannel:
+            return "Left/Mid Output";
+        case OutputPort::RightChannel:
+            return "Right/Side Output";
+    }
+}

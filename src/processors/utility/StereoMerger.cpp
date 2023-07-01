@@ -125,3 +125,17 @@ void StereoMerger::processAudioBypassed (AudioBuffer<float>& buffer)
 
     outputBuffers.getReference (0) = &stereoBuffer;
 }
+
+String StereoMerger::getTooltipForPort (int portIndex, bool isInput)
+{
+    if (! isInput)
+        return BaseProcessor::getTooltipForPort (portIndex, isInput);
+
+    switch ((InputPort) portIndex)
+    {
+        case InputPort::LeftChannel:
+            return "Left/Mid Input";
+        case InputPort::RightChannel:
+            return "Right/Side Input";
+    }
+}
