@@ -135,4 +135,3 @@ String Mixer::getTooltipForPort (int portIndex, bool isInput)
             return "Channel 4 Input";
     }
 }
-

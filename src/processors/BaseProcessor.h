@@ -271,8 +271,8 @@ private:
 
     std::atomic<float>* onOffParam = nullptr;
 
-    const int numInputs{};
-    const int numOutputs{};
+    const int numInputs {};
+    const int numOutputs {};
 
     std::vector<Array<ConnectionInfo>> outputConnections;
     Array<AudioBuffer<float>> inputBuffers;

@@ -81,7 +81,6 @@ void BoardViewport::toggleTooltips (bool shouldShow)
         tooltips.emplace (this, 1000);
     else if (! shouldShow && tooltips.has_value())
         tooltips.reset();
-
 }
 
 void BoardViewport::resized()
