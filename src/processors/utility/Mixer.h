@@ -14,6 +14,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
+    String getTooltipForPort (int portIndex, bool isInput) override;
+
 private:
     enum InputPort
     {

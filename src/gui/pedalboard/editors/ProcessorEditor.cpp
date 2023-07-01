@@ -59,6 +59,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
         const auto portType = baseProc.getInputPortType (i);
         auto newPort = inputPorts.add (std::make_unique<Port> (procUI.backgroundColour, portType));
         newPort->setInputOutput (true);
+        newPort->setTooltip (baseProc.getTooltipForPort (i, true));
         addAndMakeVisible (newPort);
     }
 
@@ -67,6 +68,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
         const auto portType = baseProc.getOutputPortType (i);
         auto newPort = outputPorts.add (std::make_unique<Port> (procUI.backgroundColour, portType));
         newPort->setInputOutput (false);
+        newPort->setTooltip (baseProc.getTooltipForPort (i, false));
         addAndMakeVisible (newPort);
     }
 

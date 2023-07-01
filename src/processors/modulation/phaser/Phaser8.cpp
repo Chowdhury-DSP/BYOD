@@ -74,6 +74,22 @@ ParamLayout Phaser8::createParameterLayout()
     return { params.begin(), params.end() };
 }
 
+String Phaser8::getTooltipForPort (int portIndex, bool isInput)
+{
+    if (isInput)
+        return BaseProcessor::getTooltipForPort (portIndex, isInput);
+
+    switch ((OutputPort) portIndex)
+    {
+        case OutputPort::AudioOutput:
+            return "Stage 8 Output";
+        case OutputPort::Stage1Output:
+            return "Stage 1 Output";
+        case OutputPort::ModulationOutput:
+            return "Modulation Output";
+    }
+}
+
 void Phaser8::prepare (double sampleRate, int samplesPerBlock)
 {
     depthParam.prepare (sampleRate, samplesPerBlock);

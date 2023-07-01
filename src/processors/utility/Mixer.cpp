@@ -117,3 +117,21 @@ void Mixer::processAudioBypassed (AudioBuffer<float>& buffer)
     buffer.clear();
     outputBuffers.getReference (0) = &buffer;
 }
+
+String Mixer::getTooltipForPort (int portIndex, bool isInput)
+{
+    if (! isInput)
+        return BaseProcessor::getTooltipForPort (portIndex, isInput);
+
+    switch ((InputPort) portIndex)
+    {
+        case InputPort::Channel1:
+            return "Channel 1 Input";
+        case InputPort::Channel2:
+            return "Channel 2 Input";
+        case InputPort::Channel3:
+            return "Channel 3 Input";
+        case InputPort::Channel4:
+            return "Channel 4 Input";
+    }
+}

@@ -62,6 +62,7 @@ void SettingsButton::showSettingsMenu()
         addPluginSettingMenuOption ("Refresh Parameter Tree", ParamForwardManager::refreshParamTreeID, menu, 300);
 
     defaultZoomMenu (menu, 400);
+    addPluginSettingMenuOption ("Show Port Tooltips", BoardViewport::portTooltipsSettingID, menu, 500);
 
     menu.addSeparator();
     menu.addItem ("User Manual", []

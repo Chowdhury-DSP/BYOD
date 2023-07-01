@@ -196,6 +196,9 @@ public:
      */
     const MidiBuffer* midiBuffer = nullptr;
 
+    /** Returns a tooltip string for a given port. */
+    virtual String getTooltipForPort (int portIndex, bool isInput);
+
 protected:
     virtual void prepare (double sampleRate, int samplesPerBlock) = 0;
     virtual void releaseMemory() {}
@@ -268,8 +271,8 @@ private:
 
     std::atomic<float>* onOffParam = nullptr;
 
-    const int numInputs;
-    const int numOutputs;
+    const int numInputs {};
+    const int numOutputs {};
 
     std::vector<Array<ConnectionInfo>> outputConnections;
     Array<AudioBuffer<float>> inputBuffers;
