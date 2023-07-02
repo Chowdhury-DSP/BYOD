@@ -33,7 +33,7 @@ ProcessorEditor::ProcessorEditor (BaseProcessor& baseProc,
     xButton.setImages (xSvg.get());
     addAndMakeVisible (xButton);
 
-    if (proc.getNumInputs() != 0 && proc.getNumOutputs() != 0)
+    if (&proc != &procs.getInputProcessor() && &proc != &procs.getOutputProcessor())
     {
         auto cog = Drawable::createFromImageData (BinaryData::cogsolid_svg, BinaryData::cogsolid_svgSize);
         cog->replaceColour (Colours::white, contrastColour);

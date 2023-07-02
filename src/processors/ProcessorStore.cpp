@@ -41,6 +41,7 @@
 #include "modulation/Flanger.h"
 #include "modulation/MIDIModulator.h"
 #include "modulation/Panner.h"
+#include "modulation/ParamModulator.h"
 #include "modulation/Rotary.h"
 #include "modulation/Tremolo.h"
 #include "modulation/phaser/Phaser4.h"
@@ -121,6 +122,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Flanger", &processorFactory<Flanger> },
     { "MIDI Modulator", &processorFactory<MidiModulator> },
     { "Panner", &processorFactory<Panner> },
+    { "Param Modulator", &processorFactory<ParamModulator> },
     { "Phaser4", &processorFactory<Phaser4> },
     { "Phaser8", &processorFactory<Phaser8> },
     { "Rotary", &processorFactory<Rotary> },
