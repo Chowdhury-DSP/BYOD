@@ -16,14 +16,14 @@ constexpr auto R3 = 8.2e3;
 constexpr auto R4 = 100.0e3;
 constexpr auto RL = 500.0e3;
 constexpr auto Vt = 26.0e-3;
-constexpr auto Is_Q1 = 20.3e-15;
-constexpr auto BetaF_Q1 = 1430.0;
+constexpr auto Is_Q1 = 17.0e-6;
+constexpr auto BetaF_Q1 = 90.0;
 constexpr auto AlphaF_Q1 = (1.0 + BetaF_Q1) / BetaF_Q1;
-constexpr auto BetaR_Q1 = 4.0;
-constexpr auto Is_Q2 = 20.3e-15;
-constexpr auto BetaF_Q2 = 1430.0;
+constexpr auto BetaR_Q1 = 100.0e-3;
+constexpr auto Is_Q2 = 17.0e-6;
+constexpr auto BetaF_Q2 = 100.0;
 constexpr auto AlphaF_Q2 = (1.0 + BetaF_Q2) / BetaF_Q2;
-constexpr auto BetaR_Q2 = 4.0;
+constexpr auto BetaR_Q2 = 100.0e-3;
 // END USER ENTRIES
 } // namespace
 
@@ -33,7 +33,8 @@ void FuzzFaceNDK::reset_state()
     for (size_t ch = 0; ch < MAX_NUM_CHANNELS; ++ch)
     {
         x_n[ch].setZero();
-        v_n[ch] = Eigen::Vector<T, num_nl_ports> { 1.43236, 1.77569, -0.636511, 0.021566 };
+        v_n[ch].setZero();
+//        v_n[ch] = Eigen::Vector<T, num_nl_ports> { 1.43236, 1.77569, -0.636511, 0.021566 };
     }
 }
 
@@ -198,7 +199,7 @@ void FuzzFaceNDK::process (std::span<float> channel_data, size_t ch) noexcept
             F_min.noalias() = p_n + K_mat * i_n - v_n[ch];
             A_solve.noalias() = K_mat * Jac - eye;
             delta_v.noalias() = A_solve.householderQr().solve (F_min);
-            v_n[ch] -= delta_v;
+            v_n[ch] -= delta_v * 0.25;
             delta = delta_v.array().abs().sum();
         } while (delta > 1.0e-2 && ++nIters < 8);
         calc_currents();

@@ -25,9 +25,9 @@ ParamLayout FuzzMachine::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createPercentParameter (params, "fuzz", "Fuzz", 0.5f);
-    createPercentParameter (params, "vol", "Volume", 0.5f);
+    createPercentParameter (params, "fuzz", "Fuzz", 1.0f);
     createPercentParameter (params, "bias", "Bias", 1.0f);
+    createPercentParameter (params, "vol", "Volume", 0.5f);
 
     return { params.begin(), params.end() };
 }
@@ -85,7 +85,7 @@ void FuzzMachine::processAudio (AudioBuffer<float>& buffer)
             sample = chowdsp::Math::algebraicSigmoid (sample);
     }
 
-    chowdsp::BufferMath::applyGain (buffer, Decibels::decibelsToGain (-72.0f));
+    chowdsp::BufferMath::applyGain (buffer, Decibels::decibelsToGain (-30.0f));
 
     const auto osBuffer = upsampler.process (buffer);
     if (fuzzParam.isSmoothing() || biasParam.isSmoothing())
@@ -110,10 +110,20 @@ void FuzzMachine::processAudio (AudioBuffer<float>& buffer)
     downsampler.process (osBuffer, buffer);
 
     if (! chowdsp::BufferMath::sanitizeBuffer (buffer))
+    {
+        upsampler.reset();
+        downsampler.reset();
         model_ndk.reset_state();
+    }
 
     dcBlocker.processBlock (buffer);
 
-    volume.setGainLinear (std::pow (volumeParam->getCurrentValue(), 2.0f) * 40.0f);
+    volume.setGainLinear (volumeParam->getCurrentValue() * 80.0f);
     volume.process (buffer);
+
+    for (auto [ch, data] : chowdsp::buffer_iters::channels (buffer))
+    {
+        for (auto& sample : data)
+            sample = 4.0f * chowdsp::Math::algebraicSigmoid (0.25f * sample);
+    }
 }
