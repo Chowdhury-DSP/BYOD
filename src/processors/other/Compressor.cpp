@@ -1,5 +1,6 @@
 #include "Compressor.h"
 #include "../ParameterHelpers.h"
+#include "../BufferHelpers.h"
 
 class Compressor::GainComputer
 {
@@ -136,36 +137,47 @@ void Compressor::prepare (double sampleRate, int samplesPerBlock)
 
 void Compressor::processAudio (AudioBuffer<float>& buffer)
 {
-    const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    // set up level buffer
-    if (numChannels == 1)
+    levelOutBuffer.setSize(1,  numSamples, false, false, true);
+    if (inputsConnected.contains(LevelInput))
     {
-        levelBuffer.makeCopyOf (buffer);
-    }
-    else
+        BufferHelpers::collapseToMonoBuffer(getInputBuffer(LevelInput), levelOutBuffer);
+    } else
     {
-        levelBuffer.setSize (1, numSamples, true, true, false);
-        levelBuffer.copyFrom (0, 0, buffer, 0, 0, numSamples);
-
-        for (int ch = 1; ch < numChannels; ++ch)
-            levelBuffer.addFrom (0, 0, buffer, ch, 0, numSamples);
-
-        levelBuffer.applyGain (1.0f / (float) numChannels);
+        if (inputsConnected.contains(AudioInput))
+        {
+            levelDetector.setParameters(*attackMsParam, *releaseMsParam);
+            levelDetector.processBlock(getInputBuffer(AudioInput), levelOutBuffer);
+        } else
+        {
+            levelOutBuffer.clear();
+        }
     }
 
-    auto&& levelBlock = dsp::AudioBlock<float> { levelBuffer };
-    levelDetector.setParameters (*attackMsParam, *releaseMsParam);
-    levelDetector.process (dsp::ProcessContextReplacing<float> { levelBlock });
+    if (inputsConnected.contains (AudioInput))
+    {
+        levelBuffer.makeCopyOf(levelOutBuffer);
+        gainComputer->setParameters (*threshDBParam, *ratioParam, *kneeDBParam);
+        gainComputer->process (levelBuffer);
 
-    gainComputer->setParameters (*threshDBParam, *ratioParam, *kneeDBParam);
-    gainComputer->process (levelBlock);
+        auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            FloatVectorOperations::multiply(audioOutBuffer.getWritePointer(ch), audioInBuffer.getReadPointer(ch), gainComputer->gainBlock.getChannelPointer(0), numSamples);
+        }
 
-    auto&& block = dsp::AudioBlock<float> { buffer };
-    for (int ch = 0; ch < numChannels; ++ch)
-        block.getSingleChannelBlock ((size_t) ch) *= gainComputer->gainBlock;
+        auto&& audioOutBlock = dsp::AudioBlock<float> { audioOutBuffer };
+        makeupGain.setGainDecibels (*makeupDBParam);
+        makeupGain.process (dsp::ProcessContextReplacing<float> { audioOutBlock });
+    }else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
 
-    makeupGain.setGainDecibels (*makeupDBParam);
-    makeupGain.process (dsp::ProcessContextReplacing<float> { block });
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
 }
