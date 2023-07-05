@@ -1,5 +1,5 @@
 /*
- * This file was generated on 2023-07-04 18:56:50.025866
+ * This file was generated on 2023-07-04 19:36:50.043253
  * using the command: `/Users/jatin/ChowDSP/Research/NDK-Framework/generate_ndk_cpp.py fuzz_face_ndk_config.json`
  */
 #pragma once
@@ -17,6 +17,7 @@ struct FuzzFaceNDK
     // START USER ENTRIES
     static constexpr size_t MAX_NUM_CHANNELS = 2;
     static constexpr double VRfuzz = 1.0e3;
+    double Vcc = 9.0;
     // END USER ENTRIES
 
     using T = double;

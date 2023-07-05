@@ -1,5 +1,5 @@
 /*
- * This file was generated on 2023-07-04 18:56:50.025991
+ * This file was generated on 2023-07-04 19:36:50.043506
  * using the command: `/Users/jatin/ChowDSP/Research/NDK-Framework/generate_ndk_cpp.py fuzz_face_ndk_config.json`
  */
 #include "FuzzFaceNDK.h"
@@ -15,7 +15,6 @@ constexpr auto R2 = 470.0;
 constexpr auto R3 = 8.2e3;
 constexpr auto R4 = 100.0e3;
 constexpr auto RL = 500.0e3;
-constexpr auto Vcc = 9.0;
 constexpr auto Vt = 26.0e-3;
 constexpr auto Is_Q1 = 20.3e-15;
 constexpr auto BetaF_Q1 = 1430.0;
@@ -154,9 +153,9 @@ void FuzzFaceNDK::process (std::span<float> channel_data, size_t ch) noexcept
     Eigen::Vector<T, num_nl_ports> delta_v;
     Eigen::Vector<T, num_outputs> y_n;
 
-    for (auto& sample : channel_data)
+    for (size_t n = 0; n < channel_data.size(); ++n)
     {
-        u_n_var (0) = (T) sample;
+        u_n_var (0) = (T) channel_data[n];
         p_n.noalias() = G_mat * x_n[ch] + H_mat_var * u_n_var + H_u_fix;
 
         T exp_v1_v0;
@@ -205,7 +204,7 @@ void FuzzFaceNDK::process (std::span<float> channel_data, size_t ch) noexcept
         calc_currents();
 
         y_n.noalias() = D_mat * x_n[ch] + E_mat_var * u_n_var + E_u_fix + F_mat * i_n;
-        sample = (float) y_n (0);
+        channel_data[n] = (float) y_n (0);
         x_n[ch] = A_mat * x_n[ch] + B_mat_var * u_n_var + B_u_fix + C_mat * i_n;
     }
 }

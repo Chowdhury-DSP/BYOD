@@ -22,7 +22,8 @@
   ],
   "cpp_struct_entries": [
     "    static constexpr size_t MAX_NUM_CHANNELS = 2;",
-    "    static constexpr double VRfuzz = 1.0e3;"
+    "    static constexpr double VRfuzz = 1.0e3;",
+    "    double Vcc = 9.0;"
   ],
   "cpp_namespace_entries": [
     "constexpr auto C1 = 2.2e-6;",
@@ -33,7 +34,6 @@
     "constexpr auto R3 = 8.2e3;",
     "constexpr auto R4 = 100.0e3;",
     "constexpr auto RL = 500.0e3;",
-    "constexpr auto Vcc = 9.0;",
     "constexpr auto Vt = 26.0e-3;",
     "constexpr auto Is_Q1 = 20.3e-15;",
     "constexpr auto BetaF_Q1 = 1430.0;",

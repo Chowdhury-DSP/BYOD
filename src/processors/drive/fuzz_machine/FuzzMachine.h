@@ -16,6 +16,7 @@ public:
 
 private:
     chowdsp::SmoothedBufferValue<float> fuzzParam;
+    chowdsp::SmoothedBufferValue<float> biasParam;
     chowdsp::PercentParameter* volumeParam = nullptr;
 
     FuzzFaceNDK model_ndk;

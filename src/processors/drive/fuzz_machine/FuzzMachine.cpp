@@ -11,6 +11,7 @@ FuzzMachine::FuzzMachine (UndoManager* um)
 {
     using namespace ParameterHelpers;
     fuzzParam.setParameterHandle (getParameterPointer<chowdsp::PercentParameter*> (vts, "fuzz"));
+    biasParam.setParameterHandle (getParameterPointer<chowdsp::PercentParameter*> (vts, "bias"));
     loadParameterPointer (volumeParam, vts, "vol");
 
     uiOptions.backgroundColour = Colours::red.darker (0.15f);
@@ -26,20 +27,28 @@ ParamLayout FuzzMachine::createParameterLayout()
 
     createPercentParameter (params, "fuzz", "Fuzz", 0.5f);
     createPercentParameter (params, "vol", "Volume", 0.5f);
+    createPercentParameter (params, "bias", "Bias", 1.0f);
 
     return { params.begin(), params.end() };
 }
 
 void FuzzMachine::prepare (double sampleRate, int samplesPerBlock)
 {
-    fuzzParam.mappingFunction = [](float x) { return 0.9f * x + 0.05f; };
+    fuzzParam.mappingFunction = [] (float x)
+    { return 0.9f * x + 0.05f; };
     fuzzParam.setRampLength (0.025);
     fuzzParam.prepare (sampleRate, samplesPerBlock);
+
+    biasParam.mappingFunction = [] (float x)
+    { return 6.5f + 2.5f * x; };
+    biasParam.setRampLength (0.025);
+    biasParam.prepare (sampleRate, samplesPerBlock);
 
     upsampler.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 }, osRatio);
     downsampler.prepare ({ osRatio * sampleRate, osRatio * (uint32_t) samplesPerBlock, 2 }, osRatio);
 
     model_ndk.reset (sampleRate * osRatio);
+    model_ndk.Vcc = (double) biasParam.getCurrentValue();
     model_ndk.update_pots ({ FuzzFaceNDK::VRfuzz * (1.0 - (double) fuzzParam.getCurrentValue()),
                              FuzzFaceNDK::VRfuzz * (double) fuzzParam.getCurrentValue() });
 
@@ -68,6 +77,7 @@ void FuzzMachine::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     fuzzParam.process (numSamples);
+    biasParam.process (numSamples);
 
     for (auto [ch, data] : chowdsp::buffer_iters::channels (buffer))
     {
@@ -78,12 +88,13 @@ void FuzzMachine::processAudio (AudioBuffer<float>& buffer)
     chowdsp::BufferMath::applyGain (buffer, Decibels::decibelsToGain (-72.0f));
 
     const auto osBuffer = upsampler.process (buffer);
-    if (fuzzParam.isSmoothing())
+    if (fuzzParam.isSmoothing() || biasParam.isSmoothing())
     {
         for (auto [ch, n, data] : chowdsp::buffer_iters::sub_blocks<32, true> (osBuffer))
         {
             if (ch == 0)
             {
+                model_ndk.Vcc = (double) biasParam.getSmoothedBuffer()[n / osRatio];
                 const auto fuzzAmt = fuzzParam.getSmoothedBuffer()[n / osRatio];
                 model_ndk.update_pots ({ FuzzFaceNDK::VRfuzz * (1.0 - (double) fuzzAmt),
                                          FuzzFaceNDK::VRfuzz * (double) fuzzAmt });
@@ -103,6 +114,6 @@ void FuzzMachine::processAudio (AudioBuffer<float>& buffer)
 
     dcBlocker.processBlock (buffer);
 
-    volume.setGainLinear (volumeParam->getCurrentValue() * 5.0f);
+    volume.setGainLinear (std::pow (volumeParam->getCurrentValue(), 2.0f) * 40.0f);
     volume.process (buffer);
 }
