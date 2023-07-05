@@ -75,7 +75,7 @@ target_sources(BYOD PRIVATE
     processors/drive/diode_circuits/DiodeRectifier.cpp
     processors/drive/flapjack/Flapjack.cpp
     processors/drive/fuzz_machine/FuzzMachine.cpp
-    processors/drive/fuzz_machine/FuzzFaceSolver.cpp
+    processors/drive/fuzz_machine/FuzzFaceNDK.cpp
     processors/drive/hysteresis/Hysteresis.cpp
     processors/drive/hysteresis/HysteresisProcessing.cpp
     processors/drive/junior_b/JuniorB.cpp

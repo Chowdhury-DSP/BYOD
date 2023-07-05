@@ -1,8 +1,7 @@
 #pragma once
 
+#include "FuzzFaceNDK.h"
 #include "processors/BaseProcessor.h"
-
-#include "FuzzFaceSolver.h"
 
 class FuzzMachine : public BaseProcessor
 {
@@ -19,7 +18,11 @@ private:
     chowdsp::SmoothedBufferValue<float> fuzzParam;
     chowdsp::PercentParameter* volumeParam = nullptr;
 
-    FuzzFaceSolver model;
+    FuzzFaceNDK model_ndk;
+
+    using AAFilter = chowdsp::EllipticFilter<4>;
+    chowdsp::Upsampler<float, AAFilter> upsampler;
+    chowdsp::Downsampler<float, AAFilter, false> downsampler;
 
     chowdsp::FirstOrderHPF<float> dcBlocker;
     chowdsp::Gain<float> volume;

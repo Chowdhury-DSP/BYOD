@@ -1,6 +1,11 @@
 #include "FuzzMachine.h"
 #include "processors/ParameterHelpers.h"
 
+namespace
+{
+constexpr int osRatio = 2;
+}
+
 FuzzMachine::FuzzMachine (UndoManager* um)
     : BaseProcessor ("Fuzz Machine", createParameterLayout(), um)
 {
@@ -27,10 +32,16 @@ ParamLayout FuzzMachine::createParameterLayout()
 
 void FuzzMachine::prepare (double sampleRate, int samplesPerBlock)
 {
-    model.prepare (sampleRate);
-
+    fuzzParam.mappingFunction = [](float x) { return 0.9f * x + 0.05f; };
     fuzzParam.setRampLength (0.025);
     fuzzParam.prepare (sampleRate, samplesPerBlock);
+
+    upsampler.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 }, osRatio);
+    downsampler.prepare ({ osRatio * sampleRate, osRatio * (uint32_t) samplesPerBlock, 2 }, osRatio);
+
+    model_ndk.reset (sampleRate * osRatio);
+    model_ndk.update_pots ({ FuzzFaceNDK::VRfuzz * (1.0 - (double) fuzzParam.getCurrentValue()),
+                             FuzzFaceNDK::VRfuzz * (double) fuzzParam.getCurrentValue() });
 
     const auto spec = juce::dsp::ProcessSpec { sampleRate, (uint32_t) samplesPerBlock, 2 };
     dcBlocker.prepare (spec);
@@ -43,11 +54,13 @@ void FuzzMachine::prepare (double sampleRate, int samplesPerBlock)
     // pre-buffering
     AudioBuffer<float> buffer (2, samplesPerBlock);
     float level = 100.0f;
-    while (level > 1.0e-4f)
+    int count = 0;
+    while (level > 1.0e-4f || count < 100)
     {
         buffer.clear();
         processAudio (buffer);
         level = buffer.getMagnitude (0, samplesPerBlock);
+        count++;
     }
 }
 
@@ -56,18 +69,40 @@ void FuzzMachine::processAudio (AudioBuffer<float>& buffer)
     const auto numSamples = buffer.getNumSamples();
     fuzzParam.process (numSamples);
 
-    for (auto [ch, n, data] : chowdsp::buffer_iters::sub_blocks<32, true> (buffer))
+    for (auto [ch, data] : chowdsp::buffer_iters::channels (buffer))
     {
-        if (ch == 0)
-            model.set_gain (fuzzParam.getSmoothedBuffer()[n]);
-        model.process (data, ch);
+        for (auto& sample : data)
+            sample = chowdsp::Math::algebraicSigmoid (sample);
     }
 
+    chowdsp::BufferMath::applyGain (buffer, Decibels::decibelsToGain (-72.0f));
+
+    const auto osBuffer = upsampler.process (buffer);
+    if (fuzzParam.isSmoothing())
+    {
+        for (auto [ch, n, data] : chowdsp::buffer_iters::sub_blocks<32, true> (osBuffer))
+        {
+            if (ch == 0)
+            {
+                const auto fuzzAmt = fuzzParam.getSmoothedBuffer()[n / osRatio];
+                model_ndk.update_pots ({ FuzzFaceNDK::VRfuzz * (1.0 - (double) fuzzAmt),
+                                         FuzzFaceNDK::VRfuzz * (double) fuzzAmt });
+            }
+            model_ndk.process (data, ch);
+        }
+    }
+    else
+    {
+        for (auto [ch, data] : chowdsp::buffer_iters::channels (osBuffer))
+            model_ndk.process (data, ch);
+    }
+    downsampler.process (osBuffer, buffer);
+
     if (! chowdsp::BufferMath::sanitizeBuffer (buffer))
-        model.reset();
+        model_ndk.reset_state();
 
     dcBlocker.processBlock (buffer);
 
-    volume.setGainLinear (volumeParam->getCurrentValue());
+    volume.setGainLinear (volumeParam->getCurrentValue() * 5.0f);
     volume.process (buffer);
 }
