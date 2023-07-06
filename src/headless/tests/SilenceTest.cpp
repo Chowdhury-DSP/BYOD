@@ -45,7 +45,8 @@ public:
                                      proc->processAudioBlock (buffer);
 
                                      testBuffer (buffer.getReadPointer (0));
-                                 });
+                                 },
+                                 { "Fuzz Machine" });
     }
 };
 
