@@ -23,8 +23,8 @@ public:
 
         plugin.prepareToPlay (sampleRate, blockSize);
 
-        auto& splitterFactory = ProcessorStore::getStoreMap().at ("Stereo Splitter");
-        auto& mergerFactory = ProcessorStore::getStoreMap().at ("Stereo Merger");
+        auto& splitterFactory = ProcessorStore::getStoreMap().at ("Stereo Splitter").factory;
+        auto& mergerFactory = ProcessorStore::getStoreMap().at ("Stereo Merger").factory;
 
         actionHelper.addProcessor (splitterFactory (undoManager));
         actionHelper.addProcessor (mergerFactory (undoManager));
@@ -69,8 +69,8 @@ public:
 
         plugin.prepareToPlay (sampleRate, blockSize);
 
-        auto& splitterFactory = ProcessorStore::getStoreMap().at ("Stereo Splitter");
-        auto& mergerFactory = ProcessorStore::getStoreMap().at ("Stereo Merger");
+        auto& splitterFactory = ProcessorStore::getStoreMap().at ("Stereo Splitter").factory;
+        auto& mergerFactory = ProcessorStore::getStoreMap().at ("Stereo Merger").factory;
 
         actionHelper.addProcessor (splitterFactory (undoManager));
         actionHelper.addProcessor (mergerFactory (undoManager));
@@ -125,7 +125,7 @@ public:
 
         plugin.prepareToPlay (sampleRate, blockSize);
 
-        auto& splitterFactory = ProcessorStore::getStoreMap().at ("Stereo Splitter");
+        auto& splitterFactory = ProcessorStore::getStoreMap().at ("Stereo Splitter").factory;
         actionHelper.addProcessor (splitterFactory (undoManager));
 
         auto* input = &chain.getInputProcessor();
@@ -165,7 +165,7 @@ public:
 
         plugin.prepareToPlay (sampleRate, blockSize);
 
-        auto& splitterFactory = ProcessorStore::getStoreMap().at ("Stereo Splitter");
+        auto& splitterFactory = ProcessorStore::getStoreMap().at ("Stereo Splitter").factory;
         actionHelper.addProcessor (splitterFactory (undoManager));
 
         auto* input = &chain.getInputProcessor();

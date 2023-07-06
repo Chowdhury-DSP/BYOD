@@ -14,7 +14,7 @@ public:
                         Component* associatedComponent = nullptr,
                         WaitableEvent* waiter = nullptr);
 
-    bool validateProcChainState (const XmlElement* xml) const;
+    static bool validateProcChainState (const XmlElement* xml, const ProcessorStore& processorStore);
 
 private:
     void loadProcChainInternal (const XmlElement* xml,

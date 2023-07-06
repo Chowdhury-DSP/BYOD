@@ -16,7 +16,6 @@ public:
 
     String getTooltipForPort (int portIndex, bool isInput) override;
 
-private:
     enum OutputPort
     {
         HighBand,
@@ -25,6 +24,7 @@ private:
     };
     static constexpr int numOuts = magic_enum::enum_count<OutputPort>();
 
+private:
     chowdsp::FloatParameter* crossLowParam = nullptr;
     chowdsp::FloatParameter* crossHighParam = nullptr;
 

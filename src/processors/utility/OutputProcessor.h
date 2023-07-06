@@ -8,6 +8,8 @@ class OutputProcessor : public BaseProcessor
 public:
     explicit OutputProcessor (UndoManager* um = nullptr);
 
+    static constexpr std::string_view name = "Output";
+
     ProcessorType getProcessorType() const override { return Utility; }
     static ParamLayout createParameterLayout();
 

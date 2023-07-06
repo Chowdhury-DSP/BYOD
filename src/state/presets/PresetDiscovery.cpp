@@ -2,6 +2,7 @@
 
 #include "PresetDiscovery.h"
 #include "PresetManager.h"
+#include "processors/ProcessorStore.h"
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
 #include <clap/helpers/preset-discovery-provider.hh>
@@ -13,6 +14,96 @@ namespace preset_discovery
 static constexpr clap_plugin_id plugin_id {
     .abi = "clap",
     .id = CLAP_ID,
+};
+
+struct FactoryPresetsProvider
+#if JUCE_DEBUG
+    : clap::helpers::PresetDiscoveryProvider<clap::helpers::MisbehaviourHandler::Terminate, clap::helpers::CheckingLevel::Maximal>
+#else
+    : clap::helpers::PresetDiscoveryProvider<clap::helpers::MisbehaviourHandler::Ignore, clap::helpers::CheckingLevel::Minimal>
+#endif
+{
+    static constexpr clap_preset_discovery_provider_descriptor descriptor {
+        .clap_version = CLAP_VERSION,
+        .id = "org.chowdsp.byod.factory-presets",
+        .name = "BYOD Factory Presets Provider",
+        .vendor = "ChowDSP"
+    };
+
+    explicit FactoryPresetsProvider (const clap_preset_discovery_indexer* indexer)
+        : PresetDiscoveryProvider (&descriptor, indexer)
+    {
+    }
+
+
+    static constexpr clap_preset_discovery_location factoryPresetsLocation {
+        .flags = CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT,
+        .name = "Factory Presets Location",
+        .kind = CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN,
+        .location = nullptr,
+    };
+
+    bool init() noexcept override
+    {
+        indexer()->declare_location (indexer(), &factoryPresetsLocation);
+        return true;
+    }
+
+    bool getMetadata (uint32_t location_kind,
+                      [[maybe_unused]] const char* location,
+                      const clap_preset_discovery_metadata_receiver_t* metadata_receiver) noexcept override
+    {
+        if (location_kind != CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN)
+            return false;
+
+        ScopedJuceInitialiser_GUI scopedJuce {};
+        const ProcessorStore procStore { nullptr };
+        for (const auto& factoryPreset : PresetManager::getFactoryPresets (procStore))
+        {
+            DBG ("Indexing factory preset: " + factoryPreset.getName());
+            if (metadata_receiver->begin_preset (metadata_receiver, factoryPreset.getName().toRawUTF8(), factoryPreset.getName().toRawUTF8()))
+            {
+                metadata_receiver->add_plugin_id (metadata_receiver, &plugin_id);
+                metadata_receiver->add_creator (metadata_receiver, factoryPreset.getVendor().toRawUTF8());
+
+                if (factoryPreset.getCategory().isNotEmpty())
+                    metadata_receiver->add_feature (metadata_receiver, factoryPreset.getCategory().toRawUTF8());
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return true;
+
+        /*
+        if (location_kind != CLAP_PRESET_DISCOVERY_LOCATION_FILE || location == nullptr)
+            return false;
+
+        const auto userPresetFile = juce::File { location };
+        if (! userPresetFile.existsAsFile())
+            return false;
+
+        chowdsp::Preset preset { userPresetFile };
+        if (! preset.isValid())
+            return false;
+
+        if (metadata_receiver->begin_preset (metadata_receiver, userPresetFile.getFullPathName().toRawUTF8(), ""))
+        {
+            metadata_receiver->add_plugin_id (metadata_receiver, &plugin_id);
+            metadata_receiver->add_creator (metadata_receiver, preset.getVendor().toRawUTF8());
+
+            if (preset.getCategory().isNotEmpty())
+                metadata_receiver->add_feature (metadata_receiver, preset.getCategory().toRawUTF8());
+            metadata_receiver->set_timestamps (metadata_receiver,
+                                               (clap_timestamp_t) userPresetFile.getCreationTime().toMilliseconds() / 1000,
+                                               (clap_timestamp_t) userPresetFile.getLastModificationTime().toMilliseconds() / 1000);
+        }
+
+        return true;
+         */
+    }
 };
 
 struct UserPresetsProvider
@@ -48,7 +139,7 @@ struct UserPresetsProvider
         indexer()->declare_filetype (indexer(), &filetype);
 
         userPresetsFolder = chowdsp::PresetManager::getUserPresetPath (chowdsp::toString (PresetManager::userPresetPath));
-        if (! userPresetsFolder.isDirectory())
+        if (userPresetsFolder == juce::File{} || ! userPresetsFolder.isDirectory())
             return false;
 
         userPresetsLocation.flags = CLAP_PRESET_DISCOVERY_IS_USER_CONTENT;
@@ -93,7 +184,7 @@ struct UserPresetsProvider
 
 uint32_t count (const struct clap_preset_discovery_factory*)
 {
-    return 1;
+    return 2;
 }
 
 const clap_preset_discovery_provider_descriptor_t* get_descriptor (
@@ -101,6 +192,9 @@ const clap_preset_discovery_provider_descriptor_t* get_descriptor (
     uint32_t index)
 {
     if (index == 0)
+        return &FactoryPresetsProvider::descriptor;
+
+    if (index == 1)
         return &UserPresetsProvider::descriptor;
 
     return nullptr;
@@ -111,6 +205,12 @@ const clap_preset_discovery_provider_t* create (
     const clap_preset_discovery_indexer_t* indexer,
     const char* provider_id)
 {
+    if (strcmp (provider_id, FactoryPresetsProvider::descriptor.id) == 0)
+    {
+        auto* provider = new FactoryPresetsProvider { indexer };
+        return provider->provider();
+    }
+
     if (strcmp (provider_id, UserPresetsProvider::descriptor.id) == 0)
     {
         auto* provider = new UserPresetsProvider { indexer };

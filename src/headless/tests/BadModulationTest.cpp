@@ -10,9 +10,9 @@ public:
     void runTest() override
     {
         StringArray processorsWithNoModulation {};
-        for (auto [name, factory] : ProcessorStore::getStoreMap())
+        for (auto [name, storeEntry] : ProcessorStore::getStoreMap())
         {
-            const auto proc = factory (nullptr);
+            const auto proc = storeEntry.factory (nullptr);
 
             bool hasModulationInputs = false;
             for (int i = 0; i < proc->getNumInputs(); ++i)

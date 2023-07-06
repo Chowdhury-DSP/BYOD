@@ -82,75 +82,75 @@ static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
 }
 
 ProcessorStore::StoreMap ProcessorStore::store = {
-    { "Bass Face", &processorFactory<BassFace> },
-    { "Blonde Drive", &processorFactory<BlondeDrive> },
-    { "Centaur", &processorFactory<Centaur> },
-    { "Diode Clipper", &processorFactory<DiodeClipper> },
-    { "Diode Rectifier", &processorFactory<DiodeRectifier> },
-    { "Dirty Tube", &processorFactory<TubeAmp> },
-    { "Distortion Plus", &processorFactory<MXRDistortion> },
-    { "Flapjack", &processorFactory<Flapjack> },
-    { "Fuzz Machine", &processorFactory<FuzzMachine> },
-    { "GuitarML", &processorFactory<GuitarMLAmp> },
-    { "Hysteresis", &processorFactory<Hysteresis> },
-    { "Junior B", &processorFactory<JuniorB> },
-    { "Tone King", &processorFactory<KingOfToneDrive> },
-    { "Metal Face", &processorFactory<MetalFace> },
-    { "Mouse Drive", &processorFactory<MouseDrive> },
-    { "Muff Clipper", &processorFactory<MuffClipper> },
-    { "Muff Drive", &processorFactory<BigMuffDrive> },
-    { "Range Booster", &processorFactory<RangeBooster> },
-    { "RONN", &processorFactory<RONN> },
-    { "Tube Screamer", &processorFactory<TubeScreamer> },
-    { "Waveshaper", &processorFactory<Waveshaper> },
-    { "Warp", &processorFactory<Warp> },
-    { "Yen Drive", &processorFactory<ZenDrive> },
+    { "Bass Face", { .factory = &processorFactory<BassFace>, .info = { ProcessorType::Drive, 1, 1 } } },
+    { "Blonde Drive", { &processorFactory<BlondeDrive>, { ProcessorType::Drive, 1, 1 } } },
+    { "Centaur", { &processorFactory<Centaur>, { ProcessorType::Drive, 1, 1 } } },
+    { "Diode Clipper", { &processorFactory<DiodeClipper>, { ProcessorType::Drive, 1, 1 } } },
+    { "Diode Rectifier", { &processorFactory<DiodeRectifier>, { ProcessorType::Drive, 1, 1 } } },
+    { "Dirty Tube", { &processorFactory<TubeAmp>, { ProcessorType::Drive, 1, 1 } } },
+    { "Distortion Plus", { &processorFactory<MXRDistortion>, { ProcessorType::Drive, 1, 1 } } },
+    { "Flapjack", { &processorFactory<Flapjack>, { ProcessorType::Drive, 1, 1 } } },
+    { "Fuzz Machine", { &processorFactory<FuzzMachine>, { ProcessorType::Drive, 1, 1 } } },
+    { "GuitarML", { &processorFactory<GuitarMLAmp>, { ProcessorType::Drive, 1, 1 } } },
+    { "Hysteresis", { &processorFactory<Hysteresis>, { ProcessorType::Drive, 1, 1 } } },
+    { "Junior B", { &processorFactory<JuniorB>, { ProcessorType::Drive, 1, 1 } } },
+    { "Tone King", { &processorFactory<KingOfToneDrive>, { ProcessorType::Drive, 1, 1 } } },
+    { "Metal Face", { &processorFactory<MetalFace>, { ProcessorType::Drive, 1, 1 } } },
+    { "Mouse Drive", { &processorFactory<MouseDrive>, { ProcessorType::Drive, 1, 1 } } },
+    { "Muff Clipper", { &processorFactory<MuffClipper>, { ProcessorType::Drive, 1, 1 } } },
+    { "Muff Drive", { &processorFactory<BigMuffDrive>, { ProcessorType::Drive, 1, 1 } } },
+    { "Range Booster", { &processorFactory<RangeBooster>, { ProcessorType::Drive, 1, 1 } } },
+    { "RONN", { &processorFactory<RONN>, { ProcessorType::Drive, 1, 1 } } },
+    { "Tube Screamer", { &processorFactory<TubeScreamer>, { ProcessorType::Drive, 1, 1 } } },
+    { "Waveshaper", { &processorFactory<Waveshaper>, { ProcessorType::Drive, 1, 1 } } },
+    { "Warp", { &processorFactory<Warp>, { ProcessorType::Drive, 1, 1 } } },
+    { "Yen Drive", { &processorFactory<ZenDrive>, { ProcessorType::Drive, 1, 1 } } },
 
-    { "Amp IRs", &processorFactory<AmpIRs> },
-    { "Bass Cleaner", &processorFactory<BassCleaner> },
-    { "Bassman Tone", &processorFactory<BassmanTone> },
-    { "Baxandall EQ", &processorFactory<BaxandallEQ> },
-    { "Blonde Tone", &processorFactory<BlondeTone> },
-    { "Graphic EQ", &processorFactory<GraphicEQ> },
-    { "High Cut", &processorFactory<HighCut> },
-    { "LoFi IRs", &processorFactory<LofiIrs> },
-    { "Muff Tone", &processorFactory<BigMuffTone> },
-    { "SVF", &processorFactory<StateVariableFilter> },
-    { "Treble Booster", &processorFactory<TrebleBooster> },
-    { "TS-Tone", &processorFactory<TubeScreamerTone> },
-    { "Ladder Filter", &processorFactory<LadderFilterProcessor> },
+    { "Amp IRs", { &processorFactory<AmpIRs>, { ProcessorType::Tone, 1, 1 } } },
+    { "Bass Cleaner", { &processorFactory<BassCleaner>, { ProcessorType::Tone, 1, 1 } } },
+    { "Bassman Tone", { &processorFactory<BassmanTone>, { ProcessorType::Tone, 1, 1 } } },
+    { "Baxandall EQ", { &processorFactory<BaxandallEQ>, { ProcessorType::Tone, 1, 1 } } },
+    { "Blonde Tone", { &processorFactory<BlondeTone>, { ProcessorType::Tone, 1, 1 } } },
+    { "Graphic EQ", { &processorFactory<GraphicEQ>, { ProcessorType::Tone, 1, 1 } } },
+    { "High Cut", { &processorFactory<HighCut>, { ProcessorType::Tone, 1, 1 } } },
+    { "LoFi IRs", { &processorFactory<LofiIrs>, { ProcessorType::Tone, 1, 1 } } },
+    { "Muff Tone", { &processorFactory<BigMuffTone>, { ProcessorType::Tone, 1, 1 } } },
+    { "SVF", { &processorFactory<StateVariableFilter>, { ProcessorType::Tone, 1, 1 } } },
+    { "Treble Booster", { &processorFactory<TrebleBooster>, { ProcessorType::Tone, 1, 1 } } },
+    { "TS-Tone", { &processorFactory<TubeScreamerTone>, { ProcessorType::Tone, 1, 1 } } },
+    { "Ladder Filter", { &processorFactory<LadderFilterProcessor>, { ProcessorType::Tone, 1, 1 } } },
 
-    { "Chorus", &processorFactory<Chorus> },
-    { "Flanger", &processorFactory<Flanger> },
-    { "MIDI Modulator", &processorFactory<MidiModulator> },
-    { "Panner", &processorFactory<Panner> },
-    { "Param Modulator", &processorFactory<ParamModulator> },
-    { "Phaser4", &processorFactory<Phaser4> },
-    { "Phaser8", &processorFactory<Phaser8> },
-    { "Rotary", &processorFactory<Rotary> },
-    { "Scanner Vibrato", &processorFactory<ScannerVibrato> },
-    { "Solo-Vibe", &processorFactory<UniVibe> },
-    { "Tremolo", &processorFactory<Tremolo> },
+    { "Chorus", { &processorFactory<Chorus>, { ProcessorType::Modulation, Chorus::numInputs, Chorus::numOutputs } } },
+    { "Flanger", { &processorFactory<Flanger>, { ProcessorType::Modulation, Flanger::numInputs, Flanger::numOutputs } } },
+    { "MIDI Modulator", { &processorFactory<MidiModulator>, { ProcessorType::Modulation, 0, 1 } } },
+    { "Panner", { &processorFactory<Panner>, { ProcessorType::Modulation, Panner::numInputs, Panner::numOutputs } } },
+    { "Param Modulator", { &processorFactory<ParamModulator>, { ProcessorType::Modulation, 0, 1 } } },
+    { "Phaser4", { &processorFactory<Phaser4>, { ProcessorType::Modulation, Phaser4::numInputs, Phaser4::numOutputs } } },
+    { "Phaser8", { &processorFactory<Phaser8>, { ProcessorType::Modulation, Phaser8::numInputs, Phaser8::numOutputs } } },
+    { "Rotary", { &processorFactory<Rotary>, { ProcessorType::Modulation, Rotary::numInputs, Rotary::numOutputs } } },
+    { "Scanner Vibrato", { &processorFactory<ScannerVibrato>, { ProcessorType::Modulation, ScannerVibrato::numInputs, ScannerVibrato::numOutputs } } },
+    { "Solo-Vibe", { &processorFactory<UniVibe>, { ProcessorType::Modulation, UniVibe::numInputs, UniVibe::numOutputs } } },
+    { "Tremolo", { &processorFactory<Tremolo>, { ProcessorType::Modulation, Tremolo::numInputs, Tremolo::numOutputs } } },
 
-    { "Clean Gain", &processorFactory<CleanGain> },
-    { "DC Bias", &processorFactory<DCBias> },
-    { "DC Blocker", &processorFactory<DCBlocker> },
-    { "Frequency Splitter", &processorFactory<FreqBandSplitter> },
-    { "Mixer", &processorFactory<Mixer> },
-    { "Oscilloscope", &processorFactory<Oscilloscope> },
-    { "Stereo Merger", &processorFactory<StereoMerger> },
-    { "Stereo Splitter", &processorFactory<StereoSplitter> },
-    { "Tuner", &processorFactory<Tuner> },
+    { "Clean Gain", { &processorFactory<CleanGain>, { ProcessorType::Utility, 1, 1 } } },
+    { "DC Bias", { &processorFactory<DCBias>, { ProcessorType::Utility, 1, 1 } } },
+    { "DC Blocker", { &processorFactory<DCBlocker>, { ProcessorType::Utility, 1, 1 } } },
+    { "Frequency Splitter", { &processorFactory<FreqBandSplitter>, { ProcessorType::Utility, 1, FreqBandSplitter::numOuts } } },
+    { "Mixer", { &processorFactory<Mixer>, { ProcessorType::Utility, Mixer::numIns, 1 } } },
+    { "Oscilloscope", { &processorFactory<Oscilloscope>, { ProcessorType::Utility, 1, 0 } } },
+    { "Stereo Merger", { &processorFactory<StereoMerger>, { ProcessorType::Utility, 2, 1 } } },
+    { "Stereo Splitter", { &processorFactory<StereoSplitter>, { ProcessorType::Utility, 1, 2 } } },
+    { "Tuner", { &processorFactory<Tuner>, { ProcessorType::Utility, 1, 0 } } },
 
-    { "Compressor", &processorFactory<Compressor> },
-    { "Crying Child", &processorFactory<CryBaby> },
-    { "Delay", &processorFactory<DelayModule> },
-    { "Envelope Filter", &processorFactory<EnvelopeFilter> },
-    { "Gate", &processorFactory<Gate> },
-    { "Octaver", &processorFactory<Octaver> },
-    { "Shimmer Reverb", &processorFactory<ShimmerReverb> },
-    { "Smooth Reverb", &processorFactory<SmoothReverb> },
-    { "Spring Reverb", &processorFactory<SpringReverbProcessor> },
+    { "Compressor", { &processorFactory<Compressor>, { ProcessorType::Other, Compressor::numInputs, Compressor::numOutputs } } },
+    { "Crying Child", { &processorFactory<CryBaby>, { ProcessorType::Other, CryBaby::numInputs, CryBaby::numOutputs } } },
+    { "Delay", { &processorFactory<DelayModule>, { ProcessorType::Other, 1, 1 } } },
+    { "Envelope Filter", { &processorFactory<EnvelopeFilter>, { ProcessorType::Other, EnvelopeFilter::numInputs, EnvelopeFilter::numOutputs } } },
+    { "Gate", { &processorFactory<Gate>, { ProcessorType::Other, Gate::numInputs, Gate::numOutputs } } },
+    { "Octaver", { &processorFactory<Octaver>, { ProcessorType::Other, 1, 1 } } },
+    { "Shimmer Reverb", { &processorFactory<ShimmerReverb>, { ProcessorType::Other, 1, 1 } } },
+    { "Smooth Reverb", { &processorFactory<SmoothReverb>, { ProcessorType::Other, 1, 1 } } },
+    { "Spring Reverb", { &processorFactory<SpringReverbProcessor>, { ProcessorType::Other, 1, 1 } } },
 
 #if BYOD_ENABLE_ADD_ON_MODULES
     BYOD_STORE_MAP_ADD_ON_MODULES
@@ -159,28 +159,6 @@ ProcessorStore::StoreMap ProcessorStore::store = {
 
 ProcessorStore::ProcessorStore (UndoManager* um) : undoManager (um)
 {
-    // load processor info asynchronously
-    std::vector<std::future<std::pair<String, ProcInfo>>> futureProcInfos;
-    futureProcInfos.reserve (store.size());
-
-    for (auto& [name, procFactory] : store)
-    {
-        futureProcInfos.push_back (std::async (std::launch::async,
-                                               [this, name = name, procFactory = procFactory]
-                                               {
-                                                   auto proc = procFactory (undoManager);
-                                                   jassert (name == proc->getName());
-
-                                                   return std::make_pair (name, ProcInfo { proc->getProcessorType(), proc->getNumInputs(), proc->getNumOutputs() });
-                                               }));
-    }
-
-    for (auto& f : futureProcInfos)
-    {
-        const auto& [name, info] = f.get();
-        procTypeStore[name] = info;
-    }
-
 #if BYOD_ENABLE_ADD_ON_MODULES
     addOnProcessorStore = std::make_unique<AddOnProcessorStore>();
     addOnProcessorStore->validateModules (store);
@@ -194,7 +172,7 @@ BaseProcessor::Ptr ProcessorStore::createProcByName (const String& name)
     if (store.find (name) == store.end())
         return {};
 
-    return store[name](undoManager);
+    return store[name].factory ((undoManager));
 }
 
 void ProcessorStore::duplicateProcessor (BaseProcessor& procToDuplicate)
@@ -238,9 +216,10 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
     for (auto type : { Drive, Tone, Modulation, Utility, Other })
     {
         PopupMenu subMenu;
-        for (const auto& [procName, procCreator] : store.store)
+        for (const auto& [procName, storeEntry] : store.store)
         {
-            const auto& procInfo = store.procTypeStore.at (procName);
+            const auto& procCreator = storeEntry.factory;
+            const auto& procInfo = storeEntry.info;
 
             if (procInfo.type != type)
                 continue;
@@ -304,7 +283,7 @@ void ProcessorStore::createProcReplaceList (PopupMenu& menu, int& menuID, BasePr
         *this,
         menu,
         menuID,
-        [procToReplace] ([[maybe_unused]] const String& name, const ProcInfo& procInfo)
+        [procToReplace] ([[maybe_unused]] const String& name, const StoreEntryInfo& procInfo)
         {
             return procInfo.numInputs == procToReplace->getNumInputs()
                    && procInfo.numOutputs == procToReplace->getNumOutputs();
@@ -318,7 +297,7 @@ void ProcessorStore::createProcFromCableClickList (PopupMenu& menu, int& menuID,
         *this,
         menu,
         menuID,
-        [] (auto, const ProcInfo& procInfo)
+        [] (auto, const StoreEntryInfo& procInfo)
         {
             return procInfo.numInputs == 1 && procInfo.numOutputs == 1;
         },

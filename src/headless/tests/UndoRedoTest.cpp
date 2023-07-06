@@ -17,7 +17,7 @@ public:
         std::advance (storeIter, storeIndex);
 
         auto& actionHelper = chain.getActionHelper();
-        actionHelper.addProcessor (storeIter->second (um));
+        actionHelper.addProcessor (storeIter->second.factory (um));
 
         return true;
     }

@@ -245,7 +245,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml,
     chain.refreshConnectionsBroadcaster();
 }
 
-bool ProcessorChainStateHelper::validateProcChainState (const XmlElement* xml) const
+bool ProcessorChainStateHelper::validateProcChainState (const XmlElement* xml, const ProcessorStore& procStore)
 {
     if (xml == nullptr)
         return false;
@@ -256,10 +256,10 @@ bool ProcessorChainStateHelper::validateProcChainState (const XmlElement* xml) c
     for (auto* procXml : xml->getChildIterator())
     {
         const auto procName = getProcessorName (procXml->getTagName());
-        if (procName == chain.inputProcessor.getName() || procName == chain.outputProcessor.getName())
+        if (procName == chowdsp::toString (InputProcessor::name) || procName == chowdsp::toString (OutputProcessor::name))
             continue;
 
-        if (! chain.procStore.isModuleAvailable (procName))
+        if (! procStore.isModuleAvailable (procName))
         {
             Logger::writeToLog ("State contains processor: " + procName + ", which is currently locked!");
             return false;
