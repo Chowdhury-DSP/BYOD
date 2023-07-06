@@ -8,6 +8,8 @@ class InputProcessor : public BaseProcessor
 public:
     explicit InputProcessor (UndoManager* um = nullptr);
 
+    static constexpr std::string_view name = "Input";
+
     ProcessorType getProcessorType() const override { return Utility; }
     static ParamLayout createParameterLayout();
 

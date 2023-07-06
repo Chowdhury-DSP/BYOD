@@ -121,3 +121,27 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new BYOD();
 }
+
+#if HAS_CLAP_JUCE_EXTENSIONS
+#include "state/presets/PresetDiscovery.h"
+
+bool BYOD::presetLoadFromLocation (uint32_t location_kind, const char* location, const char* load_key) noexcept
+{
+    return preset_discovery::presetLoadFromLocation (*presetManager, location_kind, location, load_key);
+}
+
+static const clap_preset_discovery_factory byod_preset_discovery_factory {
+    .count = preset_discovery::count,
+    .get_descriptor = preset_discovery::get_descriptor,
+    .create = preset_discovery::create,
+};
+
+const void* clapJuceExtensionCustomFactory(const char *factory_id)
+{
+    if (strcmp(factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0)
+    {
+        return &byod_preset_discovery_factory;
+    }
+    return nullptr;
+}
+#endif

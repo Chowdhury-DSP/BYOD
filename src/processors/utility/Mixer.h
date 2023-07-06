@@ -16,7 +16,6 @@ public:
 
     String getTooltipForPort (int portIndex, bool isInput) override;
 
-private:
     enum InputPort
     {
         Channel1,
@@ -24,8 +23,10 @@ private:
         Channel3,
         Channel4,
     };
-
     static constexpr int numIns = magic_enum::enum_count<InputPort>();
+
+private:
+
     std::array<chowdsp::FloatParameter*, numIns> gainDBParams { nullptr };
     std::array<dsp::Gain<float>, numIns> gains;
 

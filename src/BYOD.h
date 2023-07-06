@@ -35,6 +35,11 @@ public:
     auto& getUndoManager() { return undoManager; }
     auto& getStateManager() { return *stateManager; }
 
+#if HAS_CLAP_JUCE_EXTENSIONS
+    bool supportsPresetLoad() const noexcept override { return true; }
+    bool presetLoadFromLocation (uint32_t location_kind, const char* location, const char* load_key) noexcept override;
+#endif
+
 private:
     void processBypassDelay (AudioBuffer<float>& buffer);
     void updateSampleLatency (int latencySamples);

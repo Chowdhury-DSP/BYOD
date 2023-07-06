@@ -14,6 +14,21 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
+    enum InputPort
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        ModulationOutput,
+    };
+
+    static constexpr auto numInputs = (int) magic_enum::enum_count<InputPort>();
+    static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
+
 private:
     chowdsp::FloatParameter* rateHzParam = nullptr;
     chowdsp::BoolParameter* stereoParam = nullptr;
@@ -66,18 +81,6 @@ private:
     dsp::DryWetMixer<float> chorusMixer[2];
     float chorusDepthSamples = 0.0f;
     chowdsp::SmoothedBufferValue<float> chorusDepthSmoothed;
-
-    enum InputPort
-    {
-        AudioInput = 0,
-        ModulationInput,
-    };
-
-    enum OutputPort
-    {
-        AudioOutput = 0,
-        ModulationOutput,
-    };
 
     AudioBuffer<float> audioOutBuffer;
 

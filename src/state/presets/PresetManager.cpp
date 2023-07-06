@@ -10,7 +10,6 @@
 
 namespace
 {
-const String userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
 const String presetTag = "preset";
 } // namespace
 
@@ -65,20 +64,20 @@ PresetManager::PresetManager (ProcessorChain* chain, AudioProcessorValueTreeStat
     userManager->addListener (this);
 #endif
 
-    auto factoryPresets = getFactoryPresets();
+    auto factoryPresets = getFactoryPresets (chain->getProcStore());
     addPresets (factoryPresets);
 
     setDefaultPreset (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
     loadDefaultPreset();
     vts.undoManager->clearUndoHistory();
 
-    setUserPresetConfigFile (userPresetPath);
+    setUserPresetConfigFile (chowdsp::toString (userPresetPath));
 
 #if JUCE_IOS
     const auto groupDir = File::getContainerForSecurityApplicationGroupIdentifier ("group.com.chowdsp.BYOD");
     if (groupDir != File())
     {
-        auto userPresetFolder = groupDir.getChildFile (userPresetPath).getSiblingFile ("Presets");
+        auto userPresetFolder = groupDir.getChildFile (chowdsp::toString (userPresetPath)).getSiblingFile ("Presets");
         if (! userPresetFolder.isDirectory())
         {
             userPresetFolder.deleteFile();
@@ -194,12 +193,12 @@ bool PresetManager::syncServerPresetsToLocal()
 }
 #endif // BYOD_BUILD_PRESET_SERVER
 
-std::vector<chowdsp::Preset> PresetManager::getFactoryPresets() const
+std::vector<chowdsp::Preset> PresetManager::getFactoryPresets (const ProcessorStore& procStore)
 {
     std::vector<chowdsp::Preset> factoryPresets;
 
     // default
-    factoryPresets.emplace_back (chowdsp::Preset { BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize });
+    factoryPresets.emplace_back (BinaryData::Default_chowpreset, BinaryData::Default_chowpresetSize);
 
     // amps
     factoryPresets.emplace_back (BinaryData::Instant_Metal_chowpreset, BinaryData::Instant_Metal_chowpresetSize);
@@ -247,20 +246,20 @@ std::vector<chowdsp::Preset> PresetManager::getFactoryPresets() const
     AddOnPresets::addFactoryPresets (factoryPresets);
 #endif
 
-    filterPresets (factoryPresets);
+    filterPresets (factoryPresets, procStore);
 
     return factoryPresets;
 }
 
-void PresetManager::filterPresets (std::vector<chowdsp::Preset>& presets) const
+void PresetManager::filterPresets (std::vector<chowdsp::Preset>& presets, const ProcessorStore& procStore)
 {
-    sst::cpputils::nodal_erase_if (presets,
-                                   [this] (const chowdsp::Preset& preset)
-                                   {
-                                       const auto* presetXML = preset.getState();
-                                       jassert (presetXML != nullptr);
-                                       return ! procChain->getStateHelper().validateProcChainState (presetXML);
-                                   });
+    std::erase_if (presets,
+                   [&procStore] (const chowdsp::Preset& preset)
+                   {
+                       const auto* presetXML = preset.getState();
+                       jassert (presetXML != nullptr);
+                       return ! ProcessorChainStateHelper::validateProcChainState (presetXML, procStore);
+                   });
 }
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
@@ -369,14 +368,15 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
     }
 
     // delete old user presets
-    sst::cpputils::nodal_erase_if (presetMap, [factoryPresets = getFactoryPresets()] (const auto& presetPair)
+    const auto& procStore = procChain->getProcStore();
+    sst::cpputils::nodal_erase_if (presetMap, [factoryPresets = getFactoryPresets(procStore)] (const auto& presetPair)
                                    { return ! sst::cpputils::contains (factoryPresets, presetPair.second); });
 
     int presetID = userIDMap[userPresetsName];
     while (presetMap.find (presetID) != presetMap.end())
         presetMap.erase (presetID++);
 
-    filterPresets (presets);
+    filterPresets (presets, procStore);
     addPresets (presets);
 }
 

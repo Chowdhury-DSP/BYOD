@@ -13,7 +13,20 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
 class ProcessorStore
 {
 public:
-    using StoreMap = std::map<String, std::function<BaseProcessor::Ptr (UndoManager*)>>;
+    struct StoreEntryInfo
+    {
+        ProcessorType type;
+        int numInputs;
+        int numOutputs;
+    };
+
+    using Factory = std::function<BaseProcessor::Ptr (UndoManager*)>;
+    struct StoreEntry
+    {
+        Factory factory;
+        const StoreEntryInfo info {};
+    };
+    using StoreMap = std::map<String, StoreEntry>;
 
     explicit ProcessorStore (UndoManager* um = nullptr);
     ~ProcessorStore();
@@ -38,14 +51,6 @@ private:
     std::function<void (BaseProcessor::Ptr, BaseProcessor*)> replaceProcessorCallback = nullptr;
     std::function<void (BaseProcessor::Ptr, ConnectionInfo& connectionInfo)> replaceConnectionWithProcessorCallback = nullptr;
 
-    struct ProcInfo
-    {
-        ProcessorType type;
-        int numInputs;
-        int numOutputs;
-    };
-
-    std::unordered_map<String, ProcInfo> procTypeStore;
     UndoManager* undoManager;
 
     template <typename FilterType>

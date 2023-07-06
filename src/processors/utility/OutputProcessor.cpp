@@ -1,7 +1,7 @@
 #include "OutputProcessor.h"
 #include "../ParameterHelpers.h"
 
-OutputProcessor::OutputProcessor (UndoManager* um) : BaseProcessor ("Output",
+OutputProcessor::OutputProcessor (UndoManager* um) : BaseProcessor (chowdsp::toString (name),
                                                                     createParameterLayout(),
                                                                     BasicInputPort {},
                                                                     NullPort {},
