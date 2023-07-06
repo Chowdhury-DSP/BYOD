@@ -13,6 +13,7 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+    void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
     chowdsp::FloatParameter* threshDBParam = nullptr;
@@ -23,6 +24,8 @@ private:
     chowdsp::FloatParameter* makeupDBParam = nullptr;
 
     AudioBuffer<float> levelBuffer;
+    AudioBuffer<float> levelOutBuffer;
+    AudioBuffer<float> audioOutBuffer;
     chowdsp::LevelDetector<float> levelDetector;
 
     class GainComputer;
