@@ -35,7 +35,6 @@ struct FactoryPresetsProvider
     {
     }
 
-
     static constexpr clap_preset_discovery_location factoryPresetsLocation {
         .flags = CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT,
         .name = "Factory Presets Location",
@@ -139,7 +138,7 @@ struct UserPresetsProvider
         indexer()->declare_filetype (indexer(), &filetype);
 
         userPresetsFolder = chowdsp::PresetManager::getUserPresetPath (chowdsp::toString (PresetManager::userPresetPath));
-        if (userPresetsFolder == juce::File{} || ! userPresetsFolder.isDirectory())
+        if (userPresetsFolder == juce::File {} || ! userPresetsFolder.isDirectory())
             return false;
 
         userPresetsLocation.flags = CLAP_PRESET_DISCOVERY_IS_USER_CONTENT;

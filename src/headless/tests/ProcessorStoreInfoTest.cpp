@@ -19,7 +19,6 @@ public:
             expectEquals (proc->getNumInputs(), storeEntry.info.numInputs, "Processor # inputs is incorrect!");
             expectEquals (proc->getNumOutputs(), storeEntry.info.numOutputs, "Processor # outputs is incorrect!");
         }
-
     }
 };
 

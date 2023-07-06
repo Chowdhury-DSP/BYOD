@@ -369,7 +369,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
 
     // delete old user presets
     const auto& procStore = procChain->getProcStore();
-    sst::cpputils::nodal_erase_if (presetMap, [factoryPresets = getFactoryPresets(procStore)] (const auto& presetPair)
+    sst::cpputils::nodal_erase_if (presetMap, [factoryPresets = getFactoryPresets (procStore)] (const auto& presetPair)
                                    { return ! sst::cpputils::contains (factoryPresets, presetPair.second); });
 
     int presetID = userIDMap[userPresetsName];

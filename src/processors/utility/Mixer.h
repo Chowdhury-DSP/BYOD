@@ -26,7 +26,6 @@ public:
     static constexpr int numIns = magic_enum::enum_count<InputPort>();
 
 private:
-
     std::array<chowdsp::FloatParameter*, numIns> gainDBParams { nullptr };
     std::array<dsp::Gain<float>, numIns> gains;
 

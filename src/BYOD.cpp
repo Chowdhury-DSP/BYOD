@@ -136,9 +136,9 @@ static const clap_preset_discovery_factory byod_preset_discovery_factory {
     .create = preset_discovery::create,
 };
 
-const void* clapJuceExtensionCustomFactory(const char *factory_id)
+const void* clapJuceExtensionCustomFactory (const char* factory_id)
 {
-    if (strcmp(factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0)
+    if (strcmp (factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0)
     {
         return &byod_preset_discovery_factory;
     }
