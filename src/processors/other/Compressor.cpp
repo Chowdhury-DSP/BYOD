@@ -1,6 +1,6 @@
 #include "Compressor.h"
-#include "../ParameterHelpers.h"
 #include "../BufferHelpers.h"
+#include "../ParameterHelpers.h"
 
 class Compressor::GainComputer
 {
@@ -139,17 +139,19 @@ void Compressor::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
 
-    levelOutBuffer.setSize(1,  numSamples, false, false, true);
-    if (inputsConnected.contains(LevelInput))
+    levelOutBuffer.setSize (1, numSamples, false, false, true);
+    if (inputsConnected.contains (LevelInput))
     {
-        BufferHelpers::collapseToMonoBuffer(getInputBuffer(LevelInput), levelOutBuffer);
-    } else
+        BufferHelpers::collapseToMonoBuffer (getInputBuffer (LevelInput), levelOutBuffer);
+    }
+    else
     {
-        if (inputsConnected.contains(AudioInput))
+        if (inputsConnected.contains (AudioInput))
         {
-            levelDetector.setParameters(*attackMsParam, *releaseMsParam);
-            levelDetector.processBlock(getInputBuffer(AudioInput), levelOutBuffer);
-        } else
+            levelDetector.setParameters (*attackMsParam, *releaseMsParam);
+            levelDetector.processBlock (getInputBuffer (AudioInput), levelOutBuffer);
+        }
+        else
         {
             levelOutBuffer.clear();
         }
@@ -157,7 +159,7 @@ void Compressor::processAudio (AudioBuffer<float>& buffer)
 
     if (inputsConnected.contains (AudioInput))
     {
-        levelBuffer.makeCopyOf(levelOutBuffer);
+        levelBuffer.makeCopyOf (levelOutBuffer);
         gainComputer->setParameters (*threshDBParam, *ratioParam, *kneeDBParam);
         gainComputer->process (levelBuffer);
 
@@ -166,13 +168,14 @@ void Compressor::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
         for (int ch = 0; ch < numChannels; ++ch)
         {
-            FloatVectorOperations::multiply(audioOutBuffer.getWritePointer(ch), audioInBuffer.getReadPointer(ch), gainComputer->gainBlock.getChannelPointer(0), numSamples);
+            FloatVectorOperations::multiply (audioOutBuffer.getWritePointer (ch), audioInBuffer.getReadPointer (ch), gainComputer->gainBlock.getChannelPointer (0), numSamples);
         }
 
         auto&& audioOutBlock = dsp::AudioBlock<float> { audioOutBuffer };
         makeupGain.setGainDecibels (*makeupDBParam);
         makeupGain.process (dsp::ProcessContextReplacing<float> { audioOutBlock });
-    }else
+    }
+    else
     {
         audioOutBuffer.setSize (1, numSamples, false, false, true);
         audioOutBuffer.clear();
@@ -213,4 +216,3 @@ void Compressor::processAudioBypassed (AudioBuffer<float>& buffer)
     outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
     outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
 }
-
