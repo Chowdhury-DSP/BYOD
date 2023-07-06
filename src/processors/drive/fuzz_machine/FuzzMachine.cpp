@@ -27,7 +27,7 @@ ParamLayout FuzzMachine::createParameterLayout()
 
     createPercentParameter (params, "fuzz", "Fuzz", 1.0f);
     createPercentParameter (params, "bias", "Bias", 1.0f);
-    createPercentParameter (params, "vol", "Volume", 0.5f);
+    createPercentParameter (params, "vol", "Volume", 1.0f);
 
     return { params.begin(), params.end() };
 }
@@ -118,7 +118,7 @@ void FuzzMachine::processAudio (AudioBuffer<float>& buffer)
 
     dcBlocker.processBlock (buffer);
 
-    volume.setGainLinear (volumeParam->getCurrentValue() * 80.0f);
+    volume.setGainLinear (volumeParam->getCurrentValue() * 100.0f);
     volume.process (buffer);
 
     for (auto [ch, data] : chowdsp::buffer_iters::channels (buffer))

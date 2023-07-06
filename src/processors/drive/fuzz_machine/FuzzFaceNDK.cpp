@@ -34,7 +34,10 @@ void FuzzFaceNDK::reset_state()
     {
         x_n[ch].setZero();
         v_n[ch].setZero();
-//        v_n[ch] = Eigen::Vector<T, num_nl_ports> { 1.43236, 1.77569, -0.636511, 0.021566 };
+//        v_n[ch] = Eigen::Vector<T, num_nl_ports> { 0.00079512734663310196,
+//                                                   0.086036015040678246,
+//                                                   6.9641953425394627,
+//                                                   6.9946688952593483 };
     }
 }
 
@@ -199,9 +202,9 @@ void FuzzFaceNDK::process (std::span<float> channel_data, size_t ch) noexcept
             F_min.noalias() = p_n + K_mat * i_n - v_n[ch];
             A_solve.noalias() = K_mat * Jac - eye;
             delta_v.noalias() = A_solve.householderQr().solve (F_min);
-            v_n[ch] -= delta_v * 0.25;
+            v_n[ch] -= delta_v * 0.5;
             delta = delta_v.array().abs().sum();
-        } while (delta > 1.0e-2 && ++nIters < 8);
+        } while (delta > 1.0e-2 && ++nIters < 3);
         calc_currents();
 
         y_n.noalias() = D_mat * x_n[ch] + E_mat_var * u_n_var + E_u_fix + F_mat * i_n;
