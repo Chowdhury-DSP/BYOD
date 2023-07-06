@@ -1,6 +1,6 @@
 #include "ParamModulator.h"
-#include "processors/ParameterHelpers.h"
 #include "gui/utils/ModulatableSlider.h"
+#include "processors/ParameterHelpers.h"
 
 namespace
 {
