@@ -1,0 +1,49 @@
+{
+  "struct_name": "FuzzFaceNDK",
+  "netlist": [
+    "Vi 1 0",
+    "C1 1 2",
+    "C2 5 0",
+    "C3 6 7",
+    "R1 3 8",
+    "R2 6 8",
+    "R3 9 6",
+    "R4 2 4",
+    "RL 7 0",
+    "Rfp 4 5 VARIABLE",
+    "Rfm 5 0 VARIABLE",
+    "Q1 2 3 0 # Base Collector Emitter",
+    "Q2 3 9 4 # Base Collector Emitter",
+    "Vcc 8 0 FIXED"
+  ],
+  "output_nodes": [ 7 ],
+  "header_includes": [
+    "#include <modules/Eigen/Eigen/Dense>"
+  ],
+  "cpp_struct_entries": [
+    "    static constexpr size_t MAX_NUM_CHANNELS = 2;",
+    "    static constexpr double VRfuzz = 1.0e3;",
+    "    double Vcc = 9.0;"
+  ],
+  "cpp_namespace_entries": [
+    "constexpr auto C1 = 2.2e-6;",
+    "constexpr auto C2 = 20.0e-6;",
+    "constexpr auto C3 = 0.01e-6;",
+    "constexpr auto R1 = 33.0e3;",
+    "constexpr auto R2 = 470.0;",
+    "constexpr auto R3 = 8.2e3;",
+    "constexpr auto R4 = 100.0e3;",
+    "constexpr auto RL = 500.0e3;",
+    "constexpr auto Vt = 26.0e-3;",
+    "constexpr auto Is_Q1 = 17.0e-6;",
+    "constexpr auto BetaF_Q1 = 90.0;",
+    "constexpr auto AlphaF_Q1 = (1.0 + BetaF_Q1) / BetaF_Q1;",
+    "constexpr auto BetaR_Q1 = 100.0e-3;",
+    "constexpr auto Is_Q2 = 17.0e-6;",
+    "constexpr auto BetaF_Q2 = 100.0;",
+    "constexpr auto AlphaF_Q2 = (1.0 + BetaF_Q2) / BetaF_Q2;",
+    "constexpr auto BetaR_Q2 = 100.0e-3;"
+  ],
+  "nr_exit_condition": "delta > 1.0e-2 && ++nIters < 8",
+  "process_data_type": "float"
+}
