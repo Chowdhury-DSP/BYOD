@@ -23,7 +23,6 @@ private:
     chowdsp::FloatParameter* releaseMsParam = nullptr;
     chowdsp::FloatParameter* makeupDBParam = nullptr;
 
-    AudioBuffer<float> levelBuffer;
     AudioBuffer<float> levelOutBuffer;
     AudioBuffer<float> audioOutBuffer;
     chowdsp::LevelDetector<float> levelDetector;

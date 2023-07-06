@@ -126,7 +126,8 @@ ParamLayout Compressor::createParameterLayout()
 
 void Compressor::prepare (double sampleRate, int samplesPerBlock)
 {
-    levelBuffer.setSize (1, samplesPerBlock);
+    audioOutBuffer.setSize (2, samplesPerBlock);
+    levelOutBuffer.setSize (1, samplesPerBlock);
     levelDetector.prepare ({ sampleRate, (uint32) samplesPerBlock, 1 });
 
     gainComputer->prepare (sampleRate, samplesPerBlock);
@@ -159,9 +160,8 @@ void Compressor::processAudio (AudioBuffer<float>& buffer)
 
     if (inputsConnected.contains (AudioInput))
     {
-        levelBuffer.makeCopyOf (levelOutBuffer);
         gainComputer->setParameters (*threshDBParam, *ratioParam, *kneeDBParam);
-        gainComputer->process (levelBuffer);
+        gainComputer->process (levelOutBuffer);
 
         auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numChannels = audioInBuffer.getNumChannels();
