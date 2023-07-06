@@ -55,6 +55,7 @@ public:
     static constexpr std::string_view userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
 
     static std::vector<chowdsp::Preset> getFactoryPresets (const ProcessorStore& processorStore);
+    ProcessorChain* getProcessorChain() const { return procChain; }
 
 private:
     void parameterChanged (const juce::String&, float) override {}
