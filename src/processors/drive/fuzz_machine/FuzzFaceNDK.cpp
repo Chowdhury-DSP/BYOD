@@ -2,6 +2,11 @@
  * This file was generated on 2023-07-04 19:36:50.043506
  * using the command: `/Users/jatin/ChowDSP/Research/NDK-Framework/generate_ndk_cpp.py fuzz_face_ndk_config.json`
  */
+
+#include <pch.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4459)
+
 #include "FuzzFaceNDK.h"
 
 namespace
@@ -212,3 +217,5 @@ void FuzzFaceNDK::process (std::span<float> channel_data, size_t ch) noexcept
         x_n[ch] = A_mat * x_n[ch] + B_mat_var * u_n_var + B_u_fix + C_mat * i_n;
     }
 }
+
+JUCE_END_IGNORE_WARNINGS_MSVC

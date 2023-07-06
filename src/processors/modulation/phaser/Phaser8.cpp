@@ -76,18 +76,20 @@ ParamLayout Phaser8::createParameterLayout()
 
 String Phaser8::getTooltipForPort (int portIndex, bool isInput)
 {
-    if (isInput)
-        return BaseProcessor::getTooltipForPort (portIndex, isInput);
-
-    switch ((OutputPort) portIndex)
+    if (! isInput)
     {
-        case OutputPort::AudioOutput:
-            return "Stage 8 Output";
-        case OutputPort::Stage1Output:
-            return "Stage 1 Output";
-        case OutputPort::ModulationOutput:
-            return "Modulation Output";
+        switch ((OutputPort) portIndex)
+        {
+            case OutputPort::AudioOutput:
+                return "Stage 8 Output";
+            case OutputPort::Stage1Output:
+                return "Stage 1 Output";
+            case OutputPort::ModulationOutput:
+                return "Modulation Output";
+        }
     }
+
+    return BaseProcessor::getTooltipForPort (portIndex, isInput);
 }
 
 void Phaser8::prepare (double sampleRate, int samplesPerBlock)

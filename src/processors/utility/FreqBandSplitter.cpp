@@ -61,16 +61,18 @@ void FreqBandSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
 
 String FreqBandSplitter::getTooltipForPort (int portIndex, bool isInput)
 {
-    if (isInput)
-        return BaseProcessor::getTooltipForPort (portIndex, isInput);
-
-    switch ((OutputPort) portIndex)
+    if (! isInput)
     {
-        case OutputPort::HighBand:
-            return "High Band Output";
-        case OutputPort::MidBand:
-            return "Mid Output";
-        case OutputPort::LowBand:
-            return "Low Band Output";
+        switch ((OutputPort) portIndex)
+        {
+            case OutputPort::HighBand:
+                return "High Band Output";
+            case OutputPort::MidBand:
+                return "Mid Output";
+            case OutputPort::LowBand:
+                return "Low Band Output";
+        }
     }
+
+    return BaseProcessor::getTooltipForPort (portIndex, isInput);
 }
