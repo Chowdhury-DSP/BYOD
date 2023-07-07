@@ -24,7 +24,7 @@ struct FactoryPresetsProvider
 #endif
 {
     static constexpr clap_preset_discovery_provider_descriptor descriptor {
-        .clap_version = CLAP_VERSION,
+        .clap_version = CLAP_VERSION_INIT,
         .id = "org.chowdsp.byod.factory-presets",
         .name = "BYOD Factory Presets Provider",
         .vendor = "ChowDSP"
