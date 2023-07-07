@@ -13,6 +13,7 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+    void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
     enum InputPort
     {
@@ -37,7 +38,8 @@ private:
     chowdsp::FloatParameter* releaseMsParam = nullptr;
     chowdsp::FloatParameter* makeupDBParam = nullptr;
 
-    AudioBuffer<float> levelBuffer;
+    AudioBuffer<float> levelOutBuffer;
+    AudioBuffer<float> audioOutBuffer;
     chowdsp::LevelDetector<float> levelDetector;
 
     class GainComputer;

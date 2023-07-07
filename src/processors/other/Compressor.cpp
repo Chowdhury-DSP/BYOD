@@ -1,4 +1,5 @@
 #include "Compressor.h"
+#include "../BufferHelpers.h"
 #include "../ParameterHelpers.h"
 
 class Compressor::GainComputer
@@ -125,7 +126,8 @@ ParamLayout Compressor::createParameterLayout()
 
 void Compressor::prepare (double sampleRate, int samplesPerBlock)
 {
-    levelBuffer.setSize (1, samplesPerBlock);
+    audioOutBuffer.setSize (2, samplesPerBlock);
+    levelOutBuffer.setSize (1, samplesPerBlock);
     levelDetector.prepare ({ sampleRate, (uint32) samplesPerBlock, 1 });
 
     gainComputer->prepare (sampleRate, samplesPerBlock);
@@ -136,36 +138,81 @@ void Compressor::prepare (double sampleRate, int samplesPerBlock)
 
 void Compressor::processAudio (AudioBuffer<float>& buffer)
 {
-    const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    // set up level buffer
-    if (numChannels == 1)
+    levelOutBuffer.setSize (1, numSamples, false, false, true);
+    if (inputsConnected.contains (LevelInput))
     {
-        levelBuffer.makeCopyOf (buffer);
+        BufferHelpers::collapseToMonoBuffer (getInputBuffer (LevelInput), levelOutBuffer);
     }
     else
     {
-        levelBuffer.setSize (1, numSamples, true, true, false);
-        levelBuffer.copyFrom (0, 0, buffer, 0, 0, numSamples);
-
-        for (int ch = 1; ch < numChannels; ++ch)
-            levelBuffer.addFrom (0, 0, buffer, ch, 0, numSamples);
-
-        levelBuffer.applyGain (1.0f / (float) numChannels);
+        if (inputsConnected.contains (AudioInput))
+        {
+            levelDetector.setParameters (*attackMsParam, *releaseMsParam);
+            levelDetector.processBlock (getInputBuffer (AudioInput), levelOutBuffer);
+        }
+        else
+        {
+            levelOutBuffer.clear();
+        }
     }
 
-    auto&& levelBlock = dsp::AudioBlock<float> { levelBuffer };
-    levelDetector.setParameters (*attackMsParam, *releaseMsParam);
-    levelDetector.process (dsp::ProcessContextReplacing<float> { levelBlock });
+    if (inputsConnected.contains (AudioInput))
+    {
+        gainComputer->setParameters (*threshDBParam, *ratioParam, *kneeDBParam);
+        gainComputer->process (levelOutBuffer);
 
-    gainComputer->setParameters (*threshDBParam, *ratioParam, *kneeDBParam);
-    gainComputer->process (levelBlock);
+        auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            FloatVectorOperations::multiply (audioOutBuffer.getWritePointer (ch), audioInBuffer.getReadPointer (ch), gainComputer->gainBlock.getChannelPointer (0), numSamples);
+        }
 
-    auto&& block = dsp::AudioBlock<float> { buffer };
-    for (int ch = 0; ch < numChannels; ++ch)
-        block.getSingleChannelBlock ((size_t) ch) *= gainComputer->gainBlock;
+        auto&& audioOutBlock = dsp::AudioBlock<float> { audioOutBuffer };
+        makeupGain.setGainDecibels (*makeupDBParam);
+        makeupGain.process (dsp::ProcessContextReplacing<float> { audioOutBlock });
+    }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
 
-    makeupGain.setGainDecibels (*makeupDBParam);
-    makeupGain.process (dsp::ProcessContextReplacing<float> { block });
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+}
+
+void Compressor::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+
+    levelOutBuffer.setSize (1, numSamples, false, false, true);
+    if (inputsConnected.contains (LevelInput)) //make mono and pass samples through
+    {
+        const auto& levelInputBuffer = getInputBuffer (LevelInput);
+        BufferHelpers::collapseToMonoBuffer (levelInputBuffer, levelOutBuffer);
+    }
+    else
+    {
+        levelOutBuffer.clear();
+    }
+
+    if (inputsConnected.contains (AudioInput))
+    {
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        for (int ch = 0; ch < numChannels; ++ch)
+            audioOutBuffer.copyFrom (ch, 0, audioInBuffer, ch % numChannels, 0, numSamples);
+    }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
 }
