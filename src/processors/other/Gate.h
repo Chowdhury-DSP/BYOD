@@ -14,6 +14,21 @@ public:
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
 
+    enum InputPort
+    {
+        AudioInput = 0,
+        LevelInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        LevelOutput,
+    };
+
+    static constexpr auto numInputs = (int) magic_enum::enum_count<InputPort>();
+    static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
+
 private:
     chowdsp::FloatParameter* threshDBParam = nullptr;
     chowdsp::FloatParameter* attackMsParam = nullptr;
@@ -27,18 +42,6 @@ private:
     std::unique_ptr<GateEnvelope> gateEnvelope;
 
     dsp::Gain<float> makeupGain;
-
-    enum InputPort
-    {
-        AudioInput = 0,
-        LevelInput,
-    };
-
-    enum OutputPort
-    {
-        AudioOutput = 0,
-        LevelOutput,
-    };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Gate)
 };

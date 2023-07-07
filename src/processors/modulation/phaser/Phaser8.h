@@ -17,6 +17,22 @@ public:
 
     String getTooltipForPort (int portIndex, bool isInput) override;
 
+    enum InputPort
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        Stage1Output,
+        ModulationOutput,
+    };
+
+    static constexpr auto numInputs = (int) magic_enum::enum_count<InputPort>();
+    static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
+
 private:
     void processModulation (int numSamples);
 
@@ -35,19 +51,6 @@ private:
     chowdsp::SineWave<float> sineLFO;
     std::vector<float> modData {};
     chowdsp::LookupTableTransform<float> lfoShaper;
-
-    enum InputPort
-    {
-        AudioInput = 0,
-        ModulationInput,
-    };
-
-    enum OutputPort
-    {
-        AudioOutput = 0,
-        Stage1Output,
-        ModulationOutput,
-    };
 
     AudioBuffer<float> modOutBuffer;
 

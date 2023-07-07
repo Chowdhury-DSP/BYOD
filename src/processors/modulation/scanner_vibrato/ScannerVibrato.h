@@ -15,6 +15,21 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
+    enum InputPort
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        ModulationOutput,
+    };
+
+    static constexpr auto numInputs = (int) magic_enum::enum_count<InputPort>();
+    static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
+
 private:
     chowdsp::FloatParameter* rateHzParam = nullptr;
     chowdsp::SmoothedBufferValue<float> depthParam;
@@ -34,18 +49,6 @@ private:
 
     AudioBuffer<float> modOutBuffer;
     AudioBuffer<float> audioOutBuffer;
-
-    enum InputPort
-    {
-        AudioInput = 0,
-        ModulationInput,
-    };
-
-    enum OutputPort
-    {
-        AudioOutput = 0,
-        ModulationOutput,
-    };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScannerVibrato)
 };

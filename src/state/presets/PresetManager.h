@@ -11,6 +11,7 @@ const String factoryPresetVendor = "CHOW";
 } // namespace PresetConstants
 
 class ProcessorChain;
+class ProcessorStore;
 class PresetManager : public chowdsp::PresetManager
 #if BYOD_BUILD_PRESET_SERVER
     ,
@@ -39,7 +40,7 @@ public:
     void loadUserPresetsFromFolder (const juce::File& file) final;
 
     void loadPresetSafe (std::unique_ptr<chowdsp::Preset> presetToLoad, Component* associatedComp);
-    void filterPresets (std::vector<chowdsp::Preset>& presets) const;
+    static void filterPresets (std::vector<chowdsp::Preset>& presets, const ProcessorStore& processorStore);
 
     static void showErrorMessage (const String& title, const String& message, Component* associatedComp);
 
@@ -51,8 +52,12 @@ public:
     PresetUpdateList& getServerPresetUpdateList() { return serverSyncUpdatePresetsList; };
 #endif
 
+    static constexpr std::string_view userPresetPath = "ChowdhuryDSP/BYOD/UserPresets.txt";
+
+    static std::vector<chowdsp::Preset> getFactoryPresets (const ProcessorStore& processorStore);
+    ProcessorChain* getProcessorChain() const { return procChain; }
+
 private:
-    std::vector<chowdsp::Preset> getFactoryPresets() const;
     void parameterChanged (const juce::String&, float) override {}
 
     ProcessorChain* procChain;

@@ -21,7 +21,7 @@ void GuitarMLFilterDesigner::generateFiles ([[maybe_unused]] const ArgumentList&
     noiseGenerator.setSeed (123);
     noiseGenerator.setNoiseType (chowdsp::Noise<float>::NoiseType::Normal);
 
-    const auto factory = ProcessorStore::getStoreMap().at ("GuitarML");
+    const auto factory = ProcessorStore::getStoreMap().at ("GuitarML").factory;
     const auto processFile = [&factory,
                               &saveLoadHelper,
                               &noiseGenerator] (const juce::String& filePath, double sampleRate)

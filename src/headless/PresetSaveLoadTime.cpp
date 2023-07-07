@@ -29,7 +29,7 @@ void setUpInitialProcChain (ProcessorChain& procChain, ProcessorChainActionHelpe
         int storeIndex = rand.nextInt ((int) storeMap.size());
         std::advance (storeIter, storeIndex);
 
-        actionHelper.addProcessor (storeIter->second (um));
+        actionHelper.addProcessor (storeIter->second.factory (um));
         auto* newProc = procChain.getProcessors().getLast();
         actionHelper.addConnection ({ prevProc, 0, newProc, 0 });
 

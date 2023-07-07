@@ -44,6 +44,7 @@ target_sources(BYOD PRIVATE
     state/ParamForwardManager.cpp
     state/presets/PresetInfoHelpers.cpp
     state/presets/PresetManager.cpp
+    state/presets/PresetDiscovery.cpp
     state/presets/PresetsServerSyncManager.cpp
     state/presets/PresetsServerUserManager.cpp
     state/presets/PresetsServerCommunication.cpp

@@ -15,6 +15,21 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
+    enum InputPort
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        ModulationOutput,
+    };
+
+    static constexpr auto numInputs = (int) magic_enum::enum_count<InputPort>();
+    static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
+
 private:
     void processModulation (int numSamples);
 
@@ -31,18 +46,6 @@ private:
     Phase90Filters::Phase90_FB4 fb4Filter[2];
     Phase90Filters::Phase90_FB3 fb3Filter[2];
     Phase90Filters::Phase90_FB2 fb2Filter[2];
-
-    enum InputPort
-    {
-        AudioInput = 0,
-        ModulationInput,
-    };
-
-    enum OutputPort
-    {
-        AudioOutput = 0,
-        ModulationOutput,
-    };
 
     AudioBuffer<float> audioOutBuffer;
     AudioBuffer<float> modOutBuffer;

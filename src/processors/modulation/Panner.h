@@ -16,6 +16,21 @@ public:
 
     bool getStereoMode() const noexcept { return isStereoInput.load(); }
 
+    enum InputPort
+    {
+        AudioInput = 0,
+        ModulationInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        ModulationOutput,
+    };
+
+    static constexpr auto numInputs = (int) magic_enum::enum_count<InputPort>();
+    static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
+
 private:
     void setPanMode();
     void generateModulationSignal (int numSamples);
@@ -41,18 +56,6 @@ private:
     dsp::Gain<float> modulationGain;
     AudioBuffer<float> modulationBuffer;
     bool isModulationOn = true;
-
-    enum InputPort
-    {
-        AudioInput = 0,
-        ModulationInput,
-    };
-
-    enum OutputPort
-    {
-        AudioOutput = 0,
-        ModulationOutput,
-    };
 
     std::atomic_bool isStereoInput { true };
 

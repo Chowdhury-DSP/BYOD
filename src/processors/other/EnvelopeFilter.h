@@ -15,6 +15,21 @@ public:
 
     bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
+    enum InputPort
+    {
+        AudioInput = 0,
+        LevelInput,
+    };
+
+    enum OutputPort
+    {
+        AudioOutput = 0,
+        LevelOutput,
+    };
+
+    static constexpr auto numInputs = (int) magic_enum::enum_count<InputPort>();
+    static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
+
 private:
     void fillLevelBuffer (AudioBuffer<float>& buffer, bool directControlOn);
 
@@ -30,18 +45,6 @@ private:
 
     AudioBuffer<float> levelBuffer;
     chowdsp::LevelDetector<float> level;
-
-    enum InputPort
-    {
-        AudioInput = 0,
-        LevelInput,
-    };
-
-    enum OutputPort
-    {
-        AudioOutput = 0,
-        LevelOutput,
-    };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnvelopeFilter)
 };

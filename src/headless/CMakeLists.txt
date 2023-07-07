@@ -22,6 +22,7 @@ target_sources(BYOD_headless PRIVATE
     tests/PreBufferTest.cpp
     tests/PresetsTest.cpp
     tests/PresetSearchTest.cpp
+    tests/ProcessorStoreInfoTest.cpp
     tests/RAMUsageTest.cpp
     tests/SilenceTest.cpp
     tests/StereoTest.cpp
