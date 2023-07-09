@@ -205,3 +205,35 @@ void Gate::processAudio (AudioBuffer<float>& buffer)
     outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
     outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
 }
+
+void Gate::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+
+    levelOutBuffer.setSize (1, numSamples, false, false, true);
+    if (inputsConnected.contains (LevelInput)) //make mono and pass samples through
+    {
+        const auto& levelInputBuffer = getInputBuffer (LevelInput);
+        BufferHelpers::collapseToMonoBuffer (levelInputBuffer, levelOutBuffer);
+    }
+    else
+    {
+        levelOutBuffer.clear();
+    }
+
+    if (inputsConnected.contains (AudioInput))
+    {
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        for (int ch = 0; ch < numChannels; ++ch)
+            audioOutBuffer.copyFrom (ch, 0, audioInBuffer, ch % numChannels, 0, numSamples);
+    }
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
+    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+}
