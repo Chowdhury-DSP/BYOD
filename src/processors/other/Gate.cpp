@@ -194,7 +194,6 @@ void Gate::processAudio (AudioBuffer<float>& buffer)
         auto&& audioOutBlock = dsp::AudioBlock<float> { audioOutBuffer };
         makeupGain.setGainDecibels (*makeupDBParam);
         makeupGain.process (dsp::ProcessContextReplacing<float> { audioOutBlock });
-
     }
     else
     {
