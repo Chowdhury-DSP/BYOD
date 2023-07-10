@@ -51,7 +51,7 @@ public:
                     buffer.applyGain (4.0f);
 
                     for (int portIdx = 0; portIdx < proc->getNumInputs(); ++portIdx)
-                        proc->getInputBuffer (portIdx).makeCopyOf (buffer, true);
+                        proc->getInputBufferNonConst (portIdx).makeCopyOf (buffer, true);
 
                     proc->processAudioBlock (buffer);
 
