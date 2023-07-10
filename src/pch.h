@@ -30,3 +30,8 @@ namespace chowdsp
 {
 using namespace VersionUtils;
 }
+
+#if ! PERFETTO
+#define TRACE_DSP(...) void()
+#define TRACE_COMPONENT(...) void()
+#endif

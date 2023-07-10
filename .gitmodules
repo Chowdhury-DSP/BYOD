@@ -25,3 +25,6 @@
 [submodule "modules/ea_variant"]
 	path = modules/ea_variant
 	url = https://github.com/eyalamirmusic/Variant
+[submodule "modules/melatonin_perfetto"]
+	path = modules/melatonin_perfetto
+	url = https://github.com/sudara/melatonin_perfetto

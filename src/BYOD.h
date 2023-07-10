@@ -11,6 +11,7 @@ class BYOD : public chowdsp::PluginBase<BYOD>
 {
 public:
     BYOD();
+    ~BYOD() override;
 
     static void addParameters (Parameters& params);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;

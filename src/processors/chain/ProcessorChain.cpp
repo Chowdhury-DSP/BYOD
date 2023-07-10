@@ -91,6 +91,8 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
 
 void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed)
 {
+    TRACE_DSP();
+
     int nextNumProcs = 0;
     const int numOutputs = proc->getNumOutputs();
     for (int i = 0; i < numOutputs; ++i)

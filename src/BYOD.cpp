@@ -16,6 +16,10 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                          { crashLogFile.emplace (logFile); } }),
                procStore (&undoManager)
 {
+#if PERFETTO
+    MelatoninPerfetto::get().beginSession();
+#endif
+
     Logger::writeToLog (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (*this));
 
     pluginSettings->initialise (settingsFilePath);
@@ -29,6 +33,15 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
     LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
 #endif
 }
+
+#if PERFETTO
+BYOD::~BYOD()
+{
+    MelatoninPerfetto::get().endSession();
+}
+#else
+BYOD::~BYOD() = default;
+#endif
 
 void BYOD::addParameters (Parameters& params)
 {
@@ -48,6 +61,8 @@ void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 void BYOD::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
 {
+    TRACE_DSP();
+
     const juce::ScopedNoDenormals noDenormals {};
     AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
