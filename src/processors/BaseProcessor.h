@@ -159,7 +159,8 @@ public:
     /** Returns the netlist circuit quantities, or nullptr if the processor has no circuit quantities. */
     auto* getNetlistCircuitQuantities() { return netlistCircuitQuantities.get(); }
 
-    AudioBuffer<float>& getInputBuffer (int idx = 0) { return inputBuffers.getReference (idx); }
+    const AudioBuffer<float>& getInputBuffer (int idx = 0) const { return inputBuffers.getReference (idx); }
+    AudioBuffer<float>& getInputBufferNonConst (int idx = 0) { return inputBuffers.getReference (idx); } // Most derived classes should never use this!
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
     const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[portIdx].getReference (connectionIdx); }
 

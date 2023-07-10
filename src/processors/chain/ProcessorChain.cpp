@@ -134,13 +134,13 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
         }
         else if (nextNumProcs > 1 && nextNumInputs == 1)
         {
-            auto& copyNextBuffer = nextProc->getInputBuffer();
+            auto& copyNextBuffer = nextProc->getInputBufferNonConst();
             copyNextBuffer.makeCopyOf (nextBuffer, true);
             runProcessor (nextProc, copyNextBuffer, outProcessed);
         }
         else
         {
-            auto& copyNextBuffer = nextProc->getInputBuffer (inputIndex);
+            auto& copyNextBuffer = nextProc->getInputBufferNonConst (inputIndex);
             copyNextBuffer.makeCopyOf (nextBuffer, true);
 
             nextProc->incrementNumInputsReady();
