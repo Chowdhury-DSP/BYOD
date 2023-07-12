@@ -99,7 +99,7 @@ void EnvelopeFilter::fillLevelBuffer (AudioBuffer<float>& buffer, bool directCon
     {
         FloatVectorOperations::fill (levelOutBuffer.getWritePointer (0), *freqModParam, numSamples);
         level.setParameters (speed, speed * 4.0f);
-        level.processBlock(levelOutBuffer);
+        level.processBlock (levelOutBuffer);
     }
     else if (inputsConnected.contains (LevelInput))
     {
@@ -110,7 +110,7 @@ void EnvelopeFilter::fillLevelBuffer (AudioBuffer<float>& buffer, bool directCon
         if (inputsConnected.contains (AudioInput))
         {
             level.setParameters (speed, speed * 4.0f);
-            level.processBlock(getInputBuffer(AudioInput), levelOutBuffer);
+            level.processBlock (getInputBuffer (AudioInput), levelOutBuffer);
         }
         else
         {
@@ -158,7 +158,7 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     bool directControlOn = *directControlParam == 1.0f;
     fillLevelBuffer (buffer, directControlOn);
 
-    if (inputsConnected.contains(AudioInput))
+    if (inputsConnected.contains (AudioInput))
     {
         auto filterFreqHz = freqParam->getCurrentValue();
         filter.setQValue (getQ (resParam->getCurrentValue()));
