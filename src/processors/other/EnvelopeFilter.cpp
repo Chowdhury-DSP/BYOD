@@ -91,34 +91,32 @@ void EnvelopeFilter::prepare (double sampleRate, int samplesPerBlock)
 void EnvelopeFilter::fillLevelBuffer (AudioBuffer<float>& buffer, bool directControlOn)
 {
     const auto numSamples = buffer.getNumSamples();
+    auto speed = speedRange.convertFrom0to1 (1.0f - *speedParam);
 
     levelOutBuffer.setSize (1, numSamples, false, false, true);
-    //does levelOutBuffer need clearing here?
-    if (directControlOn) //fill buffer with freq mod percentage (regardless of level or audio I/O)
+    levelOutBuffer.clear();
+    if (directControlOn)
     {
         FloatVectorOperations::fill (levelOutBuffer.getWritePointer (0), *freqModParam, numSamples);
+        level.setParameters (speed, speed * 4.0f);
+        level.processBlock(levelOutBuffer);
     }
-    else if (inputsConnected.contains (LevelInput)) //use level input for level buffer
+    else if (inputsConnected.contains (LevelInput))
     {
         BufferHelpers::collapseToMonoBuffer (getInputBuffer (LevelInput), levelOutBuffer);
     }
     else
     {
-        if (inputsConnected.contains (AudioInput)) //use audio buffer for level input
+        if (inputsConnected.contains (AudioInput))
         {
-            BufferHelpers::collapseToMonoBuffer (getInputBuffer (AudioInput), levelOutBuffer);
+            level.setParameters (speed, speed * 4.0f);
+            level.processBlock(getInputBuffer(AudioInput), levelOutBuffer);
         }
         else
         {
             levelOutBuffer.clear();
         }
     }
-
-    auto speed = speedRange.convertFrom0to1 (1.0f - *speedParam);
-    level.setParameters (speed, speed * 4.0f);
-    dsp::AudioBlock<float> levelBlock { levelOutBuffer };
-    dsp::ProcessContextReplacing<float> levelCtx { levelBlock };
-    level.process (levelCtx);
 }
 
 template <chowdsp::StateVariableFilterType FilterType, typename ModFreqFunc>
@@ -158,53 +156,58 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     const auto numSamples = buffer.getNumSamples();
 
     bool directControlOn = *directControlParam == 1.0f;
-    fillLevelBuffer (buffer, directControlOn); //returns levelOutBuffer now
+    fillLevelBuffer (buffer, directControlOn);
 
-    auto filterFreqHz = freqParam->getCurrentValue();
-    filter.setQValue (getQ (resParam->getCurrentValue()));
-
-    auto freqModGain = directControlOn ? 10.0f : (20.0f * senseParam->getCurrentValue());
-    auto* levelPtr = levelOutBuffer.getReadPointer (0);
-    FloatVectorOperations::clip (levelOutBuffer.getWritePointer (0), levelPtr, 0.0f, 2.0f, numSamples);
-
-    auto getModFreq = [=] (int i) -> float
+    if (inputsConnected.contains(AudioInput))
     {
-        return jlimit (20.0f, 20.0e3f, filterFreqHz + freqModGain * levelPtr[i] * filterFreqHz);
-    };
+        auto filterFreqHz = freqParam->getCurrentValue();
+        filter.setQValue (getQ (resParam->getCurrentValue()));
 
-    //use of buffer below replaced with getInputBuffer(AudioInput)
-    auto& audioInBuffer = getInputBuffer (AudioInput);
-    const auto numChannels = audioInBuffer.getNumChannels();
-    audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
-    //copy audio in to audio out (because audio in is const)
-    for (int ch = 0; ch < numChannels; ch++)
-        audioOutBuffer.copyFrom (ch, 0, audioInBuffer.getReadPointer (0), numSamples);
+        auto freqModGain = directControlOn ? 10.0f : (20.0f * senseParam->getCurrentValue());
+        auto* levelPtr = levelOutBuffer.getReadPointer (0);
+        FloatVectorOperations::clip (levelOutBuffer.getWritePointer (0), levelPtr, 0.0f, 2.0f, numSamples);
 
-    using SVFType = chowdsp::StateVariableFilterType;
-    auto filterType = (int) filterTypeParam->load();
-    switch (filterType)
-    {
-        case 0:
-            processFilter<SVFType::Lowpass> (audioOutBuffer, filter, getModFreq);
-            break;
+        auto getModFreq = [=] (int i) -> float
+        {
+            return jlimit (20.0f, 20.0e3f, filterFreqHz + freqModGain * levelPtr[i] * filterFreqHz);
+        };
 
-        case 1:
-            processFilter<SVFType::Bandpass> (audioOutBuffer, filter, getModFreq);
-            break;
+        auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto numChannels = audioInBuffer.getNumChannels();
+        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
+        for (int ch = 0; ch < numChannels; ch++)
+            audioOutBuffer.copyFrom (ch, 0, audioInBuffer.getReadPointer (0), numSamples);
 
-        case 2:
-            processFilter<SVFType::Highpass> (audioOutBuffer, filter, getModFreq);
-            break;
+        using SVFType = chowdsp::StateVariableFilterType;
+        auto filterType = (int) filterTypeParam->load();
+        switch (filterType)
+        {
+            case 0:
+                processFilter<SVFType::Lowpass> (audioOutBuffer, filter, getModFreq);
+                break;
 
-        default:
-            jassertfalse;
+            case 1:
+                processFilter<SVFType::Bandpass> (audioOutBuffer, filter, getModFreq);
+                break;
+
+            case 2:
+                processFilter<SVFType::Highpass> (audioOutBuffer, filter, getModFreq);
+                break;
+
+            default:
+                jassertfalse;
+        }
+
+        audioOutBuffer.applyGain (Decibels::decibelsToGain (-6.0f));
     }
-
-    audioOutBuffer.applyGain (Decibels::decibelsToGain (-6.0f));
+    else
+    {
+        audioOutBuffer.setSize (1, numSamples, false, false, true);
+        audioOutBuffer.clear();
+    }
 
     outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
     outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
-
 }
 
 void EnvelopeFilter::processAudioBypassed (AudioBuffer<float>& buffer)
