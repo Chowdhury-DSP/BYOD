@@ -12,6 +12,7 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+    void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
     bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
@@ -43,7 +44,9 @@ private:
 
     chowdsp::SVFMultiMode<float> filter;
 
-    AudioBuffer<float> levelBuffer;
+    AudioBuffer<float> levelOutBuffer;
+    AudioBuffer<float> audioOutBuffer;
+
     chowdsp::LevelDetector<float> level;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnvelopeFilter)
