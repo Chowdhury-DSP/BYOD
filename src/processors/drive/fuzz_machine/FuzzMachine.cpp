@@ -1,22 +1,17 @@
 #include "FuzzMachine.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
-{
-constexpr int osRatio = 2;
-}
-
 FuzzMachine::FuzzMachine (UndoManager* um)
     : BaseProcessor ("Fuzz Machine", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
     fuzzParam.setParameterHandle (getParameterPointer<chowdsp::PercentParameter*> (vts, "fuzz"));
-    biasParam.setParameterHandle (getParameterPointer<chowdsp::PercentParameter*> (vts, "bias"));
+    loadParameterPointer (modelParam, vts, "model");
     loadParameterPointer (volumeParam, vts, "vol");
 
     uiOptions.backgroundColour = Colours::red.darker (0.15f);
     uiOptions.powerColour = Colours::silver.brighter (0.1f);
-    uiOptions.info.description = "Fuzz effect based loosely on the \"Fuzz Face\" pedal.";
+    uiOptions.info.description = "Black box model of a custom-built fuzz pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
 
@@ -25,32 +20,39 @@ ParamLayout FuzzMachine::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createPercentParameter (params, "fuzz", "Fuzz", 1.0f);
-    createPercentParameter (params, "bias", "Bias", 1.0f);
-    createPercentParameter (params, "vol", "Volume", 1.0f);
+    createPercentParameter (params, "fuzz", "Fuzz", 0.5f);
+    emplace_param<chowdsp::EnumChoiceParameter<Model>> (params, "model", "Mode", Model::Mode_2, std::initializer_list<std::pair<char, char>> { { '_', ' ' }, { 'z', '.' } });
+    createPercentParameter (params, "vol", "Volume", 0.5f);
 
     return { params.begin(), params.end() };
 }
 
 void FuzzMachine::prepare (double sampleRate, int samplesPerBlock)
 {
-    fuzzParam.mappingFunction = [] (float x)
-    { return 0.9f * x + 0.05f; };
-    fuzzParam.setRampLength (0.025);
-    fuzzParam.prepare (sampleRate, samplesPerBlock);
+    const auto osRatio = sampleRate >= 80000.0 ? 1 : 2;
 
-    biasParam.mappingFunction = [] (float x)
-    { return 6.5f + 2.5f * x; };
-    biasParam.setRampLength (0.025);
-    biasParam.prepare (sampleRate, samplesPerBlock);
+    fuzzParam.setRampLength (0.025);
+    fuzzParam.prepare (osRatio * sampleRate, osRatio * samplesPerBlock);
+
+    for (int ch = 0; ch < 2; ++ch)
+    {
+        if ((int) sampleRate % 44100 == 0)
+        {
+            model_ff_15[ch].initialise (BinaryData::fuzz_15_88_json, BinaryData::fuzz_15_88_jsonSize, 88200.0);
+            model_ff_2[ch].initialise (BinaryData::fuzz_2_88_json, BinaryData::fuzz_2_88_jsonSize, 88200.0);
+        }
+        else
+        {
+            model_ff_15[ch].initialise (BinaryData::fuzz_15_json, BinaryData::fuzz_15_jsonSize, 96000.0);
+            model_ff_2[ch].initialise (BinaryData::fuzz_2_json, BinaryData::fuzz_2_jsonSize, 96000.0);
+        }
+
+        model_ff_15[ch].prepare (osRatio * sampleRate, osRatio * samplesPerBlock);
+        model_ff_2[ch].prepare (osRatio * sampleRate, osRatio * samplesPerBlock);
+    }
 
     upsampler.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 }, osRatio);
     downsampler.prepare ({ osRatio * sampleRate, osRatio * (uint32_t) samplesPerBlock, 2 }, osRatio);
-
-    model_ndk.reset (sampleRate * osRatio);
-    model_ndk.Vcc = (double) biasParam.getCurrentValue();
-    model_ndk.update_pots ({ FuzzFaceNDK::VRfuzz * (1.0 - (double) fuzzParam.getCurrentValue()),
-                             FuzzFaceNDK::VRfuzz * (double) fuzzParam.getCurrentValue() });
 
     const auto spec = juce::dsp::ProcessSpec { sampleRate, (uint32_t) samplesPerBlock, 2 };
     dcBlocker.prepare (spec);
@@ -75,55 +77,28 @@ void FuzzMachine::prepare (double sampleRate, int samplesPerBlock)
 
 void FuzzMachine::processAudio (AudioBuffer<float>& buffer)
 {
-    const auto numSamples = buffer.getNumSamples();
-    fuzzParam.process (numSamples);
-    biasParam.process (numSamples);
-
-    for (auto [ch, data] : chowdsp::buffer_iters::channels (buffer))
-    {
-        for (auto& sample : data)
-            sample = chowdsp::Math::algebraicSigmoid (sample);
-    }
-
-    chowdsp::BufferMath::applyGain (buffer, Decibels::decibelsToGain (-30.0f));
-
     const auto osBuffer = upsampler.process (buffer);
-    if (fuzzParam.isSmoothing() || biasParam.isSmoothing())
-    {
-        for (auto [ch, n, data] : chowdsp::buffer_iters::sub_blocks<32, true> (osBuffer))
-        {
-            if (ch == 0)
-            {
-                model_ndk.Vcc = (double) biasParam.getSmoothedBuffer()[n / osRatio];
-                const auto fuzzAmt = fuzzParam.getSmoothedBuffer()[n / osRatio];
-                model_ndk.update_pots ({ FuzzFaceNDK::VRfuzz * (1.0 - (double) fuzzAmt),
-                                         FuzzFaceNDK::VRfuzz * (double) fuzzAmt });
-            }
-            model_ndk.process (data, ch);
-        }
-    }
-    else
-    {
-        for (auto [ch, data] : chowdsp::buffer_iters::channels (osBuffer))
-            model_ndk.process (data, ch);
-    }
-    downsampler.process (osBuffer, buffer);
+    const auto osNumSamples = osBuffer.getNumSamples();
+    fuzzParam.process (osNumSamples);
 
-    if (! chowdsp::BufferMath::sanitizeBuffer (buffer))
+    for (auto [ch, data] : chowdsp::buffer_iters::channels (osBuffer))
     {
-        upsampler.reset();
-        downsampler.reset();
-        model_ndk.reset_state();
+        magic_enum::enum_switch (
+            [this, ch = ch, data = data, osNumSamples] (auto modelType)
+            {
+                static constexpr Model model = modelType;
+                if constexpr (model == Model::Mode_1z5)
+                    model_ff_15[ch].process<true> (data, { fuzzParam.getSmoothedBuffer(), (size_t) osNumSamples });
+                else if constexpr (model == Model::Mode_2)
+                    model_ff_2[ch].process<true> (data, { fuzzParam.getSmoothedBuffer(), (size_t) osNumSamples });
+            },
+            modelParam->get());
     }
+
+    downsampler.process (osBuffer, buffer);
 
     dcBlocker.processBlock (buffer);
 
-    volume.setGainLinear (volumeParam->getCurrentValue() * 100.0f);
+    volume.setGainLinear (1.5f * volumeParam->getCurrentValue());
     volume.process (buffer);
-
-    for (auto [ch, data] : chowdsp::buffer_iters::channels (buffer))
-    {
-        for (auto& sample : data)
-            sample = 4.0f * chowdsp::Math::algebraicSigmoid (0.25f * sample);
-    }
 }

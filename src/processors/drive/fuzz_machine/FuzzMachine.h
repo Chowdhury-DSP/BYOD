@@ -1,7 +1,9 @@
 #pragma once
 
-#include "FuzzFaceNDK.h"
 #include "processors/BaseProcessor.h"
+
+#include "FuzzFaceNDK.h"
+#include "processors/drive/neural_utils/ResampledRNNAccelerated.h"
 
 class FuzzMachine : public BaseProcessor
 {
@@ -15,11 +17,19 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
+    enum class Model
+    {
+        Mode_1z5 = 1,
+        Mode_2 = 2,
+    };
+
     chowdsp::SmoothedBufferValue<float> fuzzParam;
-    chowdsp::SmoothedBufferValue<float> biasParam;
+    chowdsp::EnumChoiceParameter<Model>* modelParam = nullptr;
     chowdsp::PercentParameter* volumeParam = nullptr;
 
-    FuzzFaceNDK model_ndk;
+    static constexpr int hiddenSize = 24;
+    ResampledRNNAccelerated<2, hiddenSize> model_ff_15[2];
+    ResampledRNNAccelerated<2, hiddenSize> model_ff_2[2];
 
     using AAFilter = chowdsp::EllipticFilter<4>;
     chowdsp::Upsampler<float, AAFilter> upsampler;

@@ -17,23 +17,23 @@ public:
     void reset();
 
     template <bool useResiduals = false>
-    void process (juce::dsp::AudioBlock<float>& block, std::span<const float> condition_data = {}) noexcept
+    void process (std::span<float> block, std::span<const float> condition_data = {}) noexcept
     {
-        auto processNNInternal = [this, &condition_data] (const chowdsp::BufferView<float>& bufferView)
+        auto processNNInternal = [this, &condition_data] (std::span<float> data)
         {
             model_variant.visit (
-                [&bufferView, &condition_data] (auto& model)
+                [&data, &condition_data] (auto& model)
                 {
                     if constexpr (numIns == 1)
                     {
                         jassert (condition_data.empty());
                         juce::ignoreUnused (condition_data);
-                        model.process (bufferView.getWriteSpan (0), useResiduals);
+                        model.process (data, useResiduals);
                     }
                     else
                     {
                         jassert ((int) condition_data.size() == bufferView.getNumSamples());
-                        model.process_conditioned (bufferView.getWriteSpan (0), condition_data, useResiduals);
+                        model.process_conditioned (data, condition_data, useResiduals);
                     }
                 });
         };
@@ -44,11 +44,18 @@ public:
         }
         else
         {
-            auto bufferView = chowdsp::BufferView<float> { block };
+            auto bufferView = chowdsp::BufferView<float> { block.data(), (int) block.size() };
             auto blockAtSampleRate = resampler.processIn (bufferView);
-            processNNInternal (blockAtSampleRate);
+            processNNInternal (blockAtSampleRate.getWriteSpan (0));
             resampler.processOut (blockAtSampleRate, bufferView);
         }
+    }
+
+    template <bool useResiduals = false>
+    void process (const juce::dsp::AudioBlock<float>& block, std::span<const float> condition_data = {}) noexcept
+    {
+        const auto bufferView = chowdsp::BufferView<float> { block };
+        process<useResiduals> (bufferView.getWriteSpan (0), condition_data);
     }
 
 private:
