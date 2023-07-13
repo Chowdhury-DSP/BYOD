@@ -32,7 +32,7 @@ public:
                     }
                     else
                     {
-                        jassert ((int) condition_data.size() == bufferView.getNumSamples());
+                        jassert ((int) condition_data.size() == data.size());
                         model.process_conditioned (data, condition_data, useResiduals);
                     }
                 });
@@ -54,6 +54,7 @@ public:
     template <bool useResiduals = false>
     void process (const juce::dsp::AudioBlock<float>& block, std::span<const float> condition_data = {}) noexcept
     {
+        jassert (block.getNumChannels() == 1);
         const auto bufferView = chowdsp::BufferView<float> { block };
         process<useResiduals> (bufferView.getWriteSpan (0), condition_data);
     }
