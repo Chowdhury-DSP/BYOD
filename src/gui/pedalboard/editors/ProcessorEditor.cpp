@@ -171,7 +171,7 @@ void ProcessorEditor::paint (Graphics& g)
                           false };
     g.setGradientFill (grad);
     g.fillRoundedRectangle (getLocalBounds().toFloat(), cornerSize);
-erf
+
     if (procUI.backgroundImage != nullptr)
     {
         auto backgroundBounds = getLocalBounds().reduced ((int) cornerSize);
