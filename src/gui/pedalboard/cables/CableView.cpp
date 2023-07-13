@@ -69,6 +69,8 @@ bool CableView::mouseDraggingOverOutputPort()
 
 void CableView::paint (Graphics& g)
 {
+    TRACE_COMPONENT();
+
     using namespace CableDrawingHelpers;
 
     if (portGlow)
@@ -95,6 +97,8 @@ void CableView::mouseExit (const MouseEvent&)
 
 void CableView::mouseDown (const MouseEvent& e)
 {
+    TRACE_COMPONENT();
+
     if (e.mods.isAnyModifierKeyDown() || e.mods.isPopupMenu() || e.eventComponent == nullptr)
         return; // not a valid mouse event
 
@@ -115,6 +119,8 @@ void CableView::mouseDown (const MouseEvent& e)
 
 void CableView::mouseDrag (const MouseEvent& e)
 {
+    TRACE_COMPONENT();
+
     if (e.eventComponent == nullptr)
         return;
 
@@ -148,6 +154,8 @@ void CableView::mouseUp (const MouseEvent& e)
 
 void CableView::timerCallback()
 {
+    TRACE_COMPONENT();
+
     using namespace CableDrawingHelpers;
 
     // repaint port glow

@@ -85,6 +85,8 @@ void BoardViewport::toggleTooltips (bool shouldShow)
 
 void BoardViewport::resized()
 {
+    TRACE_COMPONENT();
+
     const auto width = getWidth();
     const auto height = getHeight();
 

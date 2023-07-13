@@ -16,7 +16,7 @@ constexpr int getScaleDim (int dim, float scaleFactor)
 
 juce::Point<int> getRandomPosition (const Component& comp)
 {
-    auto b = comp.getLocalBounds()
+    auto b = comp.getLocalBounds()\
                  .withWidth (comp.getWidth() * 2 / 3)
                  .withHeight (comp.getHeight() * 2 / 3);
 
@@ -103,6 +103,8 @@ float BoardComponent::getScaleFactor() const
 
 void BoardComponent::resized()
 {
+    TRACE_COMPONENT();
+
     const auto width = getWidth();
     const auto height = getHeight();
 
@@ -127,6 +129,8 @@ void BoardComponent::resized()
 
 void BoardComponent::paintOverChildren (Graphics& g)
 {
+    TRACE_COMPONENT();
+
     RectangleList<int> rectangles;
     rectangles.ensureStorageAllocated (editorSelector.getLassoSelection().getNumSelected());
     for (auto& editor : editorSelector.getLassoSelection())

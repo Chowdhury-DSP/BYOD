@@ -159,6 +159,8 @@ void ProcessorEditor::createReplaceProcMenu (PopupMenu& menu)
 
 void ProcessorEditor::paint (Graphics& g)
 {
+    TRACE_COMPONENT();
+
     const auto& procColour = procUI.backgroundColour;
     ColourGradient grad { procColour,
                           0.0f,
@@ -169,7 +171,7 @@ void ProcessorEditor::paint (Graphics& g)
                           false };
     g.setGradientFill (grad);
     g.fillRoundedRectangle (getLocalBounds().toFloat(), cornerSize);
-
+erf
     if (procUI.backgroundImage != nullptr)
     {
         auto backgroundBounds = getLocalBounds().reduced ((int) cornerSize);
@@ -186,6 +188,8 @@ void ProcessorEditor::paint (Graphics& g)
 
 void ProcessorEditor::resized()
 {
+    TRACE_COMPONENT();
+
     const auto width = getWidth();
     const auto height = getHeight();
 
