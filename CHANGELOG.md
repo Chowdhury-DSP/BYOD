@@ -4,15 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [UNRELEASED]
 - Added "Flapjack" module.
+- Added "Fuzz Machine" module.
 - Added "Mouse Drive" module.
 - Added "Crying Child" module.
 - Added "Solo-Vibe" module.
 - Added "Ladder Filter" module.
-- Added "MIDI Modulator" module.
+- Added "MIDI Modulator" and "Param Modulator" modules.
+- Added level tracking input and output ports for relevant modules.
 - Added "netlist view" to allow for customization of some circuit-modelled modules.
 - Added AVX support (for PCs that support it) for neural network-based modules.
 - Added mouse interactions for selecting and moving/deleting multiple modules at once.
+- Added port tooltips.
 - Added sample rate correction filter for GuitarML module.
+- Added support for CLAP preset discovery and preset loading.
 - Improved preset search results.
 - Improved custom IR loading/saving for "Amp IRs" module.
 - Improved IR menu UX with mouse and keyboard interactions.
