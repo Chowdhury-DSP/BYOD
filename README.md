@@ -5,13 +5,13 @@
 [![License](https://img.shields.io/badge/License-GPL3-blue.svg)](https://opensource.org/licenses/GPL-3.0)
 [![Downloads](https://img.shields.io/github/downloads/Chowdhury-DSP/BYOD/total)](https://somsubhra.github.io/github-release-stats/?username=Chowdhury-DSP&repository=BYOD&page=1&per_page=30)
 
-BYOD is a guitar distortion plugin with a customisable
+BYOD is a guitar effects plugin with a customisable
 signal chain that allows users to create their own guitar
 distortion effects. The plugin contains a wide variety
 of distortion effects from analog modelled circuits
 to purely digital creations, along with some musical
 tone-shaping filters, and a handful of other useful
-processing blocks.
+signal processors.
 
 ## Quick Links
 - [Latest Release](https://chowdsp.com/products.html#byod)
