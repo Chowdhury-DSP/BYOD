@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Hot Cakes" plugin="BYOD" vendor="CHOW" category="Pedals"
+        version="1.1.7">
+  <proc_chain state_plugin_version="1.1.7">
+    <Flapjack>
+      <Parameters x_pos="0.3600000143051147" y_pos="0.3188679218292236">
+        <PARAM id="drive" value="0.75"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="lowcut" value="100.0000076293945"/>
+        <PARAM id="mode" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="presence" value="0.5"/>
+        <circuit_elements R1="1.0e6" R2="10000.0" R3="100000.0" R5="10000.0" R6="10000.0"
+                          R7="1000.0" C1="9.99999993922529e-9" C2="9.999999747378752e-6"
+                          C6="2.200000004393132e-8" C7="8.199999967928306e-8"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Flapjack>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

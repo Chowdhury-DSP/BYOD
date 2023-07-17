@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Hot Fuzz" plugin="BYOD" vendor="CHOW" category="Pedals"
+        version="1.1.7">
+  <proc_chain state_plugin_version="1.1.7">
+    <Fuzz_Machine>
+      <Parameters x_pos="0.1959999948740005" y_pos="0.3169811367988586">
+        <PARAM id="fuzz" value="0.5"/>
+        <PARAM id="model" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="vol" value="0.5"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Fuzz_Machine>
+    <Baxandall_EQ>
+      <Parameters x_pos="0.5260000228881836" y_pos="0.322641521692276">
+        <PARAM id="bass" value="0.3534123599529266"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.6499999761581421"/>
+        <circuit_elements Ra="10000.0" Rb="1000.0" Rc="10000.0" Rd="10000.0" Re="1000.0"
+                          RL="1.0e6" Ca="9.999999974752427e-7" Cb="2.200000004393132e-8"
+                          Cc="2.200000039920269e-7" Cd="6.400000085449165e-9" Ce="6.399999818995639e-8"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Baxandall_EQ>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

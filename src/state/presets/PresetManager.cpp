@@ -218,11 +218,14 @@ std::vector<chowdsp::Preset> PresetManager::getFactoryPresets (const ProcessorSt
     factoryPresets.emplace_back (BinaryData::Big_Muff_Russian_chowpreset, BinaryData::Big_Muff_Russian_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Centaur_chowpreset, BinaryData::Centaur_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Gainful_Clipper_chowpreset, BinaryData::Gainful_Clipper_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Hot_Cakes_chowpreset, BinaryData::Hot_Cakes_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Hot_Fuzz_chowpreset, BinaryData::Hot_Fuzz_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::King_Of_Tone_chowpreset, BinaryData::King_Of_Tone_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::RAT_chowpreset, BinaryData::RAT_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Violet_Mist_chowpreset, BinaryData::Violet_Mist_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Wah_Pedal_chowpreset, BinaryData::Wah_Pedal_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::ZenDrive_chowpreset, BinaryData::ZenDrive_chowpresetSize);
 
     // players
