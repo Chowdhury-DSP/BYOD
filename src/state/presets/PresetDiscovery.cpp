@@ -5,8 +5,10 @@
 #include "processors/ProcessorStore.h"
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
+JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4100)
 #include <clap/helpers/preset-discovery-provider.hh>
 #include <clap/helpers/preset-discovery-provider.hxx>
+JUCE_END_IGNORE_WARNINGS_MSVC
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
 namespace preset_discovery
