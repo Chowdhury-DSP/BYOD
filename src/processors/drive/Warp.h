@@ -39,12 +39,12 @@ private:
                 return y;
             }
 
-            void calcCoefs (float fc, float qVal, float gain, float fs)
+            void calcCoefs (float fc, float qVal, float gain, float _fs)
             {
                 using namespace chowdsp::ConformalMaps;
 
                 const auto wc = MathConstants<float>::twoPi * fc;
-                const auto K = computeKValue (fc, fs);
+                const auto K = computeKValue (fc, _fs);
 
                 auto kSqTerm = 1.0f / (wc * wc);
                 auto kTerm = 1.0f / (qVal * wc);

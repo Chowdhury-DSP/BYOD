@@ -15,7 +15,7 @@
 
 #include "SurgeWaveshapers.h"
 
-JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wstrict-aliasing")
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wstrict-aliasing", "-Wmissing-prototypes", "-Wimplicit-int-float-conversion")
 
 namespace SurgeWaveshapers
 {

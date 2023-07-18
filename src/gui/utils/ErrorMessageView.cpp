@@ -32,7 +32,7 @@ ErrorMessageView::ErrorMessageView()
     addAndMakeVisible (custom2Button);
 }
 
-BYODPluginEditor* findTopLevelEditor (Component* currentComponent)
+static BYODPluginEditor* findTopLevelEditor (Component* currentComponent)
 {
     BYODPluginEditor* topLevelEditor = nullptr;
     while (currentComponent != nullptr)

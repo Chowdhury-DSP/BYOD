@@ -1,8 +1,5 @@
 #include "RONN.h"
 
-// borrowed from RTNeural's submodules...
-#include <modules/Eigen/Eigen/Dense>
-
 namespace
 {
 int randomSeeds[5] = { 1, 101, 2048, 5005, 9001 };

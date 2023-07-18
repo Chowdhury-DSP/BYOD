@@ -162,10 +162,10 @@ public:
     const AudioBuffer<float>& getInputBuffer (int idx = 0) const { return inputBuffers.getReference (idx); }
     AudioBuffer<float>& getInputBufferNonConst (int idx = 0) { return inputBuffers.getReference (idx); } // Most derived classes should never use this!
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
-    const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[portIdx].getReference (connectionIdx); }
+    const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[(size_t) portIdx].getReference (connectionIdx); }
 
-    int getNumOutputConnections (int portIdx) const { return outputConnections[portIdx].size(); }
-    int getNumInputConnections() const { return inputsConnected.size(); };
+    int getNumOutputConnections (int portIdx) const { return outputConnections[(size_t) portIdx].size(); }
+    int getNumInputConnections() const { return inputsConnected.size(); }
 
     int incrementNumInputsReady() { return numInputsReady++; }
     int getNumInputsReady() const { return numInputsReady; }

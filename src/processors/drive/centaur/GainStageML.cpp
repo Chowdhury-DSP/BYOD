@@ -21,9 +21,9 @@ void GainStageML::reset (double sampleRate, int samplesPerBlock)
 {
     fadeBuffer.setSize (2, samplesPerBlock);
 
-    for (int i = 0; i < numModels; ++i)
+    for (size_t i = 0; i < (size_t) numModels; ++i)
     {
-        for (int ch = 0; ch < 2; ++ch)
+        for (size_t ch = 0; ch < 2; ++ch)
         {
             gainStageML[i][ch].prepare (sampleRate, samplesPerBlock);
 
@@ -47,7 +47,7 @@ void GainStageML::processModel (AudioBuffer<float>& buffer, ModelPair& model)
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
         auto&& channelBlock = block.getSingleChannelBlock ((size_t) ch);
-        model[ch].process (channelBlock);
+        model[(size_t) ch].process (channelBlock);
     }
 }
 
@@ -59,13 +59,13 @@ void GainStageML::processBlock (AudioBuffer<float>& buffer)
 
     if (modelIdx == lastModelIdx)
     {
-        processModel (buffer, gainStageML[modelIdx]);
+        processModel (buffer, gainStageML[(size_t) modelIdx]);
     }
     else // need to fade between models
     {
         fadeBuffer.makeCopyOf (buffer, true);
-        processModel (buffer, gainStageML[lastModelIdx]); // previous model
-        processModel (fadeBuffer, gainStageML[modelIdx]); // next model
+        processModel (buffer, gainStageML[(size_t) lastModelIdx]); // previous model
+        processModel (fadeBuffer, gainStageML[(size_t) modelIdx]); // next model
 
         buffer.applyGainRamp (0, buffer.getNumSamples(), 1.0f, 0.0f);
         for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
