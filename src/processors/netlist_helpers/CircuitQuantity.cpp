@@ -18,14 +18,14 @@ CircuitQuantity::CircuitQuantity (float defaultVal,
                                   float minVal,
                                   float maxVal,
                                   Type qType,
-                                  const std::string& name,
+                                  const std::string& _name,
                                   Setter&& setterFunc)
     : value (defaultVal),
       defaultValue (defaultVal),
       minValue (minVal),
       maxValue (maxVal),
       type (qType),
-      name (name),
+      name (_name),
       setter (std::move (setterFunc))
 {
 }
@@ -66,7 +66,7 @@ juce::String getStringForValue (float value)
     return {};
 }
 
-juce::String getPostFixForQuantity (CircuitQuantity::Type type)
+static juce::String getPostFixForQuantity (CircuitQuantity::Type type)
 {
     switch (type)
     {

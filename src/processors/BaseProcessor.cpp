@@ -33,11 +33,11 @@ BaseProcessor::BaseProcessor (const String& name,
 
     outputBuffers.resize (jmax (1, numOutputs));
     outputBuffers.fill (nullptr);
-    outputConnections.resize (numOutputs);
+    outputConnections.resize ((size_t) numOutputs);
 
     inputBuffers.resize (numInputs);
     inputsConnected.resize (0);
-    portMagnitudes.resize (numInputs);
+    portMagnitudes.resize ((size_t) numInputs);
 }
 
 BaseProcessor::~BaseProcessor() = default;
@@ -209,7 +209,7 @@ void BaseProcessor::loadPositionInfoFromXML (XmlElement* xml)
 void BaseProcessor::addConnection (ConnectionInfo&& info)
 {
     jassert (info.startProc == this);
-    outputConnections[info.startPort].add (info);
+    outputConnections[(size_t) info.startPort].add (info);
 
     // make sure the end processor actually has an input port available that we can connect to!
     jassert (info.endProc->inputsConnected.size() + 1 <= info.endProc->numInputs);
@@ -221,7 +221,7 @@ void BaseProcessor::removeConnection (const ConnectionInfo& info)
 {
     jassert (info.startProc == this);
 
-    auto& connections = outputConnections[info.startPort];
+    auto& connections = outputConnections[(size_t) info.startPort];
     for (int cIdx = 0; cIdx < connections.size(); ++cIdx)
     {
         if (connections[cIdx].endProc == info.endProc && connections[cIdx].endPort == info.endPort)
@@ -351,12 +351,12 @@ void BaseProcessor::setEditor (ProcessorEditor* procEditor)
 
 PortType BaseProcessor::getInputPortType (int portIndex) const
 {
-    return inputPortTypes[portIndex];
+    return inputPortTypes[(size_t) portIndex];
 }
 
 PortType BaseProcessor::getOutputPortType (int portIndex) const
 {
-    return outputPortTypes[portIndex];
+    return outputPortTypes[(size_t) portIndex];
 }
 
 void BaseProcessor::setPosition (juce::Point<int> pos, Rectangle<int> parentBounds)

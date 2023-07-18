@@ -151,6 +151,7 @@ static const clap_preset_discovery_factory byod_preset_discovery_factory {
     .create = preset_discovery::create,
 };
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wmissing-prototypes")
 const void* JUCE_CALLTYPE clapJuceExtensionCustomFactory (const char* factory_id)
 {
     if (strcmp (factory_id, CLAP_PRESET_DISCOVERY_FACTORY_ID) == 0)
@@ -159,4 +160,5 @@ const void* JUCE_CALLTYPE clapJuceExtensionCustomFactory (const char* factory_id
     }
     return nullptr;
 }
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #endif

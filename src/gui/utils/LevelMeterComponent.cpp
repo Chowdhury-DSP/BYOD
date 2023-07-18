@@ -58,7 +58,7 @@ void LevelMeterComponent::paint (Graphics& g)
 void LevelMeterComponent::timerCallback()
 {
     bool needsRepaint = false;
-    for (int ch = 0; ch < 2; ++ch)
+    for (size_t ch = 0; ch < 2; ++ch)
     {
         dbLevels[ch] = Decibels::gainToDecibels (levelDetector[ch].processSample (rmsLevels[ch]));
 

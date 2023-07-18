@@ -16,10 +16,21 @@
 
 // Any other widely used headers that don't change...
 #include <FuzzySearchDatabase.hpp>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wzero-as-null-pointer-constant",
+                                    "-Wsign-conversion")
 #include <RTNeural/RTNeural.h>
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
 #include <chowdsp_wdf/chowdsp_wdf.h>
 #include <ea_variant/ea_variant.h>
 #include <sst/cpputils.h>
+
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE("-Wzero-as-null-pointer-constant",
+                                    "-Wsign-conversion")
+#include <modules/Eigen/Eigen/Dense>
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
 
 // global definitions
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;

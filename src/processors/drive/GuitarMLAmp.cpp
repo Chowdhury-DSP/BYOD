@@ -309,11 +309,11 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
     class MainParamSlider : public Slider
     {
     public:
-        MainParamSlider (const ModelArch& modelArch,
+        MainParamSlider (const ModelArch& modelArchitecture,
                          AudioProcessorValueTreeState& vts,
-                         ModelChangeBroadcaster& modelChangeBroadcaster,
+                         ModelChangeBroadcaster& modelChangeCaster,
                          chowdsp::HostContextProvider& hcp)
-            : currentModelArch (modelArch),
+            : currentModelArch (modelArchitecture),
               gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, gainTag), hcp),
               conditionSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, conditionTag), hcp),
               gainAttach (vts, gainTag, gainSlider),
@@ -325,7 +325,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
             hcp.registerParameterComponent (gainSlider, gainSlider.getParameter());
             hcp.registerParameterComponent (conditionSlider, conditionSlider.getParameter());
 
-            modelChangeCallback = modelChangeBroadcaster.connect<&MainParamSlider::updateSliderVisibility> (this);
+            modelChangeCallback = modelChangeCaster.connect<&MainParamSlider::updateSliderVisibility> (this);
 
             this->setName (conditionTag + "__" + gainTag + "__");
         }
@@ -387,15 +387,15 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
     class ModelChoiceBox : public ComboBox
     {
     public:
-        ModelChoiceBox (GuitarMLAmp& processor, ModelChangeBroadcaster& modelChangeBroadcaster)
+        ModelChoiceBox (GuitarMLAmp& processor, ModelChangeBroadcaster& modelChangeCaster)
         {
             addItemList (guitarMLModelNames, 1);
             addSeparator();
             addItem ("Custom", guitarMLModelNames.size() + 1);
             setText (processor.getCurrentModelName(), dontSendNotification);
 
-            modelChangeCallback = modelChangeBroadcaster.connect ([this, &processor]
-                                                                  { setText (processor.getCurrentModelName(), dontSendNotification); });
+            modelChangeCallback = modelChangeCaster.connect ([this, &processor]
+                                                             { setText (processor.getCurrentModelName(), dontSendNotification); });
 
             onChange = [this, &processor]
             {
