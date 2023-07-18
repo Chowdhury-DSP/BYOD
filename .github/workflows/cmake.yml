@@ -63,7 +63,7 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --config Release --parallel 4
+      run: cmake --build build --config Release --parallel
 
     - name: Unit Tests
       if: runner.os == 'Linux'
