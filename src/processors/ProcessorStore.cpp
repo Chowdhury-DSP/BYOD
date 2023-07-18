@@ -265,7 +265,7 @@ void createProcListFiltered (const ProcessorStore& store, PopupMenu& menu, int& 
     }
 }
 
-void createProcListUnfiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID)
+static void createProcListUnfiltered (const ProcessorStore& store, PopupMenu& menu, int& menuID)
 {
     createProcListFiltered (
         store, menu, menuID, [] (auto...)

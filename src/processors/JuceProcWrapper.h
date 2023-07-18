@@ -6,7 +6,7 @@
 class JuceProcWrapper : public AudioProcessor
 {
 public:
-    explicit JuceProcWrapper (const String& name = String()) : name (name) {}
+    explicit JuceProcWrapper (const String& _name = String()) : name (_name) {}
 
     const String getName() const override { return name; }
 

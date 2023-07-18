@@ -32,7 +32,7 @@ public:
                     }
                     else
                     {
-                        jassert ((int) condition_data.size() == data.size());
+                        jassert (condition_data.size() == data.size());
                         model.process_conditioned (data, condition_data, useResiduals);
                     }
                 });
