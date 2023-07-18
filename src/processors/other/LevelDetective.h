@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../BaseProcessor.h"
 #include "../../modules/chowdsp_utils/modules/gui/chowdsp_visualizers/CompressorPlots/chowdsp_LevelDetectorVisualizer.h"
+#include "../BaseProcessor.h"
 
 using namespace chowdsp::compressor;
 
@@ -19,7 +19,6 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
 
 private:
-
     enum InputPort
     {
         AudioInput
@@ -30,8 +29,8 @@ private:
         LevelOutput
     };
 
-//    chowdsp::FloatParameter* attackMsParam = nullptr;
-//    chowdsp::FloatParameter* releaseMsParam = nullptr;
+    //    chowdsp::FloatParameter* attackMsParam = nullptr;
+    //    chowdsp::FloatParameter* releaseMsParam = nullptr;
 
     AudioBuffer<float> levelOutBuffer;
     chowdsp::LevelDetector<float> level;
