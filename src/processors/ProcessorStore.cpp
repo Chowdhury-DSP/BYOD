@@ -54,6 +54,7 @@
 #include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
 #include "other/Gate.h"
+#include "other/LevelDetective.h"
 #include "other/Octaver.h"
 #include "other/ShimmerReverb.h"
 #include "other/SmoothReverb.h"
@@ -146,6 +147,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Crying Child", { &processorFactory<CryBaby>, { ProcessorType::Other, CryBaby::numInputs, CryBaby::numOutputs } } },
     { "Delay", { &processorFactory<DelayModule>, { ProcessorType::Other, 1, 1 } } },
     { "Envelope Filter", { &processorFactory<EnvelopeFilter>, { ProcessorType::Other, EnvelopeFilter::numInputs, EnvelopeFilter::numOutputs } } },
+    { "Level Detective", { &processorFactory<LevelDetective>, { ProcessorType::Other, 1, 1 } } },
     { "Gate", { &processorFactory<Gate>, { ProcessorType::Other, Gate::numInputs, Gate::numOutputs } } },
     { "Octaver", { &processorFactory<Octaver>, { ProcessorType::Other, 1, 1 } } },
     { "Shimmer Reverb", { &processorFactory<ShimmerReverb>, { ProcessorType::Other, 1, 1 } } },
