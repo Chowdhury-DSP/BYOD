@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# expand bash aliases
+shopt -s expand_aliases
+source ~/.bashrc
+
 # exit on failure
 set -e
 
@@ -52,8 +56,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else # Windows
     echo "Building for WINDOWS"
 
-    AAX_PATH=C:/SDKs/AAX_SDK/
-    ilok_pass=$(cat /d/ilok_pass)
+    AAX_PATH=C:/Users/Jatin/SDKs/AAX_SDK_clang/
+    ilok_pass=$(cat ~/ilok_pass)
     aax_target_dir="/c/Program Files/Common Files/Avid/Audio/Plug-Ins"
     TARGET_DIR="Win64"
 fi
@@ -75,7 +79,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     cmake --build build-aax --config $build_config -j12 --target "${TARGET_NAME}_AAX" | xcpretty
 
 else # Windows
-    cmake -Bbuild-aax -G"Visual Studio 16 2019" -A x64 -DBYOD_BUILD_ADD_ON_MODULES=ON
+    cmake -Bbuild-aax -G"Visual Studio 17 2022" -T ClangCL -A x64 -DBYOD_BUILD_ADD_ON_MODULES=ON
     cmake --build build-aax --config $build_config --parallel $(nproc) --target "${TARGET_NAME}_AAX"
 fi
 
@@ -101,7 +105,7 @@ else # Windows
         --account chowdsp \
         --password "$ilok_pass" \
         --wcguid $wcguid \
-        --keyfile /c/Users/jatin/Downloads/jatin_aax_cert.p12 \
+        --keyfile ~/jatin_aax_cert.p12 \
         --keypassword "$ilok_pass" \
         --in $aax_location \
         --out $aax_location
