@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../../modules/chowdsp_utils/modules/gui/chowdsp_visualizers/CompressorPlots/chowdsp_LevelDetectorVisualizer.h"
 #include "../BaseProcessor.h"
 
 using namespace chowdsp::compressor;
@@ -17,8 +16,10 @@ public:
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void processAudio (AudioBuffer<float>& buffer) override;
+    void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
+
     enum InputPort
     {
         AudioInput
@@ -29,11 +30,11 @@ private:
         LevelOutput
     };
 
-    //    chowdsp::FloatParameter* attackMsParam = nullptr;
-    //    chowdsp::FloatParameter* releaseMsParam = nullptr;
+//    chowdsp::FloatParameter* attackMsParam = nullptr;
+//    chowdsp::FloatParameter* releaseMsParam = nullptr;
 
     AudioBuffer<float> levelOutBuffer;
     chowdsp::LevelDetector<float> level;
-    LevelDetectorVisualizer levelVisualizer {};
+    std::unique_ptr<LevelDetectorVisualizer> levelVisualizer = nullptr;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LevelDetective)
 };
