@@ -19,7 +19,6 @@ public:
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
 private:
-
     enum InputPort
     {
         AudioInput
@@ -30,8 +29,8 @@ private:
         LevelOutput
     };
 
-//    chowdsp::FloatParameter* attackMsParam = nullptr;
-//    chowdsp::FloatParameter* releaseMsParam = nullptr;
+    //    chowdsp::FloatParameter* attackMsParam = nullptr;
+    //    chowdsp::FloatParameter* releaseMsParam = nullptr;
 
     AudioBuffer<float> levelOutBuffer;
     chowdsp::LevelDetector<float> level;

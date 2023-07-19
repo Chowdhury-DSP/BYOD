@@ -1,11 +1,12 @@
 #include "LevelDetective.h"
 #include "../ParameterHelpers.h"
 
-LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor ("Level Detective",
-                                                                      createParameterLayout(),
-                                                                      InputPort {},
-                                                                      OutputPort {},
-                                                                      um,
+LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor (
+    "Level Detective",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
     [] (InputPort port)
     {
         return PortType::audio;
@@ -17,10 +18,10 @@ LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor ("Level Detecti
 {
     levelVisualizer = std::make_unique<LevelDetectorVisualizer>();
     using namespace ParameterHelpers;
-//    loadParameterPointer (attackMsParam, vts, "attack");
-//    loadParameterPointer (releaseMsParam, vts, "release");
-    uiOptions.backgroundColour = Colours::teal.darker(0.1f);
-    uiOptions.powerColour = Colours::gold.darker(0.1f);
+    //    loadParameterPointer (attackMsParam, vts, "attack");
+    //    loadParameterPointer (releaseMsParam, vts, "release");
+    uiOptions.backgroundColour = Colours::teal.darker (0.1f);
+    uiOptions.powerColour = Colours::gold.darker (0.1f);
     uiOptions.info.description = "A simple envelope follower";
     uiOptions.info.authors = StringArray { "Rachel Locke" };
 }
@@ -30,8 +31,8 @@ ParamLayout LevelDetective::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-//    createTimeMsParameter (params, "attack", "Attack", createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f);
-//    createTimeMsParameter (params, "release", "Release", createNormalisableRange (10.0f, 1000.0f, 100.0f), 400.0f);
+    //    createTimeMsParameter (params, "attack", "Attack", createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f);
+    //    createTimeMsParameter (params, "release", "Release", createNormalisableRange (10.0f, 1000.0f, 100.0f), 400.0f);
 
     return { params.begin(), params.end() };
 }
@@ -54,14 +55,14 @@ void LevelDetective::processAudio (AudioBuffer<float>& buffer)
     if (inputsConnected.contains (AudioInput))
     {
         //create span to fill audio visualiser buffer
-        nonstd::span<const float> audioChannelData = {buffer.getReadPointer(0), (size_t)numSamples};
+        nonstd::span<const float> audioChannelData = { buffer.getReadPointer (0), (size_t) numSamples };
         levelVisualizer->pushChannel (0, audioChannelData);
-//        level.setParameters(*attackMsParam, *releaseMsParam);
+        //        level.setParameters(*attackMsParam, *releaseMsParam);
         level.processBlock (buffer, levelOutBuffer);
 
         //create span to fill level visualiser buffer
-        nonstd::span<const float> levelChannelData = {levelOutBuffer.getReadPointer(0), (size_t)numSamples};
-        levelVisualizer->pushChannel(1, levelChannelData);
+        nonstd::span<const float> levelChannelData = { levelOutBuffer.getReadPointer (0), (size_t) numSamples };
+        levelVisualizer->pushChannel (1, levelChannelData);
     }
     else
     {
