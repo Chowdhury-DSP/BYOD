@@ -34,6 +34,7 @@ private:
 
     AudioBuffer<float> levelOutBuffer;
     chowdsp::LevelDetector<float> level;
-    std::unique_ptr<LevelDetectorVisualizer> levelVisualizer = nullptr;
+    LevelDetectorVisualizer levelVisualizer;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LevelDetective)
 };

@@ -7,16 +7,16 @@ LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor (
     InputPort {},
     OutputPort {},
     um,
-    [] (InputPort port)
+    [] (InputPort)
     {
         return PortType::audio;
     },
-    [] (OutputPort port)
+    [] (OutputPort)
     {
         return PortType::level;
     })
 {
-    levelVisualizer = std::make_unique<LevelDetectorVisualizer>();
+    //    levelVisualizer = std::make_unique<LevelDetectorVisualizer>();
     using namespace ParameterHelpers;
     //    loadParameterPointer (attackMsParam, vts, "attack");
     //    loadParameterPointer (releaseMsParam, vts, "release");
@@ -43,8 +43,8 @@ void LevelDetective::prepare (double sampleRate, int samplesPerBlock)
     levelOutBuffer.setSize (1, samplesPerBlock);
     level.prepare ({ sampleRate, (uint32) samplesPerBlock, 1 });
 
-    levelVisualizer->setBufferSize (int (levelVisualizer->secondsToVisualize * sampleRate / (double) samplesPerBlock));
-    levelVisualizer->setSamplesPerBlock (samplesPerBlock);
+    levelVisualizer.setBufferSize (int (levelVisualizer.secondsToVisualize * sampleRate / (double) samplesPerBlock));
+    levelVisualizer.setSamplesPerBlock (samplesPerBlock);
 }
 
 void LevelDetective::processAudio (AudioBuffer<float>& buffer)
@@ -56,13 +56,13 @@ void LevelDetective::processAudio (AudioBuffer<float>& buffer)
     {
         //create span to fill audio visualiser buffer
         nonstd::span<const float> audioChannelData = { buffer.getReadPointer (0), (size_t) numSamples };
-        levelVisualizer->pushChannel (0, audioChannelData);
+        levelVisualizer.pushChannel (0, audioChannelData);
         //        level.setParameters(*attackMsParam, *releaseMsParam);
         level.processBlock (buffer, levelOutBuffer);
 
         //create span to fill level visualiser buffer
         nonstd::span<const float> levelChannelData = { levelOutBuffer.getReadPointer (0), (size_t) numSamples };
-        levelVisualizer->pushChannel (1, levelChannelData);
+        levelVisualizer.pushChannel (1, levelChannelData);
     }
     else
     {
@@ -87,13 +87,20 @@ bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, ch
 {
     struct LevelDetectiveEditor : juce::Component
     {
-        //Parameters here?
+        explicit LevelDetectiveEditor (juce::Component& viz) : visualiser (viz)
+        {
+            addAndMakeVisible (visualiser);
+        }
 
-        juce::Component* visualiser;
-    } levelDetectiveEditor;
+        void resized() override
+        {
+            visualiser.setBounds (getLocalBounds());
+        }
 
-    levelDetectiveEditor.visualiser = levelVisualizer.get();
+        juce::Component& visualiser;
+    };
 
-    customComps.add (levelDetectiveEditor.visualiser);
+    customComps.add (std::make_unique<LevelDetectiveEditor> (levelVisualizer));
+
     return false;
 }
