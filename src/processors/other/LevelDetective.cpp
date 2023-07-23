@@ -11,7 +11,7 @@ const auto powerColour = Colours::gold.darker (0.1f);
 const auto backgroundColour = Colours::teal.darker (0.1f);
 const String attackTag = "attack";
 const String releaseTag = "release";
-}
+} // namespace
 
 LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor (
     "Level Detective",
@@ -68,7 +68,7 @@ void LevelDetective::processAudio (AudioBuffer<float>& buffer)
         //create span to fill audio visualiser buffer
         nonstd::span<const float> audioChannelData = { buffer.getReadPointer (0), (size_t) numSamples };
         levelVisualizer.pushChannel (0, audioChannelData);
-        level.setParameters(*attackMsParam, *releaseMsParam);
+        level.setParameters (*attackMsParam, *releaseMsParam);
         level.processBlock (buffer, levelOutBuffer);
 
         //create span to fill level visualiser buffer
@@ -108,26 +108,25 @@ bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, ch
               attackAttach (vts, attackTag, attackSlider),
               releaseAttach (vts, releaseTag, releaseSlider)
         {
+            attackLabel.setText ("Attack", juce::dontSendNotification);
+            releaseLabel.setText ("Release", juce::dontSendNotification);
+            attackLabel.setJustificationType (Justification::centred);
+            releaseLabel.setJustificationType (Justification::centred);
 
-            attackLabel.setText("Attack", juce::dontSendNotification);
-            releaseLabel.setText("Release", juce::dontSendNotification);
-            attackLabel.setJustificationType(Justification::centred);
-            releaseLabel.setJustificationType(Justification::centred);
-
-            addAndMakeVisible(attackLabel);
-            addAndMakeVisible(releaseLabel);
+            addAndMakeVisible (attackLabel);
+            addAndMakeVisible (releaseLabel);
 
             for (auto* s : { &attackSlider, &releaseSlider })
             {
                 s->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
                 s->setTextBoxStyle (Slider::TextBoxBelow, false, 80, 20);
-                s->setColour (Slider::textBoxHighlightColourId, powerColour.withAlpha(0.55f));
-                s->setColour(Slider::thumbColourId, powerColour);
-                addAndMakeVisible(s);
+                s->setColour (Slider::textBoxHighlightColourId, powerColour.withAlpha (0.55f));
+                s->setColour (Slider::thumbColourId, powerColour);
+                addAndMakeVisible (s);
             }
 
-            visualiser.backgroundColour = backgroundColour.darker(0.4f);
-            visualiser.audioColour = juce::Colours::greenyellow.darker(0.4f);
+            visualiser.backgroundColour = backgroundColour.darker (0.4f);
+            visualiser.audioColour = juce::Colours::greenyellow.darker (0.4f);
 
             hcp.registerParameterComponent (attackSlider, attackSlider.getParameter());
             hcp.registerParameterComponent (releaseSlider, releaseSlider.getParameter());
@@ -139,17 +138,17 @@ bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, ch
         void resized() override
         {
             auto bounds = getLocalBounds();
-            visualiser.setBounds (bounds.removeFromTop(proportionOfHeight(0.33f)));
-            bounds.removeFromTop(proportionOfHeight(0.03f));
-            auto labelRect = bounds.removeFromTop(proportionOfHeight(0.115f));
-            attackLabel.setBounds(labelRect.removeFromLeft(proportionOfWidth(0.5f)));
-            attackLabel.setFont(Font((float)attackLabel.getHeight() - 2.0f).boldened());
-            releaseLabel.setBounds(labelRect);
-            releaseLabel.setFont(Font((float)releaseLabel.getHeight() - 2.0f).boldened());
-            attackSlider.setBounds (bounds.removeFromLeft(proportionOfWidth(0.5f)));
+            visualiser.setBounds (bounds.removeFromTop (proportionOfHeight (0.33f)));
+            bounds.removeFromTop (proportionOfHeight (0.03f));
+            auto labelRect = bounds.removeFromTop (proportionOfHeight (0.115f));
+            attackLabel.setBounds (labelRect.removeFromLeft (proportionOfWidth (0.5f)));
+            attackLabel.setFont (Font ((float) attackLabel.getHeight() - 2.0f).boldened());
+            releaseLabel.setBounds (labelRect);
+            releaseLabel.setFont (Font ((float) releaseLabel.getHeight() - 2.0f).boldened());
+            attackSlider.setBounds (bounds.removeFromLeft (proportionOfWidth (0.5f)));
             releaseSlider.setBounds (bounds);
             for (auto* s : { &attackSlider, &releaseSlider })
-                s->setTextBoxStyle (Slider::TextBoxBelow, false, proportionOfWidth(0.4f), proportionOfHeight(0.137f));
+                s->setTextBoxStyle (Slider::TextBoxBelow, false, proportionOfWidth (0.4f), proportionOfHeight (0.137f));
         }
 
     private:
