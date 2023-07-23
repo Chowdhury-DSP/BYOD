@@ -132,6 +132,7 @@ target_sources(BYOD PRIVATE
     processors/other/Compressor.cpp
     processors/other/Delay.cpp
     processors/other/EnvelopeFilter.cpp
+    processors/other/LevelDetective.cpp
     processors/other/Gate.cpp
     processors/other/Octaver.cpp
     processors/other/ShimmerReverb.cpp
