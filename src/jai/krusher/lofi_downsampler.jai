@@ -1,17 +1,17 @@
-Lofi_Resample_State :: struct {
+Krusher_Lofi_Resample_State :: struct {
     upsample_overshoot: float64;
     downsample_overshoot: float64;
 }
 
 #program_export
-krusher_init_lofi_resample :: (using state: *Lofi_Resample_State) #c_call {
+krusher_init_lofi_resample :: (using state: *Krusher_Lofi_Resample_State) #c_call {
     upsample_overshoot = 0.0;
     downsample_overshoot = 0.0;
 }
 
 #program_export
 krusher_process_lofi_downsample :: (ctx: *Context,
-                                    using state: *Lofi_Resample_State,
+                                    using state: *Krusher_Lofi_Resample_State,
                                     buffer: **float32,
                                     num_channels: s32,
                                     num_samples: s32,

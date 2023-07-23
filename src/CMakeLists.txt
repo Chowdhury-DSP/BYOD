@@ -157,19 +157,19 @@ target_sources(BYOD PRIVATE
 )
 
 # Jai files
-set(IS_JAI_AVAILABLE 1)
-if (IS_JAI_AVAILABLE)
+find_program(JAI_COMPILER
+    NAMES jai jai.exe jai-linux jai-macos
+    HINTS ${CMAKE_SOURCE_DIR}/../jai/bin ${CMAKE_SOURCE_DIR}/../../Research/jai/bin
+)
+
+message(STATUS "Jai compiler: ${JAI_COMPILER}")
+if (NOT(${JAI_COMPILER} STREQUAL "JAI_COMPILER-NOTFOUND"))
     message(STATUS "Building Jai files!")
+    add_subdirectory(jai)
     target_compile_definitions(BYOD PRIVATE BYOD_BUILDING_JAI_MODULES=1)
     target_sources(BYOD PRIVATE
         processors/other/krusher/Krusher.cpp
     )
-
-    find_library(BYOD_JAI_LIB
-        NAMES krusher_jai_lib
-        PATHS ${CMAKE_CURRENT_SOURCE_DIR}/processors/other/krusher/jai
-    )
-    target_link_libraries(BYOD PRIVATE ${BYOD_JAI_LIB})
 endif()
 
 # AVX/SSE files for accelerated neural nets

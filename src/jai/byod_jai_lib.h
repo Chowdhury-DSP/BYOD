@@ -46,7 +46,7 @@ struct jai_Buffer;
 struct jai_String_Builder;
 struct jai_Print_Style;
 struct jai_Context;
-struct jai_Lofi_Resample_State;
+struct jai_Krusher_Lofi_Resample_State;
 
 enum jai_Type_Info_Tag {
     INTEGER = 0,
@@ -318,19 +318,19 @@ typedef struct jai_Context {
     struct jai_Print_Style print_style;
 } jai_Context;
 
-typedef struct jai_Lofi_Resample_State {
+typedef struct jai_Krusher_Lofi_Resample_State {
     double upsample_overshoot;
     double downsample_overshoot;
-} jai_Lofi_Resample_State;
+} jai_Krusher_Lofi_Resample_State;
 
 
 void __jai_runtime_fini(void *_context);
 
 struct jai_Context * __jai_runtime_init(s32 argc, u8 **argv);
 
-void krusher_process_lofi_downsample(struct jai_Context *ctx, struct jai_Lofi_Resample_State *state, float **buffer, s32 num_channels, s32 num_samples, double resample_factor);
+void krusher_process_lofi_downsample(struct jai_Context *ctx, struct jai_Krusher_Lofi_Resample_State *state, float **buffer, s32 num_channels, s32 num_samples, double resample_factor);
 
-void krusher_init_lofi_resample(struct jai_Lofi_Resample_State *state);
+void krusher_init_lofi_resample(struct jai_Krusher_Lofi_Resample_State *state);
 
 
 #ifdef __cplusplus

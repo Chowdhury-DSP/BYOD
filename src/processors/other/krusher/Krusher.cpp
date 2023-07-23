@@ -17,13 +17,6 @@ Krusher::Krusher (UndoManager* um)
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
     addPopupMenuParameter ("antialias");
-
-    jai_context = __jai_runtime_init (0, nullptr);
-}
-
-Krusher::~Krusher()
-{
-    __jai_runtime_fini (jai_context);
 }
 
 ParamLayout Krusher::createParameterLayout()
@@ -99,7 +92,7 @@ void Krusher::processDownsampler (const chowdsp::BufferView<float>& buffer, floa
     if (antialias)
         aaFilter.processBlock (buffer);
 
-    krusher_process_lofi_downsample (jai_context,
+    krusher_process_lofi_downsample (jai_context.get(),
                                      &resample_state,
                                      const_cast<float**> (buffer.getArrayOfWritePointers()),
                                      buffer.getNumChannels(),

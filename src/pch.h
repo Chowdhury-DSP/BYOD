@@ -31,6 +31,10 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant",
 #include <modules/Eigen/Eigen/Dense>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
+#if BYOD_BUILDING_JAI_MODULES
+#include "jai/SharedJaiContext.h"
+#endif
+
 // global definitions
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;
 using ParamLayout = AudioProcessorValueTreeState::ParameterLayout;

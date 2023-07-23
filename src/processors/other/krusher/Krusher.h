@@ -2,7 +2,7 @@
 
 #include "processors/BaseProcessor.h"
 
-#include "jai/krusher_jai_lib.h"
+#include "jai/byod_jai_lib.h"
 
 //#include "BRRHelpers.h"
 //#include "LoFiDownsampler.h"
@@ -11,7 +11,6 @@ class Krusher : public BaseProcessor
 {
 public:
     explicit Krusher (UndoManager* um = nullptr);
-    ~Krusher() override;
 
     ProcessorType getProcessorType() const override { return Other; }
     static ParamLayout createParameterLayout();
@@ -32,8 +31,8 @@ private:
     chowdsp::EllipticFilter<8> aiFilter;
     float hostFs = 48000.0f;
 
-    jai_Context* jai_context = nullptr;
-    jai_Lofi_Resample_State resample_state;
+    SharedJaiContext jai_context;
+    jai_Krusher_Lofi_Resample_State resample_state {};
 
 //    LoFiDownsampler loFiDownsampler;
 //
