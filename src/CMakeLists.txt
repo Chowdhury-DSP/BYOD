@@ -3,6 +3,7 @@ if(NOT (IOS OR BUILD_RELEASE))
     add_subdirectory(headless)
 endif()
 
+# main source files
 target_sources(BYOD PRIVATE
     BYOD.cpp
 
@@ -155,8 +156,23 @@ target_sources(BYOD PRIVATE
     processors/netlist_helpers/NetlistViewer.cpp
 )
 
-target_precompile_headers(BYOD PRIVATE pch.h)
+# Jai files
+set(IS_JAI_AVAILABLE 1)
+if (IS_JAI_AVAILABLE)
+    message(STATUS "Building Jai files!")
+    target_compile_definitions(BYOD PRIVATE BYOD_BUILDING_JAI_MODULES=1)
+    target_sources(BYOD PRIVATE
+        processors/other/krusher/Krusher.cpp
+    )
 
+    find_library(BYOD_JAI_LIB
+        NAMES krusher_jai_lib
+        PATHS ${CMAKE_CURRENT_SOURCE_DIR}/processors/other/krusher/jai
+    )
+    target_link_libraries(BYOD PRIVATE ${BYOD_JAI_LIB})
+endif()
+
+# AVX/SSE files for accelerated neural nets
 make_lib_simd_runtime(rnn_accelerated processors/drive/neural_utils/RNNAccelerated.cpp)
 foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
     target_link_libraries(${target} PRIVATE config_flags juce::juce_recommended_lto_flags warning_flags)
@@ -177,7 +193,10 @@ target_compile_definitions(rnn_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_A
 target_compile_definitions(rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32)
 target_link_libraries(BYOD PRIVATE rnn_accelerated)
 
+# special flags for MSVC
 if (MSVC)
     target_compile_options(BYOD PRIVATE /bigobj)
 endif ()
 
+# pre-compiled header
+target_precompile_headers(BYOD PRIVATE pch.h)
