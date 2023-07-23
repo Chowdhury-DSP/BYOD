@@ -1,5 +1,17 @@
 #include "LevelDetective.h"
 #include "../ParameterHelpers.h"
+#include "gui/utils/ModulatableSlider.h"
+
+using namespace chowdsp::compressor;
+
+namespace
+{
+
+const auto powerColour = Colours::gold.darker (0.1f);
+const auto backgroundColour = Colours::teal.darker (0.1f);
+const String attackTag = "attack";
+const String releaseTag = "release";
+}
 
 LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor (
     "Level Detective",
@@ -16,12 +28,11 @@ LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor (
         return PortType::level;
     })
 {
-    //    levelVisualizer = std::make_unique<LevelDetectorVisualizer>();
     using namespace ParameterHelpers;
-    //    loadParameterPointer (attackMsParam, vts, "attack");
-    //    loadParameterPointer (releaseMsParam, vts, "release");
-    uiOptions.backgroundColour = Colours::teal.darker (0.1f);
-    uiOptions.powerColour = Colours::gold.darker (0.1f);
+    loadParameterPointer (attackMsParam, vts, attackTag);
+    loadParameterPointer (releaseMsParam, vts, releaseTag);
+    uiOptions.backgroundColour = backgroundColour;
+    uiOptions.powerColour = powerColour;
     uiOptions.info.description = "A simple envelope follower";
     uiOptions.info.authors = StringArray { "Rachel Locke" };
 }
@@ -31,8 +42,8 @@ ParamLayout LevelDetective::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    //    createTimeMsParameter (params, "attack", "Attack", createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f);
-    //    createTimeMsParameter (params, "release", "Release", createNormalisableRange (10.0f, 1000.0f, 100.0f), 400.0f);
+    createTimeMsParameter (params, attackTag, "Attack", createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f);
+    createTimeMsParameter (params, releaseTag, "Release", createNormalisableRange (10.0f, 1000.0f, 100.0f), 400.0f);
 
     return { params.begin(), params.end() };
 }
@@ -57,7 +68,7 @@ void LevelDetective::processAudio (AudioBuffer<float>& buffer)
         //create span to fill audio visualiser buffer
         nonstd::span<const float> audioChannelData = { buffer.getReadPointer (0), (size_t) numSamples };
         levelVisualizer.pushChannel (0, audioChannelData);
-        //        level.setParameters(*attackMsParam, *releaseMsParam);
+        level.setParameters(*attackMsParam, *releaseMsParam);
         level.processBlock (buffer, levelOutBuffer);
 
         //create span to fill level visualiser buffer
@@ -83,24 +94,75 @@ void LevelDetective::processAudioBypassed (AudioBuffer<float>& buffer)
     }
 }
 
-bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider&)
+bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
 {
-    struct LevelDetectiveEditor : juce::Component
+    using namespace chowdsp::ParamUtils;
+    class LevelDetectiveEditor : public juce::Component
     {
-        explicit LevelDetectiveEditor (juce::Component& viz) : visualiser (viz)
+    public:
+        explicit LevelDetectiveEditor (LevelDetectorVisualizer& viz, AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
+            : visualiser (viz),
+              vts (vtState),
+              attackSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, attackTag), hcp),
+              releaseSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, releaseTag), hcp),
+              attackAttach (vts, attackTag, attackSlider),
+              releaseAttach (vts, releaseTag, releaseSlider)
         {
+
+            attackLabel.setText("Attack", juce::dontSendNotification);
+            releaseLabel.setText("Release", juce::dontSendNotification);
+            attackLabel.setJustificationType(Justification::centred);
+            releaseLabel.setJustificationType(Justification::centred);
+
+            addAndMakeVisible(attackLabel);
+            addAndMakeVisible(releaseLabel);
+
+            for (auto* s : { &attackSlider, &releaseSlider })
+            {
+                s->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
+                s->setTextBoxStyle (Slider::TextBoxBelow, false, 80, 20);
+                s->setColour (Slider::textBoxHighlightColourId, powerColour.withAlpha(0.55f));
+                s->setColour(Slider::thumbColourId, powerColour);
+                addAndMakeVisible(s);
+            }
+
+            visualiser.backgroundColour = backgroundColour.darker(0.4f);
+            visualiser.audioColour = juce::Colours::greenyellow.darker(0.4f);
+
+            hcp.registerParameterComponent (attackSlider, attackSlider.getParameter());
+            hcp.registerParameterComponent (releaseSlider, releaseSlider.getParameter());
+
+            this->setName (attackTag + "__" + releaseTag + "__");
             addAndMakeVisible (visualiser);
         }
 
         void resized() override
         {
-            visualiser.setBounds (getLocalBounds());
+            auto bounds = getLocalBounds();
+            visualiser.setBounds (bounds.removeFromTop(proportionOfHeight(0.33f)));
+            bounds.removeFromTop(proportionOfHeight(0.03f));
+            auto labelRect = bounds.removeFromTop(proportionOfHeight(0.115f));
+            attackLabel.setBounds(labelRect.removeFromLeft(proportionOfWidth(0.5f)));
+            attackLabel.setFont(Font((float)attackLabel.getHeight() - 2.0f).boldened());
+            releaseLabel.setBounds(labelRect);
+            releaseLabel.setFont(Font((float)releaseLabel.getHeight() - 2.0f).boldened());
+            attackSlider.setBounds (bounds.removeFromLeft(proportionOfWidth(0.5f)));
+            releaseSlider.setBounds (bounds);
+            for (auto* s : { &attackSlider, &releaseSlider })
+                s->setTextBoxStyle (Slider::TextBoxBelow, false, proportionOfWidth(0.4f), proportionOfHeight(0.137f));
         }
 
-        juce::Component& visualiser;
+    private:
+        using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
+        LevelDetectorVisualizer& visualiser;
+        AudioProcessorValueTreeState& vts;
+        ModulatableSlider attackSlider, releaseSlider;
+        SliderAttachment attackAttach, releaseAttach;
+        Label attackLabel, releaseLabel;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LevelDetectiveEditor)
     };
 
-    customComps.add (std::make_unique<LevelDetectiveEditor> (levelVisualizer));
-
+    customComps.add (std::make_unique<LevelDetectiveEditor> (levelVisualizer, vts, hcp));
     return false;
 }

@@ -2,8 +2,6 @@
 
 #include "../BaseProcessor.h"
 
-using namespace chowdsp::compressor;
-
 class LevelDetective : public BaseProcessor
 {
 public:
@@ -29,12 +27,12 @@ private:
         LevelOutput
     };
 
-    //    chowdsp::FloatParameter* attackMsParam = nullptr;
-    //    chowdsp::FloatParameter* releaseMsParam = nullptr;
+    chowdsp::FloatParameter* attackMsParam = nullptr;
+    chowdsp::FloatParameter* releaseMsParam = nullptr;
 
     AudioBuffer<float> levelOutBuffer;
     chowdsp::LevelDetector<float> level;
-    LevelDetectorVisualizer levelVisualizer;
+    chowdsp::compressor::LevelDetectorVisualizer levelVisualizer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LevelDetective)
 };
