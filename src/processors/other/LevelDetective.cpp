@@ -6,7 +6,6 @@ using namespace chowdsp::compressor;
 
 namespace
 {
-
 const auto powerColour = Colours::gold.darker (0.1f);
 const auto backgroundColour = Colours::teal.darker (0.1f);
 const String attackTag = "attack";
@@ -50,7 +49,6 @@ ParamLayout LevelDetective::createParameterLayout()
 
 void LevelDetective::prepare (double sampleRate, int samplesPerBlock)
 {
-    //prepare the buffers
     levelOutBuffer.setSize (1, samplesPerBlock);
     level.prepare ({ sampleRate, (uint32) samplesPerBlock, 1 });
 
@@ -62,16 +60,13 @@ void LevelDetective::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     levelOutBuffer.setSize (1, numSamples, false, false, true);
-    //if audio input connected, extract level from input signal and assign to levelOutBuffer
     if (inputsConnected.contains (AudioInput))
     {
-        //create span to fill audio visualiser buffer
         nonstd::span<const float> audioChannelData = { buffer.getReadPointer (0), (size_t) numSamples };
         levelVisualizer.pushChannel (0, audioChannelData);
         level.setParameters (*attackMsParam, *releaseMsParam);
         level.processBlock (buffer, levelOutBuffer);
 
-        //create span to fill level visualiser buffer
         nonstd::span<const float> levelChannelData = { levelOutBuffer.getReadPointer (0), (size_t) numSamples };
         levelVisualizer.pushChannel (1, levelChannelData);
     }
@@ -90,6 +85,10 @@ void LevelDetective::processAudioBypassed (AudioBuffer<float>& buffer)
     if (inputsConnected.contains (AudioInput))
     {
         levelOutBuffer.clear();
+        nonstd::span<const float> audioChannelData = { buffer.getReadPointer (0), (size_t) numSamples };
+        nonstd::span<const float> levelChannelData = { levelOutBuffer.getReadPointer (0), (size_t) numSamples };
+        levelVisualizer.pushChannel (0, audioChannelData);
+        levelVisualizer.pushChannel(1, levelChannelData);
         outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
     }
 }
@@ -126,7 +125,7 @@ bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, ch
             }
 
             visualiser.backgroundColour = backgroundColour.darker (0.4f);
-            visualiser.audioColour = juce::Colours::greenyellow.darker (0.4f);
+            visualiser.audioColour = powerColour;
 
             hcp.registerParameterComponent (attackSlider, attackSlider.getParameter());
             hcp.registerParameterComponent (releaseSlider, releaseSlider.getParameter());
