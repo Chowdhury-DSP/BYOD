@@ -58,8 +58,8 @@
 #include "other/ShimmerReverb.h"
 #include "other/SmoothReverb.h"
 #include "other/cry_baby/CryBaby.h"
-#include "other/spring_reverb/SpringReverbProcessor.h"
 #include "other/krusher/Krusher.h"
+#include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
