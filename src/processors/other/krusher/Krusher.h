@@ -41,6 +41,7 @@ private:
 #else
     std::unique_ptr<chowdsp::NullType> jai_context;
     Krusher_Lofi_Resample_State resample_state {};
+    std::array<Krusher_Bit_Reducer_Filter_State, 2> brFilterStates {};
 #endif
 
     chowdsp::FirstOrderHPF<float> dcBlocker;

@@ -22,6 +22,7 @@ extern "C" {
     const bool true = 1;
 #endif
 
+struct jai_Krusher_Bit_Reducer_Filter_State;
 struct jai_Type_Info;
 struct jai_string;
 struct jai_Array_View_64;
@@ -46,8 +47,12 @@ struct jai_Buffer;
 struct jai_String_Builder;
 struct jai_Print_Style;
 struct jai_Context;
-struct jai_Krusher_Bit_Reducer_Filter_State;
 struct jai_Krusher_Lofi_Resample_State;
+
+typedef struct jai_Krusher_Bit_Reducer_Filter_State {
+    s32 p1;
+    s32 p2;
+} jai_Krusher_Bit_Reducer_Filter_State;
 
 enum jai_Type_Info_Tag {
     INTEGER = 0,
@@ -319,22 +324,17 @@ typedef struct jai_Context {
     struct jai_Print_Style print_style;
 } jai_Context;
 
-typedef struct jai_Krusher_Bit_Reducer_Filter_State {
-    s32 p1;
-    s32 p2;
-} jai_Krusher_Bit_Reducer_Filter_State;
-
 typedef struct jai_Krusher_Lofi_Resample_State {
     double upsample_overshoot;
     double downsample_overshoot;
 } jai_Krusher_Lofi_Resample_State;
 
 
+void krusher_bit_reduce_process_block(float **buffer, s32 num_channels, s32 num_samples, s32 filter_index, s32 bit_depth, struct jai_Krusher_Bit_Reducer_Filter_State *filter_states);
+
 void __jai_runtime_fini(void *_context);
 
 struct jai_Context * __jai_runtime_init(s32 argc, u8 **argv);
-
-void krusher_bit_reduce_process_block(float **buffer, s32 num_channels, s32 num_samples, s32 filter_index, s32 bit_depth, struct jai_Krusher_Bit_Reducer_Filter_State *filter_states);
 
 void krusher_process_lofi_downsample(struct jai_Context *ctx, struct jai_Krusher_Lofi_Resample_State *state, float **buffer, s32 num_channels, s32 num_samples, double resample_factor);
 
