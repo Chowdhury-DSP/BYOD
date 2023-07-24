@@ -41,7 +41,7 @@ ParamLayout Krusher::createParameterLayout()
                                             &stringToFloatVal);
     emplace_param<chowdsp::ChoiceParameter> (params,
                                              "bit_reduction_filter",
-                                             "Order",
+                                             "Smoothq",
                                              StringArray { "Zero-Order", "First-Order", "Second-Order", "Third-Order" },
                                              1);
     createPercentParameter (params, "mix", "Mix", 1.0f);

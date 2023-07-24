@@ -23,7 +23,7 @@ krusher_bit_reduce_process_block :: (buffer: **float,
             samples_float_span.data = buffer[channel] + num_samples - samples_remaining;
             samples_float_span.count = samples_to_process;
 
-            memset(*samples_int, 0, size_of(s32) * small_block_size);
+            memset(*samples_int, 0, size_of(s16) * small_block_size);
             samples_int_span : []s16;
             samples_int_span.data = samples_int.data;
             samples_int_span.count = samples_to_process;
@@ -84,7 +84,7 @@ decode_sample :: inline (shift: u8, x: u16) -> s16 #no_context {
 bit_reduce_decode :: (using br_block: Bit_Reduction_Block,
                       out: []s16,
                       filter: BR_Filter,
-                      using state: *Krusher_Bit_Reducer_Filter_State) #no_context {
+                      state: *Krusher_Bit_Reducer_Filter_State) #no_context {
 
     type1_filter :: inline (nibble_2r: s16, using state: *Krusher_Bit_Reducer_Filter_State) -> s16 #no_context {
         y := cast(s32) nibble_2r + ((p1 * 15) >> 4);
