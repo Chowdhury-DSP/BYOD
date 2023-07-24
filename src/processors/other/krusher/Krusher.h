@@ -2,10 +2,13 @@
 
 #include "processors/BaseProcessor.h"
 
-#include "jai/byod_jai_lib.h"
+#define KRUSHER_USE_JAI_IMPL ! (JUCE_ARM || JUCE_IOS)
 
-//#include "BRRHelpers.h"
-//#include "LoFiDownsampler.h"
+#if KRUSHER_USE_JAI_IMPL
+#include "jai/byod_jai_lib.h"
+#else
+#include "krusher_fallback_impl.h"
+#endif
 
 class Krusher : public BaseProcessor
 {
@@ -31,11 +34,14 @@ private:
     chowdsp::EllipticFilter<8> aiFilter;
     float hostFs = 48000.0f;
 
+#if KRUSHER_USE_JAI_IMPL
     SharedJaiContext jai_context;
     jai_Krusher_Lofi_Resample_State resample_state {};
+#else
+    std::unique_ptr<chowdsp::NullType> jai_context;
+    Krusher_Lofi_Resample_State resample_state {};
+#endif
 
-//    LoFiDownsampler loFiDownsampler;
-//
 //    std::array<brr_helpers::BRRFilterState, 2> brrFilterStates {};
 
     chowdsp::FirstOrderHPF<float> dcBlocker;

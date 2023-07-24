@@ -157,12 +157,7 @@ target_sources(BYOD PRIVATE
 )
 
 # Jai files
-find_program(JAI_COMPILER
-    NAMES jai jai.exe jai-linux jai-macos
-    HINTS ${CMAKE_SOURCE_DIR}/../jai/bin ${CMAKE_SOURCE_DIR}/../../Research/jai/bin
-)
-
-message(STATUS "Jai compiler: ${JAI_COMPILER}")
+include(${CMAKE_SOURCE_DIR}/modules/cmake/FindJaiCompiler.cmake)
 if (NOT(${JAI_COMPILER} STREQUAL "JAI_COMPILER-NOTFOUND"))
     message(STATUS "Configuring Jai compilation!")
     add_subdirectory(jai)

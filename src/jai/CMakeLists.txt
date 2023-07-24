@@ -26,7 +26,7 @@ target_link_libraries(BYOD PRIVATE byod_jai_lib)
 target_sources(BYOD PRIVATE SharedJaiContext.cpp stb_sprintf.cpp)
 target_compile_definitions(BYOD PRIVATE STB_SPRINTF_IMPLEMENTATION=1)
 
-if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
     string(JOIN " " STB_CXX_FLAGS
         "-Wno-language-extension-token"
         "-Wno-zero-as-null-pointer-constant"

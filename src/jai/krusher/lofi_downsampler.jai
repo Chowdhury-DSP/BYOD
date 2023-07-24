@@ -48,13 +48,12 @@ krusher_process_lofi_resample :: (source_buffer: **float32,
                                   overshoot_samples: *float64)
 {
     // simple S&H lofi resampler
-    grab_index : s32 = -1;
     for channel: 0..num_channels-1 {
         source_data := source_buffer[channel];
         dest_data := dest_buffer[channel];
 
         for i: 0..num_samples_dest-1 {
-            grab_index = cast(s32) (cast(float64) i * resample_factor + (<<overshoot_samples));
+            grab_index := cast(s32) (cast(float64) i * resample_factor + (<<overshoot_samples));
             dest_data[i] = source_data[min(grab_index, num_samples_source - 1)];
         }
     }
