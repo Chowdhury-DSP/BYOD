@@ -164,7 +164,7 @@ find_program(JAI_COMPILER
 
 message(STATUS "Jai compiler: ${JAI_COMPILER}")
 if (NOT(${JAI_COMPILER} STREQUAL "JAI_COMPILER-NOTFOUND"))
-    message(STATUS "Building Jai files!")
+    message(STATUS "Configuring Jai compilation!")
     add_subdirectory(jai)
     target_compile_definitions(BYOD PRIVATE BYOD_BUILDING_JAI_MODULES=1)
     target_sources(BYOD PRIVATE

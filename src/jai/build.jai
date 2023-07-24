@@ -13,6 +13,9 @@ build :: () {
     target_options := get_build_options(w);
     target_options.output_executable_name = "byod_jai_lib";
     target_options.output_type = .STATIC_LIBRARY; // specifies output to be a static library
+    target_options.backend = .LLVM;
+    target_options.text_output_flags = 1;
+    set_optimization(*target_options, .OPTIMIZED);
 
     set_build_options(target_options, w);
 

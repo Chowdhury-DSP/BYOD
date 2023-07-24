@@ -17,6 +17,7 @@ krusher_process_lofi_downsample :: (ctx: *Context,
                                     num_samples: s32,
                                     resample_factor: float64) #c_call
 {
+
     push_context ctx {
         ds_buffer_size := cast(s32) Math.ceil(cast(float64) num_samples / resample_factor);
 

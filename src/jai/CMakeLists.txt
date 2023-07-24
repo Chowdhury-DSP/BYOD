@@ -8,7 +8,7 @@ else()
 endif()
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${JAI_LIBRARY_FILE}
-    COMMAND ${JAI_COMPILER} build.jai -release
+    COMMAND ${JAI_COMPILER} build.jai
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDS ${JAI_SRC_FILES} # To make sure this command re-runs whenever we update the Jai source files
 )
@@ -27,9 +27,18 @@ target_sources(BYOD PRIVATE SharedJaiContext.cpp stb_sprintf.cpp)
 target_compile_definitions(BYOD PRIVATE STB_SPRINTF_IMPLEMENTATION=1)
 
 if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+    string(JOIN " " STB_CXX_FLAGS
+        "-Wno-language-extension-token"
+        "-Wno-zero-as-null-pointer-constant"
+        "-Wno-cast-align"
+        "-Wno-implicit-fallthrough"
+        "-Wno-conditional-uninitialized"
+        "-Wno-duplicate-decl-specifier"
+        "-Wno-unreachable-code"
+    )
     set_source_files_properties(stb_sprintf.cpp
-        PROPERTIES
-        COMPILE_FLAGS "-Wno-duplicate-decl-specifier -Wno-language-extension-token -Wno-zero-as-null-pointer-constant -Wno-cast-align -Wno-implicit-fallthrough -Wno-conditional-uninitialized"
+        TARGET_DIRECTORY BYOD
+        PROPERTIES COMPILE_FLAGS "${STB_CXX_FLAGS}"
     )
 endif()
 
