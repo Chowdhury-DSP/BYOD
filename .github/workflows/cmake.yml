@@ -24,7 +24,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            cmake_args: "-DCMAKE_CXX_COMPILER=g++-11"
+            cmake_args: "-DCMAKE_C_COMPILER=clang-12 -DCMAKE_CXX_COMPILER=clang++-12"
           - os: windows-2022
             cmake_args: "-TClangCL -A x64"
           - os: macos-latest
@@ -34,6 +34,10 @@ jobs:
     - name: Install Linux Deps
       if: runner.os == 'Linux'
       run: |
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key|sudo apt-key add -
+        sudo apt-add-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-12 main"
+        sudo apt update
+        sudo apt install clang-12 -y
         sudo apt-get update
         sudo apt install libasound2-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libfreetype6-dev libglu1-mesa-dev libjack-jackd2-dev
 

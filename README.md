@@ -29,6 +29,10 @@ add new guitar effect processors, please see
 
 To build from scratch, you must have CMake installed.
 
+Builds are tested using the Clang compiler across all platforms
+(Windows, Mac, linux, iOS), however it is likely that the plugin
+will build correctly with most other major compilers.
+
 ```bash
 # Clone the repository
 $ git clone https://github.com/Chowdhury-DSP/BYOD.git
