@@ -58,6 +58,7 @@
 #include "other/ShimmerReverb.h"
 #include "other/SmoothReverb.h"
 #include "other/cry_baby/CryBaby.h"
+#include "other/krusher/Krusher.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "utility/CleanGain.h"
@@ -151,6 +152,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Shimmer Reverb", { &processorFactory<ShimmerReverb>, { ProcessorType::Other, 1, 1 } } },
     { "Smooth Reverb", { &processorFactory<SmoothReverb>, { ProcessorType::Other, 1, 1 } } },
     { "Spring Reverb", { &processorFactory<SpringReverbProcessor>, { ProcessorType::Other, 1, 1 } } },
+    { "Krusher", { &processorFactory<Krusher>, { ProcessorType::Other, 1, 1 } } },
 
 #if BYOD_ENABLE_ADD_ON_MODULES
     BYOD_STORE_MAP_ADD_ON_MODULES

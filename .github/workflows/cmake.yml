@@ -54,6 +54,15 @@ jobs:
         path: modules/BYOD-add-ons
         token: ${{ secrets.OUR_GITHUB_PAT }}
 
+    - name: Checkout Jai
+      uses: actions/checkout@v2
+      if: github.actor == 'jatinchowdhury18'
+      with:
+        ref: main
+        repository: Chowdhury-DSP/jai-minimal
+        token: ${{ secrets.OUR_GITHUB_PAT }}
+        path: modules/jai
+
     - name: Configure
       shell: bash
       env:
