@@ -67,8 +67,8 @@ void Krusher::prepare (double sampleRate, int samplesPerBlock)
 
     krusher_init_lofi_resample (&resample_state);
 
-    //    for (auto& state : brrFilterStates)
-    //        state = {};
+    for (auto& state : brFilterStates)
+        state = {};
 
     dcBlocker.prepare (2);
     dcBlocker.calcCoefs (20.0f, (float) sampleRate);
@@ -108,7 +108,12 @@ void Krusher::processAudio (AudioBuffer<float>& buffer)
     dryBuffer.setCurrentSize (buffer.getNumChannels(), buffer.getNumSamples());
     chowdsp::BufferMath::copyBufferData (buffer, dryBuffer);
 
-    //    brr_helpers::processBlock (buffer, brrFilterIndex->getIndex(), (int) *bitDepthParam, brrFilterStates);
+    krusher_bit_reduce_process_block (const_cast<float**> (buffer.getArrayOfWritePointers()),
+                                      buffer.getNumChannels(),
+                                      buffer.getNumSamples(),
+                                      brrFilterIndex->getIndex(),
+                                      (int) *bitDepthParam,
+                                      brFilterStates.data());
 
     processDownsampler (buffer, *sampleRateParam, antialiasParam->get());
 

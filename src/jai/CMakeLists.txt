@@ -1,6 +1,3 @@
-file(GLOB_RECURSE JAI_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.jai)
-#message(STATUS "Found Jai source files ${JAI_SRC_FILES}")
-
 if(WIN32)
     set(JAI_LIBRARY_FILE "byod_jai_lib.lib")
 else()
@@ -10,7 +7,7 @@ endif()
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${JAI_LIBRARY_FILE}
     COMMAND ${JAI_COMPILER} build.jai
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDS ${JAI_SRC_FILES} # To make sure this command re-runs whenever we update the Jai source files
+    DEPENDS build.jai krusher/bit_reduction.jai krusher/lofi_downsampler.jai
 )
 add_custom_target(jai_library_build DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${JAI_LIBRARY_FILE})
 

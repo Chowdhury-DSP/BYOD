@@ -37,12 +37,11 @@ private:
 #if KRUSHER_USE_JAI_IMPL
     SharedJaiContext jai_context;
     jai_Krusher_Lofi_Resample_State resample_state {};
+    std::array<jai_Krusher_Bit_Reducer_Filter_State, 2> brFilterStates {};
 #else
     std::unique_ptr<chowdsp::NullType> jai_context;
     Krusher_Lofi_Resample_State resample_state {};
 #endif
-
-//    std::array<brr_helpers::BRRFilterState, 2> brrFilterStates {};
 
     chowdsp::FirstOrderHPF<float> dcBlocker;
 
