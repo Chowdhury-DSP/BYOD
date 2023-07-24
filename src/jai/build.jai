@@ -19,6 +19,7 @@ build :: () {
     target_options.output_executable_name = "byod_jai_lib";
     target_options.output_type = .STATIC_LIBRARY; // specifies output to be a static library
     target_options.backend = .LLVM;
+    target_options.llvm_options.command_line = string.[target_options.output_executable_name, "--relocation-model=pic"];
     target_options.text_output_flags = 1;
     set_optimization(*target_options, .OPTIMIZED);
 
