@@ -9,7 +9,7 @@ if(NOT IOS)
 
     find_program(JAI_COMPILER
         NAMES ${JAI_COMPILER_EXE}
-        HINTS ${CMAKE_SOURCE_DIR}/../jai/bin ${CMAKE_SOURCE_DIR}/../../Research/jai/bin
+        HINTS ${CMAKE_SOURCE_DIR}/modules/jai/bin ${CMAKE_SOURCE_DIR}/../../Research/jai/bin
     )
     message(STATUS "Jai compiler: ${JAI_COMPILER}")
 else()

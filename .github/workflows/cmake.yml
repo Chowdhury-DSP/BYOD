@@ -61,7 +61,7 @@ jobs:
         ref: main
         repository: Chowdhury-DSP/jai-minimal
         token: ${{ secrets.OUR_GITHUB_PAT }}
-        path: ${{github.workspace}}/../jai
+        path: modules/jai
 
     - name: Configure
       shell: bash
