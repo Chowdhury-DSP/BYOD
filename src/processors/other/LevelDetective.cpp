@@ -88,7 +88,7 @@ void LevelDetective::processAudioBypassed (AudioBuffer<float>& buffer)
         nonstd::span<const float> audioChannelData = { buffer.getReadPointer (0), (size_t) numSamples };
         nonstd::span<const float> levelChannelData = { levelOutBuffer.getReadPointer (0), (size_t) numSamples };
         levelVisualizer.pushChannel (0, audioChannelData);
-        levelVisualizer.pushChannel(1, levelChannelData);
+        levelVisualizer.pushChannel (1, levelChannelData);
         outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
     }
 }
