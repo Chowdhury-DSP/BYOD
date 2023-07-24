@@ -141,6 +141,7 @@ target_sources(BYOD PRIVATE
     processors/other/cry_baby/CryBabyNDK.cpp
     processors/other/spring_reverb/SpringReverb.cpp
     processors/other/spring_reverb/SpringReverbProcessor.cpp
+    processors/other/krusher/Krusher.cpp
 
     processors/utility/CleanGain.cpp
     processors/utility/FreqBandSplitter.cpp
@@ -162,9 +163,6 @@ if (NOT(${JAI_COMPILER} STREQUAL "JAI_COMPILER-NOTFOUND"))
     message(STATUS "Configuring Jai compilation!")
     add_subdirectory(jai)
     target_compile_definitions(BYOD PRIVATE BYOD_BUILDING_JAI_MODULES=1)
-    target_sources(BYOD PRIVATE
-        processors/other/krusher/Krusher.cpp
-    )
 endif()
 
 # AVX/SSE files for accelerated neural nets

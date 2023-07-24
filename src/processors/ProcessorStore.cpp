@@ -59,6 +59,7 @@
 #include "other/SmoothReverb.h"
 #include "other/cry_baby/CryBaby.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
+#include "other/krusher/Krusher.h"
 
 #include "utility/CleanGain.h"
 #include "utility/DCBias.h"
@@ -69,10 +70,6 @@
 #include "utility/StereoMerger.h"
 #include "utility/StereoSplitter.h"
 #include "utility/Tuner.h"
-
-#if BYOD_BUILDING_JAI_MODULES
-#include "other/krusher/Krusher.h"
-#endif
 
 #if BYOD_ENABLE_ADD_ON_MODULES
 #include <AddOnProcessorStore.h>
@@ -155,10 +152,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Shimmer Reverb", { &processorFactory<ShimmerReverb>, { ProcessorType::Other, 1, 1 } } },
     { "Smooth Reverb", { &processorFactory<SmoothReverb>, { ProcessorType::Other, 1, 1 } } },
     { "Spring Reverb", { &processorFactory<SpringReverbProcessor>, { ProcessorType::Other, 1, 1 } } },
-
-#if BYOD_BUILDING_JAI_MODULES
     { "Krusher", { &processorFactory<Krusher>, { ProcessorType::Other, 1, 1 } } },
-#endif
 
 #if BYOD_ENABLE_ADD_ON_MODULES
     BYOD_STORE_MAP_ADD_ON_MODULES
