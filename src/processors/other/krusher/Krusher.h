@@ -2,7 +2,7 @@
 
 #include "processors/BaseProcessor.h"
 
-#define KRUSHER_USE_JAI_IMPL ! JUCE_ARM && BYOD_BUILDING_JAI_MODULES
+#define KRUSHER_USE_JAI_IMPL ! JUCE_ARM&& BYOD_BUILDING_JAI_MODULES
 
 #if KRUSHER_USE_JAI_IMPL
 #include "jai/byod_jai_lib.h"
