@@ -1,4 +1,4 @@
-if(NOT IOS)
+if(NOT (IOS OR LINUX))
     if(WIN32)
         set(JAI_COMPILER_EXE "jai.exe")
     elseif(APPLE)
