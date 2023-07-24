@@ -1,0 +1,4 @@
+.build/
+*.lib
+*.a
+*_jai_lib.h
