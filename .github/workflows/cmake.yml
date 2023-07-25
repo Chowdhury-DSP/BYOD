@@ -51,7 +51,7 @@ jobs:
 
     - name: Checkout add-ons
       uses: actions/checkout@v2
-      if: github.event_name != 'pull_request'
+      if: github.actor == 'jatinchowdhury18'
       with:
         ref: main
         repository: Chowdhury-DSP/BYOD-add-ons
