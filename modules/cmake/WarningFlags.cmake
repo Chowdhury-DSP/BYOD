@@ -76,6 +76,9 @@ elseif((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQU
         -Wno-deprecated-anon-enum-enum-conversion
         # Needed for ARM processor, OSX versions below 10.14
         -fno-aligned-allocation
+        # Needed for constexpr evaluation
+        -fconstexpr-steps=1000000000
+
     )
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(STATUS "Setting GNU compiler flags")
