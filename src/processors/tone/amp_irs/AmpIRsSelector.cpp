@@ -334,7 +334,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
                                       Logger::writeToLog ("AmpIRs attempting to load IR from local file: " + irFile.getLocalFile().getFullPathName());
                                       ampIRs.loadIRFromStream (irFile.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)),
                                                                {},
-                                                               irFile,
+                                                               irFile.getLocalFile(),
                                                                safeParent.getComponent());
 #else
                 if (fc.getResults().isEmpty())

@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 - Added "Fuzz Machine" module.
 - Added "Mouse Drive" module.
 - Added "Crying Child" module.
+- Added "Krusher" module.
 - Added "Solo-Vibe" module.
 - Added "Ladder Filter" module.
 - Added "MIDI Modulator" and "Param Modulator" modules.
