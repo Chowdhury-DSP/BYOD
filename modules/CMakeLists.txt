@@ -38,6 +38,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_serialization
         chowdsp::chowdsp_units
         chowdsp::chowdsp_wdf
+        chowdsp::chowdsp_visualizers
         RTNeural
         ea_variant
     PUBLIC
