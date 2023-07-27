@@ -59,6 +59,9 @@ any previously destroyed cables.
 ### Modulation Ports
 Purple modulation ports are available on all modulation processors. When connected, these ports allow for one processor's modulation signal to be passed to another. A processor with a connected modulation input will use the modulation signal from that input instead of generating its own. This feature allows multiple modulation processors to be synced to the same modulation signal, creating unique effects possibilities.
 
+### Level Ports
+Red level ports are available on all dynamics processors. When connected, these ports allow one processor's level signal to be passed to another. A processor with a connected level input will use the level signal from that input for internal processing, instead of internally calculating the level of the incoming audio signal. This feature allows dynamics processors to share level information between multiple processors. An additional dynamics processor named ‘Level Detective’ receives an audio signal and sends out the audio input's corresponding level signal.
+
 ## Processor Controls
 
 Each processor has an on/off switch, as well as a settings menu,
