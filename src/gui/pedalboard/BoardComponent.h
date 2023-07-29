@@ -35,7 +35,7 @@ public:
     ProcessorEditor* findEditorForProcessor (const BaseProcessor* proc) const;
 
 private:
-    void showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, ConnectionInfo* connectionInfo = nullptr);
+    void showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, juce::Point<int> mousePos, ConnectionInfo* connectionInfo = nullptr);
     void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
     void mouseDown (const MouseEvent& e) override;
     void mouseDrag (const MouseEvent& e) override;

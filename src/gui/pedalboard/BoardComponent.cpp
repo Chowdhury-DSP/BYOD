@@ -41,7 +41,7 @@ BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvi
     newProcButton.onClick = [&]
     {
         ScopedValueSetter svs { addingFromNewProcButton, true };
-        popupMenu.showPopupMenu();
+        popupMenu.showPopupMenu ({});
     };
 
     inputEditor = std::make_unique<ProcessorEditor> (procs.getInputProcessor(), procChain, hostContextProvider);
@@ -72,11 +72,11 @@ BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvi
     cableView.getConnectionHelper()->connectToProcessorChain (procChain);
 
     popupMenu.setAssociatedComponent (this);
-    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
+    popupMenu.popupMenuCallback = [this] (PopupMenu& menu, PopupMenu::Options& options, juce::Point<int> mousePos)
     {
         menu.addSectionHeader ("Add Processor:");
         menu.addSeparator();
-        showNewProcMenu (menu, options);
+        showNewProcMenu (menu, options, mousePos);
     };
 
     selectorLasso.setColour (LassoComponent<ProcessorEditor*>::lassoOutlineColourId, Colours::red);
@@ -248,7 +248,7 @@ void BoardComponent::duplicateProcessor (const ProcessorEditor& editor)
     procChain.getProcStore().duplicateProcessor (*editor.getProcPtr());
 }
 
-void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, ConnectionInfo* connectionInfo)
+void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, juce::Point<int> mousePos, ConnectionInfo* connectionInfo)
 {
     if (addingFromNewProcButton)
     {
@@ -256,7 +256,12 @@ void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& optio
     }
     else
     {
-        nextEditorPosition = options.getTargetScreenArea().getPosition() - getScreenPosition();
+//        const auto desktopScaleFactor = Desktop::getInstance().getGlobalScaleFactor();
+//        const auto clickPosition = options.getTargetScreenArea().getPosition();
+//        const auto clickPositionScaled = Desktop::getInstance().getDisplays().physicalToLogical (clickPosition);
+//        const auto screenPosition = getScreenPosition();
+        nextEditorPosition = mousePos; // options.getTargetScreenArea().getPosition() - getScreenPosition();
+//        const auto editorPositionFixed = clickPositionScaled - screenPosition;
 
         const auto halfEditorWidth = getScaleDim (editorWidth, scaleFactor) / 2;
         const auto halfEditorHeight = getScaleDim (editorHeight, scaleFactor) / 2;
