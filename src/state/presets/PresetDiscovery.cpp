@@ -81,6 +81,11 @@ struct FactoryPresetsProvider
     }
 };
 
+static auto getUserPresetsFolder()
+{
+    return chowdsp::PresetManager::getUserPresetPath (chowdsp::toString (PresetManager::userPresetPath));
+}
+
 struct UserPresetsProvider
 #if JUCE_DEBUG
     : clap::helpers::PresetDiscoveryProvider<clap::helpers::MisbehaviourHandler::Terminate, clap::helpers::CheckingLevel::Maximal>
@@ -113,7 +118,7 @@ struct UserPresetsProvider
     {
         indexer()->declare_filetype (indexer(), &filetype);
 
-        userPresetsFolder = chowdsp::PresetManager::getUserPresetPath (chowdsp::toString (PresetManager::userPresetPath));
+        userPresetsFolder = getUserPresetsFolder();
         if (userPresetsFolder == juce::File {} || ! userPresetsFolder.isDirectory())
             return false;
 
@@ -159,6 +164,9 @@ struct UserPresetsProvider
 
 uint32_t count (const struct clap_preset_discovery_factory*)
 {
+    const auto userPresetsFolder = getUserPresetsFolder();
+    if (userPresetsFolder == juce::File {} || ! userPresetsFolder.isDirectory())
+        return 1;
     return 2;
 }
 
