@@ -11,7 +11,8 @@ StateManager::StateManager (AudioProcessorValueTreeState& vtState, ProcessorChai
     : vts (vtState),
       procChain (procs),
       presetManager (presetMgr),
-      uiState (vts, GUIConstants::defaultWidth, GUIConstants::defaultHeight)
+      uiState (vts, GUIConstants::defaultWidth, GUIConstants::defaultHeight),
+      pluginWrapperType (vts.processor.wrapperType)
 {
 }
 
@@ -53,7 +54,9 @@ void StateManager::loadState (XmlElement* xmlState)
 
     const auto [presetWasDirty, pluginVersion] = [&]
     {
-        const MessageManagerLock mml;
+        std::optional<MessageManagerLock> mml {};
+        if (pluginWrapperType != AudioProcessor::WrapperType::wrapperType_AAX)
+            mml.emplace();
         presetManager.loadXmlState (xmlState->getChildByName (chowdsp::PresetManager::presetStateTag));
         const auto wasDirty = presetManager.getIsDirty();
 
@@ -63,11 +66,16 @@ void StateManager::loadState (XmlElement* xmlState)
         return std::make_tuple (wasDirty, savedPluginVersion);
     }();
 
-    WaitableEvent waiter;
-    procChain.getStateHelper().loadProcChain (procChainXml, pluginVersion, false, nullptr, &waiter);
-    waiter.wait (1000);
+    std::unique_ptr<WaitableEvent> waiter;
+    if (pluginWrapperType != AudioProcessor::WrapperType::wrapperType_AAX)
+        waiter = std::make_unique<WaitableEvent>();
+    procChain.getStateHelper().loadProcChain (procChainXml, pluginVersion, false, nullptr, waiter.get());
+    if (waiter != nullptr)
+        waiter->wait (1000);
 
-    const MessageManagerLock mml;
+    std::optional<MessageManagerLock> mml {};
+    if (pluginWrapperType != AudioProcessor::WrapperType::wrapperType_AAX)
+        mml.emplace();
     presetManager.setIsDirty (presetWasDirty);
 
     if (auto* um = vts.undoManager)

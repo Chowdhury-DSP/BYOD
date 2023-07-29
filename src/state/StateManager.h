@@ -23,6 +23,7 @@ private:
     chowdsp::PresetManager& presetManager;
 
     chowdsp::UIState uiState;
+    const juce::AudioProcessor::WrapperType pluginWrapperType;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StateManager)
 };
