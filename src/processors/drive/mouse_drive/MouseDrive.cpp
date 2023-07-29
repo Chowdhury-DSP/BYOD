@@ -137,8 +137,8 @@ ParamLayout MouseDrive::createParameterLayout()
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createPercentParameter (params, "distortion", "Distortion", 0.5f);
-    createPercentParameter (params, "volume", "Volume", 0.5f);
+    createPercentParameter (params, "distortion", "Distortion", 0.75f);
+    createPercentParameter (params, "volume", "Volume", 0.75f);
 
     return { params.begin(), params.end() };
 }

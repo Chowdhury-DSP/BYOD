@@ -155,7 +155,7 @@ ParamLayout Flapjack::createParameterLayout()
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createPercentParameter (params, driveTag, "Drive", 0.5f);
+    createPercentParameter (params, driveTag, "Drive", 0.75f);
     createPercentParameter (params, presenceTag, "Presence", 0.5f);
     createFreqParameter (params, lowCutTag, "Low Cut", 20.0f, 750.0f, 100.0f, 100.0f);
     createPercentParameter (params, levelTag, "Level", 0.5f);

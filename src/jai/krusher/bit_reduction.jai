@@ -16,7 +16,7 @@ krusher_bit_reduce_process_block :: (buffer: **float,
     for channel : 0..num_channels-1 {
         samples_remaining : s32 = num_samples;
         while samples_remaining > 0 {
-            samples_to_process := ifx samples_remaining > small_block_size then small_block_size else samples_remaining;
+            samples_to_process : s32 = ifx samples_remaining > small_block_size then small_block_size else samples_remaining;
             defer { samples_remaining -= samples_to_process; }
 
             samples_float_span : []float32;
@@ -108,6 +108,10 @@ bit_reduce_decode :: (using br_block: Bit_Reduction_Block,
     }
 
     for br_sample, i : data {
+        if i >= out.count {
+            break;
+        }
+
         if #complete filter == {
             case .TYPE_0; out[i] = decode_sample(shift_amount, br_sample);
             case .TYPE_1; out[i] = type1_filter (decode_sample(shift_amount, br_sample), state);
