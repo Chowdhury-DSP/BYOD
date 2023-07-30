@@ -34,7 +34,7 @@ ParamLayout MidiModulator::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    emplace_param<chowdsp::BoolParameter> (params, bipolarTag, "Bipolar", false);
+    emplace_param<chowdsp::BoolParameter> (params, bipolarTag, "Bipolar", true);
     return { params.begin(), params.end() };
 }
 
