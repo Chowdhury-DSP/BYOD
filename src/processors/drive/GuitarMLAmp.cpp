@@ -42,7 +42,7 @@ GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createPa
     uiOptions.info.authors = StringArray { "Keith Bloemer", "Jatin Chowdhury" };
     uiOptions.info.infoLink = "https://guitarml.com";
 
-#if 0 // JUCE_INTEL
+#if JUCE_INTEL
     if (juce::SystemStats::hasAVX() && juce::SystemStats::hasFMA3())
     {
         juce::Logger::writeToLog ("Using RNN model with AVX SIMD instructions!");
