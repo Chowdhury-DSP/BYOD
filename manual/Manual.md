@@ -161,7 +161,7 @@ Information about specific sessions of the plugin can be seen in
 the plugin log files. These files are can be found in the following
 location:
 - Windows: `C:\Users\<username>\AppData\Roaming\ChowdhuryDSP\BYOD\Logs`
-- Mac: `~/Library/ChowdhuryDSP/BYOD/Logs`
+- Mac: `~/Library/Logs/ChowdhuryDSP/BYOD/Logs`
 - Linux: `~/.config/ChowdhuryDSP/BYOD/Logs`
 
 ### Copying Plugin Diagnostics
