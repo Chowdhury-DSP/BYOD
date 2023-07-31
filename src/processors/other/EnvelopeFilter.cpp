@@ -55,6 +55,8 @@ EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor (
     uiOptions.powerColour = Colours::yellow.darker (0.1f);
     uiOptions.info.description = "A envelope filter with lowpass, bandpass, and highpass filter types. Use the right-click menu to control the filter modulation directly";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    disableWhenInputConnected ({ "speed" }, LevelInput);
 }
 
 ParamLayout EnvelopeFilter::createParameterLayout()

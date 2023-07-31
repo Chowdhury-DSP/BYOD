@@ -104,6 +104,8 @@ Compressor::Compressor (UndoManager* um) : BaseProcessor (
     uiOptions.paramIDsToSkip = { "knee", "makeup" };
     uiOptions.info.description = "A dynamic range compressor.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+    disableWhenInputConnected ({ "attack", "release" }, LevelInput);
 }
 
 Compressor::~Compressor() = default;
