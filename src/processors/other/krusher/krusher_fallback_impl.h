@@ -133,6 +133,9 @@ inline void bit_reduce_decode (const Bit_Reduction_Block& br_block,
 
     for (size_t i = 0; i < 16; ++i)
     {
+        if (i >= out.size())
+            break;
+
         const auto brr_sample = br_block.data[i];
 
         switch (filter)

@@ -185,9 +185,9 @@ void CableViewConnectionHelper::destroyCable (BaseProcessor* proc, int portIndex
     cableView.repaint();
 }
 
-void CableViewConnectionHelper::clickOnCable (PopupMenu& menu, PopupMenu::Options& options, Cable* clickedCable)
+void CableViewConnectionHelper::clickOnCable (PopupMenu& menu, PopupMenu::Options& options, juce::Point<int> clickPos, Cable* clickedCable)
 {
     menu.addSectionHeader ("Replace Cable:");
     menu.addSeparator();
-    board.showNewProcMenu (menu, options, &(clickedCable->connectionInfo));
+    board.showNewProcMenu (menu, options, clickPos, &(clickedCable->connectionInfo));
 }

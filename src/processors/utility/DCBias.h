@@ -21,7 +21,7 @@ public:
     {
         using namespace ParameterHelpers;
         auto params = createBaseParams();
-        emplace_param<chowdsp::FloatParameter> (params, "bias", "Bias", NormalisableRange { -0.25f, 0.25f }, 0.0f, &floatValToString, &stringToFloatVal);
+        emplace_param<chowdsp::FloatParameter> (params, "bias", "Bias", NormalisableRange { -1.0f, 1.0f }, 0.0f, &floatValToString, &stringToFloatVal);
 
         return { params.begin(), params.end() };
     }

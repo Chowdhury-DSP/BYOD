@@ -11,8 +11,8 @@ Cable::Cable (const BoardComponent* comp, CableView& cv, const ConnectionInfo co
                                                                                             board (comp)
 {
     popupMenu.setAssociatedComponent (this);
-    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options)
-    { cableView.getConnectionHelper()->clickOnCable (menu, options, this); };
+    popupMenu.popupMenuCallback = [&] (PopupMenu& menu, PopupMenu::Options& options, juce::Point<int> mousePos)
+    { cableView.getConnectionHelper()->clickOnCable (menu, options, mousePos, this); };
 }
 
 Cable::~Cable() = default;

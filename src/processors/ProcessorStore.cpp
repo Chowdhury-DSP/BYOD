@@ -149,7 +149,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Delay", { &processorFactory<DelayModule>, { ProcessorType::Other, 1, 1 } } },
     { "Envelope Filter", { &processorFactory<EnvelopeFilter>, { ProcessorType::Other, EnvelopeFilter::numInputs, EnvelopeFilter::numOutputs } } },
     { "Level Detective", { &processorFactory<LevelDetective>, { ProcessorType::Other, 1, 1 } } },
-    { "Gate", { &processorFactory<Gate>, { ProcessorType::Other, Gate::numInputs, Gate::numOutputs } } },
+    { "Gate", { &processorFactory<Gate>, { ProcessorType::Other, 1, 1 } } },
     { "Octaver", { &processorFactory<Octaver>, { ProcessorType::Other, 1, 1 } } },
     { "Shimmer Reverb", { &processorFactory<ShimmerReverb>, { ProcessorType::Other, 1, 1 } } },
     { "Smooth Reverb", { &processorFactory<SmoothReverb>, { ProcessorType::Other, 1, 1 } } },

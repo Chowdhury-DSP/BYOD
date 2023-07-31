@@ -95,11 +95,14 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
 
     int nextNumProcs = 0;
     const int numOutputs = proc->getNumOutputs();
+    int numAudioOutputs = 0;
     for (int i = 0; i < numOutputs; ++i)
     {
         const int numOutProcs = proc->getNumOutputConnections (i);
         for (int j = 0; j < numOutProcs; ++j)
             nextNumProcs += 1;
+
+        numAudioOutputs += proc->getOutputPortType (i) == PortType::audio ? 1 : 0;
     }
 
     if (proc == &outputProcessor) // we've reached the output processor, so we're done!
@@ -115,7 +118,7 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
         return;
     }
 
-    if (nextNumProcs == 0) // the output of this processor is connected to nothing, so let's not waste our processing...
+    if (nextNumProcs == 0 && numAudioOutputs > 0) // the output of this processor is connected to nothing, so let's not waste our processing...
     {
         if (proc == &inputProcessor)
             inputProcessor.resetLevels();
