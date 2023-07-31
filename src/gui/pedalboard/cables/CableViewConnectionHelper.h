@@ -16,7 +16,7 @@ public:
     bool releaseCable (const MouseEvent& e);
     void destroyCable (BaseProcessor* proc, int portIndex);
 
-    void clickOnCable (PopupMenu& menu, PopupMenu::Options& options, Cable* clickedCable);
+    void clickOnCable (PopupMenu& menu, PopupMenu::Options& options, juce::Point<int> clickPos, Cable* clickedCable);
     std::unique_ptr<MouseEvent> cableMouse;
 
 private:

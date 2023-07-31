@@ -40,7 +40,7 @@ ParamLayout ParamModulator::createParameterLayout()
     auto params = createBaseParams();
     createPercentParameter (params, unipolarModTag, "Modulation", 0.0f);
     createBipolarPercentParameter (params, bipolarModTag, "Modulation +/-", 0.0f);
-    emplace_param<chowdsp::BoolParameter> (params, bipolarModeTag, "Bipolar", false);
+    emplace_param<chowdsp::BoolParameter> (params, bipolarModeTag, "Bipolar", true);
     return { params.begin(), params.end() };
 }
 

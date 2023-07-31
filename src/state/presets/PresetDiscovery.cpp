@@ -3,6 +3,7 @@
 #include "PresetDiscovery.h"
 #include "PresetManager.h"
 #include "processors/ProcessorStore.h"
+#include "processors/chain/ProcessorChain.h"
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wunused-parameter")
 JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4100)
@@ -77,35 +78,13 @@ struct FactoryPresetsProvider
         }
 
         return true;
-
-        /*
-        if (location_kind != CLAP_PRESET_DISCOVERY_LOCATION_FILE || location == nullptr)
-            return false;
-
-        const auto userPresetFile = juce::File { location };
-        if (! userPresetFile.existsAsFile())
-            return false;
-
-        chowdsp::Preset preset { userPresetFile };
-        if (! preset.isValid())
-            return false;
-
-        if (metadata_receiver->begin_preset (metadata_receiver, userPresetFile.getFullPathName().toRawUTF8(), ""))
-        {
-            metadata_receiver->add_plugin_id (metadata_receiver, &plugin_id);
-            metadata_receiver->add_creator (metadata_receiver, preset.getVendor().toRawUTF8());
-
-            if (preset.getCategory().isNotEmpty())
-                metadata_receiver->add_feature (metadata_receiver, preset.getCategory().toRawUTF8());
-            metadata_receiver->set_timestamps (metadata_receiver,
-                                               (clap_timestamp_t) userPresetFile.getCreationTime().toMilliseconds() / 1000,
-                                               (clap_timestamp_t) userPresetFile.getLastModificationTime().toMilliseconds() / 1000);
-        }
-
-        return true;
-         */
     }
 };
+
+static auto getUserPresetsFolder()
+{
+    return chowdsp::PresetManager::getUserPresetPath (chowdsp::toString (PresetManager::userPresetPath));
+}
 
 struct UserPresetsProvider
 #if JUCE_DEBUG
@@ -139,7 +118,7 @@ struct UserPresetsProvider
     {
         indexer()->declare_filetype (indexer(), &filetype);
 
-        userPresetsFolder = chowdsp::PresetManager::getUserPresetPath (chowdsp::toString (PresetManager::userPresetPath));
+        userPresetsFolder = getUserPresetsFolder();
         if (userPresetsFolder == juce::File {} || ! userPresetsFolder.isDirectory())
             return false;
 
@@ -185,6 +164,9 @@ struct UserPresetsProvider
 
 uint32_t count (const struct clap_preset_discovery_factory*)
 {
+    const auto userPresetsFolder = getUserPresetsFolder();
+    if (userPresetsFolder == juce::File {} || ! userPresetsFolder.isDirectory())
+        return 1;
     return 2;
 }
 
@@ -223,7 +205,8 @@ const clap_preset_discovery_provider_t* create (
 
 bool presetLoadFromLocation (chowdsp::PresetManager& presetManager, uint32_t location_kind, const char* location, const char* load_key) noexcept
 {
-    juce::ignoreUnused (load_key);
+    auto& byodPresetManager = static_cast<PresetManager&> (presetManager); // NOLINT
+
     if (location_kind == CLAP_PRESET_DISCOVERY_LOCATION_FILE)
     {
         const auto presetFile = juce::File { location };
@@ -237,9 +220,21 @@ bool presetLoadFromLocation (chowdsp::PresetManager& presetManager, uint32_t loc
         if (! preset.isValid())
             return false;
 
-        static_cast<PresetManager&> (presetManager).loadPresetSafe (std::make_unique<chowdsp::Preset> (std::move (preset)), nullptr); //NOLINT
+        byodPresetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (std::move (preset)), nullptr);
 
         return true;
+    }
+
+    if (location_kind == CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN)
+    {
+        for (auto& preset : byodPresetManager.getFactoryPresets (byodPresetManager.getProcessorChain()->getProcStore()))
+        {
+            if (preset.getName() == load_key)
+            {
+                byodPresetManager.loadPresetSafe (std::make_unique<chowdsp::Preset> (std::move (preset)), nullptr);
+                return true;
+            }
+        }
     }
 
     return false;

@@ -89,8 +89,8 @@ struct FeedForward2WDF
 
     ResistorCapacitorParallelT<float> R5_C4 { 5.1e3f, 68e-9f };
     WDFSeriesT<float, decltype (R5_C4), decltype (S6)> S7 { R5_C4, S6 };
-    PolarityInverterT<double, decltype (S7)> I1 { S7 };
+    PolarityInverterT<float, decltype (S7)> I1 { S7 };
 
-    IdealVoltageSourceT<double, decltype (I1)> Vin { I1 };
+    IdealVoltageSourceT<float, decltype (I1)> Vin { I1 };
 };
 } // namespace gain_stage

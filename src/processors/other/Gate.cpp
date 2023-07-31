@@ -1,5 +1,4 @@
 #include "Gate.h"
-#include "../BufferHelpers.h"
 #include "../ParameterHelpers.h"
 
 class Gate::GateEnvelope
@@ -94,24 +93,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GateEnvelope)
 };
 
-Gate::Gate (UndoManager* um) : BaseProcessor (
-    "Gate",
-    createParameterLayout(),
-    InputPort {},
-    OutputPort {},
-    um,
-    [] (InputPort port)
-    {
-        if (port == InputPort::LevelInput)
-            return PortType::level;
-        return PortType::audio;
-    },
-    [] (OutputPort port)
-    {
-        if (port == OutputPort::LevelOutput)
-            return PortType::level;
-        return PortType::audio;
-    })
+Gate::Gate (UndoManager* um) : BaseProcessor ("Gate", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (threshDBParam, vts, "thresh");
@@ -120,7 +102,7 @@ Gate::Gate (UndoManager* um) : BaseProcessor (
     loadParameterPointer (releaseMsParam, vts, "release");
     loadParameterPointer (makeupDBParam, vts, "makeup");
 
-    gateEnvelope = std::make_unique<GateEnvelope>();
+    gateEnvelope.emplace();
 
     uiOptions.backgroundColour = Colours::forestgreen.brighter (0.1f);
     uiOptions.powerColour = Colours::gold.brighter (0.1f);
@@ -147,8 +129,7 @@ ParamLayout Gate::createParameterLayout()
 
 void Gate::prepare (double sampleRate, int samplesPerBlock)
 {
-    audioOutBuffer.setSize (2, samplesPerBlock);
-    levelOutBuffer.setSize (1, samplesPerBlock);
+    levelBuffer.setSize (1, samplesPerBlock);
 
     gateEnvelope->prepare (sampleRate, samplesPerBlock);
 
@@ -158,81 +139,33 @@ void Gate::prepare (double sampleRate, int samplesPerBlock)
 
 void Gate::processAudio (AudioBuffer<float>& buffer)
 {
+    const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    //set up level output
-    levelOutBuffer.setSize (1, numSamples, false, false, true);
-    if (inputsConnected.contains (LevelInput))
+    // set up level buffer
+    if (numChannels == 1)
     {
-        BufferHelpers::collapseToMonoBuffer (getInputBuffer (LevelInput), levelOutBuffer);
+        levelBuffer.makeCopyOf (buffer);
     }
     else
     {
-        if (inputsConnected.contains (AudioInput))
-        {
-            BufferHelpers::collapseToMonoBuffer (getInputBuffer (AudioInput), levelOutBuffer);
-        }
-        else
-        {
-            levelOutBuffer.clear();
-        }
+        levelBuffer.setSize (1, numSamples, true, true, false);
+        levelBuffer.copyFrom (0, 0, buffer, 0, 0, numSamples);
+
+        for (int ch = 1; ch < numChannels; ++ch)
+            levelBuffer.addFrom (0, 0, buffer, ch, 0, numSamples);
+
+        levelBuffer.applyGain (1.0f / (float) numChannels);
     }
 
-    if (inputsConnected.contains (AudioInput))
-    {
-        gateEnvelope->setParameters (*threshDBParam, *attackMsParam, *holdMsParam, *releaseMsParam);
-        gateEnvelope->process (levelOutBuffer);
+    auto&& levelBlock = dsp::AudioBlock<float> { levelBuffer };
+    gateEnvelope->setParameters (*threshDBParam, *attackMsParam, *holdMsParam, *releaseMsParam);
+    gateEnvelope->process (levelBlock);
 
-        auto& audioInBuffer = getInputBuffer (AudioInput);
-        const auto numChannels = audioInBuffer.getNumChannels();
-        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
-        for (int ch = 0; ch < numChannels; ++ch)
-        {
-            FloatVectorOperations::multiply (audioOutBuffer.getWritePointer (ch), audioInBuffer.getReadPointer (ch), gateEnvelope->gainBlock.getChannelPointer (0), numSamples);
-        }
+    auto&& block = dsp::AudioBlock<float> { buffer };
+    for (int ch = 0; ch < numChannels; ++ch)
+        block.getSingleChannelBlock ((size_t) ch) *= gateEnvelope->gainBlock;
 
-        auto&& audioOutBlock = dsp::AudioBlock<float> { audioOutBuffer };
-        makeupGain.setGainDecibels (*makeupDBParam);
-        makeupGain.process (dsp::ProcessContextReplacing<float> { audioOutBlock });
-    }
-    else
-    {
-        audioOutBuffer.setSize (1, numSamples, false, false, true);
-        audioOutBuffer.clear();
-    }
-
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
-}
-
-void Gate::processAudioBypassed (AudioBuffer<float>& buffer)
-{
-    const auto numSamples = buffer.getNumSamples();
-
-    levelOutBuffer.setSize (1, numSamples, false, false, true);
-    if (inputsConnected.contains (LevelInput)) //make mono and pass samples through
-    {
-        const auto& levelInputBuffer = getInputBuffer (LevelInput);
-        BufferHelpers::collapseToMonoBuffer (levelInputBuffer, levelOutBuffer);
-    }
-    else
-    {
-        levelOutBuffer.clear();
-    }
-
-    if (inputsConnected.contains (AudioInput))
-    {
-        const auto& audioInBuffer = getInputBuffer (AudioInput);
-        const auto numChannels = audioInBuffer.getNumChannels();
-        audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
-        for (int ch = 0; ch < numChannels; ++ch)
-            audioOutBuffer.copyFrom (ch, 0, audioInBuffer, ch % numChannels, 0, numSamples);
-    }
-    else
-    {
-        audioOutBuffer.setSize (1, numSamples, false, false, true);
-        audioOutBuffer.clear();
-    }
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    makeupGain.setGainDecibels (*makeupDBParam);
+    makeupGain.process (dsp::ProcessContextReplacing<float> { block });
 }
