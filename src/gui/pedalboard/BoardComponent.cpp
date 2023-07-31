@@ -256,12 +256,12 @@ void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& optio
     }
     else
     {
-//        const auto desktopScaleFactor = Desktop::getInstance().getGlobalScaleFactor();
-//        const auto clickPosition = options.getTargetScreenArea().getPosition();
-//        const auto clickPositionScaled = Desktop::getInstance().getDisplays().physicalToLogical (clickPosition);
-//        const auto screenPosition = getScreenPosition();
+        //        const auto desktopScaleFactor = Desktop::getInstance().getGlobalScaleFactor();
+        //        const auto clickPosition = options.getTargetScreenArea().getPosition();
+        //        const auto clickPositionScaled = Desktop::getInstance().getDisplays().physicalToLogical (clickPosition);
+        //        const auto screenPosition = getScreenPosition();
         nextEditorPosition = mousePos; // options.getTargetScreenArea().getPosition() - getScreenPosition();
-//        const auto editorPositionFixed = clickPositionScaled - screenPosition;
+        //        const auto editorPositionFixed = clickPositionScaled - screenPosition;
 
         const auto halfEditorWidth = getScaleDim (editorWidth, scaleFactor) / 2;
         const auto halfEditorHeight = getScaleDim (editorHeight, scaleFactor) / 2;
