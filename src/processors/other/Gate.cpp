@@ -102,8 +102,6 @@ Gate::Gate (UndoManager* um) : BaseProcessor ("Gate", createParameterLayout(), u
     loadParameterPointer (releaseMsParam, vts, "release");
     loadParameterPointer (makeupDBParam, vts, "makeup");
 
-    [[maybe_unused]] static constexpr auto ss = sizeof (GateEnvelope);
-    static_assert (ss <= 1048);
     gateEnvelope.emplace();
 
     uiOptions.backgroundColour = Colours::forestgreen.brighter (0.1f);
