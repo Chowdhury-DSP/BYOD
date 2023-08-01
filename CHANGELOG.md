@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UNRELEASED]
+## [1.2.0] - 2023-08-01
 - Added "Flapjack" module.
 - Added "Fuzz Machine" module.
 - Added "Mouse Drive" module.
