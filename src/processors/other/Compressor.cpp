@@ -146,6 +146,11 @@ void Compressor::processAudio (AudioBuffer<float>& buffer)
     if (inputsConnected.contains (LevelInput))
     {
         BufferHelpers::collapseToMonoBuffer (getInputBuffer (LevelInput), levelOutBuffer);
+        FloatVectorOperations::clip (levelOutBuffer.getWritePointer (0),
+                                     levelOutBuffer.getReadPointer (0),
+                                     0.0f,
+                                     10.0f,
+                                     numSamples);
     }
     else
     {
