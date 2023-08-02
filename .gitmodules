@@ -15,7 +15,7 @@
 	url = https://github.com/surge-synthesizer/sst-cpputils
 [submodule "modules/clap-juce-extensions"]
 	path = modules/clap-juce-extensions
-	url = https://github.com/free-audio/clap-juce-extensions
+	url = https://github.com/jatinchowdhury18/clap-juce-extensions
 [submodule "modules/chowdsp_wdf"]
 	path = modules/chowdsp_wdf
 	url = https://github.com/Chowdhury-DSP/chowdsp_wdf
