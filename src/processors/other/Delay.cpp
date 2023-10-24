@@ -50,7 +50,7 @@ ParamLayout DelayModule::createParameterLayout()
     emplace_param<AudioParameterChoice> (params,
                                          tempoSyncAmountTag,
                                          "Tempo Sync",
-                                         StringArray { "1/2", "1/4", "1/8" },
+                                         StringArray { "1/2", "1/4", "1/8" , "1/8 dotted"},
                                          0);
     emplace_param<AudioParameterBool> (params, tempoSyncTag, "Tempo Sync Delay", false);
     emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
@@ -234,7 +234,26 @@ void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& d
 void DelayModule::processAudio (AudioBuffer<float>& buffer)
 {
     feedbackSmoothBuffer.process (std::pow (feedbackParam->getCurrentValue() * 0.67f, 0.9f), buffer.getNumSamples());
-    delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f); //delay time in samples (if tempo-sync change the calculation here?)
+
+    if (!tempoSyncOnOffParam)
+    {
+        std::cout << "Delay Time In Ms..." << std::endl;
+        delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f); //delay time in samples (if tempo-sync change the calculation here?)
+    }
+    else
+    {
+        std::cout << "Delay Time In Notes..." << std::endl;
+        //calculate delay time based on delayTimeTempoSyncParam
+        auto noteDivision = (int)*delayTimeTempoSyncParam;
+        if (noteDivision == 0)
+            std::cout<< "1/2 note delay" << std::endl;
+        else if (noteDivision == 1)
+            std::cout<< "1/4 note delay" << std::endl;
+        else if (noteDivision == 2)
+            std::cout<< "1/8 note delay" << std::endl;
+        else if (noteDivision == 3)
+            std::cout<< "1/8 note dottod delay" << std::endl;
+    }
     freqSmooth.setTargetValue (*freqParam);
 
     const auto delayTypeIndex = (int) *delayTypeParam;
