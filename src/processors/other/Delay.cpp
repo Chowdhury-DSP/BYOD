@@ -234,30 +234,45 @@ void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& d
 void DelayModule::processAudio (AudioBuffer<float>& buffer)
 {
     feedbackSmoothBuffer.process (std::pow (feedbackParam->getCurrentValue() * 0.67f, 0.9f), buffer.getNumSamples());
-
-    if (!tempoSyncOnOffParam)
+    auto tempoSync = (int)*tempoSyncOnOffParam;
+    if (!tempoSync)
     {
         std::cout << "Delay Time In Ms..." << std::endl;
         delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f); //delay time in samples (if tempo-sync change the calculation here?)
     }
     else
     {
+        float delayInSamples = fs * 200 * 0.001f ;
         std::cout << "Delay Time In Notes..." << std::endl;
-        //calculate delay time based on delayTimeTempoSyncParam
+        auto positionInfo = audioPlayHead.getPosition();
+//        auto hardcodedBpm = 120;
+        auto bpm = positionInfo->getBpm();
         auto noteDivision = (int)*delayTimeTempoSyncParam;
         if (noteDivision == 0)
-            std::cout<< "1/2 note delay" << std::endl;
+        {
+            delayInSamples = calculateTempoSyncDelayTime(2.0f, *bpm);
+            std::cout << "1/2 Note Delay..." << std::endl;
+        }
         else if (noteDivision == 1)
-            std::cout<< "1/4 note delay" << std::endl;
+        {
+            delayInSamples = calculateTempoSyncDelayTime(1.0f, *bpm);
+            std::cout << "1/4 Note Delay..." << std::endl;
+        }
         else if (noteDivision == 2)
-            std::cout<< "1/8 note delay" << std::endl;
+        {
+            delayInSamples = calculateTempoSyncDelayTime (0.5f, *bpm);
+            std::cout << "1/8 Note Delay..." << std::endl;
+        }
         else if (noteDivision == 3)
-            std::cout<< "1/8 note dottod delay" << std::endl;
+        {
+            delayInSamples = calculateTempoSyncDelayTime (0.75f, *bpm);
+            std::cout << "1/8 Note Dotted Delay..." << std::endl;
+        }
+        delaySmooth.setTargetValue (delayInSamples);
     }
     freqSmooth.setTargetValue (*freqParam);
 
     const auto delayTypeIndex = (int) *delayTypeParam;
-    const auto tempoSyncAmountIndex = (int) *delayTimeTempoSyncParam;
     if (delayTypeIndex != prevDelayTypeIndex)
     {
         cleanDelayLine.reset();
@@ -296,6 +311,15 @@ void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
     }
 
     outputBuffers.getReference (0) = &buffer;
+}
+
+float DelayModule::calculateTempoSyncDelayTime(const float noteDuration, const double bpm) const
+{
+    //calculate tempo sync delay in samples
+    auto beatsPerSecond = static_cast<float> (bpm / 60);
+    auto secondsPerBeat = 1/beatsPerSecond;
+
+    return floor(noteDuration * secondsPerBeat * fs);
 }
 
 bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
