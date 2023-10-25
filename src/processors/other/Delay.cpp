@@ -242,7 +242,7 @@ void DelayModule::processAudio (AudioBuffer<float>& buffer)
     }
     else
     {
-        float delayInSamples = fs * 200 * 0.001f ;
+        float delayInSamples = fs * 200 * 0.001f; //fallback delay
         std::cout << "Delay Time In Notes..." << std::endl;
         auto positionInfo = audioPlayHead.getPosition();
 //        auto hardcodedBpm = 120;
