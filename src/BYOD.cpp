@@ -24,11 +24,10 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
 
     pluginSettings->initialise (settingsFilePath);
     procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager, paramForwarder, [&] (int l)
-                                              { updateSampleLatency (l); }); //make unique
+                                              { updateSampleLatency (l); });
     paramForwarder = std::make_unique<ParamForwardManager> (vts, *procs);
     presetManager = std::make_unique<PresetManager> (procs.get(), vts);
     stateManager = std::make_unique<StateManager> (vts, *procs, *presetManager);
-//    playheadHelper = std::make_unique<PlayheadHelpers> ();
 
 #if JUCE_IOS
     LookAndFeel::setDefaultLookAndFeel (lnfAllocator->getLookAndFeel<chowdsp::ChowLNF>());
@@ -68,8 +67,7 @@ void BYOD::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
     AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
     //get playhead
-    playheadHelper.process(getPlayHead(), buffer.getNumSamples());
-    procs->setPlayheadHelpersReference(playheadHelper);
+    procs->getPlayheadHelper().process (getPlayHead(), buffer.getNumSamples());
 
     // push samples into bypass delay
     bypassScratchBuffer.makeCopyOf (buffer, true);

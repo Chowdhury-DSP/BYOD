@@ -84,7 +84,6 @@ private:
     AudioBuffer<float> stereoBuffer;
 
     bool bypassNeedsReset = false;
-    std::atomic<double>& bpm;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayModule)
 };

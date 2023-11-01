@@ -4,22 +4,18 @@
 
 struct PlayheadHelpers
 {
-    static void prepare(double sampleRate, int maxBlockSize)
+    void process (AudioPlayHead* playHead, int numSamples)
     {
-        ignoreUnused(sampleRate, maxBlockSize);
-    }
-
-    void process(AudioPlayHead* playHead, int numSamples)
-    {
-        ignoreUnused(numSamples);
+        ignoreUnused (numSamples);
         if (playHead != nullptr)
         {
-            info = *playHead->getPosition();
-            bpm.store(*info.getBpm());
+            bpm.store (playHead->getPosition().orFallback (AudioPlayHead::PositionInfo {}).getBpm().orFallback (120.0));
+        }
+        else
+        {
+            bpm.store (120.0);
         }
     }
 
     std::atomic<double> bpm;
-    AudioPlayHead::PositionInfo info;
 };
-

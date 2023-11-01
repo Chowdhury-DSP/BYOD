@@ -1,7 +1,6 @@
 #pragma once
 
 #include "JuceProcWrapper.h"
-#include "processors/PlayheadHelpers.h"
 
 enum ProcessorType
 {
@@ -36,6 +35,7 @@ struct ProcessorUIOptions
 
 class BaseProcessor;
 class ProcessorEditor;
+struct PlayheadHelpers;
 namespace netlist
 {
 struct CircuitQuantityList;
@@ -111,8 +111,6 @@ public:
     void prepareProcessing (double sampleRate, int numSamples);
     void freeInternalMemory();
     void processAudioBlock (AudioBuffer<float>& buffer);
-    void setPlayheadHelpersReference(PlayheadHelpers& helpers);
-    PlayheadHelpers& getPlayheadHelpersReference();
 
     // methods for working with port input levels
     float getInputLevelDB (int portIndex) const noexcept;
@@ -199,6 +197,9 @@ public:
      * At all other times this will be null.
      */
     const MidiBuffer* midiBuffer = nullptr;
+
+    /** Provided by the processor chain */
+    const PlayheadHelpers* playheadHelpers = nullptr;
 
     /** Returns a tooltip string for a given port. */
     virtual String getTooltipForPort (int portIndex, bool isInput);
@@ -304,8 +305,6 @@ private:
 
     StringArray popupMenuParameterIDs;
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
-
-    PlayheadHelpers* playheadHelpersReference;
 
     const base_processor_detail::PortTypesVector inputPortTypes;
     const base_processor_detail::PortTypesVector outputPortTypes;

@@ -57,10 +57,6 @@ void ProcessorChain::createParameters (Parameters& params)
     ChainIOProcessor::createParameters (params);
 }
 
-void ProcessorChain::setPlayheadHelpersReference(PlayheadHelpers& helpers) {
-    playheadHelpersReference = &helpers;
-}
-
 void ProcessorChain::initializeProcessors()
 {
     const auto osFactor = ioProcessor.getOversamplingFactor();
@@ -74,8 +70,6 @@ void ProcessorChain::initializeProcessors()
     {
         if (auto* proc = procs[i])
         {
-            if (proc->getName() == "Delay")
-                proc->setPlayheadHelpersReference(*playheadHelpersReference);
             proc->prepareProcessing (osSampleRate, osSamplesPerBlock);
         }
     }

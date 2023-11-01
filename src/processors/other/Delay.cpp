@@ -1,6 +1,7 @@
 #include "Delay.h"
 #include "../ParameterHelpers.h"
 #include "gui/utils/ModulatableSlider.h"
+#include "processors/PlayheadHelpers.h"
 
 namespace
 {
@@ -15,8 +16,7 @@ const String tempoSyncTag = "tempo_sync";
 const String tempoSyncAmountTag = "delay_time_type";
 } // namespace
 
-DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um),
-                                             bpm(getPlayheadHelpersReference().bpm)
+DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (freqParam, vts, freqTag);
@@ -242,10 +242,9 @@ void DelayModule::processAudio (AudioBuffer<float>& buffer)
         delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f); //delay time in samples (if tempo-sync change the calculation here?)
     }
 
-//    PlayheadHelpers& PlayheadHelpersRef = this->getPlayheadHelpersReference();
-//    std::cout << playheadHelpersReference.bpmDouble << std::endl;
-//    double tempo = bpm.load();
-//    std::cout << "My BPM: " << tempo << std::endl;
+    std::cout << playheadHelpers->bpm << std::endl;
+    double tempo = playheadHelpers->bpm.load();
+    std::cout << "My BPM: " << tempo << std::endl;
 //    int myIntVal = intRef.load();
 //    std::cout << "My Int: " << myIntVal << std::endl;
 

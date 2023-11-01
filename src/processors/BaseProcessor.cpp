@@ -115,14 +115,6 @@ void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
         processAudio (buffer);
 }
 
-void BaseProcessor::setPlayheadHelpersReference(PlayheadHelpers& helpers) {
-    playheadHelpersReference = &helpers;
-}
-
-PlayheadHelpers& BaseProcessor::getPlayheadHelpersReference() {
-    return *playheadHelpersReference;
-}
-
 float BaseProcessor::getInputLevelDB (int portIndex) const noexcept
 {
     jassert (isPositiveAndBelow (portIndex, numInputs));

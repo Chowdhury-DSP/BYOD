@@ -69,8 +69,6 @@ private:
 
     std::unique_ptr<chowdsp::OpenGLHelper> openGLHelper = nullptr;
 
-    PlayheadHelpers playheadHelper;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BYOD)
 };
 
