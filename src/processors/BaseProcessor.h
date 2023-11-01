@@ -1,6 +1,7 @@
 #pragma once
 
 #include "JuceProcWrapper.h"
+#include "processors/PlayheadHelpers.h"
 
 enum ProcessorType
 {
@@ -110,6 +111,8 @@ public:
     void prepareProcessing (double sampleRate, int numSamples);
     void freeInternalMemory();
     void processAudioBlock (AudioBuffer<float>& buffer);
+    void setPlayheadHelpersReference(PlayheadHelpers& helpers);
+    PlayheadHelpers& getPlayheadHelpersReference();
 
     // methods for working with port input levels
     float getInputLevelDB (int portIndex) const noexcept;
@@ -301,6 +304,8 @@ private:
 
     StringArray popupMenuParameterIDs;
     OwnedArray<ParameterAttachment> popupMenuParameterAttachments;
+
+    PlayheadHelpers* playheadHelpersReference;
 
     const base_processor_detail::PortTypesVector inputPortTypes;
     const base_processor_detail::PortTypesVector outputPortTypes;

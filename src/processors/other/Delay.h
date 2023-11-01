@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../BaseProcessor.h"
+#include "processors/PlayheadHelpers.h"
 
 class DelayModule : public BaseProcessor
 {
@@ -16,6 +17,7 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
     float calculateTempoSyncDelayTime(const float noteDuration, const double bpm) const;
+//    void setPlayheadHelpersReference(PlayheadHelpers& helpers);
 
 private:
     template <typename DelayType>
@@ -82,6 +84,7 @@ private:
     AudioBuffer<float> stereoBuffer;
 
     bool bypassNeedsReset = false;
+    std::atomic<double>& bpm;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayModule)
 };

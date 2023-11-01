@@ -15,7 +15,8 @@ const String tempoSyncTag = "tempo_sync";
 const String tempoSyncAmountTag = "delay_time_type";
 } // namespace
 
-DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
+DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um),
+                                             bpm(getPlayheadHelpersReference().bpm)
 {
     using namespace ParameterHelpers;
     loadParameterPointer (freqParam, vts, freqTag);
@@ -240,37 +241,49 @@ void DelayModule::processAudio (AudioBuffer<float>& buffer)
         std::cout << "Delay Time In Ms..." << std::endl;
         delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f); //delay time in samples (if tempo-sync change the calculation here?)
     }
-    else
-    {
-        float delayInSamples = fs * 200 * 0.001f; //fallback delay
-        std::cout << "Delay Time In Notes..." << std::endl;
-        auto positionInfo = audioPlayHead.getPosition();
-//        auto hardcodedBpm = 120;
-        auto bpm = positionInfo->getBpm();
-        auto noteDivision = (int)*delayTimeTempoSyncParam;
-        if (noteDivision == 0)
-        {
-            delayInSamples = calculateTempoSyncDelayTime(2.0f, *bpm);
-            std::cout << "1/2 Note Delay..." << std::endl;
-        }
-        else if (noteDivision == 1)
-        {
-            delayInSamples = calculateTempoSyncDelayTime(1.0f, *bpm);
-            std::cout << "1/4 Note Delay..." << std::endl;
-        }
-        else if (noteDivision == 2)
-        {
-            delayInSamples = calculateTempoSyncDelayTime (0.5f, *bpm);
-            std::cout << "1/8 Note Delay..." << std::endl;
-        }
-        else if (noteDivision == 3)
-        {
-            delayInSamples = calculateTempoSyncDelayTime (0.75f, *bpm);
-            std::cout << "1/8 Note Dotted Delay..." << std::endl;
-        }
-        delaySmooth.setTargetValue (delayInSamples);
-    }
-    freqSmooth.setTargetValue (*freqParam);
+
+//    PlayheadHelpers& PlayheadHelpersRef = this->getPlayheadHelpersReference();
+//    std::cout << playheadHelpersReference.bpmDouble << std::endl;
+//    double tempo = bpm.load();
+//    std::cout << "My BPM: " << tempo << std::endl;
+//    int myIntVal = intRef.load();
+//    std::cout << "My Int: " << myIntVal << std::endl;
+
+
+//    bpm = PlayheadHelpersRef.bpm.load();
+
+//    std::cout << "Playhead Helper BPM: " << bpm << std::endl;
+//    else
+//    {
+//        float delayInSamples = fs * 200 * 0.001f; //fallback delay
+//        std::cout << "Delay Time In Notes..." << std::endl;
+//        auto positionInfo = audioPlayHead.getPosition();
+////        auto hardcodedBpm = 120;
+//        auto bpm = positionInfo->getBpm();
+//        auto noteDivision = (int)*delayTimeTempoSyncParam;
+//        if (noteDivision == 0)
+//        {
+//            delayInSamples = calculateTempoSyncDelayTime(2.0f, *bpm);
+//            std::cout << "1/2 Note Delay..." << std::endl;
+//        }
+//        else if (noteDivision == 1)
+//        {
+//            delayInSamples = calculateTempoSyncDelayTime(1.0f, *bpm);
+//            std::cout << "1/4 Note Delay..." << std::endl;
+//        }
+//        else if (noteDivision == 2)
+//        {
+//            delayInSamples = calculateTempoSyncDelayTime (0.5f, *bpm);
+//            std::cout << "1/8 Note Delay..." << std::endl;
+//        }
+//        else if (noteDivision == 3)
+//        {
+//            delayInSamples = calculateTempoSyncDelayTime (0.75f, *bpm);
+//            std::cout << "1/8 Note Dotted Delay..." << std::endl;
+//        }
+//        delaySmooth.setTargetValue (delayInSamples);
+//    }
+//    freqSmooth.setTargetValue (*freqParam);
 
     const auto delayTypeIndex = (int) *delayTypeParam;
     if (delayTypeIndex != prevDelayTypeIndex)
@@ -312,6 +325,10 @@ void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
 
     outputBuffers.getReference (0) = &buffer;
 }
+
+//void DelayModule::setPlayheadHelpersReference(PlayheadHelpers& helpers) {
+//    playheadHelpersReference = &helpers;
+//}
 
 float DelayModule::calculateTempoSyncDelayTime(const float noteDuration, const double bpm) const
 {

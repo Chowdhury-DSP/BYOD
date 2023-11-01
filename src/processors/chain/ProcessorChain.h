@@ -27,6 +27,7 @@ public:
     auto& getProcessors() { return procs; }
     const auto& getProcessors() const { return procs; }
     ProcessorStore& getProcStore() { return procStore; }
+    void setPlayheadHelpersReference(PlayheadHelpers& helpers);
 
     InputProcessor& getInputProcessor() { return inputProcessor; }
     OutputProcessor& getOutputProcessor() { return outputProcessor; }
@@ -78,6 +79,7 @@ private:
     std::unique_ptr<ParamForwardManager>& paramForwardManager;
 
     MidiBuffer internalMidiBuffer;
+    PlayheadHelpers* playheadHelpersReference = nullptr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };
