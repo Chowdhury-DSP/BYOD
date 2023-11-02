@@ -69,7 +69,9 @@ void ProcessorChain::initializeProcessors()
     for (int i = procs.size() - 1; i >= 0; --i)
     {
         if (auto* proc = procs[i])
+        {
             proc->prepareProcessing (osSampleRate, osSamplesPerBlock);
+        }
     }
 }
 

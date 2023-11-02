@@ -2,6 +2,7 @@
 
 #include "processors/ProcessorStore.h"
 #include "processors/chain/ProcessorChain.h"
+#include "processors/PlayheadHelpers.h"
 #include "state/ParamForwardManager.h"
 #include "state/StateManager.h"
 
@@ -54,7 +55,7 @@ private:
     [[maybe_unused]] chowdsp::SharedLNFAllocator lnfAllocator; // keep alive!
 
     ProcessorStore procStore;
-    std::unique_ptr<ProcessorChain> procs;
+    std::unique_ptr<ProcessorChain> procs; //ptrs to processor chain
     [[maybe_unused]] std::unique_ptr<ParamForwardManager> paramForwarder;
 
     AudioBuffer<float> bypassScratchBuffer;

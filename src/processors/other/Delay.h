@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../BaseProcessor.h"
+#include "processors/PlayheadHelpers.h"
 
 class DelayModule : public BaseProcessor
 {
@@ -9,11 +10,13 @@ public:
 
     ProcessorType getProcessorType() const override { return Other; }
     static ParamLayout createParameterLayout();
+    bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
+    float calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate) const;
 
 private:
     template <typename DelayType>
@@ -21,12 +24,24 @@ private:
     template <typename DelayType>
     void processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLine);
 
-    chowdsp::FloatParameter* delayTimeMsParam = nullptr;
+    struct SimpleAudioPlayHead : juce::AudioPlayHead {
+        juce::Optional<AudioPlayHead::PositionInfo> getPosition() const override {
+            PositionInfo info;
+            return info;
+        }
+    };
+
+    SimpleAudioPlayHead audioPlayHead;
+
     chowdsp::FloatParameter* freqParam = nullptr;
     chowdsp::FloatParameter* feedbackParam = nullptr;
     chowdsp::FloatParameter* mixParam = nullptr;
     std::atomic<float>* delayTypeParam = nullptr;
     std::atomic<float>* pingPongParam = nullptr;
+
+    chowdsp::FloatParameter* delayTimeMsParam = nullptr;
+    std::atomic<float>* delayTimeTempoSyncParam = nullptr;
+    std::atomic<float>* tempoSyncOnOffParam = nullptr;
 
     dsp::DryWetMixer<float> dryWetMixer;
     dsp::DryWetMixer<float> dryWetMixerMono;
