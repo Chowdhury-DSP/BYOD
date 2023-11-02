@@ -16,8 +16,7 @@ public:
     void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
-    float calculateTempoSyncDelayTime(const float noteDuration, const double bpm) const;
-//    void setPlayheadHelpersReference(PlayheadHelpers& helpers);
+    float calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate) const;
 
 private:
     template <typename DelayType>

@@ -3,6 +3,8 @@
 #include "gui/utils/ModulatableSlider.h"
 #include "processors/PlayheadHelpers.h"
 
+using namespace chowdsp::RhythmUtils;
+
 namespace
 {
 const String delayTypeTag = "delay_type";
@@ -234,6 +236,10 @@ void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& d
 
 void DelayModule::processAudio (AudioBuffer<float>& buffer)
 {
+    std::cout << playheadHelpers->bpm << std::endl;
+    double tempo = playheadHelpers->bpm.load();
+    std::cout << "My BPM: " << tempo << std::endl;
+
     feedbackSmoothBuffer.process (std::pow (feedbackParam->getCurrentValue() * 0.67f, 0.9f), buffer.getNumSamples());
     auto tempoSync = (int)*tempoSyncOnOffParam;
     if (!tempoSync)
@@ -241,48 +247,36 @@ void DelayModule::processAudio (AudioBuffer<float>& buffer)
         std::cout << "Delay Time In Ms..." << std::endl;
         delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f); //delay time in samples (if tempo-sync change the calculation here?)
     }
+    else
+    {
+        float delayInSamples = fs * 200 * 0.001f; //fallback delay
+        std::cout << "Delay Time In Notes..." << std::endl;
+        auto positionInfo = audioPlayHead.getPosition();
 
-    std::cout << playheadHelpers->bpm << std::endl;
-    double tempo = playheadHelpers->bpm.load();
-    std::cout << "My BPM: " << tempo << std::endl;
-//    int myIntVal = intRef.load();
-//    std::cout << "My Int: " << myIntVal << std::endl;
-
-
-//    bpm = PlayheadHelpersRef.bpm.load();
-
-//    std::cout << "Playhead Helper BPM: " << bpm << std::endl;
-//    else
-//    {
-//        float delayInSamples = fs * 200 * 0.001f; //fallback delay
-//        std::cout << "Delay Time In Notes..." << std::endl;
-//        auto positionInfo = audioPlayHead.getPosition();
-////        auto hardcodedBpm = 120;
-//        auto bpm = positionInfo->getBpm();
-//        auto noteDivision = (int)*delayTimeTempoSyncParam;
-//        if (noteDivision == 0)
-//        {
-//            delayInSamples = calculateTempoSyncDelayTime(2.0f, *bpm);
-//            std::cout << "1/2 Note Delay..." << std::endl;
-//        }
-//        else if (noteDivision == 1)
-//        {
-//            delayInSamples = calculateTempoSyncDelayTime(1.0f, *bpm);
-//            std::cout << "1/4 Note Delay..." << std::endl;
-//        }
-//        else if (noteDivision == 2)
-//        {
-//            delayInSamples = calculateTempoSyncDelayTime (0.5f, *bpm);
-//            std::cout << "1/8 Note Delay..." << std::endl;
-//        }
-//        else if (noteDivision == 3)
-//        {
-//            delayInSamples = calculateTempoSyncDelayTime (0.75f, *bpm);
-//            std::cout << "1/8 Note Dotted Delay..." << std::endl;
-//        }
-//        delaySmooth.setTargetValue (delayInSamples);
-//    }
-//    freqSmooth.setTargetValue (*freqParam);
+        auto noteDivision = (int)*delayTimeTempoSyncParam;
+        if (noteDivision == 0)
+        {
+            delayInSamples = calculateTempoSyncDelayTime(HALF.getTimeSeconds(tempo), fs);
+            std::cout << "1/2 Note Delay..." << std::endl;
+        }
+        else if (noteDivision == 1)
+        {
+            delayInSamples = calculateTempoSyncDelayTime(QUARTER.getTimeSeconds(tempo), fs);
+            std::cout << "1/4 Note Delay..." << std::endl;
+        }
+        else if (noteDivision == 2)
+        {
+            delayInSamples = calculateTempoSyncDelayTime (EIGHTH.getTimeSeconds(tempo), fs);
+            std::cout << "1/8 Note Delay..." << std::endl;
+        }
+        else if (noteDivision == 3)
+        {
+            delayInSamples = calculateTempoSyncDelayTime (EIGHTH_DOT.getTimeSeconds(tempo), fs);
+            std::cout << "1/8 Note Dotted Delay..." << std::endl;
+        }
+        delaySmooth.setTargetValue (delayInSamples);
+    }
+    freqSmooth.setTargetValue (*freqParam);
 
     const auto delayTypeIndex = (int) *delayTypeParam;
     if (delayTypeIndex != prevDelayTypeIndex)
@@ -325,17 +319,9 @@ void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
     outputBuffers.getReference (0) = &buffer;
 }
 
-//void DelayModule::setPlayheadHelpersReference(PlayheadHelpers& helpers) {
-//    playheadHelpersReference = &helpers;
-//}
-
-float DelayModule::calculateTempoSyncDelayTime(const float noteDuration, const double bpm) const
+float DelayModule::calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate) const
 {
-    //calculate tempo sync delay in samples
-    auto beatsPerSecond = static_cast<float> (bpm / 60);
-    auto secondsPerBeat = 1/beatsPerSecond;
-
-    return floor(noteDuration * secondsPerBeat * fs);
+    return static_cast<float> (timeInSeconds * sampleRate);
 }
 
 bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
