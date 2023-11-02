@@ -15,7 +15,7 @@ const String mixTag = "mix";
 
 const String delayTimeMsTag = "time_ms";
 const String tempoSyncTag = "tempo_sync";
-const String tempoSyncAmountTag = "delay_time_type";
+const String tempoSyncAmountTag = "time_tempo_sync";
 } // namespace
 
 DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
@@ -52,10 +52,10 @@ ParamLayout DelayModule::createParameterLayout()
 
     emplace_param<AudioParameterChoice> (params,
                                          tempoSyncAmountTag,
-                                         "Tempo Sync",
+                                         "Tempo Sync Delay",
                                          StringArray { "1/2", "1/4", "1/8" , "1/8 dotted"},
                                          0);
-    emplace_param<AudioParameterBool> (params, tempoSyncTag, "Tempo Sync Delay", false);
+    emplace_param<AudioParameterBool> (params, tempoSyncTag, "Tempo Sync", false);
     emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
     emplace_param<AudioParameterBool> (params, pingPongTag, "Ping-Pong", false);
 
