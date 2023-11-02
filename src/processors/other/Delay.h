@@ -16,7 +16,7 @@ public:
     void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
-    float calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate) const;
+    float calculateTempoSyncDelayTime (const double timeInSeconds, const double sampleRate) const;
 
 private:
     template <typename DelayType>
@@ -24,8 +24,10 @@ private:
     template <typename DelayType>
     void processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLine);
 
-    struct SimpleAudioPlayHead : juce::AudioPlayHead {
-        juce::Optional<AudioPlayHead::PositionInfo> getPosition() const override {
+    struct SimpleAudioPlayHead : juce::AudioPlayHead
+    {
+        juce::Optional<AudioPlayHead::PositionInfo> getPosition() const override
+        {
             PositionInfo info;
             return info;
         }
