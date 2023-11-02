@@ -236,43 +236,32 @@ void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& d
 
 void DelayModule::processAudio (AudioBuffer<float>& buffer)
 {
-    std::cout << playheadHelpers->bpm << std::endl;
-    double tempo = playheadHelpers->bpm.load();
-    std::cout << "My BPM: " << tempo << std::endl;
-
     feedbackSmoothBuffer.process (std::pow (feedbackParam->getCurrentValue() * 0.67f, 0.9f), buffer.getNumSamples());
+    double tempo = playheadHelpers->bpm.load();
     auto tempoSync = (int)*tempoSyncOnOffParam;
     if (!tempoSync)
     {
-        std::cout << "Delay Time In Ms..." << std::endl;
-        delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f); //delay time in samples (if tempo-sync change the calculation here?)
+        delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f);
     }
     else
     {
-        float delayInSamples = fs * 200 * 0.001f; //fallback delay
-        std::cout << "Delay Time In Notes..." << std::endl;
-        auto positionInfo = audioPlayHead.getPosition();
-
+        float delayInSamples = fs * 200 * 0.001f;
         auto noteDivision = (int)*delayTimeTempoSyncParam;
         if (noteDivision == 0)
         {
             delayInSamples = calculateTempoSyncDelayTime(HALF.getTimeSeconds(tempo), fs);
-            std::cout << "1/2 Note Delay..." << std::endl;
         }
         else if (noteDivision == 1)
         {
             delayInSamples = calculateTempoSyncDelayTime(QUARTER.getTimeSeconds(tempo), fs);
-            std::cout << "1/4 Note Delay..." << std::endl;
         }
         else if (noteDivision == 2)
         {
             delayInSamples = calculateTempoSyncDelayTime (EIGHTH.getTimeSeconds(tempo), fs);
-            std::cout << "1/8 Note Delay..." << std::endl;
         }
         else if (noteDivision == 3)
         {
             delayInSamples = calculateTempoSyncDelayTime (EIGHTH_DOT.getTimeSeconds(tempo), fs);
-            std::cout << "1/8 Note Dotted Delay..." << std::endl;
         }
         delaySmooth.setTargetValue (delayInSamples);
     }
