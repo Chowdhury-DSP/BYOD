@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../BaseProcessor.h"
-#include "processors/PlayheadHelpers.h"
 
 class DelayModule : public BaseProcessor
 {
@@ -16,24 +15,13 @@ public:
     void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
-    float calculateTempoSyncDelayTime (const double timeInSeconds, const double sampleRate) const;
+    static float calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate);
 
 private:
     template <typename DelayType>
     void processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType& delayLine);
     template <typename DelayType>
     void processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLine);
-
-    struct SimpleAudioPlayHead : juce::AudioPlayHead
-    {
-        juce::Optional<AudioPlayHead::PositionInfo> getPosition() const override
-        {
-            PositionInfo info;
-            return info;
-        }
-    };
-
-    SimpleAudioPlayHead audioPlayHead;
 
     chowdsp::FloatParameter* freqParam = nullptr;
     chowdsp::FloatParameter* feedbackParam = nullptr;
@@ -42,7 +30,7 @@ private:
     std::atomic<float>* pingPongParam = nullptr;
 
     chowdsp::FloatParameter* delayTimeMsParam = nullptr;
-    std::atomic<float>* delayTimeTempoSyncParam = nullptr;
+    chowdsp::RhythmParameter* delayTimeRhythmParam = nullptr;
     std::atomic<float>* tempoSyncOnOffParam = nullptr;
 
     dsp::DryWetMixer<float> dryWetMixer;
