@@ -2,6 +2,7 @@
 
 static inline void runTestForAllProcessors (UnitTest* ut, const std::function<void (BaseProcessor*)>& testFunc, const StringArray& procsToSkip = {})
 {
+    PlayheadHelpers playheadHelper;
     for (auto [name, storeEntry] : ProcessorStore::getStoreMap())
     {
         if (procsToSkip.contains (name))
@@ -11,6 +12,7 @@ static inline void runTestForAllProcessors (UnitTest* ut, const std::function<vo
         }
 
         auto proc = storeEntry.factory (nullptr);
+        proc->playheadHelpers = &playheadHelper;
         ut->beginTest (proc->getName() + " Test");
         testFunc (proc.get());
         proc->freeInternalMemory();

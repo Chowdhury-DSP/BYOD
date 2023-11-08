@@ -237,8 +237,10 @@ void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& d
 
 void DelayModule::processAudio (AudioBuffer<float>& buffer)
 {
+    jassert (playheadHelpers != nullptr);
+
     feedbackSmoothBuffer.process (std::pow (feedbackParam->getCurrentValue() * 0.67f, 0.9f), buffer.getNumSamples());
-    double tempo = playheadHelpers->bpm.load();
+    const auto tempo = playheadHelpers->bpm.load();
     const auto tempoSync = *tempoSyncOnOffParam == 1.0f;
     if (! tempoSync)
     {
