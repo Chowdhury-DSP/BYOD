@@ -35,6 +35,7 @@ struct ProcessorUIOptions
 
 class BaseProcessor;
 class ProcessorEditor;
+struct PlayheadHelpers;
 namespace netlist
 {
 struct CircuitQuantityList;
@@ -196,6 +197,9 @@ public:
      * At all other times this will be null.
      */
     const MidiBuffer* midiBuffer = nullptr;
+
+    /** Provided by the processor chain */
+    const PlayheadHelpers* playheadHelpers = nullptr;
 
     /** Returns a tooltip string for a given port. */
     virtual String getTooltipForPort (int portIndex, bool isInput);

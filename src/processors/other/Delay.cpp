@@ -1,24 +1,39 @@
 #include "Delay.h"
 #include "../ParameterHelpers.h"
+#include "gui/utils/ModulatableSlider.h"
+#include "processors/PlayheadHelpers.h"
+
+using namespace chowdsp::RhythmUtils;
+//using namespace chowdsp::RhythmParameter;
 
 namespace
 {
 const String delayTypeTag = "delay_type";
 const String pingPongTag = "ping_pong";
+const String freqTag = "freq";
+const String feedBackTag = "feedback";
+const String mixTag = "mix";
+
+const String delayTimeMsTag = "time_ms";
+const String tempoSyncTag = "tempo_sync";
+const String tempoSyncAmountTag = "time_tempo_sync";
 } // namespace
 
 DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (delayTimeMsParam, vts, "time_ms");
-    loadParameterPointer (freqParam, vts, "freq");
-    loadParameterPointer (feedbackParam, vts, "feedback");
-    loadParameterPointer (mixParam, vts, "mix");
+    loadParameterPointer (freqParam, vts, freqTag);
+    loadParameterPointer (feedbackParam, vts, feedBackTag);
+    loadParameterPointer (mixParam, vts, mixTag);
+    loadParameterPointer (delayTimeMsParam, vts, delayTimeMsTag);
+    loadParameterPointer (delayTimeRhythmParam, vts, tempoSyncAmountTag);
+    tempoSyncOnOffParam = vts.getRawParameterValue (tempoSyncTag);
     delayTypeParam = vts.getRawParameterValue (delayTypeTag);
     pingPongParam = vts.getRawParameterValue (pingPongTag);
 
     addPopupMenuParameter (delayTypeTag);
     addPopupMenuParameter (pingPongTag);
+    addPopupMenuParameter (tempoSyncTag);
 
     uiOptions.backgroundColour = Colours::cyan.darker (0.1f);
     uiOptions.powerColour = Colours::gold;
@@ -31,12 +46,17 @@ ParamLayout DelayModule::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createTimeMsParameter (params, "time_ms", "Delay Time", createNormalisableRange (20.0f, 2000.0f, 200.0f), 100.0f);
+    createTimeMsParameter (params, delayTimeMsTag, "Delay Time", createNormalisableRange (20.0f, 2000.0f, 200.0f), 100.0f);
+    createFreqParameter (params, freqTag, "Cutoff", 500.0f, 10000.0f, 4000.0f, 10000.0f);
+    createPercentParameter (params, feedBackTag, "Feedback", 0.0f);
+    createPercentParameter (params, mixTag, "Mix", 0.5f);
 
-    createFreqParameter (params, "freq", "Cutoff", 500.0f, 10000.0f, 4000.0f, 10000.0f);
-    createPercentParameter (params, "feedback", "Feedback", 0.0f);
-    createPercentParameter (params, "mix", "Mix", 0.5f);
-
+    emplace_param<chowdsp::RhythmParameter>( params,
+                                             tempoSyncAmountTag,
+                                             "Delay Rhythm",
+                                             std::initializer_list<Rhythm>{HALF, QUARTER, EIGHTH, EIGHTH_DOT},
+                                             HALF );
+    emplace_param<AudioParameterBool> (params, tempoSyncTag, "Tempo Sync", false);
     emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
     emplace_param<AudioParameterBool> (params, pingPongTag, "Ping-Pong", false);
 
@@ -218,7 +238,34 @@ void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& d
 void DelayModule::processAudio (AudioBuffer<float>& buffer)
 {
     feedbackSmoothBuffer.process (std::pow (feedbackParam->getCurrentValue() * 0.67f, 0.9f), buffer.getNumSamples());
-    delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f);
+    double tempo = playheadHelpers->bpm.load();
+    const auto tempoSync = *tempoSyncOnOffParam == 1.0f;
+    if (!tempoSync)
+    {
+        delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f);
+    }
+    else
+    {
+        float delayInSamples = fs * 200 * 0.001f;
+        auto noteDivision = (int)*delayTimeRhythmParam;
+        if (noteDivision == 0)
+        {
+            delayInSamples = calculateTempoSyncDelayTime(HALF.getTimeSeconds(tempo), fs);
+        }
+        else if (noteDivision == 1)
+        {
+            delayInSamples = calculateTempoSyncDelayTime(QUARTER.getTimeSeconds(tempo), fs);
+        }
+        else if (noteDivision == 2)
+        {
+            delayInSamples = calculateTempoSyncDelayTime (EIGHTH.getTimeSeconds(tempo), fs);
+        }
+        else if (noteDivision == 3)
+        {
+            delayInSamples = calculateTempoSyncDelayTime (EIGHTH_DOT.getTimeSeconds(tempo), fs);
+        }
+        delaySmooth.setTargetValue (delayInSamples);
+    }
     freqSmooth.setTargetValue (*freqParam);
 
     const auto delayTypeIndex = (int) *delayTypeParam;
@@ -260,4 +307,109 @@ void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
     }
 
     outputBuffers.getReference (0) = &buffer;
+}
+
+float DelayModule::calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate)
+{
+    return static_cast<float> (timeInSeconds * sampleRate);
+}
+
+bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
+{
+    using namespace chowdsp::ParamUtils;
+    class DelayTimeModeControl : public Slider
+    {
+    public:
+        DelayTimeModeControl (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
+            : vts (vtState),
+              tempoSyncSelectorAttach (vts, tempoSyncAmountTag, tempoSyncSelector),
+              delayTimeSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, delayTimeMsTag), hcp),
+              delayTimeAttach(vts, delayTimeMsTag, delayTimeSlider),
+              tempoSyncOnOffAttach (
+                  *vts.getParameter (tempoSyncTag),
+                  [this] (float newValue)
+                  { updateControlVisibility (newValue == 1.0f); },
+                  vts.undoManager)
+        {
+            addChildComponent (tempoSyncSelector);
+            addChildComponent (delayTimeSlider);
+
+            const auto* modeChoiceParam = getParameterPointer<chowdsp::RhythmParameter*> (vts, tempoSyncAmountTag);
+            tempoSyncSelector.addItemList (modeChoiceParam->choices, 1);
+            tempoSyncSelector.setSelectedItemIndex (0);
+            tempoSyncSelector.setScrollWheelEnabled (true);
+            hcp.registerParameterComponent (tempoSyncSelector, *modeChoiceParam);
+
+            hcp.registerParameterComponent (delayTimeSlider, delayTimeSlider.getParameter());
+
+            this->setName (tempoSyncAmountTag + "__" + delayTimeMsTag + "__");
+        }
+
+        void colourChanged() override
+        {
+            for (auto colourID : { Slider::textBoxOutlineColourId,
+                                   Slider::textBoxTextColourId,
+                                   Slider::textBoxBackgroundColourId,
+                                   Slider::textBoxHighlightColourId,
+                                   Slider::thumbColourId })
+            {
+                delayTimeSlider.setColour (colourID, findColour (colourID, false));
+            }
+
+            for (auto colourID : { ComboBox::outlineColourId,
+                                   ComboBox::textColourId,
+                                   ComboBox::arrowColourId })
+            {
+                tempoSyncSelector.setColour (colourID, findColour (Slider::textBoxTextColourId, false));
+            }
+        }
+
+        void updateControlVisibility (bool tempoSyncOn)
+        {
+            tempoSyncSelector.setVisible (tempoSyncOn);
+            delayTimeSlider.setVisible (!tempoSyncOn);
+
+            setName (vts.getParameter (tempoSyncOn ? tempoSyncAmountTag : delayTimeMsTag)->name);
+            if (auto* parent = getParentComponent())
+                parent->repaint();
+        }
+
+        void visibilityChanged() override
+        {
+            updateControlVisibility (vts.getRawParameterValue (tempoSyncTag)->load() == 1.0f);
+        }
+
+        void resized() override
+        {
+            delayTimeSlider.setSliderStyle (getSliderStyle());
+            delayTimeSlider.setTextBoxStyle (getTextBoxPosition(), false, getTextBoxWidth(), getTextBoxHeight());
+
+            const auto bounds = getLocalBounds();
+            tempoSyncSelector.setBounds (bounds.proportionOfWidth(0.15f),
+                                         bounds.proportionOfHeight(0.1f),
+                                         bounds.proportionOfWidth(0.7f),
+                                         bounds.proportionOfHeight(0.25f));
+            delayTimeSlider.setBounds (bounds);
+        }
+
+    private:
+        using SliderAttachment = AudioProcessorValueTreeState::SliderAttachment;
+        using BoxAttachment = AudioProcessorValueTreeState::ComboBoxAttachment;
+
+        AudioProcessorValueTreeState& vts;
+
+        ComboBox tempoSyncSelector;
+        BoxAttachment tempoSyncSelectorAttach;
+
+        ModulatableSlider delayTimeSlider;
+        SliderAttachment delayTimeAttach;
+
+        ParameterAttachment tempoSyncOnOffAttach;
+
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DelayTimeModeControl)
+    };
+
+    customComps.add (std::make_unique<DelayTimeModeControl> (vts, hcp));
+
+    return true;
 }

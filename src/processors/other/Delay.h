@@ -9,11 +9,13 @@ public:
 
     ProcessorType getProcessorType() const override { return Other; }
     static ParamLayout createParameterLayout();
+    bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
     void prepare (double sampleRate, int samplesPerBlock) override;
     void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
+    static float calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate);
 
 private:
     template <typename DelayType>
@@ -21,12 +23,15 @@ private:
     template <typename DelayType>
     void processPingPongDelay (AudioBuffer<float>& buffer, DelayType& delayLine);
 
-    chowdsp::FloatParameter* delayTimeMsParam = nullptr;
     chowdsp::FloatParameter* freqParam = nullptr;
     chowdsp::FloatParameter* feedbackParam = nullptr;
     chowdsp::FloatParameter* mixParam = nullptr;
     std::atomic<float>* delayTypeParam = nullptr;
     std::atomic<float>* pingPongParam = nullptr;
+
+    chowdsp::FloatParameter* delayTimeMsParam = nullptr;
+    chowdsp::RhythmParameter* delayTimeRhythmParam = nullptr;
+    std::atomic<float>* tempoSyncOnOffParam = nullptr;
 
     dsp::DryWetMixer<float> dryWetMixer;
     dsp::DryWetMixer<float> dryWetMixerMono;

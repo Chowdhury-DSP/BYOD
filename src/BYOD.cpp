@@ -66,6 +66,9 @@ void BYOD::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
     const juce::ScopedNoDenormals noDenormals {};
     AudioProcessLoadMeasurer::ScopedTimer loadTimer { loadMeasurer, buffer.getNumSamples() };
 
+    //get playhead
+    procs->getPlayheadHelper().process (getPlayHead(), buffer.getNumSamples());
+
     // push samples into bypass delay
     bypassScratchBuffer.makeCopyOf (buffer, true);
     processBypassDelay (bypassScratchBuffer);
