@@ -34,6 +34,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_plugin_base
         chowdsp::chowdsp_plugin_utils
         chowdsp::chowdsp_reverb
+        chowdsp::chowdsp_rhythm
         chowdsp::chowdsp_presets
         chowdsp::chowdsp_serialization
         chowdsp::chowdsp_units

@@ -25,6 +25,7 @@ public:
     {
         Logger::writeToLog (String ("Creating processor: ") + newProc->getName());
 
+        newProc->playheadHelpers = &chain.playheadHelper;
         auto osFactor = chain.ioProcessor.getOversamplingFactor();
         newProc->prepareProcessing (osFactor * chain.mySampleRate, osFactor * chain.mySamplesPerBlock);
 
