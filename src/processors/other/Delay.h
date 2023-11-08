@@ -15,7 +15,7 @@ public:
     void releaseMemory() override;
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
-    static float calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate);
+    static float calculateTempoSyncDelayTime (const double timeInSeconds, const double sampleRate);
 
 private:
     template <typename DelayType>

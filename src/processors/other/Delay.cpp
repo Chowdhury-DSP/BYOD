@@ -51,11 +51,11 @@ ParamLayout DelayModule::createParameterLayout()
     createPercentParameter (params, feedBackTag, "Feedback", 0.0f);
     createPercentParameter (params, mixTag, "Mix", 0.5f);
 
-    emplace_param<chowdsp::RhythmParameter>( params,
+    emplace_param<chowdsp::RhythmParameter> (params,
                                              tempoSyncAmountTag,
                                              "Delay Rhythm",
-                                             std::initializer_list<Rhythm>{HALF, QUARTER, EIGHTH, EIGHTH_DOT},
-                                             HALF );
+                                             std::initializer_list<Rhythm> { HALF, QUARTER, EIGHTH, EIGHTH_DOT },
+                                             HALF);
     emplace_param<AudioParameterBool> (params, tempoSyncTag, "Tempo Sync", false);
     emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
     emplace_param<AudioParameterBool> (params, pingPongTag, "Ping-Pong", false);
@@ -240,29 +240,29 @@ void DelayModule::processAudio (AudioBuffer<float>& buffer)
     feedbackSmoothBuffer.process (std::pow (feedbackParam->getCurrentValue() * 0.67f, 0.9f), buffer.getNumSamples());
     double tempo = playheadHelpers->bpm.load();
     const auto tempoSync = *tempoSyncOnOffParam == 1.0f;
-    if (!tempoSync)
+    if (! tempoSync)
     {
         delaySmooth.setTargetValue (fs * *delayTimeMsParam * 0.001f);
     }
     else
     {
         float delayInSamples = fs * 200 * 0.001f;
-        auto noteDivision = (int)*delayTimeRhythmParam;
+        auto noteDivision = (int) *delayTimeRhythmParam;
         if (noteDivision == 0)
         {
-            delayInSamples = calculateTempoSyncDelayTime(HALF.getTimeSeconds(tempo), fs);
+            delayInSamples = calculateTempoSyncDelayTime (HALF.getTimeSeconds (tempo), fs);
         }
         else if (noteDivision == 1)
         {
-            delayInSamples = calculateTempoSyncDelayTime(QUARTER.getTimeSeconds(tempo), fs);
+            delayInSamples = calculateTempoSyncDelayTime (QUARTER.getTimeSeconds (tempo), fs);
         }
         else if (noteDivision == 2)
         {
-            delayInSamples = calculateTempoSyncDelayTime (EIGHTH.getTimeSeconds(tempo), fs);
+            delayInSamples = calculateTempoSyncDelayTime (EIGHTH.getTimeSeconds (tempo), fs);
         }
         else if (noteDivision == 3)
         {
-            delayInSamples = calculateTempoSyncDelayTime (EIGHTH_DOT.getTimeSeconds(tempo), fs);
+            delayInSamples = calculateTempoSyncDelayTime (EIGHTH_DOT.getTimeSeconds (tempo), fs);
         }
         delaySmooth.setTargetValue (delayInSamples);
     }
@@ -309,7 +309,7 @@ void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
     outputBuffers.getReference (0) = &buffer;
 }
 
-float DelayModule::calculateTempoSyncDelayTime(const double timeInSeconds, const double sampleRate)
+float DelayModule::calculateTempoSyncDelayTime (const double timeInSeconds, const double sampleRate)
 {
     return static_cast<float> (timeInSeconds * sampleRate);
 }
@@ -324,7 +324,7 @@ bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowd
             : vts (vtState),
               tempoSyncSelectorAttach (vts, tempoSyncAmountTag, tempoSyncSelector),
               delayTimeSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, delayTimeMsTag), hcp),
-              delayTimeAttach(vts, delayTimeMsTag, delayTimeSlider),
+              delayTimeAttach (vts, delayTimeMsTag, delayTimeSlider),
               tempoSyncOnOffAttach (
                   *vts.getParameter (tempoSyncTag),
                   [this] (float newValue)
@@ -367,7 +367,7 @@ bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowd
         void updateControlVisibility (bool tempoSyncOn)
         {
             tempoSyncSelector.setVisible (tempoSyncOn);
-            delayTimeSlider.setVisible (!tempoSyncOn);
+            delayTimeSlider.setVisible (! tempoSyncOn);
 
             setName (vts.getParameter (tempoSyncOn ? tempoSyncAmountTag : delayTimeMsTag)->name);
             if (auto* parent = getParentComponent())
@@ -385,10 +385,10 @@ bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowd
             delayTimeSlider.setTextBoxStyle (getTextBoxPosition(), false, getTextBoxWidth(), getTextBoxHeight());
 
             const auto bounds = getLocalBounds();
-            tempoSyncSelector.setBounds (bounds.proportionOfWidth(0.15f),
-                                         bounds.proportionOfHeight(0.1f),
-                                         bounds.proportionOfWidth(0.7f),
-                                         bounds.proportionOfHeight(0.25f));
+            tempoSyncSelector.setBounds (bounds.proportionOfWidth (0.15f),
+                                         bounds.proportionOfHeight (0.1f),
+                                         bounds.proportionOfWidth (0.7f),
+                                         bounds.proportionOfHeight (0.25f));
             delayTimeSlider.setBounds (bounds);
         }
 
