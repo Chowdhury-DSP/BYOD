@@ -42,6 +42,7 @@ target_include_directories(BYOD_headless
         ../../modules/chowdsp_utils/modules/gui
         ../../modules/chowdsp_utils/modules/plugin
         ../../modules/chowdsp_utils/modules/common
+        ../../modules/chowdsp_utils/modules/music
         ../../modules/JUCE/modules
         ../../modules/chowdsp_wdf/include
         ../../modules/ea_variant

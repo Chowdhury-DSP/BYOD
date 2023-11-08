@@ -246,24 +246,8 @@ void DelayModule::processAudio (AudioBuffer<float>& buffer)
     }
     else
     {
-        float delayInSamples = fs * 200 * 0.001f;
-        auto noteDivision = (int) *delayTimeRhythmParam;
-        if (noteDivision == 0)
-        {
-            delayInSamples = calculateTempoSyncDelayTime (HALF.getTimeSeconds (tempo), fs);
-        }
-        else if (noteDivision == 1)
-        {
-            delayInSamples = calculateTempoSyncDelayTime (QUARTER.getTimeSeconds (tempo), fs);
-        }
-        else if (noteDivision == 2)
-        {
-            delayInSamples = calculateTempoSyncDelayTime (EIGHTH.getTimeSeconds (tempo), fs);
-        }
-        else if (noteDivision == 3)
-        {
-            delayInSamples = calculateTempoSyncDelayTime (EIGHTH_DOT.getTimeSeconds (tempo), fs);
-        }
+        const auto delayInSeconds = delayTimeRhythmParam->getRhythmTimeSeconds (tempo);
+        const auto delayInSamples = static_cast<float> (delayInSeconds) * fs;
         delaySmooth.setTargetValue (delayInSamples);
     }
     freqSmooth.setTargetValue (*freqParam);
@@ -307,11 +291,6 @@ void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
     }
 
     outputBuffers.getReference (0) = &buffer;
-}
-
-float DelayModule::calculateTempoSyncDelayTime (const double timeInSeconds, const double sampleRate)
-{
-    return static_cast<float> (timeInSeconds * sampleRate);
 }
 
 bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
