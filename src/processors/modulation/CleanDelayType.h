@@ -1,5 +1,7 @@
 #pragma once
 
+#include <pch.h>
+
 /*
  This class wraps chowdsp::DelayLine so it has an equivalent
  interface to chowdsp::BBBDelayWrapper
@@ -24,6 +26,6 @@ struct CleanDelayType
     inline void pushSample (int channel, float sample) { delay.pushSample (channel, sample); }
     inline float popSample (int channel) { return lpf.processSample (channel, delay.popSample (channel)); }
 
-    chowdsp::SVFLowpass<float> lpf;
+    chowdsp::SVFLowpass<float> lpf {};
     chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange5th> delay { 1 << 18 };
 };
