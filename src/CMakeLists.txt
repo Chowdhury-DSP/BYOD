@@ -191,6 +191,3 @@ target_link_libraries(BYOD PRIVATE rnn_accelerated)
 if (MSVC)
     target_compile_options(BYOD PRIVATE /bigobj)
 endif ()
-
-# pre-compiled header
-target_precompile_headers(BYOD PRIVATE pch.h)

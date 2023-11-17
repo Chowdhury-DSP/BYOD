@@ -3,6 +3,7 @@
 #include "PresetsServerJobPool.h"
 #include "PresetsServerSyncManager.h"
 #include "PresetsServerUserManager.h"
+#include <pch.h>
 
 namespace PresetConstants
 {
