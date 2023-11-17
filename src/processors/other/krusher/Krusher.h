@@ -2,7 +2,7 @@
 
 #include "processors/BaseProcessor.h"
 
-#define KRUSHER_USE_JAI_IMPL ! JUCE_ARM&& BYOD_BUILDING_JAI_MODULES
+#define KRUSHER_USE_JAI_IMPL ! JUCE_IOS && BYOD_BUILDING_JAI_MODULES
 
 #if KRUSHER_USE_JAI_IMPL
 #include "jai/byod_jai_lib.h"
@@ -36,8 +36,8 @@ private:
 
 #if KRUSHER_USE_JAI_IMPL
     SharedJaiContext jai_context;
-    jai_Krusher_Lofi_Resample_State resample_state {};
-    std::array<jai_Krusher_Bit_Reducer_Filter_State, 2> brFilterStates {};
+    jai::Krusher_Lofi_Resample_State resample_state {};
+    std::array<jai::Krusher_Bit_Reducer_Filter_State, 2> brFilterStates {};
 #else
     std::unique_ptr<chowdsp::NullType> jai_context;
     Krusher_Lofi_Resample_State resample_state {};
