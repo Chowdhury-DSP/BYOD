@@ -1,7 +1,7 @@
 #include "ResampledRNN.h"
 #include "model_loaders.h"
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode, typename> typename RecurrentLayerType>
 void ResampledRNN<hiddenSize, RecurrentLayerType>::initialise (const void* modelData, int modelDataSize, double modelSampleRate)
 {
     targetSampleRate = modelSampleRate;
@@ -15,7 +15,7 @@ void ResampledRNN<hiddenSize, RecurrentLayerType>::initialise (const void* model
         model_loaders::loadLSTMModel (model, hiddenSize, weightsJson);
 }
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode, typename> typename RecurrentLayerType>
 void ResampledRNN<hiddenSize, RecurrentLayerType>::prepare (double sampleRate, int samplesPerBlock)
 {
     const auto [resampleRatio, rnnDelaySamples] = [] (auto curFs, auto targetFs)
@@ -40,7 +40,7 @@ void ResampledRNN<hiddenSize, RecurrentLayerType>::prepare (double sampleRate, i
     model.reset();
 }
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType>
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode, typename> typename RecurrentLayerType>
 void ResampledRNN<hiddenSize, RecurrentLayerType>::reset()
 {
     resampler.reset();

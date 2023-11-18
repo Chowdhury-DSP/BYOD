@@ -20,6 +20,25 @@
 
 #include <RTNeural/RTNeural.h>
 
+#if RTNEURAL_USE_MATH_APPROX
+#include <math_approx/math_approx.hpp>
+
+struct ApproxMathsProvider
+{
+    template <typename T>
+    static T tanh (T x)
+    {
+        return math_approx::tanh<9> (x);
+    }
+
+    template <typename T>
+    static T sigmoid (T x)
+    {
+        return math_approx::sigmoid<9> (x);
+    }
+};
+#endif
+
 #include "model_loaders.h"
 
 #if __clang__
@@ -45,8 +64,13 @@ template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
 struct RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::Internal
 {
     using RecurrentLayerTypeComplete = std::conditional_t<RecurrentLayerType == RecurrentLayerType::LSTMLayer,
+#if RTNEURAL_USE_MATH_APPROX
+                                                          RTNeural::LSTMLayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode, ApproxMathsProvider>,
+                                                          RTNeural::GRULayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode, ApproxMathsProvider>>;
+#else
                                                           RTNeural::LSTMLayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode>,
                                                           RTNeural::GRULayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode>>;
+#endif
     using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
     RTNeural::ModelT<float, inputSize, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
 };

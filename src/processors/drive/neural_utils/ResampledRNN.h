@@ -2,7 +2,7 @@
 
 #include <pch.h>
 
-template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode> typename RecurrentLayerType = RTNeural::LSTMLayerT>
+template <int hiddenSize, template <typename, int, int, RTNeural::SampleRateCorrectionMode, typename> typename RecurrentLayerType = RTNeural::LSTMLayerT>
 class ResampledRNN
 {
 public:
@@ -50,7 +50,7 @@ public:
 
 private:
     static constexpr auto DefaultSRCMode = RTNeural::SampleRateCorrectionMode::NoInterp;
-    using RecurrentLayerTypeComplete = RecurrentLayerType<float, 1, hiddenSize, DefaultSRCMode>;
+    using RecurrentLayerTypeComplete = RecurrentLayerType<float, 1, hiddenSize, DefaultSRCMode, RTNeural::DefaultMathsProvider>;
     using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
     RTNeural::ModelT<float, 1, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
 
