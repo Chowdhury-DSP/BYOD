@@ -26,6 +26,9 @@ struct ApproxMathsProvider
         return math_approx::sigmoid<9> (x);
     }
 };
+using RNNMathsProvider = ApproxMathsProvider;
+#else
+using RNNMathsProvider = RTNEURAL_NAMESPACE::DefaultMathsProvider;
 #endif
 
 #include "model_loaders.h"
@@ -34,7 +37,7 @@ struct ApproxMathsProvider
 #pragma GCC diagnostic pop
 #endif
 
-#if __AVX__ // Intel/AVX
+#if (__MMX__ || __SSE__ || __amd64__) && BYOD_COMPILING_WITH_AVX // INTEL + AVX
 namespace rnn_avx
 #else
 namespace rnn_sse_arm
@@ -47,13 +50,8 @@ template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
 struct RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::Internal
 {
     using RecurrentLayerTypeComplete = std::conditional_t<RecurrentLayerType == RecurrentLayerType::LSTMLayer,
-#if RTNEURAL_USE_MATH_APPROX
-                                                          RTNEURAL_NAMESPACE::LSTMLayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode, ApproxMathsProvider>,
-                                                          RTNEURAL_NAMESPACE::GRULayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode, ApproxMathsProvider>>;
-#else
-                                                          RTNEURAL_NAMESPACE::LSTMLayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode>,
-                                                          RTNEURAL_NAMESPACE::GRULayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode>>;
-#endif
+                                                          RTNEURAL_NAMESPACE::LSTMLayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode, RNNMathsProvider>,
+                                                          RTNEURAL_NAMESPACE::GRULayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode, RNNMathsProvider>>;
     using DenseLayerType = RTNEURAL_NAMESPACE::DenseT<float, hiddenSize, 1>;
     RTNEURAL_NAMESPACE::ModelT<float, inputSize, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
 };

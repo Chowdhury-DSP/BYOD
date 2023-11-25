@@ -42,7 +42,7 @@ private:
 };
 } // namespace rnn_sse_arm
 
-#if __AVX__ // Intel/AVX
+#if __MMX__ || __SSE__ || __amd64__ // INTEL
 namespace rnn_avx
 {
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
