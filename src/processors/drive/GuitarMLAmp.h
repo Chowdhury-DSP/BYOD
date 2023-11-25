@@ -40,16 +40,13 @@ private:
     double processSampleRate = 96000.0;
     std::shared_ptr<FileChooser> customModelChooser;
 
+    template <int numIns, int hiddenSize>
+    using GuitarML_LSTM = EA::Variant<rnn_sse_arm::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>
 #if JUCE_INTEL
-    template <int numIns, int hiddenSize>
-    using GuitarML_LSTM = EA::Variant<
-        rnn_sse::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>,
-        rnn_avx::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>;
-#else
-    template <int numIns, int hiddenSize>
-    using GuitarML_LSTM = EA::Variant<
-        rnn_arm::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>>;
+                                      ,
+                                      rnn_avx::RNNAccelerated<numIns, hiddenSize, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>
 #endif
+                                      >;
 
     using LSTM40Cond = GuitarML_LSTM<2, 40>;
     using LSTM40NoCond = GuitarML_LSTM<1, 40>;

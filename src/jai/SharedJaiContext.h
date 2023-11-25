@@ -11,7 +11,7 @@ struct JaiContextWrapper
     JaiContextWrapper();
     ~JaiContextWrapper();
 
-    operator jai::Context*() { return internal; }; // NOLINT
+    operator jai::Context*() { return internal; } // NOLINT
 
 private:
     jai::Context* internal = nullptr;
