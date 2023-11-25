@@ -43,7 +43,6 @@ namespace rnn_avx
 namespace rnn_sse_arm
 #endif
 {
-
 #if ! (XSIMD_WITH_NEON && BYOD_COMPILING_WITH_AVX)
 
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
