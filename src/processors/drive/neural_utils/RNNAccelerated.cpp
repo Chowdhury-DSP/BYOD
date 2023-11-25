@@ -1,16 +1,5 @@
 #include "RNNAccelerated.h"
 
-#if __AVX__
-#define RTNeural RTNeural_avx
-#define xsimd xsimd_avx
-#elif __SSE__
-#define RTNeural RTNeural_sse
-#define xsimd xsimd_sse
-#else
-#define RTNeural RTNeural_arm
-#define xsimd xsimd_arm
-#endif
-
 #if __clang__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshorten-64-to-32"
@@ -45,18 +34,12 @@ struct ApproxMathsProvider
 #pragma GCC diagnostic pop
 #endif
 
-#if (__aarch64__ || __arm__)
-namespace rnn_arm
-{
-#elif __AVX__ || (_MSC_VER && BYOD_COMPILING_WITH_AVX)
+#if __AVX__ // Intel/AVX
 namespace rnn_avx
-{
-#elif __SSE__ || (_MSC_VER && ! BYOD_COMPILING_WITH_AVX)
-namespace rnn_sse
-{
 #else
-#error "Unknown or un-supported platform!"
+namespace rnn_sse_arm
 #endif
+{
 
 #if ! (XSIMD_WITH_NEON && BYOD_COMPILING_WITH_AVX)
 
@@ -65,14 +48,14 @@ struct RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::Inter
 {
     using RecurrentLayerTypeComplete = std::conditional_t<RecurrentLayerType == RecurrentLayerType::LSTMLayer,
 #if RTNEURAL_USE_MATH_APPROX
-                                                          RTNeural::LSTMLayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode, ApproxMathsProvider>,
-                                                          RTNeural::GRULayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode, ApproxMathsProvider>>;
+                                                          RTNEURAL_NAMESPACE::LSTMLayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode, ApproxMathsProvider>,
+                                                          RTNEURAL_NAMESPACE::GRULayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode, ApproxMathsProvider>>;
 #else
-                                                          RTNeural::LSTMLayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode>,
-                                                          RTNeural::GRULayerT<float, inputSize, hiddenSize, (RTNeural::SampleRateCorrectionMode) SRCMode>>;
+                                                          RTNEURAL_NAMESPACE::LSTMLayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode>,
+                                                          RTNEURAL_NAMESPACE::GRULayerT<float, inputSize, hiddenSize, (RTNEURAL_NAMESPACE::SampleRateCorrectionMode) SRCMode>>;
 #endif
-    using DenseLayerType = RTNeural::DenseT<float, hiddenSize, 1>;
-    RTNeural::ModelT<float, inputSize, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
+    using DenseLayerType = RTNEURAL_NAMESPACE::DenseT<float, hiddenSize, 1>;
+    RTNEURAL_NAMESPACE::ModelT<float, inputSize, 1, RecurrentLayerTypeComplete, DenseLayerType> model;
 };
 
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
@@ -98,7 +81,7 @@ void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::initial
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
 void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::prepare ([[maybe_unused]] int rnnDelaySamples)
 {
-    if constexpr (SRCMode == (int) RTNeural::SampleRateCorrectionMode::NoInterp)
+    if constexpr (SRCMode == (int) RTNEURAL_NAMESPACE::SampleRateCorrectionMode::NoInterp)
     {
         internal->model.template get<0>().prepare (rnnDelaySamples);
         internal->model.reset();
@@ -108,7 +91,7 @@ void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::prepare
 template <int inputSize, int hiddenSize, int RecurrentLayerType, int SRCMode>
 void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::prepare ([[maybe_unused]] float rnnDelaySamples)
 {
-    if constexpr (SRCMode == (int) RTNeural::SampleRateCorrectionMode::LinInterp)
+    if constexpr (SRCMode == (int) RTNEURAL_NAMESPACE::SampleRateCorrectionMode::LinInterp)
     {
         internal->model.template get<0>().prepare (rnnDelaySamples);
         internal->model.reset();
@@ -160,9 +143,9 @@ void RNNAccelerated<inputSize, hiddenSize, RecurrentLayerType, SRCMode>::process
     }
 }
 
-template class RNNAccelerated<1, 28, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::NoInterp>; // MetalFace
-template class RNNAccelerated<2, 24, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::NoInterp>; // BassFace
-template class RNNAccelerated<1, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>; // GuitarML (no-cond)
-template class RNNAccelerated<2, 40, RecurrentLayerType::LSTMLayer, (int) RTNeural::SampleRateCorrectionMode::LinInterp>; // GuitarML (cond)
+template class RNNAccelerated<1, 28, RecurrentLayerType::LSTMLayer, (int) RTNEURAL_NAMESPACE::SampleRateCorrectionMode::NoInterp>; // MetalFace
+template class RNNAccelerated<2, 24, RecurrentLayerType::LSTMLayer, (int) RTNEURAL_NAMESPACE::SampleRateCorrectionMode::NoInterp>; // BassFace
+template class RNNAccelerated<1, 40, RecurrentLayerType::LSTMLayer, (int) RTNEURAL_NAMESPACE::SampleRateCorrectionMode::LinInterp>; // GuitarML (no-cond)
+template class RNNAccelerated<2, 40, RecurrentLayerType::LSTMLayer, (int) RTNEURAL_NAMESPACE::SampleRateCorrectionMode::LinInterp>; // GuitarML (cond)
 #endif // NEON + AVX
 }

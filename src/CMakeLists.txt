@@ -191,8 +191,8 @@ foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
         target_link_libraries(${target} PRIVATE math_approx)
     endif()
 endforeach()
-target_compile_definitions(rnn_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=16)
-target_compile_definitions(rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32)
+target_compile_definitions(rnn_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=16 RTNEURAL_NAMESPACE=RTNeural_sse_arm)
+target_compile_definitions(rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32 RTNEURAL_NAMESPACE=RTNeural_avx)
 target_link_libraries(BYOD PRIVATE rnn_accelerated)
 
 # special flags for MSVC

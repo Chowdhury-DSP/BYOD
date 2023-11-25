@@ -1,5 +1,7 @@
 #pragma once
 
+#include <RTNeural/RTNeural.h>
+
 namespace model_loaders
 {
 using Vec2d = std::vector<std::vector<float>>;
@@ -22,8 +24,8 @@ template <typename ModelType>
 void loadLSTMModel (ModelType& model, const nlohmann::json& weights_json)
 {
     const auto& state_dict = weights_json.at ("state_dict");
-    RTNeural::torch_helpers::loadLSTM<float> (state_dict, "rec.", model.template get<0>());
-    RTNeural::torch_helpers::loadDense<float> (state_dict, "lin.", model.template get<1>());
+    RTNEURAL_NAMESPACE::torch_helpers::loadLSTM<float> (state_dict, "rec.", model.template get<0>());
+    RTNEURAL_NAMESPACE::torch_helpers::loadDense<float> (state_dict, "lin.", model.template get<1>());
 }
 
 template <typename ModelType>
@@ -38,7 +40,7 @@ void loadGRUModel (ModelType& model, const nlohmann::json& weights_json)
 
     int layer_idx = 0;
     const auto& gru_weights = gru_layer_json["weights"];
-    RTNeural::json_parser::loadGRU<float> (gru, gru_weights);
-    RTNeural::modelt_detail::loadLayer<float> (dense, layer_idx, dense_layer_json, "dense", 1, false);
+    RTNEURAL_NAMESPACE::json_parser::loadGRU<float> (gru, gru_weights);
+    RTNEURAL_NAMESPACE::modelt_detail::loadLayer<float> (dense, layer_idx, dense_layer_json, "dense", 1, false);
 }
 } // namespace model_loaders
