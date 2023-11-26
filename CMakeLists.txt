@@ -86,6 +86,7 @@ juce_add_plugin(BYOD
     ProductName "BYOD"
     ICON_BIG res/logo.png
     NEEDS_MIDI_INPUT True
+    VST3_AUTO_MANIFEST FALSE
 
     VST2_CATEGORY kPlugCategEffect
     VST3_CATEGORIES Fx Distortion
