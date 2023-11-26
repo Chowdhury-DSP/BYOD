@@ -22,7 +22,10 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant",
 #include <RTNeural/RTNeural.h>
 JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 
+JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wshadow-field-in-constructor")
 #include <chowdsp_wdf/chowdsp_wdf.h>
+JUCE_END_IGNORE_WARNINGS_GCC_LIKE
+
 #include <ea_variant/ea_variant.h>
 #include <sst/cpputils.h>
 

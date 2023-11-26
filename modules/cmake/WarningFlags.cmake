@@ -40,6 +40,9 @@ if(WIN32)
             -Wno-cast-function-type
             -Wno-range-loop-bind-reference
             -Wno-sign-conversion
+            -Wno-implicit-int-float-conversion
+            -Wno-implicit-const-int-float-conversion
+            -Wno-header-hygiene
         )
     elseif((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC"))
         message(STATUS "Setting MSVC compiler flags")
