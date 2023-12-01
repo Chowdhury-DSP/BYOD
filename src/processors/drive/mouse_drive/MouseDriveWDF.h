@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include "../diode_circuits/OmegaProvider.h"
 
 class MouseDriveWDF
 {
@@ -75,7 +76,7 @@ public:
     wdft::ResistorCapacitorSeriesT<float> R6_C7 { 1.0e3f, 4.7e-6f };
     wdft::WDFSeriesT<float, decltype (R), decltype (R6_C7)> Sd { R, R6_C7 };
 
-    wdft::DiodePairT<float, decltype (Sd)> diodes { Sd, 5.0e-9f, 25.85e-3f, 2.0f };
+    wdft::DiodePairT<float, decltype (Sd), wdft::DiodeQuality::Best, OmegaProvider> diodes { Sd, 5.0e-9f, 25.85e-3f, 2.0f };
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MouseDriveWDF)

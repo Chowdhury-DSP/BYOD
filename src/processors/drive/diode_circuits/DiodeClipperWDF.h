@@ -1,8 +1,9 @@
 #pragma once
 
 #include <pch.h>
+#include "OmegaProvider.h"
 
-template <template <typename, typename, wdft::DiodeQuality> typename DiodeType>
+template <template <typename, typename, wdft::DiodeQuality, typename> typename DiodeType>
 class DiodeClipperWDF
 {
 public:
@@ -96,7 +97,7 @@ private:
     Cap C1 { capVal };
 
     wdft::WDFParallelT<wdf_type, Cap, ResVs> P1 { C1, Vs };
-    DiodeType<wdf_type, decltype (P1), wdft::DiodeQuality::Best> dp { P1, 2.52e-9f };
+    DiodeType<wdf_type, decltype (P1), wdft::DiodeQuality::Best, OmegaProvider> dp { P1, 2.52e-9f };
 
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> cutoffSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> nDiodesSmooth;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include "../diode_circuits/OmegaProvider.h"
 
 class ZenDriveWDF
 {
@@ -111,7 +112,7 @@ public:
     wdft::ResistorCapacitorParallelT<float> Rv9_C4 { R9, 100.0e-12f };
     wdft::WDFParallelT<float, decltype (Rv9_C4), decltype (R)> P3 { Rv9_C4, R };
 
-    wdft::DiodePairT<float, decltype (P1)> diodes { P1, 5.241435962608312e-10f, 0.07877217375325735f };
+    wdft::DiodePairT<float, decltype (P1), wdft::DiodeQuality::Best, OmegaProvider> diodes { P1, 5.241435962608312e-10f, 0.07877217375325735f };
 
 private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> voiceSmooth;

@@ -167,10 +167,6 @@ if (NOT(${JAI_COMPILER} STREQUAL "JAI_COMPILER-NOTFOUND"))
 endif()
 
 # AVX/SSE files for accelerated neural nets
-if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../modules/math_approx")
-    message(STATUS "Using RTNeural with math_approx")
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../modules/math_approx" math_approx)
-endif()
 make_lib_simd_runtime(rnn_accelerated processors/drive/neural_utils/RNNAccelerated.cpp)
 foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
     target_link_libraries(${target} PRIVATE config_flags juce::juce_recommended_lto_flags warning_flags)
@@ -187,6 +183,7 @@ foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
         CXX_VISIBILITY_PRESET hidden
     )
     if(TARGET math_approx)
+        message(STATUS "Using math_approx for ${target}")
         target_compile_definitions(${target} PRIVATE RTNEURAL_USE_MATH_APPROX=1)
         target_link_libraries(${target} PRIVATE math_approx)
     endif()

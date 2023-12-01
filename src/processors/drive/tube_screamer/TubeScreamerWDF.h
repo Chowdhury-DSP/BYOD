@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include "../diode_circuits/OmegaProvider.h"
 
 class TubeScreamerWDF
 {
@@ -108,7 +109,7 @@ public:
     wdft::ResistorCapacitorParallelT<float> R6_P1_par_C4 { R6, 51.0e-12f };
     wdft::WDFParallelT<float, decltype (R6_P1_par_C4), decltype (R)> P3 { R6_P1_par_C4, R };
 
-    wdft::DiodePairT<float, decltype (P3)> dp { P3, 4.352e-9f, Vt, 1.906f }; // 1N4148
+    wdft::DiodePairT<float, decltype (P3), wdft::DiodeQuality::Best, OmegaProvider> dp { P3, 4.352e-9f, Vt, 1.906f }; // 1N4148
 
     SmoothedValue<float, ValueSmoothingTypes::Linear> nDiodesSmooth;
     SmoothedValue<float, ValueSmoothingTypes::Linear> gainSmooth;

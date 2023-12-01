@@ -1,6 +1,7 @@
 #pragma once
 
 #include <pch.h>
+#include "../diode_circuits/OmegaProvider.h"
 
 // This circuit model was originally implemented as part of Sam Schachter's
 // Master's Thesis (https://github.com/schachtersam32/WaveDigitalFilters_Sharc/blob/master/MXR_DistPlus.h).
@@ -89,7 +90,7 @@ public:
     wdft::CapacitorT<float> C5 { 1.0e-9f };
     wdft::WDFParallelT<float, decltype (C5), decltype (P4)> P3 { C5, P4 };
 
-    wdft::DiodePairT<float, decltype (P3), wdft::DiodeQuality::Best> DP { P3, 2.52e-9f, 25.85e-3f * 1.75f };
+    wdft::DiodePairT<float, decltype (P3), wdft::DiodeQuality::Best, OmegaProvider> DP { P3, 2.52e-9f, 25.85e-3f * 1.75f };
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MXRDistWDF)

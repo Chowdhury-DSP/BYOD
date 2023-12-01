@@ -98,6 +98,13 @@ if(ASIOSDK_DIR)
     target_compile_definitions(juce_plugin_modules PUBLIC JUCE_ASIO=1)
 endif()
 
+if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/math_approx")
+    message(STATUS "Configuring math_approx")
+    add_subdirectory(math_approx)
+    target_link_libraries(juce_plugin_modules PUBLIC math_approx)
+    target_compile_definitions(juce_plugin_modules PRIVATE BYOD_USE_MATH_APPROX=1)
+endif()
+
 if(IOS)
     target_link_libraries(juce_plugin_modules PRIVATE juce::juce_product_unlocking)
     target_compile_definitions(juce_plugin_modules PUBLIC JUCE_IN_APP_PURCHASES=1)
