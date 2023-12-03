@@ -26,6 +26,7 @@ public:
 
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    void memoryWarningReceived() override;
 
     auto& getProcChain() { return *procs; }
     auto& getVTS() { return vts; }

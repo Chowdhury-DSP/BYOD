@@ -59,6 +59,12 @@ void BYOD::prepareToPlay (double sampleRate, int samplesPerBlock)
     bypassScratchBuffer.setSize (2, samplesPerBlock);
 }
 
+void BYOD::memoryWarningReceived()
+{
+    const MessageManagerLock mml {};
+    undoManager.clearUndoHistory();
+}
+
 void BYOD::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
 {
     TRACE_DSP();
