@@ -6,7 +6,11 @@ template <typename T = float, int order = 1>
 class SchroederAllpass
 {
 public:
-    SchroederAllpass() = default;
+    explicit SchroederAllpass (double sampleRate)
+        : delay { static_cast<int> (0.0035 * sampleRate) },
+          nestedAllpass { sampleRate }
+    {
+    }
 
     void prepare (double sampleRate)
     {
@@ -50,7 +54,10 @@ template <typename T>
 class SchroederAllpass<T, 1>
 {
 public:
-    SchroederAllpass() = default;
+    explicit SchroederAllpass (double sampleRate)
+        : delay { static_cast<int> (0.0035 * sampleRate) }
+    {
+    }
 
     void prepare (double sampleRate)
     {
@@ -78,7 +85,7 @@ public:
     }
 
 private:
-    chowdsp::DelayLine<T, chowdsp::DelayLineInterpolationTypes::Thiran> delay { 1 << 18 };
+    chowdsp::DelayLine<T, chowdsp::DelayLineInterpolationTypes::Thiran> delay;
     T g;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SchroederAllpass)

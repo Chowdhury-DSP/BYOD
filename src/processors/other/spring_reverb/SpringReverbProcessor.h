@@ -1,12 +1,13 @@
 #pragma once
 
 #include "../../BaseProcessor.h"
-#include "SpringReverb.h"
 
+class SpringReverb;
 class SpringReverbProcessor : public BaseProcessor
 {
 public:
     explicit SpringReverbProcessor (UndoManager* um = nullptr);
+    ~SpringReverbProcessor() override;
 
     ProcessorType getProcessorType() const override { return Other; }
     static ParamLayout createParameterLayout();

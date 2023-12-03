@@ -1,5 +1,6 @@
 #include "SpringReverbProcessor.h"
 #include "../../ParameterHelpers.h"
+#include "SpringReverb.h"
 
 SpringReverbProcessor::SpringReverbProcessor (UndoManager* um) : BaseProcessor ("Spring Reverb", createParameterLayout(), um)
 {
@@ -18,6 +19,8 @@ SpringReverbProcessor::SpringReverbProcessor (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "A reverb effect inspired by old spring reverb units.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
+
+SpringReverbProcessor::~SpringReverbProcessor() = default;
 
 ParamLayout SpringReverbProcessor::createParameterLayout()
 {
@@ -39,7 +42,7 @@ ParamLayout SpringReverbProcessor::createParameterLayout()
 void SpringReverbProcessor::prepare (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
-    reverb = std::make_unique<SpringReverb>();
+    reverb = std::make_unique<SpringReverb> (sampleRate);
     reverb->prepare (spec);
 
     dryBuffer.setSize (2, samplesPerBlock);

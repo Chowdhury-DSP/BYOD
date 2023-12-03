@@ -6,7 +6,7 @@
 class SpringReverb : public chowdsp::RebufferedProcessor<float>
 {
 public:
-    SpringReverb() = default;
+    explicit SpringReverb (double sampleRate);
 
     struct Params
     {
@@ -32,7 +32,7 @@ private:
     chowdsp::Upsampler<float, AAFilter, false> upsample;
     AudioBuffer<float> downsampledBuffer;
 
-    chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange3rd> delay { 1 << 18 };
+    chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange3rd> delay;
     float feedbackGain = 0.0f;
 
     chowdsp::SVFHighpass<float> dcBlocker;

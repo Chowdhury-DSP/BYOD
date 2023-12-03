@@ -9,6 +9,13 @@ constexpr float smallShakeSeconds = 0.0005f;
 constexpr float largeShakeSeconds = 0.001f;
 } // namespace
 
+SpringReverb::SpringReverb (double sampleRate)
+    : delay { static_cast<int> (0.099 * sampleRate * 1.5) },
+      vecAPFs { chowdsp::make_array<SchroederAllpass<Vec, 2>, allpassStages> (sampleRate) },
+      reflectionNetwork { sampleRate }
+{
+}
+
 int SpringReverb::prepareRebuffering (const dsp::ProcessSpec& spec)
 {
     const auto blockSizeDouble = (preDelayMs * 0.001) * spec.sampleRate;
@@ -78,7 +85,7 @@ void SpringReverb::setParams (const Params& params)
     const auto decayCorr = 0.7f * (1.0f - params.size * params.size);
     float t60Seconds = lowT60 * std::pow (highT60 / lowT60, 0.95f * params.decay - decayCorr);
 
-    float delaySamples = 1000.0f + std::pow (params.size * 0.099f, 1.0f) * fs;
+    float delaySamples = 1000.0f + (params.size * 0.099f) * fs;
     chaosSmooth.setTargetValue (rand.nextFloat() * delaySamples * 0.07f);
     delaySamples += std::pow (params.chaos, 3.0f) * chaosSmooth.skip (blockSize);
     delay.setDelay (delaySamples);
@@ -104,7 +111,7 @@ void SpringReverb::processRebufferedBlock (const chowdsp::BufferView<float>& buf
     const auto numSamples = buffer.getNumSamples();
     const auto numChannels = buffer.getNumChannels();
 
-    const auto dsNumSamples = numSamples / downsampleFactor;
+    const auto dsNumSamples = numSamples / downsample.getDownsamplingRatio();
     downsampledBuffer.setSize (numChannels, dsNumSamples, false, false, true);
     for (int ch = 0; ch < numChannels; ++ch)
         downsample.process (buffer.getReadPointer (ch), downsampledBuffer.getWritePointer (ch), ch, numSamples);

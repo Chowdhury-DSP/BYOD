@@ -5,7 +5,10 @@
 class ReflectionNetwork
 {
 public:
-    ReflectionNetwork() = default;
+    explicit ReflectionNetwork (double sampleRate)
+        : delays { chowdsp::make_array<ReflectionDelay, 4> (static_cast<int> (2.25 * sampleRate)) }
+    {
+    }
 
     void prepare (const dsp::ProcessSpec& spec)
     {
@@ -67,10 +70,7 @@ public:
 private:
     using VecType = xsimd::batch<float>;
     using ReflectionDelay = chowdsp::DelayLine<float, chowdsp::DelayLineInterpolationTypes::Lagrange3rd>;
-    std::array<ReflectionDelay, 4> delays { ReflectionDelay { 1 << 18 },
-                                            ReflectionDelay { 1 << 18 },
-                                            ReflectionDelay { 1 << 18 },
-                                            ReflectionDelay { 1 << 18 } };
+    std::array<ReflectionDelay, 4> delays;
 
     VecType feedback {};
     float fs = 48000.0f;
