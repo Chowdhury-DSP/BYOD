@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## UNRELEASED
+- General performance improvements.
+- Added "Tempo Sync" options for Delay module.
+- Added a "Mix" parameter for Phaser4 module.
+- Improved memory-efficiency for Spriong Reverb module.
+
 ## [1.2.0] - 2023-08-01
 - Added "Flapjack" module.
 - Added "Fuzz Machine" module.

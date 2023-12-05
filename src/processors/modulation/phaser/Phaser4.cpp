@@ -10,26 +10,27 @@ const String depthTag = "depth";
 const String feedbackTag = "feedback";
 const String fbStageTag = "fb_stage";
 const String stereoTag = "stereo";
+const String mixTag = "mix";
 } // namespace
 
 Phaser4::Phaser4 (UndoManager* um) : BaseProcessor (
-    "Phaser4",
-    createParameterLayout(),
-    InputPort {},
-    OutputPort {},
-    um,
-    [] (InputPort port)
-    {
-        if (port == InputPort::ModulationInput)
-            return PortType::modulation;
-        return PortType::audio;
-    },
-    [] (OutputPort port)
-    {
-        if (port == OutputPort::ModulationOutput)
-            return PortType::modulation;
-        return PortType::audio;
-    })
+                                         "Phaser4",
+                                         createParameterLayout(),
+                                         InputPort {},
+                                         OutputPort {},
+                                         um,
+                                         [] (InputPort port)
+                                         {
+                                             if (port == InputPort::ModulationInput)
+                                                 return PortType::modulation;
+                                             return PortType::audio;
+                                         },
+                                         [] (OutputPort port)
+                                         {
+                                             if (port == OutputPort::ModulationOutput)
+                                                 return PortType::modulation;
+                                             return PortType::audio;
+                                         })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateHzParam, vts, rateTag);
@@ -43,6 +44,14 @@ Phaser4::Phaser4 (UndoManager* um) : BaseProcessor (
     feedbackParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, feedbackTag));
     feedbackParam.mappingFunction = [] (float x)
     { return 0.95f * x; };
+
+    const auto* mixParam = getParameterPointer<chowdsp::FloatParameter*> (vts, mixTag);
+    dryMix.setParameterHandle (mixParam);
+    dryMix.setRampLength (0.05);
+    dryMix.mappingFunction = [] (float x)
+    { return 1.0f - x; };
+    wetMix.setParameterHandle (mixParam);
+    wetMix.setRampLength (0.05);
 
     lfoShaper.initialise ([] (float x)
                           {
@@ -103,6 +112,7 @@ ParamLayout Phaser4::createParameterLayout()
     createFreqParameter (params, rateTag, "Rate", 0.1f, 10.0f, 1.0f, 1.0f);
     createPercentParameter (params, depthTag, "Depth", 1.0f);
     createBipolarPercentParameter (params, feedbackTag, "Feedback", 0.6f);
+    createPercentParameter (params, mixTag, "Mix", 0.5f);
     emplace_param<chowdsp::ChoiceParameter> (params,
                                              fbStageTag,
                                              "FB Stage",
@@ -129,6 +139,9 @@ void Phaser4::prepare (double sampleRate, int samplesPerBlock)
         fb3Filter[ch].prepare ((float) sampleRate);
         fb2Filter[ch].prepare ((float) sampleRate);
     }
+
+    dryMix.prepare (sampleRate, samplesPerBlock);
+    wetMix.prepare (sampleRate, samplesPerBlock);
 
     audioOutBuffer.setSize (2, samplesPerBlock);
     modOutBuffer.setSize (1, samplesPerBlock);
@@ -167,6 +180,8 @@ void Phaser4::processAudio (AudioBuffer<float>& buffer)
 
     depthParam.process (numSamples);
     feedbackParam.process (numSamples);
+    dryMix.process (numSamples);
+    wetMix.process (numSamples);
     processModulation (numSamples);
 
     if (inputsConnected.contains (AudioInput))
@@ -199,6 +214,9 @@ void Phaser4::processAudio (AudioBuffer<float>& buffer)
                 fb3Filter[ch].processBlock (xIn, xOut, modDataPtr, fbData, numSamples);
             else if (fbStage == 4)
                 fb4Filter[ch].processBlock (xIn, xOut, modDataPtr, fbData, numSamples);
+
+            juce::FloatVectorOperations::multiply (xOut, wetMix.getSmoothedBuffer(), numSamples);
+            juce::FloatVectorOperations::addWithMultiply (xOut, xIn, dryMix.getSmoothedBuffer(), numSamples);
         }
     }
     else
@@ -242,4 +260,17 @@ void Phaser4::processAudioBypassed (AudioBuffer<float>& buffer)
 
     outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
     outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+}
+
+void Phaser4::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)
+{
+    BaseProcessor::fromXML (xml, version, loadPosition);
+
+    using namespace std::string_view_literals;
+    if (version <= chowdsp::Version { "1.2.0"sv })
+    {
+        // The "Mix" control was only introduced in version 1.2.1. Prior to that, mix was always at 100% wet.
+        auto* mixParam = vts.getParameter (mixTag);
+        mixParam->setValueNotifyingHost (1.0f);
+    }
 }

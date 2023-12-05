@@ -15,6 +15,8 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
+    void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
+
     enum InputPort
     {
         AudioInput = 0,
@@ -49,6 +51,9 @@ private:
 
     AudioBuffer<float> audioOutBuffer;
     AudioBuffer<float> modOutBuffer;
+
+    chowdsp::SmoothedBufferValue<float> dryMix;
+    chowdsp::SmoothedBufferValue<float> wetMix;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Phaser4)
 };
