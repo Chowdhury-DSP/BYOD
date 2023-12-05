@@ -81,7 +81,7 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --config Release --parallel 3
+      run: cmake --build build --config Release --parallel 3 --target BYOD_Standalone BYOD_VST3 BYOD_CLAP BYOD_headless
 
     - name: Unit Tests
       if: runner.os == 'Linux'

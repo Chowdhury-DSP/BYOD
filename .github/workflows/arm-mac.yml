@@ -46,4 +46,4 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --config Debug --parallel | xcpretty
+      run: cmake --build build --config Debug --parallel --target BYOD_AU | xcpretty
