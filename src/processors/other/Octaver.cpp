@@ -7,7 +7,7 @@ namespace OctaverTags
 const String trackingTag = "tracking";
 const String cutoffTag = "cutoff";
 const String mixTag = "mix";
-} // namespace
+} // namespace OctaverTags
 
 Octaver::Octaver (UndoManager* um) : BaseProcessor ("Octaver", createParameterLayout(), um)
 {

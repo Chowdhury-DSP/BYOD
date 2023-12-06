@@ -9,7 +9,7 @@ const String intensityTag = "intensity";
 const String numStagesTag = "num_stages";
 const String stereoTag = "stereo";
 const String mixTag = "mix";
-} // namespace
+} // namespace UniVibeTags
 
 UniVibe::UniVibe (UndoManager* um) : BaseProcessor (
     "Solo-Vibe",

@@ -56,7 +56,7 @@ inline float newton_raphson (float x, float y, float C_12_state, float G_C_12) n
 
     return y;
 }
-} // namespace
+} // namespace BigMuffMath
 
 void BigMuffClippingStage::prepare (double sampleRate)
 {

@@ -4,7 +4,7 @@ namespace PresetSearchDims
 {
 constexpr int rowHeight = 40;
 constexpr int itemHeight = rowHeight + 20;
-} // namespace
+} // namespace PresetSearchDims
 
 struct PresetSearchWindow::ResultsListModel : public ListBoxModel
 {

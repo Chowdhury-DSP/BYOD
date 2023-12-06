@@ -9,7 +9,7 @@ const String depthTag = "depth";
 const String mixTag = "mix";
 const String modeTag = "mode";
 const String stereoTag = "stereo";
-} // namespace
+} // namespace ScannerVibratoTags
 
 ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor (
     "Scanner Vibrato",

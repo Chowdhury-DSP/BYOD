@@ -6,7 +6,7 @@ namespace TremoloTags
 {
 const String stereoTag = "stereo";
 const String v1WaveTag = "v1_wave";
-} // namespace
+} // namespace TremoloTags
 
 Tremolo::Tremolo (UndoManager* um) : BaseProcessor (
     "Tremolo",

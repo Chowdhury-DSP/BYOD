@@ -8,7 +8,7 @@ const String rateTag = "rate";
 const String depthTag = "depth";
 const String feedbackTag = "feedback";
 const String modulationTag = "modulation";
-} // namespace
+} // namespace Phaser8Tags
 
 Phaser8::Phaser8 (UndoManager* um) : BaseProcessor (
     "Phaser8",

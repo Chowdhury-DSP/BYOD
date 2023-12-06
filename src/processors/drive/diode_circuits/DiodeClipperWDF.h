@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pch.h>
 #include "OmegaProvider.h"
+#include <pch.h>
 
 template <template <typename, typename, wdft::DiodeQuality, typename> typename DiodeType>
 class DiodeClipperWDF

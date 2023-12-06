@@ -11,26 +11,26 @@ const String feedbackTag = "feedback";
 const String fbStageTag = "fb_stage";
 const String stereoTag = "stereo";
 const String mixTag = "mix";
-} // namespace
+} // namespace Phaser4Tags
 
 Phaser4::Phaser4 (UndoManager* um) : BaseProcessor (
-                                         "Phaser4",
-                                         createParameterLayout(),
-                                         InputPort {},
-                                         OutputPort {},
-                                         um,
-                                         [] (InputPort port)
-                                         {
-                                             if (port == InputPort::ModulationInput)
-                                                 return PortType::modulation;
-                                             return PortType::audio;
-                                         },
-                                         [] (OutputPort port)
-                                         {
-                                             if (port == OutputPort::ModulationOutput)
-                                                 return PortType::modulation;
-                                             return PortType::audio;
-                                         })
+    "Phaser4",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::ModulationInput)
+            return PortType::modulation;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::ModulationOutput)
+            return PortType::modulation;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateHzParam, vts, Phaser4Tags::rateTag);

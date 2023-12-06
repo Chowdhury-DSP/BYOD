@@ -8,7 +8,7 @@ constexpr int headerHeight = 40;
 constexpr int footerHeight = 50;
 constexpr int labelsWidth = 80;
 constexpr int itemHeight = 50;
-} // namespace
+} // namespace PresetSaveDims
 
 PresetsSaveDialog::PresetsSaveDialog()
 {

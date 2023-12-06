@@ -6,7 +6,7 @@ namespace CentaurTags
 const String gainTag = "gain";
 const String levelTag = "level";
 const String modeTag = "mode";
-} // namespace
+} // namespace CentaurTags
 
 Centaur::Centaur (UndoManager* um) : BaseProcessor ("Centaur", createParameterLayout(), um),
                                      gainStageML (vts)

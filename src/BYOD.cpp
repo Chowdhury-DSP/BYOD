@@ -1,7 +1,7 @@
 #include "BYOD.h"
 #include "gui/BYODPluginEditor.h"
-#include "state/presets/PresetManager.h"
 #include "state/StateManager.h"
+#include "state/presets/PresetManager.h"
 
 namespace
 {

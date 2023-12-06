@@ -17,7 +17,7 @@ const String mixTag = "mix";
 const String delayTimeMsTag = "time_ms";
 const String tempoSyncTag = "tempo_sync";
 const String tempoSyncAmountTag = "time_tempo_sync";
-} // namespace
+} // namespace DelayTags
 
 DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
 {

@@ -56,7 +56,7 @@ inline float newton_raphson (float x, float y, float C_12_state, float G_C_12, f
 
     return y;
 }
-} // namespace
+} // namespace MuffClipperMath
 
 void MuffClipperStage::prepare (double sampleRate)
 {
