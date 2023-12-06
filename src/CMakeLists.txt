@@ -204,3 +204,4 @@ set_source_files_properties(${juce_module_sources}
     TARGET_DIRECTORY BYOD
     PROPERTIES SKIP_PRECOMPILE_HEADERS TRUE SKIP_UNITY_BUILD_INCLUSION TRUE)
 set_target_properties(BYOD PROPERTIES UNITY_BUILD ON UNITY_BUILD_BATCH_SIZE 8)
+target_precompile_headers(BYOD PRIVATE pch.h)
