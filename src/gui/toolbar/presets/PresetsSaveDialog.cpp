@@ -2,7 +2,7 @@
 #include "gui/utils/ErrorMessageView.h"
 #include "state/presets/PresetInfoHelpers.h"
 
-namespace
+namespace PresetSaveDims
 {
 constexpr int headerHeight = 40;
 constexpr int footerHeight = 50;
@@ -89,15 +89,15 @@ void PresetsSaveDialog::paint (Graphics& g)
     g.fillAll (Colours::black);
 
     g.setColour (Colours::white);
-    g.setFont ((float) headerHeight * 0.5f);
-    const auto headerBounds = getLocalBounds().removeFromTop (headerHeight);
+    g.setFont ((float) PresetSaveDims::headerHeight * 0.5f);
+    const auto headerBounds = getLocalBounds().removeFromTop (PresetSaveDims::headerHeight);
     const auto headerText = isSaveMode ? "Save Preset:" : "Edit Preset";
     g.drawFittedText (headerText, headerBounds, Justification::centred, 1);
 
-    g.setFont ((float) itemHeight * 0.35f);
+    g.setFont ((float) PresetSaveDims::itemHeight * 0.35f);
     auto drawItemLabel = [&] (const Component& comp, const String& label)
     {
-        auto textBounds = Rectangle { labelsWidth, comp.getHeight() }.withY (comp.getY());
+        auto textBounds = Rectangle { PresetSaveDims::labelsWidth, comp.getHeight() }.withY (comp.getY());
         g.drawFittedText (label, textBounds, Justification::centredRight, 1);
     };
 
@@ -108,15 +108,15 @@ void PresetsSaveDialog::paint (Graphics& g)
 void PresetsSaveDialog::resized()
 {
     auto bounds = getLocalBounds();
-    bounds.removeFromTop (headerHeight);
-    auto footerBounds = bounds.removeFromBottom (footerHeight);
+    bounds.removeFromTop (PresetSaveDims::headerHeight);
+    auto footerBounds = bounds.removeFromBottom (PresetSaveDims::footerHeight);
 
-    bounds.removeFromLeft (labelsWidth);
-    nameLabel.setBounds (bounds.removeFromTop (itemHeight).reduced (10, 5));
-    categoryLabel.setBounds (bounds.removeFromTop (itemHeight).reduced (10, 5));
+    bounds.removeFromLeft (PresetSaveDims::labelsWidth);
+    nameLabel.setBounds (bounds.removeFromTop (PresetSaveDims::itemHeight).reduced (10, 5));
+    categoryLabel.setBounds (bounds.removeFromTop (PresetSaveDims::itemHeight).reduced (10, 5));
 
 #if BYOD_BUILD_PRESET_SERVER
-    publicSwitch.setBounds (bounds.removeFromTop (itemHeight).reduced (10, 5).withWidth (100));
+    publicSwitch.setBounds (bounds.removeFromTop (PresetSaveDims::itemHeight).reduced (10, 5).withWidth (100));
 #endif
 
     okButton.setBounds (footerBounds.removeFromLeft (proportionOfWidth (0.5f)).reduced (5));

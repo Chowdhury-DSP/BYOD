@@ -2,7 +2,7 @@
 #include "processors/BufferHelpers.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace OctaverTags
 {
 const String trackingTag = "tracking";
 const String cutoffTag = "cutoff";
@@ -12,9 +12,9 @@ const String mixTag = "mix";
 Octaver::Octaver (UndoManager* um) : BaseProcessor ("Octaver", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (trackingParam, vts, trackingTag);
-    loadParameterPointer (cutoffParam, vts, cutoffTag);
-    loadParameterPointer (mixParam, vts, mixTag);
+    loadParameterPointer (trackingParam, vts, OctaverTags::trackingTag);
+    loadParameterPointer (cutoffParam, vts, OctaverTags::cutoffTag);
+    loadParameterPointer (mixParam, vts, OctaverTags::mixTag);
 
     uiOptions.backgroundColour = Colour { 0xff5c96ac };
     uiOptions.powerColour = Colour { 0xffd8d737 };
@@ -27,9 +27,9 @@ ParamLayout Octaver::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createFreqParameter (params, trackingTag, "Tracking", 300.0f, 1000.0f, 650.0f, 650.0f);
-    createFreqParameter (params, cutoffTag, "Cutoff", 500.0f, 2000.0f, 1000.0f, 2000.0f);
-    createPercentParameter (params, mixTag, "Mix", 0.75f);
+    createFreqParameter (params, OctaverTags::trackingTag, "Tracking", 300.0f, 1000.0f, 650.0f, 650.0f);
+    createFreqParameter (params, OctaverTags::cutoffTag, "Cutoff", 500.0f, 2000.0f, 1000.0f, 2000.0f);
+    createPercentParameter (params, OctaverTags::mixTag, "Mix", 0.75f);
 
     return { params.begin(), params.end() };
 }

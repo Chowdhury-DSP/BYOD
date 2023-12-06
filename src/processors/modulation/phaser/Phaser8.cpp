@@ -2,7 +2,7 @@
 #include "processors/BufferHelpers.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace Phaser8Tags
 {
 const String rateTag = "rate";
 const String depthTag = "depth";
@@ -30,18 +30,18 @@ Phaser8::Phaser8 (UndoManager* um) : BaseProcessor (
     })
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (rateHzParam, vts, rateTag);
+    loadParameterPointer (rateHzParam, vts, Phaser8Tags::rateTag);
 
-    depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, depthTag));
+    depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, Phaser8Tags::depthTag));
     depthParam.mappingFunction = [] (float x)
     { return 0.45f * x; };
 
-    feedbackParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, feedbackTag));
+    feedbackParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, Phaser8Tags::feedbackTag));
     feedbackParam.mappingFunction = [] (float x)
     { return 0.95f * x; };
 
-    modSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, modulationTag));
-    noModSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, modulationTag));
+    modSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, Phaser8Tags::modulationTag));
+    noModSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, Phaser8Tags::modulationTag));
     noModSmooth.mappingFunction = [] (float x)
     { return 1.0f - x; };
 
@@ -53,7 +53,7 @@ Phaser8::Phaser8 (UndoManager* um) : BaseProcessor (
                           1.0f,
                           2048);
 
-    disableWhenInputConnected ({ rateTag }, ModulationInput);
+    disableWhenInputConnected ({ Phaser8Tags::rateTag }, ModulationInput);
 
     uiOptions.backgroundColour = Colour { 0xff00a8e9 };
     uiOptions.powerColour = Colour { 0xfff44e44 };
@@ -66,10 +66,10 @@ ParamLayout Phaser8::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createFreqParameter (params, rateTag, "Rate", 0.1f, 20.0f, 1.0f, 1.0f);
-    createPercentParameter (params, depthTag, "Depth", 1.0f);
-    createPercentParameter (params, feedbackTag, "Feedback", 0.75f);
-    createPercentParameter (params, modulationTag, "Modulation", 0.75f);
+    createFreqParameter (params, Phaser8Tags::rateTag, "Rate", 0.1f, 20.0f, 1.0f, 1.0f);
+    createPercentParameter (params, Phaser8Tags::depthTag, "Depth", 1.0f);
+    createPercentParameter (params, Phaser8Tags::feedbackTag, "Feedback", 0.75f);
+    createPercentParameter (params, Phaser8Tags::modulationTag, "Modulation", 0.75f);
 
     return { params.begin(), params.end() };
 }

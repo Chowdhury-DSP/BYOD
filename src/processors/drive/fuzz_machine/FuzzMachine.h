@@ -2,7 +2,6 @@
 
 #include "processors/BaseProcessor.h"
 
-#include "FuzzFaceNDK.h"
 #include "processors/drive/neural_utils/ResampledRNNAccelerated.h"
 
 class FuzzMachine : public BaseProcessor
