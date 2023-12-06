@@ -3,7 +3,7 @@
 #include "processors/ParameterHelpers.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
-namespace
+namespace Phaser4Tags
 {
 const String rateTag = "rate";
 const String depthTag = "depth";
@@ -11,41 +11,41 @@ const String feedbackTag = "feedback";
 const String fbStageTag = "fb_stage";
 const String stereoTag = "stereo";
 const String mixTag = "mix";
-} // namespace
+} // namespace Phaser4Tags
 
 Phaser4::Phaser4 (UndoManager* um) : BaseProcessor (
-                                         "Phaser4",
-                                         createParameterLayout(),
-                                         InputPort {},
-                                         OutputPort {},
-                                         um,
-                                         [] (InputPort port)
-                                         {
-                                             if (port == InputPort::ModulationInput)
-                                                 return PortType::modulation;
-                                             return PortType::audio;
-                                         },
-                                         [] (OutputPort port)
-                                         {
-                                             if (port == OutputPort::ModulationOutput)
-                                                 return PortType::modulation;
-                                             return PortType::audio;
-                                         })
+    "Phaser4",
+    createParameterLayout(),
+    InputPort {},
+    OutputPort {},
+    um,
+    [] (InputPort port)
+    {
+        if (port == InputPort::ModulationInput)
+            return PortType::modulation;
+        return PortType::audio;
+    },
+    [] (OutputPort port)
+    {
+        if (port == OutputPort::ModulationOutput)
+            return PortType::modulation;
+        return PortType::audio;
+    })
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (rateHzParam, vts, rateTag);
-    loadParameterPointer (fbStageParam, vts, fbStageTag);
-    loadParameterPointer (stereoParam, vts, stereoTag);
+    loadParameterPointer (rateHzParam, vts, Phaser4Tags::rateTag);
+    loadParameterPointer (fbStageParam, vts, Phaser4Tags::fbStageTag);
+    loadParameterPointer (stereoParam, vts, Phaser4Tags::stereoTag);
 
-    depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, depthTag));
+    depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, Phaser4Tags::depthTag));
     depthParam.mappingFunction = [] (float x)
     { return 0.45f * x; };
 
-    feedbackParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, feedbackTag));
+    feedbackParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, Phaser4Tags::feedbackTag));
     feedbackParam.mappingFunction = [] (float x)
     { return 0.95f * x; };
 
-    const auto* mixParam = getParameterPointer<chowdsp::FloatParameter*> (vts, mixTag);
+    const auto* mixParam = getParameterPointer<chowdsp::FloatParameter*> (vts, Phaser4Tags::mixTag);
     dryMix.setParameterHandle (mixParam);
     dryMix.setRampLength (0.05);
     dryMix.mappingFunction = [] (float x)
@@ -61,8 +61,8 @@ Phaser4::Phaser4 (UndoManager* um) : BaseProcessor (
                           1.0f,
                           2048);
 
-    addPopupMenuParameter (stereoTag);
-    disableWhenInputConnected ({ rateTag }, ModulationInput);
+    addPopupMenuParameter (Phaser4Tags::stereoTag);
+    disableWhenInputConnected ({ Phaser4Tags::rateTag }, ModulationInput);
 
     uiOptions.backgroundColour = Colour { 0xfffc7533 };
     uiOptions.powerColour = Colours::cyan.brighter (0.1f);
@@ -109,16 +109,16 @@ ParamLayout Phaser4::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createFreqParameter (params, rateTag, "Rate", 0.1f, 10.0f, 1.0f, 1.0f);
-    createPercentParameter (params, depthTag, "Depth", 1.0f);
-    createBipolarPercentParameter (params, feedbackTag, "Feedback", 0.6f);
-    createPercentParameter (params, mixTag, "Mix", 0.5f);
+    createFreqParameter (params, Phaser4Tags::rateTag, "Rate", 0.1f, 10.0f, 1.0f, 1.0f);
+    createPercentParameter (params, Phaser4Tags::depthTag, "Depth", 1.0f);
+    createBipolarPercentParameter (params, Phaser4Tags::feedbackTag, "Feedback", 0.6f);
+    createPercentParameter (params, Phaser4Tags::mixTag, "Mix", 0.5f);
     emplace_param<chowdsp::ChoiceParameter> (params,
-                                             fbStageTag,
+                                             Phaser4Tags::fbStageTag,
                                              "FB Stage",
                                              StringArray { "2nd Stage", "3rd Stage", "4th Stage" },
                                              0);
-    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
+    emplace_param<chowdsp::BoolParameter> (params, Phaser4Tags::stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
 }
@@ -270,7 +270,7 @@ void Phaser4::fromXML (XmlElement* xml, const chowdsp::Version& version, bool lo
     if (version <= chowdsp::Version { "1.2.0"sv })
     {
         // The "Mix" control was only introduced in version 1.2.1. Prior to that, mix was always at 100% wet.
-        auto* mixParam = vts.getParameter (mixTag);
+        auto* mixParam = vts.getParameter (Phaser4Tags::mixTag);
         mixParam->setValueNotifyingHost (1.0f);
     }
 }

@@ -1,6 +1,6 @@
 #include "BigMuffClippingStage.h"
 
-namespace
+namespace BigMuffMath
 {
 // circuit component values
 constexpr float C5 = 100.0e-9f;
@@ -56,15 +56,15 @@ inline float newton_raphson (float x, float y, float C_12_state, float G_C_12) n
 
     return y;
 }
-} // namespace
+} // namespace BigMuffMath
 
 void BigMuffClippingStage::prepare (double sampleRate)
 {
     fs = (float) sampleRate;
 
     // set coefficients for input filter
-    float b_s[] = { C5 * R20, 0.0f };
-    float a_s[] = { C5 * (R19 + R20), 1.0f };
+    float b_s[] = { BigMuffMath::C5 * BigMuffMath::R20, 0.0f };
+    float a_s[] = { BigMuffMath::C5 * (BigMuffMath::R19 + BigMuffMath::R20), 1.0f };
     float b[2];
     float a[2];
     chowdsp::ConformalMaps::Transform<float, 1>::bilinear (b, a, b_s, a_s, 2.0f * fs);
@@ -88,7 +88,7 @@ void BigMuffClippingStage::reset()
 float BigMuffClippingStage::getGC12 (float fs, float smoothing)
 {
     // capacitor C12 admittance, smoothing adds or removes 200 pF
-    return 2.0f * (C12 + smoothing * 200.0e-12f) * fs;
+    return 2.0f * (BigMuffMath::C12 + smoothing * 200.0e-12f) * fs;
 }
 
 template <bool highQuality>
@@ -103,10 +103,10 @@ void BigMuffClippingStage::processBlock (AudioBuffer<float>& buffer, const chowd
         auto u_n = inputFilter[ch].processSample (x);
 
         // newton-raphson
-        float y_k = newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12);
+        float y_k = BigMuffMath::newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12);
 
         // update state
-        C_12_1[ch] = 2.0f * (y_k - VbiasA) * G_C_12 - C_12_1[ch];
+        C_12_1[ch] = 2.0f * (y_k - BigMuffMath::VbiasA) * G_C_12 - C_12_1[ch];
         y_1[ch] = y_k;
 
         return y_k;

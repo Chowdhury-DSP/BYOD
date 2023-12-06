@@ -1,10 +1,10 @@
 #include "PresetSearchWindow.h"
 
-namespace
+namespace PresetSearchDims
 {
 constexpr int rowHeight = 40;
 constexpr int itemHeight = rowHeight + 20;
-} // namespace
+} // namespace PresetSearchDims
 
 struct PresetSearchWindow::ResultsListModel : public ListBoxModel
 {
@@ -107,7 +107,7 @@ PresetSearchWindow::PresetSearchWindow (chowdsp::PresetManager& presetMgr) : pre
     resultsBox.setColour (ListBox::outlineColourId, Colours::white);
     resultsBox.setColour (ListBox::backgroundColourId, Colours::transparentBlack);
     resultsBox.setOutlineThickness (1);
-    resultsBox.setRowHeight (rowHeight);
+    resultsBox.setRowHeight (PresetSearchDims::rowHeight);
     addAndMakeVisible (resultsBox);
 
     numResultsLabel.setColour (Label::backgroundColourId, Colours::transparentBlack);
@@ -130,8 +130,8 @@ void PresetSearchWindow::resized()
     auto bounds = getLocalBounds();
     const auto footer = bounds.removeFromBottom (20);
 
-    searchEntryBox->setFont ((float) rowHeight * 0.55f);
-    searchEntryBox->setBounds (bounds.removeFromTop (itemHeight).reduced (10, 10));
+    searchEntryBox->setFont ((float) PresetSearchDims::rowHeight * 0.55f);
+    searchEntryBox->setBounds (bounds.removeFromTop (PresetSearchDims::itemHeight).reduced (10, 10));
     resultsBox.setBounds (bounds.reduced (10, 0));
     numResultsLabel.setBounds (footer.reduced (10, 1));
 }

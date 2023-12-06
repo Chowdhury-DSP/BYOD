@@ -2,26 +2,14 @@
 #include "processors/BufferHelpers.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace ScannerVibratoTags
 {
 const String rateTag = "rate";
 const String depthTag = "depth";
 const String mixTag = "mix";
 const String modeTag = "mode";
 const String stereoTag = "stereo";
-
-constexpr auto o16 = 1.0f / 16.0f;
-float ramp_up (float x, int off)
-{
-    const auto y = 16.0f * (x - (float) off * o16);
-    return (y > 1.0f || y < 0.0f) ? 0.0f : y;
-}
-float ramp_down (float x, int off)
-{
-    const auto y = 1.0f - 16.0f * (x - (float) off * o16);
-    return (y > 1.0f || y < 0.0f) ? 0.0f : y;
-}
-} // namespace
+} // namespace ScannerVibratoTags
 
 ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor (
     "Scanner Vibrato",
@@ -43,41 +31,52 @@ ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor (
     })
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (rateHzParam, vts, rateTag);
-    loadParameterPointer (mixParam, vts, mixTag);
-    loadParameterPointer (modeParam, vts, modeTag);
-    loadParameterPointer (stereoParam, vts, stereoTag);
+    loadParameterPointer (rateHzParam, vts, ScannerVibratoTags::rateTag);
+    loadParameterPointer (mixParam, vts, ScannerVibratoTags::mixTag);
+    loadParameterPointer (modeParam, vts, ScannerVibratoTags::modeTag);
+    loadParameterPointer (stereoParam, vts, ScannerVibratoTags::stereoTag);
 
-    addPopupMenuParameter (stereoTag);
+    addPopupMenuParameter (ScannerVibratoTags::stereoTag);
 
-    depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, depthTag));
+    depthParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, ScannerVibratoTags::depthTag));
     depthParam.setRampLength (0.05);
     depthParam.mappingFunction = [] (float x)
     {
         return 0.5f * x;
     };
 
+    static constexpr auto o16 = 1.0f / 16.0f;
+    const auto ramp_up = [] (float x, int off)
+    {
+        const auto y = 16.0f * (x - (float) off * o16);
+        return (y > 1.0f || y < 0.0f) ? 0.0f : y;
+    };
+    const auto ramp_down = [] (float x, int off)
+    {
+        const auto y = 1.0f - 16.0f * (x - (float) off * o16);
+        return (y > 1.0f || y < 0.0f) ? 0.0f : y;
+    };
     const auto initTable = [this] (int index, auto&& func)
     {
         tapMixTable[index].initialise (func, 0.0f, 1.0f, 1024);
     };
-    initTable (0, [] (float x)
+    initTable (0, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 0) + ramp_down (x, 1); });
-    initTable (1, [] (float x)
+    initTable (1, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 1) + ramp_down (x, 2) + ramp_up (x, 15) + ramp_down (x, 0); });
-    initTable (2, [] (float x)
+    initTable (2, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 2) + ramp_down (x, 3) + ramp_up (x, 14) + ramp_down (x, 15); });
-    initTable (3, [] (float x)
+    initTable (3, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 3) + ramp_down (x, 4) + ramp_up (x, 13) + ramp_down (x, 14); });
-    initTable (4, [] (float x)
+    initTable (4, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 4) + ramp_down (x, 5) + ramp_up (x, 12) + ramp_down (x, 13); });
-    initTable (5, [] (float x)
+    initTable (5, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 5) + ramp_down (x, 6) + ramp_up (x, 11) + ramp_down (x, 12); });
-    initTable (6, [] (float x)
+    initTable (6, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 6) + ramp_down (x, 7) + ramp_up (x, 10) + ramp_down (x, 11); });
-    initTable (7, [] (float x)
+    initTable (7, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 7) + ramp_down (x, 8) + ramp_up (x, 9) + ramp_down (x, 10); });
-    initTable (8, [] (float x)
+    initTable (8, [ramp_up, ramp_down] (float x)
                { return ramp_up (x, 8) + ramp_down (x, 9); });
 
     uiOptions.backgroundColour = Colour { 0xff95756d };
@@ -85,22 +84,22 @@ ScannerVibrato::ScannerVibrato (UndoManager* um) : BaseProcessor (
     uiOptions.info.description = "Virtual analog emulation of the scanner vibrato/chorus effect from the Hammond Organ.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    disableWhenInputConnected ({ rateTag }, ModulationInput);
+    disableWhenInputConnected ({ ScannerVibratoTags::rateTag }, ModulationInput);
 }
 
 ParamLayout ScannerVibrato::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    createFreqParameter (params, rateTag, "Rate", 0.5f, 10.0f, 6.0f, 6.0f);
-    createPercentParameter (params, depthTag, "Depth", 0.5f);
-    createPercentParameter (params, mixTag, "Mix", 0.5f);
+    createFreqParameter (params, ScannerVibratoTags::rateTag, "Rate", 0.5f, 10.0f, 6.0f, 6.0f);
+    createPercentParameter (params, ScannerVibratoTags::depthTag, "Depth", 0.5f);
+    createPercentParameter (params, ScannerVibratoTags::mixTag, "Mix", 0.5f);
 
     StringArray modeChoices;
     for (const auto& choice : magic_enum::enum_names<ScannerVibratoWDF::Mode>())
         modeChoices.add (choice.data());
-    emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", modeChoices, 0);
-    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
+    emplace_param<chowdsp::ChoiceParameter> (params, ScannerVibratoTags::modeTag, "Mode", modeChoices, 0);
+    emplace_param<chowdsp::BoolParameter> (params, ScannerVibratoTags::stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
 }

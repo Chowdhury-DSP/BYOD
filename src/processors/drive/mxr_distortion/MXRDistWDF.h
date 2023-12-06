@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pch.h>
 #include "../diode_circuits/OmegaProvider.h"
+#include <pch.h>
 
 // This circuit model was originally implemented as part of Sam Schachter's
 // Master's Thesis (https://github.com/schachtersam32/WaveDigitalFilters_Sharc/blob/master/MXR_DistPlus.h).

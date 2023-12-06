@@ -2,14 +2,14 @@
 #include "processors/BufferHelpers.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace UniVibeTags
 {
 const String speedTag = "speed";
 const String intensityTag = "intensity";
 const String numStagesTag = "num_stages";
 const String stereoTag = "stereo";
 const String mixTag = "mix";
-} // namespace
+} // namespace UniVibeTags
 
 UniVibe::UniVibe (UndoManager* um) : BaseProcessor (
     "Solo-Vibe",
@@ -31,19 +31,19 @@ UniVibe::UniVibe (UndoManager* um) : BaseProcessor (
     })
 {
     using namespace ParameterHelpers;
-    speedParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, speedTag));
-    intensityParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, intensityTag));
-    loadParameterPointer (numStagesParam, vts, numStagesTag);
-    loadParameterPointer (stereoParam, vts, stereoTag);
-    loadParameterPointer (mixParam, vts, mixTag);
+    speedParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, UniVibeTags::speedTag));
+    intensityParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, UniVibeTags::intensityTag));
+    loadParameterPointer (numStagesParam, vts, UniVibeTags::numStagesTag);
+    loadParameterPointer (stereoParam, vts, UniVibeTags::stereoTag);
+    loadParameterPointer (mixParam, vts, UniVibeTags::mixTag);
 
     uiOptions.backgroundColour = Colours::darkgrey.darker (0.1f);
     uiOptions.powerColour = Colours::violet.brighter();
     uiOptions.info.description = "A vibrato/chorus effect based on the Univox Uni-Vibe pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    disableWhenInputConnected ({ speedTag }, ModulationInput);
-    addPopupMenuParameter (stereoTag);
+    disableWhenInputConnected ({ UniVibeTags::speedTag }, ModulationInput);
+    addPopupMenuParameter (UniVibeTags::stereoTag);
 
     juce::Random rand { 0x1234321 };
     const auto randInRange = [&rand] (const juce::Range<float>& range)
@@ -70,11 +70,11 @@ ParamLayout UniVibe::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    createFreqParameter (params, speedTag, "Speed", 0.5f, 20.0f, 5.0f, 5.0f);
-    createPercentParameter (params, intensityTag, "Intensity", 0.5f);
+    createFreqParameter (params, UniVibeTags::speedTag, "Speed", 0.5f, 20.0f, 5.0f, 5.0f);
+    createPercentParameter (params, UniVibeTags::intensityTag, "Intensity", 0.5f);
     emplace_param<chowdsp::FloatParameter> (
         params,
-        numStagesTag,
+        UniVibeTags::numStagesTag,
         "# Stages",
         NormalisableRange { 1.0f, (float) maxNumStages },
         4,
@@ -83,8 +83,8 @@ ParamLayout UniVibe::createParameterLayout()
             return String { (int) val };
         },
         &stringToFloatVal);
-    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
-    createPercentParameter (params, mixTag, "Mix", 0.5f);
+    emplace_param<chowdsp::BoolParameter> (params, UniVibeTags::stereoTag, "Stereo", false);
+    createPercentParameter (params, UniVibeTags::mixTag, "Mix", 0.5f);
 
     return { params.begin(), params.end() };
 }

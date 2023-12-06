@@ -2,28 +2,11 @@
 #include "../BufferHelpers.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace TremoloTags
 {
-template <typename SampleType, typename SmoothingType>
-static dsp::AudioBlock<SampleType>& addSmoothed (dsp::AudioBlock<SampleType>& block, SmoothedValue<SampleType, SmoothingType>& value) noexcept
-{
-    if (! value.isSmoothing())
-        return block.add (value.getTargetValue());
-
-    for (size_t i = 0; i < block.getNumSamples(); ++i)
-    {
-        const auto scaler = value.getNextValue();
-        for (size_t ch = 0; ch < block.getNumChannels(); ++ch)
-            block.getChannelPointer (ch)[i] += scaler;
-    }
-
-    return block;
-}
-
 const String stereoTag = "stereo";
 const String v1WaveTag = "v1_wave";
-
-} // namespace
+} // namespace TremoloTags
 
 Tremolo::Tremolo (UndoManager* um) : BaseProcessor (
     "Tremolo",
@@ -48,11 +31,11 @@ Tremolo::Tremolo (UndoManager* um) : BaseProcessor (
     loadParameterPointer (rateParam, vts, "rate");
     loadParameterPointer (waveParam, vts, "wave");
     loadParameterPointer (depthParam, vts, "depth");
-    loadParameterPointer (stereoParam, vts, stereoTag);
-    loadParameterPointer (v1WaveParam, vts, v1WaveTag);
+    loadParameterPointer (stereoParam, vts, TremoloTags::stereoTag);
+    loadParameterPointer (v1WaveParam, vts, TremoloTags::v1WaveTag);
 
-    addPopupMenuParameter (stereoTag);
-    addPopupMenuParameter (v1WaveTag);
+    addPopupMenuParameter (TremoloTags::stereoTag);
+    addPopupMenuParameter (TremoloTags::v1WaveTag);
 
     uiOptions.backgroundColour = Colours::orange.darker (0.1f);
     uiOptions.powerColour = Colours::cyan.brighter();
@@ -70,8 +53,8 @@ ParamLayout Tremolo::createParameterLayout()
     createPercentParameter (params, "wave", "Wave", 0.5f);
     createPercentParameter (params, "depth", "Depth", 0.5f);
 
-    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
-    emplace_param<chowdsp::BoolParameter> (params, v1WaveTag, "V1 Wave", false);
+    emplace_param<chowdsp::BoolParameter> (params, TremoloTags::stereoTag, "Stereo", false);
+    emplace_param<chowdsp::BoolParameter> (params, TremoloTags::v1WaveTag, "V1 Wave", false);
 
     return { params.begin(), params.end() };
 }

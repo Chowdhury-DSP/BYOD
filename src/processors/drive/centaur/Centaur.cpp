@@ -1,21 +1,21 @@
 #include "Centaur.h"
 #include "processors/netlist_helpers/NetlistViewer.h"
 
-namespace
+namespace CentaurTags
 {
 const String gainTag = "gain";
 const String levelTag = "level";
 const String modeTag = "mode";
-} // namespace
+} // namespace CentaurTags
 
 Centaur::Centaur (UndoManager* um) : BaseProcessor ("Centaur", createParameterLayout(), um),
                                      gainStageML (vts)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (gainParam, vts, gainTag);
-    loadParameterPointer (levelParam, vts, levelTag);
-    modeParam = vts.getRawParameterValue (modeTag);
-    addPopupMenuParameter (modeTag);
+    loadParameterPointer (gainParam, vts, CentaurTags::gainTag);
+    loadParameterPointer (levelParam, vts, CentaurTags::levelTag);
+    modeParam = vts.getRawParameterValue (CentaurTags::modeTag);
+    addPopupMenuParameter (CentaurTags::modeTag);
 
     uiOptions.backgroundColour = Colour (0xFFDAA520);
     uiOptions.powerColour = Colour (0xFF14CBF2).brighter (0.5f);
@@ -321,9 +321,9 @@ ParamLayout Centaur::createParameterLayout()
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createPercentParameter (params, gainTag, "Gain", 0.5f);
-    createPercentParameter (params, levelTag, "Level", 0.5f);
-    emplace_param<AudioParameterChoice> (params, modeTag, "Mode", StringArray { "Traditional", "Neural" }, 0);
+    createPercentParameter (params, CentaurTags::gainTag, "Gain", 0.5f);
+    createPercentParameter (params, CentaurTags::levelTag, "Level", 0.5f);
+    emplace_param<AudioParameterChoice> (params, CentaurTags::modeTag, "Mode", StringArray { "Traditional", "Neural" }, 0);
 
     return { params.begin(), params.end() };
 }

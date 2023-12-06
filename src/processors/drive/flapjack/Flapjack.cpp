@@ -10,21 +10,21 @@
 // - transistor is _active_
 // - bias voltage = 4V
 
-namespace
+namespace FlapjackTags
 {
 const auto driveTag = "drive";
 const auto presenceTag = "presence";
 const auto levelTag = "level";
 const auto modeTag = "mode";
 const auto lowCutTag = "lowcut";
-} // namespace
+} // namespace FlapjackTags
 
 Flapjack::Flapjack (UndoManager* um)
     : BaseProcessor ("Flapjack", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
 
-    driveParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, driveTag));
+    driveParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, FlapjackTags::driveTag));
     driveParam.setRampLength (0.025);
     driveParam.mappingFunction = [this] (float x)
     {
@@ -32,13 +32,13 @@ Flapjack::Flapjack (UndoManager* um)
             x *= 0.9f;
         return chowdsp::Power::ipow<2> (1.0f - x);
     };
-    presenceParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, presenceTag));
+    presenceParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, FlapjackTags::presenceTag));
     presenceParam.setRampLength (0.025);
-    lowCutParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, lowCutTag));
+    lowCutParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, FlapjackTags::lowCutTag));
     lowCutParam.setRampLength (0.025);
 
-    loadParameterPointer (levelParam, vts, levelTag);
-    loadParameterPointer (modeParam, vts, modeTag);
+    loadParameterPointer (levelParam, vts, FlapjackTags::levelTag);
+    loadParameterPointer (modeParam, vts, FlapjackTags::modeTag);
 
     uiOptions.backgroundColour = Colours::whitesmoke.darker (0.1f);
     uiOptions.powerColour = Colours::red.darker (0.2f);
@@ -155,11 +155,11 @@ ParamLayout Flapjack::createParameterLayout()
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createPercentParameter (params, driveTag, "Drive", 0.75f);
-    createPercentParameter (params, presenceTag, "Presence", 0.5f);
-    createFreqParameter (params, lowCutTag, "Low Cut", 20.0f, 750.0f, 100.0f, 100.0f);
-    createPercentParameter (params, levelTag, "Level", 0.5f);
-    emplace_param<chowdsp::ChoiceParameter> (params, modeTag, "Mode", StringArray { "Fizzy", "Bluesberry", "Peachy" }, 1);
+    createPercentParameter (params, FlapjackTags::driveTag, "Drive", 0.75f);
+    createPercentParameter (params, FlapjackTags::presenceTag, "Presence", 0.5f);
+    createFreqParameter (params, FlapjackTags::lowCutTag, "Low Cut", 20.0f, 750.0f, 100.0f, 100.0f);
+    createPercentParameter (params, FlapjackTags::levelTag, "Level", 0.5f);
+    emplace_param<chowdsp::ChoiceParameter> (params, FlapjackTags::modeTag, "Mode", StringArray { "Fizzy", "Bluesberry", "Peachy" }, 1);
 
     return { params.begin(), params.end() };
 }

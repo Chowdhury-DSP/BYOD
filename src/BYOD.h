@@ -1,13 +1,12 @@
 #pragma once
 
-#include "processors/PlayheadHelpers.h"
 #include "processors/ProcessorStore.h"
 #include "processors/chain/ProcessorChain.h"
-#include "state/ParamForwardManager.h"
-#include "state/StateManager.h"
 
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wattributes", "-Woverloaded-virtual")
 
+class ParamForwardManager;
+class StateManager;
 class BYOD : public chowdsp::PluginBase<BYOD>
 {
 public:

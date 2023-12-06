@@ -1,7 +1,7 @@
 #pragma once
 
-#include <pch.h>
 #include "../diode_circuits/OmegaProvider.h"
+#include <pch.h>
 
 class TubeScreamerWDF
 {

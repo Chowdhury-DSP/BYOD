@@ -77,7 +77,6 @@ target_sources(BYOD PRIVATE
     processors/drive/diode_circuits/DiodeRectifier.cpp
     processors/drive/flapjack/Flapjack.cpp
     processors/drive/fuzz_machine/FuzzMachine.cpp
-    processors/drive/fuzz_machine/FuzzFaceNDK.cpp
     processors/drive/hysteresis/Hysteresis.cpp
     processors/drive/hysteresis/HysteresisProcessing.cpp
     processors/drive/junior_b/JuniorB.cpp
@@ -196,3 +195,13 @@ target_link_libraries(BYOD PRIVATE rnn_accelerated)
 if (MSVC)
     target_compile_options(BYOD PRIVATE /bigobj)
 endif ()
+
+file(GLOB_RECURSE juce_module_sources CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/juce_*/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/juce_*/*.mm
+    ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/chowdsp_utils/modules/*/chowdsp_*/*.cpp)
+set_source_files_properties(${juce_module_sources}
+    TARGET_DIRECTORY BYOD
+    PROPERTIES SKIP_PRECOMPILE_HEADERS TRUE SKIP_UNITY_BUILD_INCLUSION TRUE)
+set_target_properties(BYOD PROPERTIES UNITY_BUILD ON UNITY_BUILD_BATCH_SIZE 8)
+target_precompile_headers(BYOD PRIVATE pch.h)
