@@ -1,6 +1,6 @@
 #include "MuffClipperStage.h"
 
-namespace
+namespace MuffClipperMath
 {
 // circuit component values
 constexpr float C5 = 100.0e-9f;
@@ -63,8 +63,8 @@ void MuffClipperStage::prepare (double sampleRate)
     fs = (float) sampleRate;
 
     // set coefficients for input filter
-    float b_s[] = { C5 * R20, 0.0f };
-    float a_s[] = { C5 * (R19 + R20), 1.0f };
+    float b_s[] = { MuffClipperMath::C5 * MuffClipperMath::R20, 0.0f };
+    float a_s[] = { MuffClipperMath::C5 * (MuffClipperMath::R19 + MuffClipperMath::R20), 1.0f };
     float b[2];
     float a[2];
     chowdsp::ConformalMaps::Transform<float, 1>::bilinear (b, a, b_s, a_s, 2.0f * fs);
@@ -88,12 +88,12 @@ void MuffClipperStage::reset()
 float MuffClipperStage::getGC12 (float fs, float smoothing)
 {
     // capacitor C12 admittance, scaled by smoothing
-    return 2.0f * C12 * (smoothing + 1.0f) * fs;
+    return 2.0f * MuffClipperMath::C12 * (smoothing + 1.0f) * fs;
 }
 
 float MuffClipperStage::getClipV (float clip)
 {
-    return (clip + 1.0f) / Vt; // Vt_recip value needed by newton_raphson and sinh_cosh_asym
+    return (clip + 1.0f) / MuffClipperMath::Vt; // Vt_recip value needed by newton_raphson and sinh_cosh_asym
 }
 
 template <bool highQuality>
@@ -111,10 +111,10 @@ void MuffClipperStage::processBlock (AudioBuffer<float>& buffer,
         auto u_n = inputFilter[ch].processSample (x);
 
         // newton-raphson
-        float y_k = newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12, clip1V_recip, clip2V_recip);
+        float y_k = MuffClipperMath::newton_raphson<(highQuality ? 8 : 4)> (u_n, y_1[ch], C_12_1[ch], G_C_12, clip1V_recip, clip2V_recip);
 
         // update state
-        C_12_1[ch] = 2.0f * (y_k - VbiasA) * G_C_12 - C_12_1[ch];
+        C_12_1[ch] = 2.0f * (y_k - MuffClipperMath::VbiasA) * G_C_12 - C_12_1[ch];
         y_1[ch] = y_k;
 
         return y_k;

@@ -6,7 +6,7 @@
 using namespace chowdsp::RhythmUtils;
 //using namespace chowdsp::RhythmParameter;
 
-namespace
+namespace DelayTags
 {
 const String delayTypeTag = "delay_type";
 const String pingPongTag = "ping_pong";
@@ -22,18 +22,18 @@ const String tempoSyncAmountTag = "time_tempo_sync";
 DelayModule::DelayModule (UndoManager* um) : BaseProcessor ("Delay", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (freqParam, vts, freqTag);
-    loadParameterPointer (feedbackParam, vts, feedBackTag);
-    loadParameterPointer (mixParam, vts, mixTag);
-    loadParameterPointer (delayTimeMsParam, vts, delayTimeMsTag);
-    loadParameterPointer (delayTimeRhythmParam, vts, tempoSyncAmountTag);
-    tempoSyncOnOffParam = vts.getRawParameterValue (tempoSyncTag);
-    delayTypeParam = vts.getRawParameterValue (delayTypeTag);
-    pingPongParam = vts.getRawParameterValue (pingPongTag);
+    loadParameterPointer (freqParam, vts, DelayTags::freqTag);
+    loadParameterPointer (feedbackParam, vts, DelayTags::feedBackTag);
+    loadParameterPointer (mixParam, vts, DelayTags::mixTag);
+    loadParameterPointer (delayTimeMsParam, vts, DelayTags::delayTimeMsTag);
+    loadParameterPointer (delayTimeRhythmParam, vts, DelayTags::tempoSyncAmountTag);
+    tempoSyncOnOffParam = vts.getRawParameterValue (DelayTags::tempoSyncTag);
+    delayTypeParam = vts.getRawParameterValue (DelayTags::delayTypeTag);
+    pingPongParam = vts.getRawParameterValue (DelayTags::pingPongTag);
 
-    addPopupMenuParameter (delayTypeTag);
-    addPopupMenuParameter (pingPongTag);
-    addPopupMenuParameter (tempoSyncTag);
+    addPopupMenuParameter (DelayTags::delayTypeTag);
+    addPopupMenuParameter (DelayTags::pingPongTag);
+    addPopupMenuParameter (DelayTags::tempoSyncTag);
 
     uiOptions.backgroundColour = Colours::cyan.darker (0.1f);
     uiOptions.powerColour = Colours::gold;
@@ -46,19 +46,19 @@ ParamLayout DelayModule::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createTimeMsParameter (params, delayTimeMsTag, "Delay Time", createNormalisableRange (20.0f, 2000.0f, 200.0f), 100.0f);
-    createFreqParameter (params, freqTag, "Cutoff", 500.0f, 10000.0f, 4000.0f, 10000.0f);
-    createPercentParameter (params, feedBackTag, "Feedback", 0.0f);
-    createPercentParameter (params, mixTag, "Mix", 0.5f);
+    createTimeMsParameter (params, DelayTags::delayTimeMsTag, "Delay Time", createNormalisableRange (20.0f, 2000.0f, 200.0f), 100.0f);
+    createFreqParameter (params, DelayTags::freqTag, "Cutoff", 500.0f, 10000.0f, 4000.0f, 10000.0f);
+    createPercentParameter (params, DelayTags::feedBackTag, "Feedback", 0.0f);
+    createPercentParameter (params, DelayTags::mixTag, "Mix", 0.5f);
 
     emplace_param<chowdsp::RhythmParameter> (params,
-                                             tempoSyncAmountTag,
+                                             DelayTags::tempoSyncAmountTag,
                                              "Delay Rhythm",
                                              std::initializer_list<Rhythm> { HALF, QUARTER, EIGHTH, EIGHTH_DOT },
                                              HALF);
-    emplace_param<AudioParameterBool> (params, tempoSyncTag, "Tempo Sync", false);
-    emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
-    emplace_param<AudioParameterBool> (params, pingPongTag, "Ping-Pong", false);
+    emplace_param<AudioParameterBool> (params, DelayTags::tempoSyncTag, "Tempo Sync", false);
+    emplace_param<AudioParameterChoice> (params, DelayTags::delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
+    emplace_param<AudioParameterBool> (params, DelayTags::pingPongTag, "Ping-Pong", false);
 
     return { params.begin(), params.end() };
 }
@@ -303,11 +303,11 @@ bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowd
     public:
         DelayTimeModeControl (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
-              tempoSyncSelectorAttach (vts, tempoSyncAmountTag, tempoSyncSelector),
-              delayTimeSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, delayTimeMsTag), hcp),
-              delayTimeAttach (vts, delayTimeMsTag, delayTimeSlider),
+              tempoSyncSelectorAttach (vts, DelayTags::tempoSyncAmountTag, tempoSyncSelector),
+              delayTimeSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, DelayTags::delayTimeMsTag), hcp),
+              delayTimeAttach (vts, DelayTags::delayTimeMsTag, delayTimeSlider),
               tempoSyncOnOffAttach (
-                  *vts.getParameter (tempoSyncTag),
+                  *vts.getParameter (DelayTags::tempoSyncTag),
                   [this] (float newValue)
                   { updateControlVisibility (newValue == 1.0f); },
                   vts.undoManager)
@@ -315,7 +315,7 @@ bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowd
             addChildComponent (tempoSyncSelector);
             addChildComponent (delayTimeSlider);
 
-            const auto* modeChoiceParam = getParameterPointer<chowdsp::RhythmParameter*> (vts, tempoSyncAmountTag);
+            const auto* modeChoiceParam = getParameterPointer<chowdsp::RhythmParameter*> (vts, DelayTags::tempoSyncAmountTag);
             tempoSyncSelector.addItemList (modeChoiceParam->choices, 1);
             tempoSyncSelector.setSelectedItemIndex (0);
             tempoSyncSelector.setScrollWheelEnabled (true);
@@ -323,7 +323,7 @@ bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowd
 
             hcp.registerParameterComponent (delayTimeSlider, delayTimeSlider.getParameter());
 
-            this->setName (tempoSyncAmountTag + "__" + delayTimeMsTag + "__");
+            Component::setName (DelayTags::tempoSyncAmountTag + "__" + DelayTags::delayTimeMsTag + "__");
         }
 
         void colourChanged() override
@@ -350,14 +350,14 @@ bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowd
             tempoSyncSelector.setVisible (tempoSyncOn);
             delayTimeSlider.setVisible (! tempoSyncOn);
 
-            setName (vts.getParameter (tempoSyncOn ? tempoSyncAmountTag : delayTimeMsTag)->name);
+            setName (vts.getParameter (tempoSyncOn ? DelayTags::tempoSyncAmountTag : DelayTags::delayTimeMsTag)->name);
             if (auto* parent = getParentComponent())
                 parent->repaint();
         }
 
         void visibilityChanged() override
         {
-            updateControlVisibility (vts.getRawParameterValue (tempoSyncTag)->load() == 1.0f);
+            updateControlVisibility (vts.getRawParameterValue (DelayTags::tempoSyncTag)->load() == 1.0f);
         }
 
         void resized() override
