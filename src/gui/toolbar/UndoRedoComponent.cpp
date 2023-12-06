@@ -1,6 +1,6 @@
 #include "UndoRedoComponent.h"
 
-namespace
+namespace UndoRedoDims
 {
 constexpr int buttonPad = 10;
 }
@@ -59,9 +59,9 @@ void UndoRedoComponent::resized()
         return rect.withHeight (rect.getWidth()).withCentre ({ rect.getCentreX(), b.getCentreY() });
     };
 
-    const auto undoBounds = bounds.removeFromLeft (baseWidth).withTrimmedLeft (buttonPad).withTrimmedRight (buttonPad / 2);
+    const auto undoBounds = bounds.removeFromLeft (baseWidth).withTrimmedLeft (UndoRedoDims::buttonPad).withTrimmedRight (UndoRedoDims::buttonPad / 2);
     undoButton.setBounds (makeSquareAndCentreY (undoBounds));
 
-    const auto redoBounds = bounds.removeFromLeft (baseWidth).withTrimmedRight (buttonPad).withTrimmedLeft (buttonPad / 2);
+    const auto redoBounds = bounds.removeFromLeft (baseWidth).withTrimmedRight (UndoRedoDims::buttonPad).withTrimmedLeft (UndoRedoDims::buttonPad / 2);
     redoButton.setBounds (makeSquareAndCentreY (redoBounds));
 }

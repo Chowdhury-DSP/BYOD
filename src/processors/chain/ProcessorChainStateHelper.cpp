@@ -3,7 +3,7 @@
 #include "state/ParamForwardManager.h"
 #include "state/presets/PresetManager.h"
 
-namespace
+namespace ChainStateHelperFuncs
 {
 String getPortTag (int portIdx)
 {
@@ -70,7 +70,7 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
 
     auto saveProcessor = [&] (BaseProcessor* proc)
     {
-        auto procXml = std::make_unique<XmlElement> (getProcessorTagName (proc));
+        auto procXml = std::make_unique<XmlElement> (ChainStateHelperFuncs::getProcessorTagName (proc));
         procXml->addChildElement (proc->toXML().release());
 
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
@@ -79,7 +79,7 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
             if (numOutputs == 0)
                 continue;
 
-            auto portElement = std::make_unique<XmlElement> (getPortTag (portIdx));
+            auto portElement = std::make_unique<XmlElement> (ChainStateHelperFuncs::getPortTag (portIdx));
             for (int cIdx = 0; cIdx < numOutputs; ++cIdx)
             {
                 auto& connection = proc->getOutputConnection (portIdx, cIdx);
@@ -91,8 +91,8 @@ std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
                     jassert (connection.endProc == &chain.outputProcessor);
                 }
 
-                portElement->setAttribute (getConnectionTag (cIdx), processorIdx);
-                portElement->setAttribute (getConnectionEndTag (cIdx), connection.endPort);
+                portElement->setAttribute (ChainStateHelperFuncs::getConnectionTag (cIdx), processorIdx);
+                portElement->setAttribute (ChainStateHelperFuncs::getConnectionEndTag (cIdx), connection.endPort);
             }
 
             procXml->addChildElement (portElement.release());
@@ -142,14 +142,14 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml,
         ProcConnectionMap connectionMap;
         for (int portIdx = 0; portIdx < newProc->getNumOutputs(); ++portIdx)
         {
-            if (auto* portElement = procXml->getChildByName (getPortTag (portIdx)))
+            if (auto* portElement = procXml->getChildByName (ChainStateHelperFuncs::getPortTag (portIdx)))
             {
                 auto numConnections = portElement->getNumAttributes() / 2;
                 PortMap portConnections (numConnections);
                 for (int cIdx = 0; cIdx < numConnections; ++cIdx)
                 {
-                    auto processorIdx = portElement->getIntAttribute (getConnectionTag (cIdx));
-                    auto endPort = portElement->getIntAttribute (getConnectionEndTag (cIdx));
+                    auto processorIdx = portElement->getIntAttribute (ChainStateHelperFuncs::getConnectionTag (cIdx));
+                    auto endPort = portElement->getIntAttribute (ChainStateHelperFuncs::getConnectionEndTag (cIdx));
                     portConnections[cIdx] = std::make_pair (processorIdx, endPort);
                 }
 
@@ -174,7 +174,7 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml,
             continue;
         }
 
-        const auto procName = getProcessorName (procXml->getTagName());
+        const auto procName = ChainStateHelperFuncs::getProcessorName (procXml->getTagName());
         if (procName == chain.inputProcessor.getName())
         {
             loadProcessorState (procXml, &chain.inputProcessor, connectionMaps, ! loadingPreset);
@@ -255,7 +255,7 @@ bool ProcessorChainStateHelper::validateProcChainState (const XmlElement* xml, c
 
     for (auto* procXml : xml->getChildIterator())
     {
-        const auto procName = getProcessorName (procXml->getTagName());
+        const auto procName = ChainStateHelperFuncs::getProcessorName (procXml->getTagName());
         if (procName == chowdsp::toString (InputProcessor::name) || procName == chowdsp::toString (OutputProcessor::name))
             continue;
 

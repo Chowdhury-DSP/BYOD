@@ -4,7 +4,7 @@
 #include "ProcessorChainStateHelper.h"
 #include "processors/chain/ChainIOProcessor.h"
 
-namespace
+namespace ChainHelperFuncs
 {
 [[maybe_unused]] void printBufferLevels (const AudioBuffer<float>& buffer)
 {
@@ -199,7 +199,7 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer, const MidiBuffer&
     }
 
     bool outProcessed = false;
-    const auto& processMidiBuffer = getMidiBufferToUse (hostMidiBuffer, internalMidiBuffer, ioProcessor.getOversamplingFactor());
+    const auto& processMidiBuffer = ChainHelperFuncs::getMidiBufferToUse (hostMidiBuffer, internalMidiBuffer, ioProcessor.getOversamplingFactor());
 
     for (auto* processor : procs)
     {

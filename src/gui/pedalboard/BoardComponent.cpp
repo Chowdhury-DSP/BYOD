@@ -2,7 +2,7 @@
 #include "cables/CableViewConnectionHelper.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
 
-namespace
+namespace BoardDims
 {
 constexpr int editorWidth = 270;
 constexpr int editorHeight = 180;
@@ -108,12 +108,12 @@ void BoardComponent::resized()
     const auto width = getWidth();
     const auto height = getHeight();
 
-    const auto thisEditorWidth = getScaleDim (editorWidth, scaleFactor);
-    const auto thisEditorHeight = getScaleDim (editorHeight, scaleFactor);
+    const auto thisEditorWidth = BoardDims::getScaleDim (BoardDims::editorWidth, scaleFactor);
+    const auto thisEditorHeight = BoardDims::getScaleDim (BoardDims::editorHeight, scaleFactor);
     auto centreEditorHeight = (height - thisEditorHeight) / 2;
 
-    setEditorPosition (inputEditor.get(), Rectangle (editorPad, centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
-    setEditorPosition (outputEditor.get(), Rectangle (width - (thisEditorWidth / 2 + editorPad), centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
+    setEditorPosition (inputEditor.get(), Rectangle (BoardDims::editorPad, centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
+    setEditorPosition (outputEditor.get(), Rectangle (width - (thisEditorWidth / 2 + BoardDims::editorPad), centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
 
     for (auto* editor : processorEditors)
         setEditorPosition (editor);
@@ -121,7 +121,7 @@ void BoardComponent::resized()
     cableView.setBounds (getLocalBounds());
     cableView.updateCablePositions();
 
-    newProcButton.setBounds (width - newButtonWidth, 0, newButtonWidth, newButtonWidth);
+    newProcButton.setBounds (width - BoardDims::newButtonWidth, 0, BoardDims::newButtonWidth, BoardDims::newButtonWidth);
     infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
 
     repaint();
@@ -252,14 +252,14 @@ void BoardComponent::showNewProcMenu (PopupMenu& menu, PopupMenu::Options& optio
 {
     if (addingFromNewProcButton)
     {
-        nextEditorPosition = getRandomPosition (*this);
+        nextEditorPosition = BoardDims::getRandomPosition (*this);
     }
     else
     {
         nextEditorPosition = mousePos;
 
-        const auto halfEditorWidth = getScaleDim (editorWidth, scaleFactor) / 2;
-        const auto halfEditorHeight = getScaleDim (editorHeight, scaleFactor) / 2;
+        const auto halfEditorWidth = BoardDims::getScaleDim (BoardDims::editorWidth, scaleFactor) / 2;
+        const auto halfEditorHeight = BoardDims::getScaleDim (BoardDims::editorHeight, scaleFactor) / 2;
         nextEditorPosition.x = jlimit (halfEditorWidth, getWidth() - halfEditorWidth, nextEditorPosition.x);
         nextEditorPosition.y = jlimit (halfEditorHeight, getHeight() - halfEditorHeight, nextEditorPosition.y);
     }
@@ -301,8 +301,8 @@ ProcessorEditor* BoardComponent::findEditorForProcessor (const BaseProcessor* pr
 
 void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds)
 {
-    const auto thisEditorWidth = getScaleDim (editorWidth, scaleFactor);
-    const auto thisEditorHeight = getScaleDim (editorHeight, scaleFactor);
+    const auto thisEditorWidth = BoardDims::getScaleDim (BoardDims::editorWidth, scaleFactor);
+    const auto thisEditorHeight = BoardDims::getScaleDim (BoardDims::editorHeight, scaleFactor);
 
     auto* proc = editor->getProcPtr();
     auto position = proc->getPosition (getBounds());

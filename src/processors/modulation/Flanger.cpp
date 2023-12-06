@@ -2,12 +2,8 @@
 #include "../BufferHelpers.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace FlangerTags
 {
-constexpr float rateLow = 0.5f;
-constexpr float rateHigh = 40.0f;
-constexpr float delayMs = 0.001f;
-
 const String delayTypeTag = "delay_type";
 } // namespace
 
@@ -36,9 +32,9 @@ Flanger::Flanger (UndoManager* um) : BaseProcessor (
     loadParameterPointer (delayOffsetParam, vts, "delayOffset");
     loadParameterPointer (fbParam, vts, "feedback");
     loadParameterPointer (mixParam, vts, "mix");
-    delayTypeParam = vts.getRawParameterValue (delayTypeTag);
+    delayTypeParam = vts.getRawParameterValue (FlangerTags::delayTypeTag);
 
-    addPopupMenuParameter (delayTypeTag);
+    addPopupMenuParameter (FlangerTags::delayTypeTag);
 
     uiOptions.backgroundColour = Colour (106, 102, 190);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
@@ -64,7 +60,7 @@ ParamLayout Flanger::createParameterLayout()
     createPercentParameter (params, "feedback", "Feedback", 0.0f);
     createPercentParameter (params, "mix", "Mix", 0.5f);
 
-    emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
+    emplace_param<AudioParameterChoice> (params, FlangerTags::delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
 
     return { params.begin(), params.end() };
 }
@@ -143,6 +139,8 @@ void Flanger::processModulation (int numSamples)
     }
     else
     {
+        static constexpr float rateLow = 0.5f;
+        static constexpr float rateHigh = 40.0f;
         auto rate = rateLow * std::pow (rateHigh / rateLow, *rateParam);
         for (int ch = 0; ch < 2; ++ch)
         {
@@ -183,6 +181,7 @@ void Flanger::processFlanger (AudioBuffer<float>& buffer, DelayArrType& delay)
 
         fbSmooth[ch].setTargetValue (fbAmount);
 
+        static constexpr float delayMs = 0.001f;
         delaySmoothSamples[ch].setTargetValue (delayMs * fs * delayAmountParam->getCurrentValue());
         delayOffsetSmoothSamples[ch].setTargetValue (delayMs * fs * delayOffsetParam->getCurrentValue());
 

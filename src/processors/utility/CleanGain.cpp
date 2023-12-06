@@ -2,7 +2,7 @@
 #include "../ParameterHelpers.h"
 #include "gui/utils/ModulatableSlider.h"
 
-namespace
+namespace GainTags
 {
 const String gainTag = "gain";
 const String invertTag = "invert";
@@ -17,24 +17,24 @@ const Colour invertedColour = Colours::red;
 
 CleanGain::CleanGain (UndoManager* um) : BaseProcessor ("Clean Gain", createParameterLayout(), um),
                                          invertAttach (
-                                             *vts.getParameter (invertTag),
+                                             *vts.getParameter (GainTags::invertTag),
                                              [this] (float newValue)
                                              {
-                                                 uiOptions.powerColour = newValue > 0.5f ? invertedColour : regularColour;
+                                                 uiOptions.powerColour = newValue > 0.5f ? GainTags::invertedColour : GainTags::regularColour;
                                                  uiOptionsChanged();
                                              },
                                              um)
 {
-    chowdsp::ParamUtils::loadParameterPointer (gainDBParam, vts, gainTag);
-    chowdsp::ParamUtils::loadParameterPointer (extGainDBParam, vts, extGainTag);
-    chowdsp::ParamUtils::loadParameterPointer (invertParam, vts, invertTag);
-    chowdsp::ParamUtils::loadParameterPointer (extendParam, vts, extendTag);
+    chowdsp::ParamUtils::loadParameterPointer (gainDBParam, vts, GainTags::gainTag);
+    chowdsp::ParamUtils::loadParameterPointer (extGainDBParam, vts, GainTags::extGainTag);
+    chowdsp::ParamUtils::loadParameterPointer (invertParam, vts, GainTags::invertTag);
+    chowdsp::ParamUtils::loadParameterPointer (extendParam, vts, GainTags::extendTag);
 
-    addPopupMenuParameter (invertTag);
-    addPopupMenuParameter (extendTag);
+    addPopupMenuParameter (GainTags::invertTag);
+    addPopupMenuParameter (GainTags::extendTag);
 
     uiOptions.backgroundColour = Colours::darkgrey.brighter (0.35f).withRotatedHue (0.25f);
-    uiOptions.powerColour = regularColour;
+    uiOptions.powerColour = GainTags::regularColour;
     uiOptions.info.description = "Simple linear gain boost.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 }
@@ -43,22 +43,22 @@ ParamLayout CleanGain::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    createGainDBParameter (params, gainTag, "Gain", -18.0f, 18.0f, 0.0f);
+    createGainDBParameter (params, GainTags::gainTag, "Gain", -18.0f, 18.0f, 0.0f);
 
     const auto extGainToString = [] (float x)
-    { return x <= negativeInfinityDB ? "-inf dB" : String (x, 2, false) + " dB"; };
+    { return x <= GainTags::negativeInfinityDB ? "-inf dB" : String (x, 2, false) + " dB"; };
     auto stringToExtGain = [] (const String& t)
     { return t.getFloatValue(); };
     emplace_param<chowdsp::FloatParameter> (params,
-                                            extGainTag,
+                                            GainTags::extGainTag,
                                             "Extended Gain",
-                                            createNormalisableRange (negativeInfinityDB, 30.0f, 0.0f),
+                                            createNormalisableRange (GainTags::negativeInfinityDB, 30.0f, 0.0f),
                                             0.0f,
                                             extGainToString,
                                             stringToExtGain);
 
-    emplace_param<chowdsp::BoolParameter> (params, invertTag, "Invert", false);
-    emplace_param<chowdsp::BoolParameter> (params, extendTag, "Extend", false);
+    emplace_param<chowdsp::BoolParameter> (params, GainTags::invertTag, "Invert", false);
+    emplace_param<chowdsp::BoolParameter> (params, GainTags::extendTag, "Extend", false);
 
     return { params.begin(), params.end() };
 }
@@ -74,7 +74,7 @@ void CleanGain::processAudio (AudioBuffer<float>& buffer)
 {
     const auto invertGain = invertParam->get() ? -1.0f : 1.0f;
     const auto gainDB = extendParam->get() ? extGainDBParam->getCurrentValue() : gainDBParam->getCurrentValue();
-    const auto gainLinear = gainDB <= negativeInfinityDB ? 0.0f : Decibels::decibelsToGain (gainDB) * invertGain;
+    const auto gainLinear = gainDB <= GainTags::negativeInfinityDB ? 0.0f : Decibels::decibelsToGain (gainDB) * invertGain;
     gain.setGainLinear (gainLinear);
 
     dsp::AudioBlock<float> block { buffer };
@@ -90,12 +90,12 @@ bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps, chowdsp
     public:
         GainSlider (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
-              gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, gainTag), hcp),
-              extGainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, extGainTag), hcp),
-              gainAttach (vts, gainTag, gainSlider),
-              extGainAttach (vts, extGainTag, extGainSlider),
+              gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, GainTags::gainTag), hcp),
+              extGainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, GainTags::extGainTag), hcp),
+              gainAttach (vts, GainTags::gainTag, gainSlider),
+              extGainAttach (vts, GainTags::extGainTag, extGainSlider),
               extendAttach (
-                  *vts.getParameter (extendTag),
+                  *vts.getParameter (GainTags::extendTag),
                   [this] (float newValue)
                   { updateSliderVisibility (newValue == 1.0f); },
                   vts.undoManager)
@@ -106,7 +106,7 @@ bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps, chowdsp
             hcp.registerParameterComponent (gainSlider, gainSlider.getParameter());
             hcp.registerParameterComponent (extGainSlider, extGainSlider.getParameter());
 
-            Slider::setName (gainTag + "__" + extGainTag + "__");
+            Slider::setName (GainTags::gainTag + "__" + GainTags::extGainTag + "__");
         }
 
         void colourChanged() override
@@ -134,7 +134,7 @@ bool CleanGain::getCustomComponents (OwnedArray<Component>& customComps, chowdsp
 
         void visibilityChanged() override
         {
-            updateSliderVisibility (vts.getRawParameterValue (extendTag)->load() == 1.0f);
+            updateSliderVisibility (vts.getRawParameterValue (GainTags::extendTag)->load() == 1.0f);
         }
 
         void resized() override

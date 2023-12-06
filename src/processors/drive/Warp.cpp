@@ -1,7 +1,7 @@
 #include "Warp.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace WarpFuncs
 {
 inline float f_NL (float x, float fbDrive) noexcept
 {
@@ -104,14 +104,14 @@ void Warp::processAudio (AudioBuffer<float>& buffer)
     {
         const auto freqHz = freqHzSmooth[ch].getNextValue();
         const auto gainDB = gainDBSmooth[ch].getNextValue();
-        filt.biquad.calcCoefs (freqHz, calcQ (gainDB), Decibels::decibelsToGain (gainDB), fs);
+        filt.biquad.calcCoefs (freqHz, WarpFuncs::calcQ (gainDB), Decibels::decibelsToGain (gainDB), fs);
         filt.fbMult = fbSmooth[ch].getNextValue();
         filt.driveAmt = 0.1f * (freqHz / fs) * (96000.0f / 500.0f);
     };
 
     auto processSample = [] (float x, float fbDrive, auto& f)
     {
-        auto [y0, y1] = newton_raphson<4> (x, f.y1, f.biquad.b[0], f.biquad.z[1], f.fbMult, fbDrive);
+        auto [y0, y1] = WarpFuncs::newton_raphson<4> (x, f.y1, f.biquad.b[0], f.biquad.z[1], f.fbMult, fbDrive);
 
         f.biquad.processSample (y0, f.driveAmt);
         f.y1 = y1;

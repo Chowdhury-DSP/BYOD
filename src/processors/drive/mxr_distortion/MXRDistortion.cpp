@@ -1,12 +1,11 @@
 #include "MXRDistortion.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
-using namespace ParameterHelpers;
-
-namespace
+namespace MXRDistortionParams
 {
 float paramSkew (float paramVal)
 {
+    using namespace ParameterHelpers;
     return 1.0f - iLogPot (iLogPot (0.5f * paramVal + 0.5f));
 }
 
@@ -119,6 +118,7 @@ MXRDistortion::MXRDistortion (UndoManager* um) : BaseProcessor ("Distortion Plus
 
 ParamLayout MXRDistortion::createParameterLayout()
 {
+    using namespace ParameterHelpers;
     auto params = createBaseParams();
     createPercentParameter (params, "dist", "Distortion", 0.5f);
     createPercentParameter (params, "level", "Level", 0.5f);
@@ -131,7 +131,7 @@ void MXRDistortion::prepare (double sampleRate, int samplesPerBlock)
     for (auto& wdfProc : wdf)
     {
         wdfProc.prepare (sampleRate);
-        wdfProc.setParams (paramSkew (*distParam));
+        wdfProc.setParams (MXRDistortionParams::paramSkew (*distParam));
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
@@ -156,7 +156,7 @@ void MXRDistortion::processAudio (AudioBuffer<float>& buffer)
 
     for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
     {
-        wdf[ch].setParams (paramSkew (*distParam));
+        wdf[ch].setParams (MXRDistortionParams::paramSkew (*distParam));
 
         auto* x = buffer.getWritePointer (ch);
         for (int n = 0; n < buffer.getNumSamples(); ++n)
@@ -165,6 +165,6 @@ void MXRDistortion::processAudio (AudioBuffer<float>& buffer)
 
     dcBlocker.processAudio (buffer);
 
-    gain.setGainLinear (Decibels::decibelsToGain (levelSkew.convertFrom0to1 (*levelParam), levelSkew.start));
+    gain.setGainLinear (Decibels::decibelsToGain (MXRDistortionParams::levelSkew.convertFrom0to1 (*levelParam), MXRDistortionParams::levelSkew.start));
     gain.process (context);
 }

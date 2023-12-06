@@ -2,7 +2,7 @@
 #include "gui/utils/ErrorMessageView.h"
 #include "gui/utils/ModulatableSlider.h"
 
-namespace
+namespace RONNTags
 {
 const juce::StringArray guitarMLModelResources {
     "BluesJrAmp_VolKnob_json",
@@ -29,10 +29,10 @@ constexpr std::string_view modelNameTag = "byod_guitarml_model_name";
 GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (gainParam, vts, gainTag);
-    conditionParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, conditionTag));
-    loadParameterPointer (sampleRateCorrectionFilterParam, vts, sampleRateCorrFilterTag);
-    addPopupMenuParameter (sampleRateCorrFilterTag);
+    loadParameterPointer (gainParam, vts, RONNTags::gainTag);
+    conditionParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, RONNTags::conditionTag));
+    loadParameterPointer (sampleRateCorrectionFilterParam, vts, RONNTags::sampleRateCorrFilterTag);
+    addPopupMenuParameter (RONNTags::sampleRateCorrFilterTag);
 
     loadModel (0); // load Blues Jr. model by default
 
@@ -61,9 +61,9 @@ ParamLayout GuitarMLAmp::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createGainDBParameter (params, gainTag, "Gain", -18.0f, 18.0f, 0.0f);
-    createPercentParameter (params, conditionTag, "Condition", 0.5f);
-    emplace_param<chowdsp::BoolParameter> (params, sampleRateCorrFilterTag, "Sample Rate Correction Filter", true);
+    createGainDBParameter (params, RONNTags::gainTag, "Gain", -18.0f, 18.0f, 0.0f);
+    createPercentParameter (params, RONNTags::conditionTag, "Condition", 0.5f);
+    emplace_param<chowdsp::BoolParameter> (params, RONNTags::sampleRateCorrFilterTag, "Sample Rate Correction Filter", true);
 
     return { params.begin(), params.end() };
 }
@@ -121,7 +121,7 @@ void GuitarMLAmp::loadModelFromJson (const chowdsp::json& modelJson, const Strin
 
     cachedModel = modelJson;
     if (newModelName.isNotEmpty())
-        cachedModel[modelNameTag] = newModelName;
+        cachedModel[RONNTags::modelNameTag] = newModelName;
 
     modelChangeBroadcaster();
 }
@@ -130,14 +130,14 @@ void GuitarMLAmp::loadModel (int modelIndex, Component* parentComponent)
 {
     normalizationGain = 1.0f;
 
-    if (juce::isPositiveAndBelow (modelIndex, numBuiltInModels))
+    if (juce::isPositiveAndBelow (modelIndex, RONNTags::numBuiltInModels))
     {
         int modelDataSize = 0;
-        const auto* modelData = BinaryData::getNamedResource (guitarMLModelResources[modelIndex].toRawUTF8(), modelDataSize);
+        const auto* modelData = BinaryData::getNamedResource (RONNTags::guitarMLModelResources[modelIndex].toRawUTF8(), modelDataSize);
         jassert (modelData != nullptr);
 
         const auto modelJson = chowdsp::JSONUtils::fromBinaryData (modelData, modelDataSize);
-        loadModelFromJson (modelJson, guitarMLModelNames[modelIndex]);
+        loadModelFromJson (modelJson, RONNTags::guitarMLModelNames[modelIndex]);
 
         // The Mesa model is a bit loud, so let's normalize the level down a bit
         // Eventually it would be good to do this sort of thing programmatically.
@@ -145,7 +145,7 @@ void GuitarMLAmp::loadModel (int modelIndex, Component* parentComponent)
         if (modelIndex == 2)
             normalizationGain = 0.5f;
     }
-    else if (modelIndex == numBuiltInModels)
+    else if (modelIndex == RONNTags::numBuiltInModels)
     {
         customModelChooser = std::make_shared<FileChooser> ("GuitarML Model", File {}, "*.json", true, false, parentComponent);
         customModelChooser->launchAsync (FileBrowserComponent::FileChooserFlags::canSelectFiles,
@@ -200,7 +200,7 @@ void GuitarMLAmp::loadModel (int modelIndex, Component* parentComponent)
 
 String GuitarMLAmp::getCurrentModelName() const
 {
-    return cachedModel.value (modelNameTag, "");
+    return cachedModel.value (RONNTags::modelNameTag, "");
 }
 
 void GuitarMLAmp::prepare (double sampleRate, int samplesPerBlock)
@@ -275,14 +275,14 @@ void GuitarMLAmp::processAudio (AudioBuffer<float>& buffer)
 std::unique_ptr<XmlElement> GuitarMLAmp::toXML()
 {
     auto xml = BaseProcessor::toXML();
-    xml->setAttribute (customModelTag, cachedModel.dump());
+    xml->setAttribute (RONNTags::customModelTag, cachedModel.dump());
 
     return std::move (xml);
 }
 
 void GuitarMLAmp::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)
 {
-    const auto modelJsonString = xml->getStringAttribute (customModelTag, {});
+    const auto modelJsonString = xml->getStringAttribute (RONNTags::customModelTag, {});
     try
     {
         const auto& modelJson = chowdsp::json::parse (modelJsonString.toStdString());
@@ -314,10 +314,10 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
                          ModelChangeBroadcaster& modelChangeCaster,
                          chowdsp::HostContextProvider& hcp)
             : currentModelArch (modelArchitecture),
-              gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, gainTag), hcp),
-              conditionSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, conditionTag), hcp),
-              gainAttach (vts, gainTag, gainSlider),
-              conditionAttach (vts, conditionTag, conditionSlider)
+              gainSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, RONNTags::gainTag), hcp),
+              conditionSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, RONNTags::conditionTag), hcp),
+              gainAttach (vts, RONNTags::gainTag, gainSlider),
+              conditionAttach (vts, RONNTags::conditionTag, conditionSlider)
         {
             for (auto* s : { &gainSlider, &conditionSlider })
                 addChildComponent (s);
@@ -327,7 +327,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
 
             modelChangeCallback = modelChangeCaster.connect<&MainParamSlider::updateSliderVisibility> (this);
 
-            this->setName (conditionTag + "__" + gainTag + "__");
+            Component::setName (RONNTags::conditionTag + "__" + RONNTags::gainTag + "__");
         }
 
         void colourChanged() override
@@ -389,9 +389,9 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
     public:
         ModelChoiceBox (GuitarMLAmp& processor, ModelChangeBroadcaster& modelChangeCaster)
         {
-            addItemList (guitarMLModelNames, 1);
+            addItemList (RONNTags::guitarMLModelNames, 1);
             addSeparator();
-            addItem ("Custom", guitarMLModelNames.size() + 1);
+            addItem ("Custom", RONNTags::guitarMLModelNames.size() + 1);
             setText (processor.getCurrentModelName(), dontSendNotification);
 
             modelChangeCallback = modelChangeCaster.connect ([this, &processor]
@@ -402,7 +402,7 @@ bool GuitarMLAmp::getCustomComponents (OwnedArray<Component>& customComps, chowd
                 processor.loadModel (getSelectedItemIndex(), getTopLevelComponent());
             };
 
-            this->setName (modelTag + "__box");
+            Component::setName (RONNTags::modelTag + "__box");
         }
 
         void visibilityChanged() override

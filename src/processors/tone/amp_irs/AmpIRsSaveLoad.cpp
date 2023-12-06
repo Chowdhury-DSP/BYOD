@@ -66,7 +66,7 @@ void AmpIRs::loadIRFromCurrentState()
     loadIRFromStream (std::make_unique<MemoryInputStream> (*irState.data, true), irState.name, irState.file, nullptr);
 }
 
-namespace
+namespace AmpIRSaveLoadTags
 {
 const String irNameTag { "ir_custom_name" };
 const String irDataTag { "ir_custom_data" };
@@ -79,10 +79,10 @@ std::unique_ptr<XmlElement> AmpIRs::toXML()
 
     if (irState.data != nullptr)
     {
-        xml->setAttribute (irNameTag, irState.name);
-        xml->setAttribute (irDataTag, Base64::toBase64 (irState.data->getData(), irState.data->getSize()));
+        xml->setAttribute (AmpIRSaveLoadTags::irNameTag, irState.name);
+        xml->setAttribute (AmpIRSaveLoadTags::irDataTag, Base64::toBase64 (irState.data->getData(), irState.data->getSize()));
         if (irState.file != File {})
-            xml->setAttribute (irFileTag, irState.file.getFullPathName());
+            xml->setAttribute (AmpIRSaveLoadTags::irFileTag, irState.file.getFullPathName());
     }
 
     return std::move (xml);
@@ -95,12 +95,12 @@ void AmpIRs::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loa
     using namespace chowdsp::version_literals;
     if (version >= "1.1.4"_v)
     {
-        if (xml->hasAttribute (irNameTag) && xml->hasAttribute (irDataTag))
+        if (xml->hasAttribute (AmpIRSaveLoadTags::irNameTag) && xml->hasAttribute (AmpIRSaveLoadTags::irDataTag))
         {
-            irState.name = xml->getStringAttribute (irNameTag);
-            irState.file = xml->getStringAttribute (irFileTag);
+            irState.name = xml->getStringAttribute (AmpIRSaveLoadTags::irNameTag);
+            irState.file = xml->getStringAttribute (AmpIRSaveLoadTags::irFileTag);
 
-            const auto& irDataRaw = xml->getStringAttribute (irDataTag);
+            const auto& irDataRaw = xml->getStringAttribute (AmpIRSaveLoadTags::irDataTag);
             MemoryOutputStream outStream { (size_t) irDataRaw.length() };
             const auto successfulRead = Base64::convertFromBase64 (outStream, irDataRaw);
             if (! successfulRead)

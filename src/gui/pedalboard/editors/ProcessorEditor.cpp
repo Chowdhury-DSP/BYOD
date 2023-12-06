@@ -3,7 +3,7 @@
 #include "processors/chain/ProcessorChainActionHelper.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
-namespace
+namespace EditorDims
 {
 constexpr float cornerSize = 5.0f;
 }
@@ -170,11 +170,11 @@ void ProcessorEditor::paint (Graphics& g)
                           (float) getWidth(),
                           false };
     g.setGradientFill (grad);
-    g.fillRoundedRectangle (getLocalBounds().toFloat(), cornerSize);
+    g.fillRoundedRectangle (getLocalBounds().toFloat(), EditorDims::cornerSize);
 
     if (procUI.backgroundImage != nullptr)
     {
-        auto backgroundBounds = getLocalBounds().reduced ((int) cornerSize);
+        auto backgroundBounds = getLocalBounds().reduced ((int) EditorDims::cornerSize);
         procUI.backgroundImage->drawWithin (g, backgroundBounds.toFloat(), RectanglePlacement::stretchToFit, 1.0f);
     }
 

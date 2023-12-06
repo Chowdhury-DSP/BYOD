@@ -1,7 +1,7 @@
 #include "HighCut.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace HighCutParams
 {
 constexpr float freq2Rv2 (float cutoff, float C8, float R3)
 {
@@ -35,7 +35,7 @@ void HighCut::prepare (double sampleRate, int samplesPerBlock)
     fs = (float) sampleRate;
 
     Rv2.reset (sampleRate, 0.025);
-    Rv2.setCurrentAndTargetValue (freq2Rv2 (*cutoffParam, C8, R3));
+    Rv2.setCurrentAndTargetValue (HighCutParams::freq2Rv2 (*cutoffParam, C8, R3));
     calcCoefs (Rv2.getCurrentValue());
 
     for (auto& filt : iir)
@@ -46,7 +46,7 @@ void HighCut::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numChannels = buffer.getNumChannels();
 
-    Rv2.setTargetValue (freq2Rv2 (*cutoffParam, C8, R3));
+    Rv2.setTargetValue (HighCutParams::freq2Rv2 (*cutoffParam, C8, R3));
     auto x = buffer.getArrayOfWritePointers();
 
     if (Rv2.isSmoothing())

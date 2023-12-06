@@ -4,7 +4,7 @@
 
 using namespace chowdsp::compressor;
 
-namespace
+namespace LevelDetectiveTags
 {
 const auto powerColour = Colours::gold.darker (0.1f);
 const auto backgroundColour = Colours::teal.darker (0.1f);
@@ -28,10 +28,10 @@ LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor (
     })
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (attackMsParam, vts, attackTag);
-    loadParameterPointer (releaseMsParam, vts, releaseTag);
-    uiOptions.backgroundColour = backgroundColour;
-    uiOptions.powerColour = powerColour;
+    loadParameterPointer (attackMsParam, vts, LevelDetectiveTags::attackTag);
+    loadParameterPointer (releaseMsParam, vts, LevelDetectiveTags::releaseTag);
+    uiOptions.backgroundColour = LevelDetectiveTags::backgroundColour;
+    uiOptions.powerColour = LevelDetectiveTags::powerColour;
     uiOptions.info.description = "A simple envelope follower";
     uiOptions.info.authors = StringArray { "Rachel Locke" };
 }
@@ -41,8 +41,8 @@ ParamLayout LevelDetective::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createTimeMsParameter (params, attackTag, "Attack", createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f);
-    createTimeMsParameter (params, releaseTag, "Release", createNormalisableRange (10.0f, 1000.0f, 100.0f), 400.0f);
+    createTimeMsParameter (params, LevelDetectiveTags::attackTag, "Attack", createNormalisableRange (1.0f, 100.0f, 10.0f), 10.0f);
+    createTimeMsParameter (params, LevelDetectiveTags::releaseTag, "Release", createNormalisableRange (10.0f, 1000.0f, 100.0f), 400.0f);
 
     return { params.begin(), params.end() };
 }
@@ -102,10 +102,10 @@ bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, ch
         explicit LevelDetectiveEditor (LevelDetectorVisualizer& viz, AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : visualiser (viz),
               vts (vtState),
-              attackSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, attackTag), hcp),
-              releaseSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, releaseTag), hcp),
-              attackAttach (vts, attackTag, attackSlider),
-              releaseAttach (vts, releaseTag, releaseSlider)
+              attackSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, LevelDetectiveTags::attackTag), hcp),
+              releaseSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, LevelDetectiveTags::releaseTag), hcp),
+              attackAttach (vts, LevelDetectiveTags::attackTag, attackSlider),
+              releaseAttach (vts, LevelDetectiveTags::releaseTag, releaseSlider)
         {
             attackLabel.setText ("Attack", juce::dontSendNotification);
             releaseLabel.setText ("Release", juce::dontSendNotification);
@@ -119,18 +119,18 @@ bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, ch
             {
                 s->setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
                 s->setTextBoxStyle (Slider::TextBoxBelow, false, 80, 20);
-                s->setColour (Slider::textBoxHighlightColourId, powerColour.withAlpha (0.55f));
-                s->setColour (Slider::thumbColourId, powerColour);
+                s->setColour (Slider::textBoxHighlightColourId, LevelDetectiveTags::powerColour.withAlpha (0.55f));
+                s->setColour (Slider::thumbColourId, LevelDetectiveTags::powerColour);
                 addAndMakeVisible (s);
             }
 
-            visualiser.backgroundColour = backgroundColour.darker (0.4f);
-            visualiser.audioColour = powerColour;
+            visualiser.backgroundColour = LevelDetectiveTags::backgroundColour.darker (0.4f);
+            visualiser.audioColour = LevelDetectiveTags::powerColour;
 
             hcp.registerParameterComponent (attackSlider, attackSlider.getParameter());
             hcp.registerParameterComponent (releaseSlider, releaseSlider.getParameter());
 
-            this->setName (attackTag + "__" + releaseTag + "__");
+            Component::setName (LevelDetectiveTags::attackTag + "__" + LevelDetectiveTags::releaseTag + "__");
             addAndMakeVisible (visualiser);
         }
 

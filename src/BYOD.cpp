@@ -3,7 +3,7 @@
 #include "state/StateManager.h"
 #include "state/presets/PresetManager.h"
 
-namespace
+namespace BYODPaths
 {
 const String settingsFilePath = "ChowdhuryDSP/BYOD/.plugin_settings.json";
 const String logFileSubDir = "ChowdhuryDSP/BYOD/Logs";
@@ -11,8 +11,8 @@ const String logFileNameRoot = "BYOD_Log_";
 } // namespace
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
-               logger ({ .logFileSubDir = logFileSubDir,
-                         .logFileNameRoot = logFileNameRoot,
+               logger ({ .logFileSubDir = BYODPaths::logFileSubDir,
+                         .logFileNameRoot = BYODPaths::logFileNameRoot,
                          .crashLogAnalysisCallback = [this] (const File& logFile)
                          { crashLogFile.emplace (logFile); } }),
                procStore (&undoManager)
@@ -23,7 +23,7 @@ BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
 
     Logger::writeToLog (chowdsp::PluginDiagnosticInfo::getDiagnosticsString (*this));
 
-    pluginSettings->initialise (settingsFilePath);
+    pluginSettings->initialise (BYODPaths::settingsFilePath);
     procs = std::make_unique<ProcessorChain> (procStore, vts, presetManager, paramForwarder, [&] (int l)
                                               { updateSampleLatency (l); });
     paramForwarder = std::make_unique<ParamForwardManager> (vts, *procs);

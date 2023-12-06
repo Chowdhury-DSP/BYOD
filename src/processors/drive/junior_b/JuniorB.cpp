@@ -1,7 +1,7 @@
 #include "JuniorB.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace JuniorBTags
 {
 const String driveTag = "juniorb_drive";
 const String blendTag = "juniorb_blend";
@@ -11,9 +11,9 @@ const String stagesTag = "juniorb_nstages";
 JuniorB::JuniorB (UndoManager* um) : BaseProcessor ("Junior B", createParameterLayout(), um)
 {
     using namespace chowdsp::ParamUtils;
-    loadParameterPointer (driveParamPct, vts, driveTag);
-    loadParameterPointer (blendParamPct, vts, blendTag);
-    loadParameterPointer (stagesParam, vts, stagesTag);
+    loadParameterPointer (driveParamPct, vts, JuniorBTags::driveTag);
+    loadParameterPointer (blendParamPct, vts, JuniorBTags::blendTag);
+    loadParameterPointer (stagesParam, vts, JuniorBTags::stagesTag);
 
     uiOptions.backgroundColour = Colours::slategrey.darker (0.2f);
     uiOptions.info.description = "Virtual analog emulation first stage from the Fender Pro-Junior Amplifier.";
@@ -25,9 +25,9 @@ ParamLayout JuniorB::createParameterLayout()
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createPercentParameter (params, driveTag, "Tube Drive", 0.5f);
-    createPercentParameter (params, blendTag, "Tube Blend", 1.0f);
-    emplace_param<chowdsp::ChoiceParameter> (params, stagesTag, "Stages", StringArray { "1 Stage", "2 Stages", "3 Stages", "4 Stages" }, 1);
+    createPercentParameter (params, JuniorBTags::driveTag, "Tube Drive", 0.5f);
+    createPercentParameter (params, JuniorBTags::blendTag, "Tube Blend", 1.0f);
+    emplace_param<chowdsp::ChoiceParameter> (params, JuniorBTags::stagesTag, "Stages", StringArray { "1 Stage", "2 Stages", "3 Stages", "4 Stages" }, 1);
 
     return { params.begin(), params.end() };
 }

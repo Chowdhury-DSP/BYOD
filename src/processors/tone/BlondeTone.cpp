@@ -1,7 +1,7 @@
 #include "BlondeTone.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace BlondeToneTags
 {
 const String bassTag = "bass";
 const String midTag = "mid";
@@ -11,9 +11,9 @@ const String trebleTag = "treble";
 BlondeTone::BlondeTone (UndoManager* um) : BaseProcessor ("Blonde Tone", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (bassParam, vts, bassTag);
-    loadParameterPointer (midsParam, vts, midTag);
-    loadParameterPointer (trebleParam, vts, trebleTag);
+    loadParameterPointer (bassParam, vts, BlondeToneTags::bassTag);
+    loadParameterPointer (midsParam, vts, BlondeToneTags::midTag);
+    loadParameterPointer (trebleParam, vts, BlondeToneTags::trebleTag);
 
     magic_enum::enum_for_each<EQBands> ([this] (auto val)
                                         { filters.setBandOnOff (val, true); });
@@ -29,9 +29,9 @@ ParamLayout BlondeTone::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createBipolarPercentParameter (params, bassTag, "Bass", 0.0f);
-    createBipolarPercentParameter (params, midTag, "Mids", 0.0f);
-    createBipolarPercentParameter (params, trebleTag, "Treble", 0.0f);
+    createBipolarPercentParameter (params, BlondeToneTags::bassTag, "Bass", 0.0f);
+    createBipolarPercentParameter (params, BlondeToneTags::midTag, "Mids", 0.0f);
+    createBipolarPercentParameter (params, BlondeToneTags::trebleTag, "Treble", 0.0f);
 
     return { params.begin(), params.end() };
 }

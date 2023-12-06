@@ -1,6 +1,6 @@
 #include "LevelMeterComponent.h"
 
-namespace
+namespace LevelMeterConstants
 {
 constexpr auto maxDB = 6.0f;
 constexpr auto minDB = -45.0f;
@@ -8,7 +8,7 @@ constexpr auto dBRange = maxDB - minDB;
 } // namespace
 
 LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsLevels (levelData),
-                                                                            dbLevels ({ minDB, minDB }),
+                                                                            dbLevels ({ LevelMeterConstants::minDB, LevelMeterConstants::minDB }),
                                                                             dbLevelsPrev ({ 0.0f, 0.0f })
 {
     constexpr int timerHz = 24;
@@ -42,7 +42,7 @@ void LevelMeterComponent::paint (Graphics& g)
 
     auto getYForDB = [height] (float dB)
     {
-        auto normLevel = jmin (jmax (dB - minDB, 0.0f) / dBRange, 1.0f);
+        auto normLevel = jmin (jmax (dB - LevelMeterConstants::minDB, 0.0f) / LevelMeterConstants::dBRange, 1.0f);
         return int ((1.0f - normLevel) * (float) height);
     };
 
@@ -62,7 +62,7 @@ void LevelMeterComponent::timerCallback()
     {
         dbLevels[ch] = Decibels::gainToDecibels (levelDetector[ch].processSample (rmsLevels[ch]));
 
-        if (std::abs (dbLevels[ch] - dbLevelsPrev[ch]) > 0.5f && dbLevels[ch] > minDB && dbLevelsPrev[ch] > minDB)
+        if (std::abs (dbLevels[ch] - dbLevelsPrev[ch]) > 0.5f && dbLevels[ch] > LevelMeterConstants::minDB && dbLevelsPrev[ch] > LevelMeterConstants::minDB)
         {
             dbLevelsPrev[ch] = dbLevels[ch];
             needsRepaint = true;

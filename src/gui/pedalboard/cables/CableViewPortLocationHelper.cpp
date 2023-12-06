@@ -2,7 +2,7 @@
 #include "../BoardComponent.h"
 #include "CableDrawingHelpers.h"
 
-namespace
+namespace CableViewHelperMethods
 {
 bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const BaseProcessor* destProc, const OwnedArray<Cable>& cables)
 {
@@ -66,13 +66,13 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestInputPort (const ju
 
     for (const auto* editor : board.processorEditors)
     {
-        if (wouldConnectingCreateFeedbackLoop (sourceProc, editor->getProcPtr(), cables))
+        if (CableViewHelperMethods::wouldConnectingCreateFeedbackLoop (sourceProc, editor->getProcPtr(), cables))
             continue; // no feedback loops allowed
 
-        getClosestPort (pos, editor, minDistance, result, true, cableView.scaleFactor);
+        CableViewHelperMethods::getClosestPort (pos, editor, minDistance, result, true, cableView.scaleFactor);
     }
 
-    getClosestPort (pos, board.outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
+    CableViewHelperMethods::getClosestPort (pos, board.outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
 
     if (result.editor == nullptr || isInputPortConnected (result))
         return {};
@@ -87,12 +87,12 @@ CableView::EditorPort CableViewPortLocationHelper::getNearestPort (const juce::P
 
     for (auto* editor : board.processorEditors)
     {
-        getClosestPort (pos, editor, minDistance, result, false, cableView.scaleFactor);
-        getClosestPort (pos, editor, minDistance, result, true, cableView.scaleFactor);
+        CableViewHelperMethods::getClosestPort (pos, editor, minDistance, result, false, cableView.scaleFactor);
+        CableViewHelperMethods::getClosestPort (pos, editor, minDistance, result, true, cableView.scaleFactor);
     }
 
-    getClosestPort (pos, board.inputEditor.get(), minDistance, result, false, cableView.scaleFactor);
-    getClosestPort (pos, board.outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
+    CableViewHelperMethods::getClosestPort (pos, board.inputEditor.get(), minDistance, result, false, cableView.scaleFactor);
+    CableViewHelperMethods::getClosestPort (pos, board.outputEditor.get(), minDistance, result, true, cableView.scaleFactor);
 
     if (result.editor == nullptr)
         return {};

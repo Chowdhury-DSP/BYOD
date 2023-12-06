@@ -1,6 +1,6 @@
 #include "AmpIRs.h"
 
-namespace
+namespace AmpIRFileUtils
 {
 constexpr chowdsp::GlobalPluginSettings::SettingID userIRFolderID { "user_ir_folder" };
 
@@ -109,7 +109,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
     AmpIRsSelector (AudioProcessorValueTreeState& vtState, AmpIRs& proc, chowdsp::HostContextProvider& hcp)
         : ampIRs (proc), vts (vtState)
     {
-        pluginSettings->addProperties<&AmpIRsSelector::globalSettingChanged> ({ { userIRFolderID, String() } }, *this);
+        pluginSettings->addProperties<&AmpIRsSelector::globalSettingChanged> ({ { AmpIRFileUtils::userIRFolderID, String() } }, *this);
 
         refreshUserIRs();
         refreshBox();
@@ -132,7 +132,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
 
     void globalSettingChanged (chowdsp::GlobalPluginSettings::SettingID settingID)
     {
-        if (settingID != userIRFolderID)
+        if (settingID != AmpIRFileUtils::userIRFolderID)
             return;
 
         refreshUserIRs();
@@ -167,7 +167,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
         }
 
         if (userIRFiles.size() > 0)
-            menu->addSubMenu ("User:", IRFileTree::createPopupMenu (menuIdx, userIRFiles.getNodes(), ampIRs, getTopLevelComponent()));
+            menu->addSubMenu ("User:", AmpIRFileUtils::IRFileTree::createPopupMenu (menuIdx, userIRFiles.getNodes(), ampIRs, getTopLevelComponent()));
 
         menu->addSeparator();
 
@@ -305,7 +305,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
 
     void refreshUserIRs()
     {
-        const auto userIRsFolder = File { pluginSettings->getProperty<String> (userIRFolderID) };
+        const auto userIRsFolder = File { pluginSettings->getProperty<String> (AmpIRFileUtils::userIRFolderID) };
         if (! userIRsFolder.isDirectory())
             return;
 
@@ -357,7 +357,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
                                       if (fc.getResults().isEmpty())
                                           return;
                                       const auto irFile = fc.getResult();
-                                      pluginSettings->setProperty (userIRFolderID, irFile.getFullPathName());
+                                      pluginSettings->setProperty (AmpIRFileUtils::userIRFolderID, irFile.getFullPathName());
                                   });
     }
 
@@ -367,7 +367,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
     chowdsp::ScopedCallback onIRChanged;
 
     chowdsp::SharedPluginSettings pluginSettings;
-    IRFileTree userIRFiles;
+    AmpIRFileUtils::IRFileTree userIRFiles;
 };
 
 bool AmpIRs::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)

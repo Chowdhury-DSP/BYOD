@@ -2,7 +2,7 @@
 #include "gui/utils/LookAndFeels.h"
 #include "processors/BaseProcessor.h"
 
-namespace
+namespace KnobDims
 {
 constexpr float nameHeightScale = 0.115f;
 }
@@ -191,7 +191,7 @@ void KnobsComponent::paint (Graphics& g)
 {
     g.setColour (contrastColour.withAlpha (isEnabled() ? 1.0f : 0.6f));
 
-    const auto nameHeight = proportionOfHeight (nameHeightScale);
+    const auto nameHeight = proportionOfHeight (KnobDims::nameHeightScale);
     const auto nameOffset = proportionOfHeight (0.157f);
     auto makeName = [&g, nameHeight, nameOffset] (Component& comp, const String& name, int offset = 0)
     {
@@ -219,7 +219,7 @@ void KnobsComponent::resized()
 {
     int totalNumComponents = sliders.size() + boxes.size() + buttons.size() + customComponents.size();
 
-    const auto nameHeight = proportionOfHeight (nameHeightScale);
+    const auto nameHeight = proportionOfHeight (KnobDims::nameHeightScale);
     int compHeight = getHeight() - nameHeight;
     int compWidth = totalNumComponents > 1 ? (getWidth() - 10) / totalNumComponents : compHeight;
 

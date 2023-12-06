@@ -2,7 +2,7 @@
 #include "processors/ParameterHelpers.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
-namespace
+namespace BaxandallParams
 {
 float skewParam (float val)
 {
@@ -155,10 +155,10 @@ void BaxandallEQ::prepare (double sampleRate, int /*samplesPerBlock*/)
         wdfCircuit[ch].prepare (sampleRate);
 
         bassSmooth[ch].reset (sampleRate, 0.05);
-        bassSmooth[ch].setCurrentAndTargetValue (skewParam (*bassParam));
+        bassSmooth[ch].setCurrentAndTargetValue (BaxandallParams::skewParam (*bassParam));
 
         trebleSmooth[ch].reset (sampleRate, 0.05);
-        trebleSmooth[ch].setCurrentAndTargetValue (skewParam (*trebleParam));
+        trebleSmooth[ch].setCurrentAndTargetValue (BaxandallParams::skewParam (*trebleParam));
     }
 }
 
@@ -169,8 +169,8 @@ void BaxandallEQ::processAudio (AudioBuffer<float>& buffer)
 
     for (int ch = 0; ch < numChannels; ++ch)
     {
-        bassSmooth[ch].setTargetValue (skewParam (*bassParam));
-        trebleSmooth[ch].setTargetValue (skewParam (*trebleParam));
+        bassSmooth[ch].setTargetValue (BaxandallParams::skewParam (*bassParam));
+        trebleSmooth[ch].setTargetValue (BaxandallParams::skewParam (*trebleParam));
 
         auto* x = buffer.getWritePointer (ch);
         if (bassSmooth[ch].isSmoothing() || trebleSmooth[ch].isSmoothing())

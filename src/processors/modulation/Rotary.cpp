@@ -2,7 +2,7 @@
 #include "../BufferHelpers.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace RotaryTags
 {
 const String stereoTag = "stereo";
 }
@@ -27,9 +27,9 @@ Rotary::Rotary (UndoManager* um) : BaseProcessor (
     })
 {
     chowdsp::ParamUtils::loadParameterPointer (rateHzParam, vts, "rate");
-    chowdsp::ParamUtils::loadParameterPointer (stereoParam, vts, stereoTag);
+    chowdsp::ParamUtils::loadParameterPointer (stereoParam, vts, RotaryTags::stereoTag);
 
-    addPopupMenuParameter (stereoTag);
+    addPopupMenuParameter (RotaryTags::stereoTag);
 
     auto* depthParamHandle = dynamic_cast<chowdsp::FloatParameter*> (vts.getParameter ("depth"));
     spectralDepthSmoothed.setParameterHandle (depthParamHandle);
@@ -51,7 +51,7 @@ ParamLayout Rotary::createParameterLayout()
     createFreqParameter (params, "rate", "Rate", 0.25f, 8.0f, 1.0f, 1.0f);
     createPercentParameter (params, "depth", "Depth", 0.5f);
 
-    emplace_param<chowdsp::BoolParameter> (params, stereoTag, "Stereo", false);
+    emplace_param<chowdsp::BoolParameter> (params, RotaryTags::stereoTag, "Stereo", false);
 
     return { params.begin(), params.end() };
 }

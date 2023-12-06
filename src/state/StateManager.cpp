@@ -2,7 +2,7 @@
 #include "gui/GUIConstants.h"
 #include "processors/chain/ProcessorChainStateHelper.h"
 
-namespace
+namespace StateManagerTags
 {
 const Identifier statePluginVersionTag = "state_plugin_version";
 }
@@ -18,12 +18,12 @@ StateManager::StateManager (AudioProcessorValueTreeState& vtState, ProcessorChai
 
 void StateManager::setCurrentPluginVersionInXML (XmlElement* xml)
 {
-    xml->setAttribute (statePluginVersionTag, JucePlugin_VersionString);
+    xml->setAttribute (StateManagerTags::statePluginVersionTag, JucePlugin_VersionString);
 }
 
 chowdsp::Version StateManager::getPluginVersionFromXML (const XmlElement* xml)
 {
-    return chowdsp::Version { xml->getStringAttribute (statePluginVersionTag, "1.0.1") };
+    return chowdsp::Version { xml->getStringAttribute (StateManagerTags::statePluginVersionTag, "1.0.1") };
 }
 
 std::unique_ptr<XmlElement> StateManager::saveState()

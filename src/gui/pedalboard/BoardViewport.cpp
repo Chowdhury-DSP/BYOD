@@ -1,6 +1,6 @@
 #include "BoardViewport.h"
 
-namespace
+namespace ViewportTags
 {
 const juce::Identifier zoomLevelTag { "zoom_level" };
 }
@@ -13,9 +13,9 @@ BoardViewport::BoardViewport (AudioProcessorValueTreeState& vts,
     pluginSettings->addProperties<&BoardViewport::globalSettingChanged> ({ { defaultZoomSettingID, 1.0 },
                                                                            { portTooltipsSettingID, true } },
                                                                          *this);
-    if (! vts.state.hasProperty (zoomLevelTag))
-        vts.state.setProperty (zoomLevelTag, pluginSettings->getProperty<double> (defaultZoomSettingID), nullptr);
-    scaleFactor = vts.state.getPropertyAsValue (zoomLevelTag, nullptr, true);
+    if (! vts.state.hasProperty (ViewportTags::zoomLevelTag))
+        vts.state.setProperty (ViewportTags::zoomLevelTag, pluginSettings->getProperty<double> (defaultZoomSettingID), nullptr);
+    scaleFactor = vts.state.getPropertyAsValue (ViewportTags::zoomLevelTag, nullptr, true);
     setScaleFactor ((float) scaleFactor.getValue());
 
     toggleTooltips (pluginSettings->getProperty<bool> (portTooltipsSettingID));

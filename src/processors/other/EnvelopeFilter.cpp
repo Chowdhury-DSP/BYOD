@@ -3,7 +3,7 @@
 #include "../ParameterHelpers.h"
 #include "gui/utils/ModulatableSlider.h"
 
-namespace
+namespace EnvelopeFilterTags
 {
 constexpr int mSize = 16;
 
@@ -44,12 +44,12 @@ EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor (
     loadParameterPointer (freqParam, vts, "freq");
     loadParameterPointer (resParam, vts, "res");
     loadParameterPointer (speedParam, vts, "speed");
-    loadParameterPointer (senseParam, vts, senseTag);
-    loadParameterPointer (freqModParam, vts, freqModTag);
+    loadParameterPointer (senseParam, vts, EnvelopeFilterTags::senseTag);
+    loadParameterPointer (freqModParam, vts, EnvelopeFilterTags::freqModTag);
     filterTypeParam = vts.getRawParameterValue ("filter_type");
-    directControlParam = vts.getRawParameterValue (directControlTag);
+    directControlParam = vts.getRawParameterValue (EnvelopeFilterTags::directControlTag);
 
-    addPopupMenuParameter (directControlTag);
+    addPopupMenuParameter (EnvelopeFilterTags::directControlTag);
 
     uiOptions.backgroundColour = Colours::purple.brighter();
     uiOptions.powerColour = Colours::yellow.darker (0.1f);
@@ -67,12 +67,12 @@ ParamLayout EnvelopeFilter::createParameterLayout()
     createPercentParameter (params, "res", "Resonance", 0.5f);
     createFreqParameter (params, "freq", "Freq.", 100.0f, 1000.0f, 250.0f, 250.0f);
     createPercentParameter (params, "speed", "Speed", 0.5f);
-    createPercentParameter (params, senseTag, "Sensitivity", 0.5f);
-    createPercentParameter (params, freqModTag, "Freq. Mod", 0.0f);
+    createPercentParameter (params, EnvelopeFilterTags::senseTag, "Sensitivity", 0.5f);
+    createPercentParameter (params, EnvelopeFilterTags::freqModTag, "Freq. Mod", 0.0f);
 
     emplace_param<AudioParameterChoice> (params, "filter_type", "Type", StringArray { "Lowpass", "Bandpass", "Highpass" }, 0);
 
-    emplace_param<AudioParameterBool> (params, directControlTag, "Direct Control", false);
+    emplace_param<AudioParameterBool> (params, EnvelopeFilterTags::directControlTag, "Direct Control", false);
 
     return { params.begin(), params.end() };
 }
@@ -93,7 +93,7 @@ void EnvelopeFilter::prepare (double sampleRate, int samplesPerBlock)
 void EnvelopeFilter::fillLevelBuffer (AudioBuffer<float>& buffer, bool directControlOn)
 {
     const auto numSamples = buffer.getNumSamples();
-    auto speed = speedRange.convertFrom0to1 (1.0f - *speedParam);
+    auto speed = EnvelopeFilterTags::speedRange.convertFrom0to1 (1.0f - *speedParam);
 
     levelOutBuffer.setSize (1, numSamples, false, false, true);
     levelOutBuffer.clear();
@@ -139,10 +139,10 @@ void processFilter (AudioBuffer<float>& buffer, chowdsp::SVFMultiMode<float>& fi
         auto* x = buffer.getWritePointer (ch);
 
         int i = 0;
-        for (int n = 0; n < numSamples - mSize; n += mSize)
+        for (int n = 0; n < numSamples - EnvelopeFilterTags::mSize; n += EnvelopeFilterTags::mSize)
         {
             filter.setCutoffFrequency (getModFreq (i));
-            for (; i < n + mSize; ++i)
+            for (; i < n + EnvelopeFilterTags::mSize; ++i)
                 x[i] = filter.processSample (ch, x[i]);
         }
 
@@ -163,7 +163,7 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
     if (inputsConnected.contains (AudioInput))
     {
         auto filterFreqHz = freqParam->getCurrentValue();
-        filter.setQValue (getQ (resParam->getCurrentValue()));
+        filter.setQValue (EnvelopeFilterTags::getQ (resParam->getCurrentValue()));
 
         auto freqModGain = directControlOn ? 10.0f : (20.0f * senseParam->getCurrentValue());
         auto* levelPtr = levelOutBuffer.getReadPointer (0);
@@ -252,12 +252,12 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps, ch
     public:
         ControlSlider (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
-              freqModSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, freqModTag), hcp),
-              sensitivitySlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, senseTag), hcp),
-              freqModAttach (vts, freqModTag, freqModSlider),
-              senseAttach (vts, senseTag, sensitivitySlider),
+              freqModSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, EnvelopeFilterTags::freqModTag), hcp),
+              sensitivitySlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, EnvelopeFilterTags::senseTag), hcp),
+              freqModAttach (vts, EnvelopeFilterTags::freqModTag, freqModSlider),
+              senseAttach (vts, EnvelopeFilterTags::senseTag, sensitivitySlider),
               directControlAttach (
-                  *vts.getParameter (directControlTag),
+                  *vts.getParameter (EnvelopeFilterTags::directControlTag),
                   [this] (float newValue)
                   { updateSliderVisibility (newValue == 1.0f); },
                   vts.undoManager)
@@ -268,7 +268,7 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps, ch
             hcp.registerParameterComponent (freqModSlider, freqModSlider.getParameter());
             hcp.registerParameterComponent (sensitivitySlider, sensitivitySlider.getParameter());
 
-            this->setName (senseTag + "__" + freqModTag + "__");
+            Component::setName (EnvelopeFilterTags::senseTag + "__" + EnvelopeFilterTags::freqModTag + "__");
         }
 
         void colourChanged() override
@@ -291,14 +291,14 @@ bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps, ch
             sensitivitySlider.setVisible (! directControlOn);
             freqModSlider.setVisible (directControlOn);
 
-            setName (vts.getParameter (directControlOn ? freqModTag : senseTag)->name);
+            setName (vts.getParameter (directControlOn ? EnvelopeFilterTags::freqModTag : EnvelopeFilterTags::senseTag)->name);
             if (auto* parent = getParentComponent())
                 parent->repaint();
         }
 
         void visibilityChanged() override
         {
-            updateSliderVisibility (vts.getRawParameterValue (directControlTag)->load() == 1.0f);
+            updateSliderVisibility (vts.getRawParameterValue (EnvelopeFilterTags::directControlTag)->load() == 1.0f);
         }
 
         void resized() override

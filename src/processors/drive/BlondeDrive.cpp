@@ -1,7 +1,7 @@
 #include "BlondeDrive.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace BlondeDriveTags
 {
 const String driveTag = "drive";
 const String characterTag = "char";
@@ -81,16 +81,16 @@ void processDrive (double* left, double* right, const double* A, xsimd::batch<do
 BlondeDrive::BlondeDrive (UndoManager* um) : BaseProcessor ("Blonde Drive", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (characterParam, vts, characterTag);
-    loadParameterPointer (hiQParam, vts, hiQTag);
+    loadParameterPointer (characterParam, vts, BlondeDriveTags::characterTag);
+    loadParameterPointer (hiQParam, vts, BlondeDriveTags::hiQTag);
 
-    addPopupMenuParameter (hiQTag);
+    addPopupMenuParameter (BlondeDriveTags::hiQTag);
 
-    driveParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, driveTag));
+    driveParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, BlondeDriveTags::driveTag));
     driveParamSmooth.mappingFunction = [] (float x)
     { return 1.0f - x; };
 
-    biasParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, biasTag));
+    biasParamSmooth.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, BlondeDriveTags::biasTag));
     biasParamSmooth.mappingFunction = [] (float x)
     { return x * 0.5f; };
 
@@ -105,10 +105,10 @@ ParamLayout BlondeDrive::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createPercentParameter (params, driveTag, "Drive", 0.5f);
-    createBipolarPercentParameter (params, characterTag, "Character", 0.0f);
-    createPercentParameter (params, biasTag, "Bias", 0.5f);
-    emplace_param<chowdsp::BoolParameter> (params, hiQTag, "High Quality", false);
+    createPercentParameter (params, BlondeDriveTags::driveTag, "Drive", 0.5f);
+    createBipolarPercentParameter (params, BlondeDriveTags::characterTag, "Character", 0.0f);
+    createPercentParameter (params, BlondeDriveTags::biasTag, "Bias", 0.5f);
+    emplace_param<chowdsp::BoolParameter> (params, BlondeDriveTags::hiQTag, "High Quality", false);
 
     return { params.begin(), params.end() };
 }
@@ -163,9 +163,9 @@ void BlondeDrive::processAudio (AudioBuffer<float>& buffer)
     auto* rightData = doubleBuffer.getWritePointer (1 % numChannels);
 
     if (hiQParam->get())
-        processDrive<12> (leftData, rightData, driveData, state, numSamples);
+        BlondeDriveTags::processDrive<12> (leftData, rightData, driveData, state, numSamples);
     else
-        processDrive (leftData, rightData, driveData, state, numSamples);
+        BlondeDriveTags::processDrive (leftData, rightData, driveData, state, numSamples);
 
     buffer.makeCopyOf (doubleBuffer, true);
 

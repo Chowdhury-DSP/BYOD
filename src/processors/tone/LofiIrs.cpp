@@ -1,7 +1,7 @@
 #include "LofiIrs.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace LofiIRTags
 {
 const StringArray irNames {
     "Casio 1",
@@ -24,7 +24,7 @@ const String gainTag = "gain";
 LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterLayout(), um),
                                      convolution (getSharedConvolutionMessageQueue())
 {
-    for (const auto& irName : irNames)
+    for (const auto& irName : LofiIRTags::irNames)
     {
         auto binaryName = irName.replaceCharacter (' ', '_') + "_wav";
         int binarySize;
@@ -34,9 +34,9 @@ LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterL
     }
 
     using namespace ParameterHelpers;
-    vts.addParameterListener (irTag, this);
-    loadParameterPointer (mixParam, vts, mixTag);
-    loadParameterPointer (gainParam, vts, gainTag);
+    vts.addParameterListener (LofiIRTags::irTag, this);
+    loadParameterPointer (mixParam, vts, LofiIRTags::mixTag);
+    loadParameterPointer (gainParam, vts, LofiIRTags::gainTag);
 
     uiOptions.backgroundColour = Colours::darkgrey.brighter (0.15f);
     uiOptions.powerColour = Colours::red.darker (0.1f);
@@ -46,7 +46,7 @@ LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterL
 
 LofiIrs::~LofiIrs()
 {
-    vts.removeParameterListener (irTag, this);
+    vts.removeParameterListener (LofiIRTags::irTag, this);
 }
 
 ParamLayout LofiIrs::createParameterLayout()
@@ -54,24 +54,24 @@ ParamLayout LofiIrs::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    params.push_back (std::make_unique<AudioParameterChoice> (irTag,
+    params.push_back (std::make_unique<AudioParameterChoice> (LofiIRTags::irTag,
                                                               "IR",
-                                                              irNames,
+                                                              LofiIRTags::irNames,
                                                               0));
 
-    createGainDBParameter (params, gainTag, "Gain", -18.0f, 18.0f, 0.0f);
-    createPercentParameter (params, mixTag, "Mix", 1.0f);
+    createGainDBParameter (params, LofiIRTags::gainTag, "Gain", -18.0f, 18.0f, 0.0f);
+    createPercentParameter (params, LofiIRTags::mixTag, "Mix", 1.0f);
 
     return { params.begin(), params.end() };
 }
 
 void LofiIrs::parameterChanged (const String& parameterID, float newValue)
 {
-    if (parameterID != irTag)
+    if (parameterID != LofiIRTags::irTag)
         return;
 
     auto irIdx = (int) newValue;
-    auto& irData = irMap[irNames[irIdx]];
+    auto& irData = irMap[LofiIRTags::irNames[irIdx]];
     convolution.loadImpulseResponse (irData.first, irData.second, dsp::Convolution::Stereo::yes, dsp::Convolution::Trim::yes, 0);
 }
 
@@ -79,7 +79,7 @@ void LofiIrs::prepare (double sampleRate, int samplesPerBlock)
 {
     dsp::ProcessSpec spec { sampleRate, (uint32) samplesPerBlock, 2 };
     convolution.prepare (spec);
-    parameterChanged (irTag, vts.getRawParameterValue (irTag)->load());
+    parameterChanged (LofiIRTags::irTag, vts.getRawParameterValue (LofiIRTags::irTag)->load());
 
     gain.prepare (spec);
     gain.setRampDurationSeconds (0.01);

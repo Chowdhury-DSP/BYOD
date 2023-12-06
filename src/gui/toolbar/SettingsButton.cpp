@@ -4,7 +4,7 @@
 #include "processors/chain/ProcessorChainPortMagnitudesHelper.h"
 #include "state/ParamForwardManager.h"
 
-namespace
+namespace SettingsColours
 {
 const Colour onColour = Colours::yellow;
 const Colour offColour = Colours::white;
@@ -101,7 +101,7 @@ void SettingsButton::defaultZoomMenu (PopupMenu& menu, int itemID)
         item.text = String (int (zoomLevel * 100.0)) + "%";
         item.action = [this, zoomLevel]
         { pluginSettings->setProperty (BoardViewport::defaultZoomSettingID, zoomLevel); };
-        item.colour = isWithin (zoomLevel, curDefaultZoomLevel, 0.001) ? onColour : offColour;
+        item.colour = isWithin (zoomLevel, curDefaultZoomLevel, 0.001) ? SettingsColours::onColour : SettingsColours::offColour;
 
         defaultZoomMenu.addItem (item);
     }
@@ -124,7 +124,7 @@ void SettingsButton::addPluginSettingMenuOption (const String& name, const Setti
     item.text = name;
     item.action = [this, id, isCurrentlyOn]
     { pluginSettings->setProperty (id, ! isCurrentlyOn); };
-    item.colour = isCurrentlyOn ? onColour : offColour;
+    item.colour = isCurrentlyOn ? SettingsColours::onColour : SettingsColours::offColour;
 
     menu.addItem (item);
 }

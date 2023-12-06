@@ -5,7 +5,7 @@
 #include "processors/ParameterHelpers.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
-namespace
+namespace CryBabyTags
 {
 const String controlFreqTag = "control_freq";
 const String depthTag = "depth";
@@ -38,12 +38,12 @@ CryBaby::CryBaby (UndoManager* um)
         })
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (controlFreqParam, vts, controlFreqTag);
-    loadParameterPointer (attackParam, vts, attackTag);
-    loadParameterPointer (releaseParam, vts, releaseTag);
-    loadParameterPointer (directControlParam, vts, directControlTag);
+    loadParameterPointer (controlFreqParam, vts, CryBabyTags::controlFreqTag);
+    loadParameterPointer (attackParam, vts, CryBabyTags::attackTag);
+    loadParameterPointer (releaseParam, vts, CryBabyTags::releaseTag);
+    loadParameterPointer (directControlParam, vts, CryBabyTags::directControlTag);
 
-    depthSmooth.setParameterHandle (getParameterPointer<chowdsp::PercentParameter*> (vts, depthTag));
+    depthSmooth.setParameterHandle (getParameterPointer<chowdsp::PercentParameter*> (vts, CryBabyTags::depthTag));
     depthSmooth.setRampLength (0.025);
 
     alphaSmooth.setRampLength (0.01);
@@ -55,8 +55,8 @@ CryBaby::CryBaby (UndoManager* um)
     uiOptions.info.description = "\"Wah\" effect based on the Dunlop Cry Baby pedal.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    addPopupMenuParameter (directControlTag);
-    disableWhenInputConnected ({ attackTag, releaseTag }, LevelInput);
+    addPopupMenuParameter (CryBabyTags::directControlTag);
+    disableWhenInputConnected ({ CryBabyTags::attackTag, CryBabyTags::releaseTag }, LevelInput);
 }
 
 CryBaby::~CryBaby() = default;
@@ -66,11 +66,11 @@ ParamLayout CryBaby::createParameterLayout()
     using namespace ParameterHelpers;
 
     auto params = createBaseParams();
-    createPercentParameter (params, controlFreqTag, "Freq", 0.5f);
-    createBipolarPercentParameter (params, depthTag, "Depth", 0.5f);
-    createTimeMsParameter (params, attackTag, "Attack", createNormalisableRange (0.1f, 20.0f, 2.0f), 1.0f);
-    createTimeMsParameter (params, releaseTag, "Release", createNormalisableRange (1.0f, 200.0f, 20.0f), 25.0f);
-    emplace_param<chowdsp::BoolParameter> (params, directControlTag, "Direct Control", false);
+    createPercentParameter (params, CryBabyTags::controlFreqTag, "Freq", 0.5f);
+    createBipolarPercentParameter (params, CryBabyTags::depthTag, "Depth", 0.5f);
+    createTimeMsParameter (params, CryBabyTags::attackTag, "Attack", createNormalisableRange (0.1f, 20.0f, 2.0f), 1.0f);
+    createTimeMsParameter (params, CryBabyTags::releaseTag, "Release", createNormalisableRange (1.0f, 200.0f, 20.0f), 25.0f);
+    emplace_param<chowdsp::BoolParameter> (params, CryBabyTags::directControlTag, "Direct Control", false);
     return { params.begin(), params.end() };
 }
 
@@ -90,12 +90,12 @@ void CryBaby::prepare (double sampleRate, int samplesPerBlock)
     needsOversampling = sampleRate < 88'200.0f;
     if (needsOversampling)
     {
-        upsampler.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 }, oversampleRatio);
-        downsampler.prepare ({ oversampleRatio * sampleRate, oversampleRatio * (uint32_t) samplesPerBlock, 2 }, oversampleRatio);
+        upsampler.prepare ({ sampleRate, (uint32_t) samplesPerBlock, 2 }, CryBabyTags::oversampleRatio);
+        downsampler.prepare ({ CryBabyTags::oversampleRatio * sampleRate, CryBabyTags::oversampleRatio * (uint32_t) samplesPerBlock, 2 }, CryBabyTags::oversampleRatio);
     }
 
     ndk_model = std::make_unique<CryBabyNDK>();
-    ndk_model->reset ((needsOversampling ? oversampleRatio : 1.0) * sampleRate);
+    ndk_model->reset ((needsOversampling ? CryBabyTags::oversampleRatio : 1.0) * sampleRate);
     const auto alpha = (double) alphaSmooth.getCurrentValue();
     ndk_model->update_pots ({ (1.0 - alpha) * CryBabyNDK::VR1, alpha * CryBabyNDK::VR1 });
 
@@ -165,7 +165,7 @@ void CryBaby::processAudio (AudioBuffer<float>& buffer)
         if (needsOversampling)
         {
             const auto osBufferView = upsampler.process (audioOutBuffer);
-            processBlockNDK (osBufferView, oversampleRatio);
+            processBlockNDK (osBufferView, CryBabyTags::oversampleRatio);
             downsampler.process (osBufferView, audioOutBuffer);
         }
         else
@@ -226,7 +226,7 @@ bool CryBaby::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::
             : vts (vtState),
               internalSlider (*chowdsp::ParamUtils::getParameterPointer<chowdsp::FloatParameter*> (vts, tag), hcp),
               attach (vts, tag, internalSlider),
-              directControlAttach (*chowdsp::ParamUtils::getParameterPointer<chowdsp::BoolParameter*> (vts, directControlTag),
+              directControlAttach (*chowdsp::ParamUtils::getParameterPointer<chowdsp::BoolParameter*> (vts, CryBabyTags::directControlTag),
                                    [this] (float newValue)
                                    {
                                        internalSlider.setEnabled (newValue < 0.5f);
@@ -272,9 +272,9 @@ bool CryBaby::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CustomSlider)
     };
 
-    customComps.add (std::make_unique<CustomSlider> (vts, attackTag, hcp));
-    customComps.add (std::make_unique<CustomSlider> (vts, releaseTag, hcp));
-    customComps.add (std::make_unique<CustomSlider> (vts, depthTag, hcp));
+    customComps.add (std::make_unique<CustomSlider> (vts, CryBabyTags::attackTag, hcp));
+    customComps.add (std::make_unique<CustomSlider> (vts, CryBabyTags::releaseTag, hcp));
+    customComps.add (std::make_unique<CustomSlider> (vts, CryBabyTags::depthTag, hcp));
 
     return true;
 }

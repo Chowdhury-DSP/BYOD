@@ -1,7 +1,7 @@
 #include "ShimmerReverb.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace ShimmerReverbTags
 {
 const String shiftTag = "shift";
 const String sizeTag = "size";
@@ -54,10 +54,10 @@ const float* ShimmerReverb::ShimmerFDNConfig::doFeedbackProcess (ShimmerFDNConfi
 ShimmerReverb::ShimmerReverb (UndoManager* um) : BaseProcessor ("Shimmer Reverb", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    shiftParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, shiftTag));
-    sizeParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, sizeTag));
-    feedbackParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, feedbackTag));
-    loadParameterPointer (mixParam, vts, mixTag);
+    shiftParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, ShimmerReverbTags::shiftTag));
+    sizeParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, ShimmerReverbTags::sizeTag));
+    feedbackParam.setParameterHandle (getParameterPointer<chowdsp::FloatParameter*> (vts, ShimmerReverbTags::feedbackTag));
+    loadParameterPointer (mixParam, vts, ShimmerReverbTags::mixTag);
 
     uiOptions.backgroundColour = Colours::lightgrey;
     uiOptions.powerColour = Colours::darksalmon.darker (0.2f);
@@ -71,15 +71,15 @@ ParamLayout ShimmerReverb::createParameterLayout()
     auto params = createBaseParams();
 
     emplace_param<chowdsp::FloatParameter> (params,
-                                            shiftTag,
+                                            ShimmerReverbTags::shiftTag,
                                             "Shift",
                                             NormalisableRange { -12.0f, 12.0f },
                                             -12.0f,
                                             &floatValToString,
                                             &stringToFloatVal);
-    createPercentParameter (params, sizeTag, "Size", 1.0f);
-    createPercentParameter (params, feedbackTag, "Decay", 1.0f);
-    createPercentParameter (params, mixTag, "Mix", 0.5f);
+    createPercentParameter (params, ShimmerReverbTags::sizeTag, "Size", 1.0f);
+    createPercentParameter (params, ShimmerReverbTags::feedbackTag, "Decay", 1.0f);
+    createPercentParameter (params, ShimmerReverbTags::mixTag, "Mix", 0.5f);
 
     return { params.begin(), params.end() };
 }

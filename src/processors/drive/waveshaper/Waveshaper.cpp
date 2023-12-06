@@ -1,7 +1,7 @@
 #include "Waveshaper.h"
 #include "../../ParameterHelpers.h"
 
-namespace
+namespace WaveshaperTags
 {
 const String shapeTag = "shape";
 }
@@ -11,7 +11,7 @@ using namespace SurgeWaveshapers;
 Waveshaper::Waveshaper (UndoManager* um) : BaseProcessor ("Waveshaper", createParameterLayout(), um)
 {
     chowdsp::ParamUtils::loadParameterPointer (driveParam, vts, "drive");
-    shapeParam = vts.getRawParameterValue (shapeTag);
+    shapeParam = vts.getRawParameterValue (WaveshaperTags::shapeTag);
 
     // borrowed from: https://github.com/surge-synthesizer/surge/blob/main/src/surge-fx/SurgeLookAndFeel.h
     const Colour surgeOrange = Colour (255, 144, 0);
@@ -31,7 +31,7 @@ ParamLayout Waveshaper::createParameterLayout()
     auto params = createBaseParams();
     createGainDBParameter (params, "drive", "Drive", -6.0f, 30.0f, 0.0f);
 
-    params.push_back (std::make_unique<AudioParameterChoice> (shapeTag, "Shape", wst_names, wst_ojd));
+    params.push_back (std::make_unique<AudioParameterChoice> (WaveshaperTags::shapeTag, "Shape", wst_names, wst_ojd));
 
     return { params.begin(), params.end() };
 }
@@ -159,19 +159,19 @@ bool Waveshaper::getCustomComponents (OwnedArray<Component>& customComps, chowds
     {
         WaveshapeComboBox (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp) : vts (vtState)
         {
-            auto* param = vts.getParameter (shapeTag);
+            auto* param = vts.getParameter (WaveshaperTags::shapeTag);
             attachment = std::make_unique<CustomBoxAttach> (*param, *this, vts.undoManager);
-            shapeParam = vts.getRawParameterValue (shapeTag);
+            shapeParam = vts.getRawParameterValue (WaveshaperTags::shapeTag);
             refreshBox();
 
             hcp.registerParameterComponent (*this, *param);
 
-            this->setName (shapeTag + "__box");
+            Component::setName (WaveshaperTags::shapeTag + "__box");
         }
 
         void visibilityChanged() override
         {
-            setName (vts.getParameter (shapeTag)->name);
+            setName (vts.getParameter (WaveshaperTags::shapeTag)->name);
         }
 
         void refreshBox()

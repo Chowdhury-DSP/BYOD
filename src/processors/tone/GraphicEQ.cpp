@@ -1,7 +1,7 @@
 #include "GraphicEQ.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace GraphicEQParams
 {
 const StringArray freqLabels { "100", "220", "500", "1k", "2.2k", "5k" };
 
@@ -34,7 +34,7 @@ ParamLayout GraphicEQ::createParameterLayout()
     auto params = createBaseParams();
 
     for (int i = 0; i < nBands; ++i)
-        createGainDBParameter (params, "gain_" + String (i), freqLabels[i], -12.0f, 12.0f, 0.0f);
+        createGainDBParameter (params, "gain_" + String (i), GraphicEQParams::freqLabels[i], -12.0f, 12.0f, 0.0f);
 
     return { params.begin(), params.end() };
 }
@@ -71,7 +71,7 @@ void GraphicEQ::processAudio (AudioBuffer<float>& buffer)
                 for (int n = 0; n < numSamples; ++n)
                 {
                     auto curGainDB = gainDBSmooth[ch][i].getNextValue();
-                    auto curQ = calcQ (curGainDB);
+                    auto curQ = GraphicEQParams::calcQ (curGainDB);
                     filter[ch][i].calcCoefsDB (bandFreqs[i], curQ, curGainDB, fs);
                     x[n] = filter[ch][i].processSample (x[n]);
                 }
@@ -79,7 +79,7 @@ void GraphicEQ::processAudio (AudioBuffer<float>& buffer)
             else
             {
                 auto curGainDB = gainDBSmooth[ch][i].getNextValue();
-                auto curQ = calcQ (curGainDB);
+                auto curQ = GraphicEQParams::calcQ (curGainDB);
                 filter[ch][i].calcCoefsDB (bandFreqs[i], curQ, curGainDB, fs);
                 filter[ch][i].processBlock (x, numSamples);
             }

@@ -3,7 +3,7 @@
 #include "CableViewPortLocationHelper.h"
 #include "processors/chain/ProcessorChainActionHelper.h"
 
-namespace
+namespace CableConnectionMethods
 {
 void updateConnectionStatuses (const BoardComponent& board, const ConnectionInfo& connection, bool isConnected)
 {
@@ -42,7 +42,7 @@ CableViewConnectionHelper::CableViewConnectionHelper (CableView& cv, BoardCompon
 void CableViewConnectionHelper::processorBeingAdded (BaseProcessor* newProc)
 {
     ScopedLock sl (cableView.cableMutex);
-    addConnectionsForProcessor (cables, newProc, board, cableView);
+    CableConnectionMethods::addConnectionsForProcessor (cables, newProc, board, cableView);
 }
 
 void CableViewConnectionHelper::processorBeingRemoved (const BaseProcessor* proc)
@@ -51,7 +51,7 @@ void CableViewConnectionHelper::processorBeingRemoved (const BaseProcessor* proc
     {
         if (cables[i]->connectionInfo.startProc == proc || cables[i]->connectionInfo.endProc == proc)
         {
-            updateConnectionStatuses (board, cables[i]->connectionInfo, false);
+            CableConnectionMethods::updateConnectionStatuses (board, cables[i]->connectionInfo, false);
             ScopedLock sl (cableView.cableMutex);
             cables.remove (i);
         }
@@ -77,8 +77,8 @@ void CableViewConnectionHelper::refreshConnections()
     }
 
     for (auto* proc : board.procChain.getProcessors())
-        addConnectionsForProcessor (cables, proc, board, cableView);
-    addConnectionsForProcessor (cables, &board.procChain.getInputProcessor(), board, cableView);
+        CableConnectionMethods::addConnectionsForProcessor (cables, proc, board, cableView);
+    CableConnectionMethods::addConnectionsForProcessor (cables, &board.procChain.getInputProcessor(), board, cableView);
 
     for (auto* cable : cables)
     {
@@ -90,7 +90,7 @@ void CableViewConnectionHelper::refreshConnections()
 
 void CableViewConnectionHelper::connectionAdded (const ConnectionInfo& info)
 {
-    updateConnectionStatuses (board, info, true);
+    CableConnectionMethods::updateConnectionStatuses (board, info, true);
 
     if (ignoreConnectionCallbacks)
         return;
@@ -102,7 +102,7 @@ void CableViewConnectionHelper::connectionAdded (const ConnectionInfo& info)
 
 void CableViewConnectionHelper::connectionRemoved (const ConnectionInfo& info)
 {
-    updateConnectionStatuses (board, info, false);
+    CableConnectionMethods::updateConnectionStatuses (board, info, false);
 
     if (ignoreConnectionCallbacks)
         return;

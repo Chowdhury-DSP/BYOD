@@ -2,7 +2,7 @@
 #include "processors/ParameterHelpers.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
-namespace
+namespace BigMuffToneComponents
 {
 auto createComponentSets()
 {
@@ -24,7 +24,7 @@ auto createComponentSets()
 } // namespace
 
 BigMuffTone::BigMuffTone (UndoManager* um) : BaseProcessor ("Muff Tone", createParameterLayout(), um),
-                                             componentSets (createComponentSets())
+                                             componentSets (BigMuffToneComponents::createComponentSets())
 {
     using namespace ParameterHelpers;
     loadParameterPointer (toneParam, vts, "tone");
@@ -107,7 +107,7 @@ ParamLayout BigMuffTone::createParameterLayout()
 
     StringArray types;
     types.ensureStorageAllocated ((int) numComponentSets);
-    for (const auto& set : createComponentSets())
+    for (const auto& set : BigMuffToneComponents::createComponentSets())
         types.add (set.name.data());
     emplace_param<AudioParameterChoice> (params, "type", "Type", types, 2);
 

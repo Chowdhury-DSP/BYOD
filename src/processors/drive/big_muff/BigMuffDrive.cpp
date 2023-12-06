@@ -1,7 +1,7 @@
 #include "BigMuffDrive.h"
 #include "../../ParameterHelpers.h"
 
-namespace
+namespace BigMuffDriveRanges
 {
 const auto cutoffRange = ParameterHelpers::createNormalisableRange (500.0f, 22000.0f, 1200.0f);
 float harmParamToCutoffHz (float harmParam)
@@ -11,7 +11,7 @@ float harmParamToCutoffHz (float harmParam)
 
 const auto sustainRange = ParameterHelpers::createNormalisableRange (0.4f, 2.0f, 1.0f);
 const auto levelRange = ParameterHelpers::createNormalisableRange (-60.0f, 0.0f, -9.0f);
-} // namespace
+} // namespace BigMuffDriveRanges
 
 BigMuffDrive::BigMuffDrive (UndoManager* um) : BaseProcessor ("Muff Drive", createParameterLayout(), um)
 {
@@ -53,7 +53,7 @@ void BigMuffDrive::prepare (double sampleRate, int samplesPerBlock)
     fs = (float) sampleRate;
 
     cutoffSmooth.reset (sampleRate, 0.02);
-    cutoffSmooth.setCurrentAndTargetValue (harmParamToCutoffHz (*harmParam));
+    cutoffSmooth.setCurrentAndTargetValue (BigMuffDriveRanges::harmParamToCutoffHz (*harmParam));
     for (auto& filt : inputFilter)
     {
         filt.calcCoefs (cutoffSmooth.getTargetValue(), fs);
@@ -104,7 +104,7 @@ void BigMuffDrive::processInputStage (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    cutoffSmooth.setTargetValue (harmParamToCutoffHz (*harmParam));
+    cutoffSmooth.setTargetValue (BigMuffDriveRanges::harmParamToCutoffHz (*harmParam));
     if (cutoffSmooth.isSmoothing())
     {
         if (numChannels == 1)
@@ -141,7 +141,7 @@ void BigMuffDrive::processInputStage (AudioBuffer<float>& buffer)
         }
     }
 
-    sustainGain.setGainLinear (sustainRange.convertFrom0to1 (*sustainParam));
+    sustainGain.setGainLinear (BigMuffDriveRanges::sustainRange.convertFrom0to1 (*sustainParam));
     dsp::AudioBlock<float> block { buffer };
     sustainGain.process (dsp::ProcessContextReplacing<float> { block });
 }
@@ -176,7 +176,8 @@ void BigMuffDrive::processAudio (AudioBuffer<float>& buffer)
     for (int ch = 0; ch < numChannels; ++ch)
         dcBlocker[ch].processBlock (buffer.getWritePointer (ch), numSamples);
 
-    auto outGain = Decibels::decibelsToGain (levelRange.convertFrom0to1 (*levelParam), levelRange.start);
+    auto outGain = Decibels::decibelsToGain (BigMuffDriveRanges::levelRange.convertFrom0to1 (*levelParam),
+                                             BigMuffDriveRanges::levelRange.start);
     outGain *= Decibels::decibelsToGain (13.0f); // makeup from level lost in clipping stages
     outGain *= numStages % 2 == 0 ? 1.0f : -1.0f;
     outLevel.setGainLinear (outGain);

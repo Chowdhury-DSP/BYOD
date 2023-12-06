@@ -2,16 +2,8 @@
 #include "../BufferHelpers.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace ChorusTags
 {
-constexpr float rate1Low = 0.005f;
-constexpr float rate1High = 5.0f;
-constexpr float rate2Low = 0.5f;
-constexpr float rate2High = 40.0f;
-
-constexpr float delay1Ms = 0.6f;
-constexpr float delay2Ms = 0.2f;
-
 const String delayTypeTag = "delay_type";
 } // namespace
 
@@ -39,9 +31,9 @@ Chorus::Chorus (UndoManager* um) : BaseProcessor (
     loadParameterPointer (depthParam, vts, "depth");
     loadParameterPointer (fbParam, vts, "feedback");
     loadParameterPointer (mixParam, vts, "mix");
-    delayTypeParam = vts.getRawParameterValue (delayTypeTag);
+    delayTypeParam = vts.getRawParameterValue (ChorusTags::delayTypeTag);
 
-    addPopupMenuParameter (delayTypeTag);
+    addPopupMenuParameter (ChorusTags::delayTypeTag);
 
     uiOptions.backgroundColour = Colours::purple.brighter (0.25f);
     uiOptions.powerColour = Colours::yellow.brighter (0.1f);
@@ -60,7 +52,7 @@ ParamLayout Chorus::createParameterLayout()
     createPercentParameter (params, "feedback", "Feedback", 0.0f);
     createPercentParameter (params, "mix", "Mix", 0.5f);
 
-    emplace_param<AudioParameterChoice> (params, delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
+    emplace_param<AudioParameterChoice> (params, ChorusTags::delayTypeTag, "Delay Type", StringArray { "Clean", "Lo-Fi" }, 0);
 
     return { params.begin(), params.end() };
 }
@@ -93,7 +85,7 @@ void Chorus::prepare (double sampleRate, int samplesPerBlock)
     }
 
     // set phase offsets
-    constexpr float piOver3 = MathConstants<float>::pi / 3.0f;
+    static constexpr float piOver3 = MathConstants<float>::pi / 3.0f;
     slowLFOs[0][0].reset (-piOver3);
     fastLFOs[0][0].reset (-piOver3);
     slowLFOs[1][1].reset (piOver3);
@@ -159,6 +151,11 @@ void Chorus::processModulation (int numSamples)
     }
     else
     {
+        static constexpr float rate1Low = 0.005f;
+        static constexpr float rate1High = 5.0f;
+        static constexpr float rate2Low = 0.5f;
+        static constexpr float rate2High = 40.0f;
+
         auto slowRate = rate1Low * std::pow (rate1High / rate1Low, *rateParam);
         auto fastRate = rate2Low * std::pow (rate2High / rate2Low, *rateParam);
 
@@ -206,6 +203,9 @@ void Chorus::processChorus (AudioBuffer<float>& buffer, DelayArrType& delay)
             fbAmount *= 0.4f;
         else
             fbAmount *= 0.5f;
+
+        static constexpr float delay1Ms = 0.6f;
+        static constexpr float delay2Ms = 0.2f;
 
         fbSmooth[ch].setTargetValue (fbAmount);
         slowSmooth[ch].setTargetValue (delay1Ms * 0.001f * fs * *depthParam);

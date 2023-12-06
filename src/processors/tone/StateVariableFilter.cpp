@@ -2,7 +2,7 @@
 #include "../ParameterHelpers.h"
 #include "gui/utils/ModulatableSlider.h"
 
-namespace
+namespace SVFTags
 {
 const String modeTag = "mode";
 const String multiModeTag = "multi_mode";
@@ -14,11 +14,11 @@ StateVariableFilter::StateVariableFilter (UndoManager* um) : BaseProcessor ("SVF
     using namespace ParameterHelpers;
     loadParameterPointer (freqParam, vts, "freq");
     loadParameterPointer (qParam, vts, "q_value");
-    modeParam = vts.getRawParameterValue (modeTag);
-    multiModeOnOffParam = vts.getRawParameterValue (multiModeTag);
-    loadParameterPointer (multiModeParam, vts, multiModeTypeTag);
+    modeParam = vts.getRawParameterValue (SVFTags::modeTag);
+    multiModeOnOffParam = vts.getRawParameterValue (SVFTags::multiModeTag);
+    loadParameterPointer (multiModeParam, vts, SVFTags::multiModeTypeTag);
 
-    addPopupMenuParameter (multiModeTag);
+    addPopupMenuParameter (SVFTags::multiModeTag);
 
     uiOptions.backgroundColour = Colours::blanchedalmond;
     uiOptions.powerColour = Colours::red.darker (0.25f);
@@ -43,13 +43,13 @@ ParamLayout StateVariableFilter::createParameterLayout()
                                             &stringToFloatVal);
 
     emplace_param<AudioParameterChoice> (params,
-                                         modeTag,
+                                         SVFTags::modeTag,
                                          "Mode",
                                          StringArray { "LPF", "HPF", "BPF" },
                                          0);
 
-    emplace_param<AudioParameterBool> (params, multiModeTag, "Multi-Mode", true);
-    createPercentParameter (params, multiModeTypeTag, "Mode", 0.0f);
+    emplace_param<AudioParameterBool> (params, SVFTags::multiModeTag, "Multi-Mode", true);
+    createPercentParameter (params, SVFTags::multiModeTypeTag, "Mode", 0.0f);
 
     return { params.begin(), params.end() };
 }
@@ -135,7 +135,7 @@ void StateVariableFilter::fromXML (XmlElement* xml, const chowdsp::Version& vers
     {
         // Multi-mode behaviour was only added in version 1.0.2, so we need to
         // make sure we don't break older patches.
-        vts.getParameter (multiModeTag)->setValueNotifyingHost (0.0f);
+        vts.getParameter (SVFTags::multiModeTag)->setValueNotifyingHost (0.0f);
     }
 }
 
@@ -147,11 +147,11 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
     public:
         ModeControl (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
-              modeSelectorAttach (vts, modeTag, modeSelector),
-              multiModeSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, multiModeTypeTag), hcp),
-              multiModeAttach (vts, multiModeTypeTag, multiModeSlider),
+              modeSelectorAttach (vts, SVFTags::modeTag, modeSelector),
+              multiModeSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, SVFTags::multiModeTypeTag), hcp),
+              multiModeAttach (vts, SVFTags::multiModeTypeTag, multiModeSlider),
               multiModeOnOffAttach (
-                  *vts.getParameter (multiModeTag),
+                  *vts.getParameter (SVFTags::multiModeTag),
                   [this] (float newValue)
                   { updateControlVisibility (newValue == 1.0f); },
                   vts.undoManager)
@@ -159,7 +159,7 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
             addChildComponent (modeSelector);
             addChildComponent (multiModeSlider);
 
-            const auto* modeChoiceParam = getParameterPointer<AudioParameterChoice*> (vts, modeTag);
+            const auto* modeChoiceParam = getParameterPointer<AudioParameterChoice*> (vts, SVFTags::modeTag);
             modeSelector.addItemList (modeChoiceParam->choices, 1);
             modeSelector.setSelectedItemIndex (0);
             modeSelector.setScrollWheelEnabled (true);
@@ -167,7 +167,7 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
 
             hcp.registerParameterComponent (multiModeSlider, multiModeSlider.getParameter());
 
-            this->setName (modeTag + "__" + multiModeTypeTag + "__");
+            Component::setName (SVFTags::modeTag + "__" + SVFTags::multiModeTypeTag + "__");
         }
 
         void colourChanged() override
@@ -194,12 +194,12 @@ bool StateVariableFilter::getCustomComponents (OwnedArray<Component>& customComp
             modeSelector.setVisible (! multiModeOn);
             multiModeSlider.setVisible (multiModeOn);
 
-            setName (vts.getParameter (multiModeOn ? multiModeTypeTag : modeTag)->name);
+            setName (vts.getParameter (multiModeOn ? SVFTags::multiModeTypeTag : SVFTags::modeTag)->name);
         }
 
         void visibilityChanged() override
         {
-            updateControlVisibility (vts.getRawParameterValue (multiModeTag)->load() == 1.0f);
+            updateControlVisibility (vts.getRawParameterValue (SVFTags::multiModeTag)->load() == 1.0f);
         }
 
         void resized() override

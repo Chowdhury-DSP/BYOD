@@ -3,7 +3,7 @@
 #include "gui/utils/ModulatableSlider.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace PannerTags
 {
 const String mainPanTag = "main_pan";
 const String leftPanTag = "left_pan";
@@ -35,24 +35,24 @@ Panner::Panner (UndoManager* um) : BaseProcessor (
     })
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (mainPan, vts, mainPanTag);
-    loadParameterPointer (leftPan, vts, leftPanTag);
-    loadParameterPointer (rightPan, vts, rightPanTag);
-    loadParameterPointer (stereoWidth, vts, stereoWidthTag);
-    loadParameterPointer (modDepth, vts, modDepthTag);
-    loadParameterPointer (modRateHz, vts, modRateHzTag);
-    panMode = vts.getRawParameterValue (panModeTag);
-    stereoMode = vts.getRawParameterValue (stereoModeTag);
+    loadParameterPointer (mainPan, vts, PannerTags::mainPanTag);
+    loadParameterPointer (leftPan, vts, PannerTags::leftPanTag);
+    loadParameterPointer (rightPan, vts, PannerTags::rightPanTag);
+    loadParameterPointer (stereoWidth, vts, PannerTags::stereoWidthTag);
+    loadParameterPointer (modDepth, vts, PannerTags::modDepthTag);
+    loadParameterPointer (modRateHz, vts, PannerTags::modRateHzTag);
+    panMode = vts.getRawParameterValue (PannerTags::panModeTag);
+    stereoMode = vts.getRawParameterValue (PannerTags::stereoModeTag);
 
     uiOptions.backgroundColour = Colours::grey.brighter (0.25f);
     uiOptions.powerColour = Colours::red.brighter (0.1f);
-    uiOptions.paramIDsToSkip = { mainPanTag, leftPanTag };
+    uiOptions.paramIDsToSkip = { PannerTags::mainPanTag, PannerTags::leftPanTag };
     uiOptions.info.description = "Panning effect with mode and modulation options.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    addPopupMenuParameter (panModeTag);
-    addPopupMenuParameter (stereoModeTag);
-    disableWhenInputConnected ({ modRateHzTag }, ModulationInput);
+    addPopupMenuParameter (PannerTags::panModeTag);
+    addPopupMenuParameter (PannerTags::stereoModeTag);
+    disableWhenInputConnected ({ PannerTags::modRateHzTag }, ModulationInput);
 }
 
 ParamLayout Panner::createParameterLayout()
@@ -60,16 +60,16 @@ ParamLayout Panner::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createBipolarPercentParameter (params, mainPanTag, "Pan");
-    createBipolarPercentParameter (params, leftPanTag, "Left Pan", -1.0f);
-    createBipolarPercentParameter (params, rightPanTag, "Right Pan", 1.0f);
-    createPercentParameter (params, stereoWidthTag, "Width", 1.0f);
+    createBipolarPercentParameter (params, PannerTags::mainPanTag, "Pan");
+    createBipolarPercentParameter (params, PannerTags::leftPanTag, "Left Pan", -1.0f);
+    createBipolarPercentParameter (params, PannerTags::rightPanTag, "Right Pan", 1.0f);
+    createPercentParameter (params, PannerTags::stereoWidthTag, "Width", 1.0f);
 
-    createPercentParameter (params, modDepthTag, "Depth", 0.0f);
-    createFreqParameter (params, modRateHzTag, "Rate", 0.5f, 10.0f, 2.0f, 1.0f);
+    createPercentParameter (params, PannerTags::modDepthTag, "Depth", 0.0f);
+    createFreqParameter (params, PannerTags::modRateHzTag, "Rate", 0.5f, 10.0f, 2.0f, 1.0f);
 
-    emplace_param<AudioParameterChoice> (params, panModeTag, "Pan Mode", StringArray { "Linear", "Constant Gain", "Constant Power" }, 1);
-    emplace_param<AudioParameterChoice> (params, stereoModeTag, "Stereo Mode", StringArray { "Stereo", "Dual" }, 0);
+    emplace_param<AudioParameterChoice> (params, PannerTags::panModeTag, "Pan Mode", StringArray { "Linear", "Constant Gain", "Constant Power" }, 1);
+    emplace_param<AudioParameterChoice> (params, PannerTags::stereoModeTag, "Stereo Mode", StringArray { "Stereo", "Dual" }, 0);
 
     return { params.begin(), params.end() };
 }
@@ -262,13 +262,13 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::H
     public:
         PanSlider1 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
-              mainPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, mainPanTag), hcp),
-              leftPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, leftPanTag), hcp),
-              mainPanAttach (vts, mainPanTag, mainPanSlider),
-              leftPanAttach (vts, leftPanTag, leftPanSlider),
+              mainPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, PannerTags::mainPanTag), hcp),
+              leftPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, PannerTags::leftPanTag), hcp),
+              mainPanAttach (vts, PannerTags::mainPanTag, mainPanSlider),
+              leftPanAttach (vts, PannerTags::leftPanTag, leftPanSlider),
               isStereoInput (isStereo),
               stereoAttach (
-                  *vts.getParameter (stereoModeTag),
+                  *vts.getParameter (PannerTags::stereoModeTag),
                   [this] (float newValue)
                   { updateSliderVisibility (newValue == 1.0f); },
                   vts.undoManager)
@@ -279,7 +279,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::H
             hcp.registerParameterComponent (mainPanSlider, mainPanSlider.getParameter());
             hcp.registerParameterComponent (leftPanSlider, leftPanSlider.getParameter());
 
-            this->setName (mainPanTag + "__" + leftPanTag + "__");
+            Component::setName (PannerTags::mainPanTag + "__" + PannerTags::leftPanTag + "__");
         }
 
         void colourChanged() override
@@ -305,14 +305,14 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::H
             mainPanSlider.setVisible (! dualPanOn);
             leftPanSlider.setVisible (dualPanOn);
 
-            setName (vts.getParameter (dualPanOn ? leftPanTag : mainPanTag)->name);
+            setName (vts.getParameter (dualPanOn ? PannerTags::leftPanTag : PannerTags::mainPanTag)->name);
             if (auto* parent = getParentComponent())
                 parent->repaint();
         }
 
         void visibilityChanged() override
         {
-            updateSliderVisibility (vts.getRawParameterValue (stereoModeTag)->load() == 1.0f);
+            updateSliderVisibility (vts.getRawParameterValue (PannerTags::stereoModeTag)->load() == 1.0f);
         }
 
         void resized() override
@@ -346,13 +346,13 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::H
     public:
         PanSlider2 (AudioProcessorValueTreeState& vtState, std::atomic_bool& isStereo, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
-              widthSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, stereoWidthTag), hcp),
-              rightPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, rightPanTag), hcp),
-              widthAttach (vts, stereoWidthTag, widthSlider),
-              rightPanAttach (vts, rightPanTag, rightPanSlider),
+              widthSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, PannerTags::stereoWidthTag), hcp),
+              rightPanSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, PannerTags::rightPanTag), hcp),
+              widthAttach (vts, PannerTags::stereoWidthTag, widthSlider),
+              rightPanAttach (vts, PannerTags::rightPanTag, rightPanSlider),
               isStereoInput (isStereo),
               stereoAttach (
-                  *vts.getParameter (stereoModeTag),
+                  *vts.getParameter (PannerTags::stereoModeTag),
                   [this] (float newValue)
                   { updateSliderVisibility (newValue == 1.0f); },
                   vts.undoManager)
@@ -363,7 +363,7 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::H
             hcp.registerParameterComponent (widthSlider, widthSlider.getParameter());
             hcp.registerParameterComponent (rightPanSlider, rightPanSlider.getParameter());
 
-            this->setName (stereoWidthTag + "__" + rightPanTag + "__");
+            Component::setName (PannerTags::stereoWidthTag + "__" + PannerTags::rightPanTag + "__");
 
             startTimerHz (10);
         }
@@ -393,14 +393,14 @@ bool Panner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::H
             widthSlider.setVisible (! dualPanOn);
             rightPanSlider.setVisible (dualPanOn);
 
-            setName (vts.getParameter (dualPanOn ? rightPanTag : stereoWidthTag)->name);
+            setName (vts.getParameter (dualPanOn ? PannerTags::rightPanTag : PannerTags::stereoWidthTag)->name);
             if (auto* parent = getParentComponent())
                 parent->repaint();
         }
 
         void visibilityChanged() override
         {
-            updateSliderVisibility (vts.getRawParameterValue (stereoModeTag)->load() == 1.0f);
+            updateSliderVisibility (vts.getRawParameterValue (PannerTags::stereoModeTag)->load() == 1.0f);
         }
 
         void resized() override

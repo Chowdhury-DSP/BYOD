@@ -1,7 +1,7 @@
 #include "MIDIModulator.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace MidiModulatorTags
 {
 const String bipolarTag = "bipolar";
 const String midiMapTag = "midi_map_cc";
@@ -20,21 +20,21 @@ MidiModulator::MidiModulator (UndoManager* um)
         { return PortType::modulation; })
 {
     midiModSmooth.setRampLength (0.025);
-    ParameterHelpers::loadParameterPointer (bipolarParam, vts, bipolarTag);
+    ParameterHelpers::loadParameterPointer (bipolarParam, vts, MidiModulatorTags::bipolarTag);
 
     uiOptions.backgroundColour = Colours::forestgreen.brighter (0.1f);
     uiOptions.powerColour = Colours::whitesmoke;
     uiOptions.info.description = "Module that allows MIDI controller changes to be used as a modulation source.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    addPopupMenuParameter (bipolarTag);
+    addPopupMenuParameter (MidiModulatorTags::bipolarTag);
 }
 
 ParamLayout MidiModulator::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    emplace_param<chowdsp::BoolParameter> (params, bipolarTag, "Bipolar", true);
+    emplace_param<chowdsp::BoolParameter> (params, MidiModulatorTags::bipolarTag, "Bipolar", true);
     return { params.begin(), params.end() };
 }
 
@@ -101,14 +101,14 @@ void MidiModulator::processAudioBypassed (AudioBuffer<float>& buffer)
 std::unique_ptr<XmlElement> MidiModulator::toXML()
 {
     auto xml = BaseProcessor::toXML();
-    xml->setAttribute (midiMapTag, mappedModController);
+    xml->setAttribute (MidiModulatorTags::midiMapTag, mappedModController);
     return xml;
 }
 
 void MidiModulator::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)
 {
     BaseProcessor::fromXML (xml, version, loadPosition);
-    mappedModController = xml->getIntAttribute (midiMapTag, 1);
+    mappedModController = xml->getIntAttribute (MidiModulatorTags::midiMapTag, 1);
 }
 
 //===================================================================

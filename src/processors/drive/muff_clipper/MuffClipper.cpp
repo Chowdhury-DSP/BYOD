@@ -1,7 +1,7 @@
 #include "MuffClipper.h"
 #include "../../ParameterHelpers.h"
 
-namespace
+namespace MuffClipperRanges
 {
 const auto cutoffRange = ParameterHelpers::createNormalisableRange (500.0f, 22000.0f, 1200.0f);
 float harmParamToCutoffHz (float harmParam)
@@ -55,7 +55,7 @@ void MuffClipper::prepare (double sampleRate, int samplesPerBlock)
     fs = (float) sampleRate;
 
     cutoffSmooth.reset (sampleRate, 0.02);
-    cutoffSmooth.setCurrentAndTargetValue (harmParamToCutoffHz (*harmParam));
+    cutoffSmooth.setCurrentAndTargetValue (MuffClipperRanges::harmParamToCutoffHz (*harmParam));
     for (auto& filt : inputFilter)
     {
         filt.calcCoefs (cutoffSmooth.getTargetValue(), fs);
@@ -118,7 +118,7 @@ void MuffClipper::processInputStage (AudioBuffer<float>& buffer)
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
 
-    cutoffSmooth.setTargetValue (harmParamToCutoffHz (*harmParam));
+    cutoffSmooth.setTargetValue (MuffClipperRanges::harmParamToCutoffHz (*harmParam));
     if (cutoffSmooth.isSmoothing())
     {
         if (numChannels == 1)
@@ -155,7 +155,7 @@ void MuffClipper::processInputStage (AudioBuffer<float>& buffer)
         }
     }
 
-    sustainGain.setGainLinear (sustainRange.convertFrom0to1 (*sustainParam));
+    sustainGain.setGainLinear (MuffClipperRanges::sustainRange.convertFrom0to1 (*sustainParam));
     dsp::AudioBlock<float> block { buffer };
     sustainGain.process (dsp::ProcessContextReplacing<float> { block });
 }
@@ -183,7 +183,7 @@ void MuffClipper::processAudio (AudioBuffer<float>& buffer)
     for (int ch = 0; ch < numChannels; ++ch)
         dcBlocker[ch].processBlock (buffer.getWritePointer (ch), numSamples);
 
-    auto outGain = Decibels::decibelsToGain (levelRange.convertFrom0to1 (*levelParam), levelRange.start);
+    auto outGain = Decibels::decibelsToGain (MuffClipperRanges::levelRange.convertFrom0to1 (*levelParam), MuffClipperRanges::levelRange.start);
     outGain *= Decibels::decibelsToGain (13.0f); // makeup from level lost in clipping stage
     outGain *= -1.0f;
     outLevel.setGainLinear (outGain);

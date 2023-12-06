@@ -2,7 +2,7 @@
 #include "gui/utils/ModulatableSlider.h"
 #include "processors/ParameterHelpers.h"
 
-namespace
+namespace ParamModulatorTags
 {
 const String unipolarModTag = "unipolar_mod";
 const String bipolarModTag = "bipolar_mod";
@@ -22,25 +22,25 @@ ParamModulator::ParamModulator (UndoManager* um)
         { return PortType::modulation; })
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (unipolarModParam, vts, unipolarModTag);
-    loadParameterPointer (bipolarModParam, vts, bipolarModTag);
-    loadParameterPointer (bipolarModeParam, vts, bipolarModeTag);
+    loadParameterPointer (unipolarModParam, vts, ParamModulatorTags::unipolarModTag);
+    loadParameterPointer (bipolarModParam, vts, ParamModulatorTags::bipolarModTag);
+    loadParameterPointer (bipolarModeParam, vts, ParamModulatorTags::bipolarModeTag);
 
     uiOptions.backgroundColour = Colours::yellowgreen.darker (0.1f);
     uiOptions.powerColour = Colours::red.brighter (0.05f);
     uiOptions.info.description = "Module that uses a parameter as a modulation source.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
 
-    addPopupMenuParameter (bipolarModeTag);
+    addPopupMenuParameter (ParamModulatorTags::bipolarModeTag);
 }
 
 ParamLayout ParamModulator::createParameterLayout()
 {
     using namespace ParameterHelpers;
     auto params = createBaseParams();
-    createPercentParameter (params, unipolarModTag, "Modulation", 0.0f);
-    createBipolarPercentParameter (params, bipolarModTag, "Modulation +/-", 0.0f);
-    emplace_param<chowdsp::BoolParameter> (params, bipolarModeTag, "Bipolar", true);
+    createPercentParameter (params, ParamModulatorTags::unipolarModTag, "Modulation", 0.0f);
+    createBipolarPercentParameter (params, ParamModulatorTags::bipolarModTag, "Modulation +/-", 0.0f);
+    emplace_param<chowdsp::BoolParameter> (params, ParamModulatorTags::bipolarModeTag, "Bipolar", true);
     return { params.begin(), params.end() };
 }
 
@@ -83,12 +83,12 @@ bool ParamModulator::getCustomComponents (OwnedArray<Component>& customComps, ch
     public:
         ControlSlider (AudioProcessorValueTreeState& vtState, chowdsp::HostContextProvider& hcp)
             : vts (vtState),
-              unipolarSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, unipolarModTag), hcp),
-              bipolarSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, bipolarModTag), hcp),
-              unipolarAttach (vts, unipolarModTag, unipolarSlider),
-              bipolarAttach (vts, bipolarModTag, bipolarSlider),
+              unipolarSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, ParamModulatorTags::unipolarModTag), hcp),
+              bipolarSlider (*getParameterPointer<chowdsp::FloatParameter*> (vts, ParamModulatorTags::bipolarModTag), hcp),
+              unipolarAttach (vts, ParamModulatorTags::unipolarModTag, unipolarSlider),
+              bipolarAttach (vts, ParamModulatorTags::bipolarModTag, bipolarSlider),
               modeAttach (
-                  *vts.getParameter (bipolarModeTag),
+                  *vts.getParameter (ParamModulatorTags::bipolarModeTag),
                   [this] (float newValue)
                   { updateSliderVisibility (newValue == 1.0f); },
                   vts.undoManager)
@@ -99,7 +99,7 @@ bool ParamModulator::getCustomComponents (OwnedArray<Component>& customComps, ch
             hcp.registerParameterComponent (bipolarSlider, bipolarSlider.getParameter());
             hcp.registerParameterComponent (unipolarSlider, unipolarSlider.getParameter());
 
-            this->setName (unipolarModTag + "__" + bipolarModTag + "__");
+            Component::setName (ParamModulatorTags::unipolarModTag + "__" + ParamModulatorTags::bipolarModTag + "__");
         }
 
         void colourChanged() override
@@ -122,14 +122,14 @@ bool ParamModulator::getCustomComponents (OwnedArray<Component>& customComps, ch
             unipolarSlider.setVisible (! isBipolar);
             bipolarSlider.setVisible (isBipolar);
 
-            setName (vts.getParameter (isBipolar ? bipolarModTag : unipolarModTag)->name);
+            setName (vts.getParameter (isBipolar ? ParamModulatorTags::bipolarModTag : ParamModulatorTags::unipolarModTag)->name);
             if (auto* parent = getParentComponent())
                 parent->repaint();
         }
 
         void visibilityChanged() override
         {
-            updateSliderVisibility (vts.getRawParameterValue (bipolarModeTag)->load() == 1.0f);
+            updateSliderVisibility (vts.getRawParameterValue (ParamModulatorTags::bipolarModeTag)->load() == 1.0f);
         }
 
         void resized() override

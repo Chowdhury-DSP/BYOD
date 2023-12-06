@@ -1,6 +1,6 @@
 #include "SpringReverb.h"
 
-namespace
+namespace SpringReverbConstants
 {
 constexpr int downsampleFactor = 2;
 constexpr double preDelayMs = 2.0;
@@ -18,15 +18,15 @@ SpringReverb::SpringReverb (double sampleRate)
 
 int SpringReverb::prepareRebuffering (const dsp::ProcessSpec& spec)
 {
-    const auto blockSizeDouble = (preDelayMs * 0.001) * spec.sampleRate;
+    const auto blockSizeDouble = (SpringReverbConstants::preDelayMs * 0.001) * spec.sampleRate;
     const auto upsampledBlockSize = int (std::round (blockSizeDouble * 0.5) * 2.0);
 
     dsp::ProcessSpec smallBufferSpec { spec.sampleRate, (uint32) upsampledBlockSize, spec.numChannels };
-    downsample.prepare (smallBufferSpec, downsampleFactor);
-    upsample.prepare (smallBufferSpec, downsampleFactor);
+    downsample.prepare (smallBufferSpec, SpringReverbConstants::downsampleFactor);
+    upsample.prepare (smallBufferSpec, SpringReverbConstants::downsampleFactor);
 
-    fs = (float) spec.sampleRate / (float) downsampleFactor;
-    blockSize = upsampledBlockSize / downsampleFactor;
+    fs = (float) spec.sampleRate / (float) SpringReverbConstants::downsampleFactor;
+    blockSize = upsampledBlockSize / SpringReverbConstants::downsampleFactor;
     downsampledBuffer.setSize (2, blockSize);
     dsp::ProcessSpec dsSpec { (double) fs, (uint32) blockSize, 2 };
     delay.prepare (dsSpec);
@@ -47,7 +47,7 @@ int SpringReverb::prepareRebuffering (const dsp::ProcessSpec& spec)
     z[1] = 0.0f;
 
     shakeCounter = -1;
-    shakeBuffer.setSize (1, int (fs * largeShakeSeconds * 3.0f) + blockSize);
+    shakeBuffer.setSize (1, int (fs * SpringReverbConstants::largeShakeSeconds * 3.0f) + blockSize);
     shortShakeBuffer.setSize (1, blockSize);
 
     return upsampledBlockSize;
@@ -63,7 +63,7 @@ void SpringReverb::setParams (const Params& params)
     if (params.shake && shakeCounter < 0) // start shaking
     {
         float shakeAmount = rand.nextFloat();
-        float shakeSeconds = smallShakeSeconds + (largeShakeSeconds - smallShakeSeconds) * shakeAmount;
+        float shakeSeconds = SpringReverbConstants::smallShakeSeconds + (SpringReverbConstants::largeShakeSeconds - SpringReverbConstants::smallShakeSeconds) * shakeAmount;
         shakeSeconds *= 1.0f + 0.5f * params.size;
         shakeCounter = int (fs * shakeSeconds);
 

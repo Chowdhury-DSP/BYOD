@@ -9,7 +9,7 @@ JUCE_BEGIN_IGNORE_WARNINGS_MSVC (4459)
 
 #include "CryBabyNDK.h"
 
-namespace
+namespace CryBabyComponents
 {
 // START USER ENTRIES
 constexpr auto R1 = 68.0e3;
@@ -43,6 +43,7 @@ constexpr auto BetaR_Q2 = 4.0;
 
 void CryBabyNDK::reset (T fs)
 {
+    using namespace CryBabyComponents;
     const auto Gr = Eigen::DiagonalMatrix<T, num_resistors> { (T) 1 / R1, (T) 1 / R2, (T) 1 / R3, (T) 1 / R4, (T) 1 / R5, (T) 1 / R6, (T) 1 / R7, (T) 1 / R8, (T) 1 / R9, (T) 1 / R10 };
     const auto Gx = Eigen::DiagonalMatrix<T, num_states> { (T) 2 * fs * C1, (T) 2 * fs * C2, (T) 2 * fs * C3, (T) 2 * fs * C4, (T) 2 * fs * C5, (T) 1 / ((T) 2 * fs * L1) };
     const auto Z = Eigen::DiagonalMatrix<T, num_states> { 1, 1, 1, 1, 1, -1 };
@@ -136,6 +137,8 @@ void CryBabyNDK::reset (T fs)
 
 void CryBabyNDK::update_pots (const std::array<T, num_pots>& pot_values)
 {
+    using namespace CryBabyComponents;
+
     Eigen::Matrix<T, num_pots, num_pots> Rv = Eigen::Matrix<T, num_pots, num_pots>::Zero();
     Rv (0, 0) = pot_values[0];
     Rv (1, 1) = pot_values[1];
@@ -160,6 +163,7 @@ void CryBabyNDK::update_pots (const std::array<T, num_pots>& pot_values)
 
 void CryBabyNDK::process (std::span<float> channel_data, size_t ch) noexcept
 {
+    using namespace CryBabyComponents;
     Eigen::Vector<T, num_voltages_variable> u_n_var;
     Eigen::Vector<T, num_nl_ports> p_n;
     Eigen::Matrix<T, num_nl_ports, num_nl_ports> Jac = Eigen::Matrix<T, num_nl_ports, num_nl_ports>::Zero();

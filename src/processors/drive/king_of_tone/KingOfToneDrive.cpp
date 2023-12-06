@@ -1,7 +1,7 @@
 #include "KingOfToneDrive.h"
 #include "processors/netlist_helpers/CircuitQuantity.h"
 
-namespace
+namespace ToneKingCoeffs
 {
 template <typename FilterType>
 void calcDriveAmpCoefs (FilterType& filter, float driveParam, float fs, const KingOfToneDrive::Components& components)
@@ -113,7 +113,7 @@ KingOfToneDrive::KingOfToneDrive (UndoManager* um) : BaseProcessor ("Tone King",
         {
             components.R9 = self.value.load();
             for (auto& filt : overdriveStageBypass)
-                calcDriveStageBypassedCoefs (filt, fs, components);
+                ToneKingCoeffs::calcDriveStageBypassedCoefs (filt, fs, components);
             for (auto& wdf : overdrive)
                 wdf.R9_C7_Vin.setResistanceValue (components.R9);
         },
@@ -126,7 +126,7 @@ KingOfToneDrive::KingOfToneDrive (UndoManager* um) : BaseProcessor ("Tone King",
         {
             components.R10 = self.value.load();
             for (auto& filt : overdriveStageBypass)
-                calcDriveStageBypassedCoefs (filt, fs, components);
+                ToneKingCoeffs::calcDriveStageBypassedCoefs (filt, fs, components);
             for (auto& wdf : overdrive)
                 wdf.R10.setResistanceValue (components.R10);
         },
@@ -198,7 +198,7 @@ KingOfToneDrive::KingOfToneDrive (UndoManager* um) : BaseProcessor ("Tone King",
         {
             components.C7 = self.value.load();
             for (auto& filt : overdriveStageBypass)
-                calcDriveStageBypassedCoefs (filt, fs, components);
+                ToneKingCoeffs::calcDriveStageBypassedCoefs (filt, fs, components);
             for (auto& wdf : overdrive)
                 wdf.R9_C7_Vin.setCapacitanceValue (components.C7);
         },
@@ -231,7 +231,7 @@ void KingOfToneDrive::prepare (double sampleRate, int samplesPerBlock)
     for (auto& filt : driveAmp)
     {
         filt.reset();
-        calcDriveAmpCoefs (filt, *driveParam, fs, components);
+        ToneKingCoeffs::calcDriveAmpCoefs (filt, *driveParam, fs, components);
     }
 
     for (auto& driveParamSm : driveParamSmooth)
@@ -246,7 +246,7 @@ void KingOfToneDrive::prepare (double sampleRate, int samplesPerBlock)
     for (auto& filt : overdriveStageBypass)
     {
         filt.reset();
-        calcDriveStageBypassedCoefs (filt, fs, components);
+        ToneKingCoeffs::calcDriveStageBypassedCoefs (filt, fs, components);
     }
 
     dcBlocker.prepare (sampleRate, samplesPerBlock);
@@ -295,14 +295,14 @@ void KingOfToneDrive::processAudio (AudioBuffer<float>& buffer)
         driveParamSmooth[ch].setTargetValue (*driveParam);
         if (! driveParamSmooth[ch].isSmoothing())
         {
-            calcDriveAmpCoefs (driveAmp[ch], driveParamSmooth[ch].getNextValue(), fs, components);
+            ToneKingCoeffs::calcDriveAmpCoefs (driveAmp[ch], driveParamSmooth[ch].getNextValue(), fs, components);
             driveAmp[ch].processBlock (x, numSamples);
         }
         else
         {
             for (int n = 0; n < numSamples; ++n)
             {
-                calcDriveAmpCoefs (driveAmp[ch], driveParamSmooth[ch].getNextValue(), fs, components);
+                ToneKingCoeffs::calcDriveAmpCoefs (driveAmp[ch], driveParamSmooth[ch].getNextValue(), fs, components);
                 x[n] = driveAmp[ch].processSample (x[n]);
             }
         }

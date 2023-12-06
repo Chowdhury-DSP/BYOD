@@ -1,7 +1,7 @@
 #include "Tuner.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace TunerConstants
 {
 constexpr int tunerRefreshHz = 24;
 }
@@ -55,7 +55,7 @@ void Tuner::TunerBackgroundTask::prepareTask (double sampleRate, int /*samplesPe
     tuner.prepare (sampleRate);
     requestedBlockSize = tuner.getAutocorrelationSize();
 
-    freqValSmoother.reset ((double) tunerRefreshHz, 0.15);
+    freqValSmoother.reset ((double) TunerConstants::tunerRefreshHz, 0.15);
     freqValSmoother.setCurrentAndTargetValue ((double) tuner.getCurrentFrequencyHz());
 }
 
@@ -85,7 +85,7 @@ bool Tuner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::Ho
         explicit TunerComp (TunerBackgroundTask& tTask) : tunerTask (tTask)
         {
             tunerTask.setShouldBeRunning (true);
-            startTimerHz (tunerRefreshHz);
+            startTimerHz (TunerConstants::tunerRefreshHz);
         }
 
         ~TunerComp() override

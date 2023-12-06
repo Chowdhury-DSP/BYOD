@@ -1,7 +1,7 @@
 #include "SmoothReverb.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace SmoothReverbTags
 {
 const String decayTag = "decay";
 const String relaxTag = "relax";
@@ -19,11 +19,11 @@ constexpr auto preDelay2CutoffHz = 2000.0f;
 SmoothReverb::SmoothReverb (UndoManager* um) : BaseProcessor ("Smooth Reverb", createParameterLayout(), um)
 {
     using namespace ParameterHelpers;
-    loadParameterPointer (decayMsParam, vts, decayTag);
-    loadParameterPointer (relaxParam, vts, relaxTag);
-    loadParameterPointer (lowCutHzParam, vts, lowCutTag);
-    loadParameterPointer (highCutHzParam, vts, highCutTag);
-    loadParameterPointer (mixPctParam, vts, mixTag);
+    loadParameterPointer (decayMsParam, vts, SmoothReverbTags::decayTag);
+    loadParameterPointer (relaxParam, vts, SmoothReverbTags::relaxTag);
+    loadParameterPointer (lowCutHzParam, vts, SmoothReverbTags::lowCutTag);
+    loadParameterPointer (highCutHzParam, vts, SmoothReverbTags::highCutTag);
+    loadParameterPointer (mixPctParam, vts, SmoothReverbTags::mixTag);
 
     uiOptions.backgroundColour = Colour { 0xFF8BBBD5 };
     uiOptions.powerColour = Colour { 0xFFCC4514 };
@@ -36,14 +36,14 @@ ParamLayout SmoothReverb::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
-    createTimeMsParameter (params, decayTag, "Decay", createNormalisableRange (500.0f, 5000.0f, 1500.0f), 1500.0f);
-    createPercentParameter (params, relaxTag, "Relax", 0.5f);
+    createTimeMsParameter (params, SmoothReverbTags::decayTag, "Decay", createNormalisableRange (500.0f, 5000.0f, 1500.0f), 1500.0f);
+    createPercentParameter (params, SmoothReverbTags::relaxTag, "Relax", 0.5f);
 
     // @TODO: can we figure out a way to combine these two parameters as one slider on the UI?
-    createFreqParameter (params, lowCutTag, "Low Cut", 20.0f, 2000.0f, 200.0f, 200.0f);
-    createFreqParameter (params, highCutTag, "High Cut", 500.0f, 20000.0f, 8000.0f, 8000.0f);
+    createFreqParameter (params, SmoothReverbTags::lowCutTag, "Low Cut", 20.0f, 2000.0f, 200.0f, 200.0f);
+    createFreqParameter (params, SmoothReverbTags::highCutTag, "High Cut", 500.0f, 20000.0f, 8000.0f, 8000.0f);
 
-    createPercentParameter (params, mixTag, "Mix", 0.5f);
+    createPercentParameter (params, SmoothReverbTags::mixTag, "Mix", 0.5f);
 
     return { params.begin(), params.end() };
 }
@@ -56,12 +56,12 @@ void SmoothReverb::prepare (double sampleRate, int samplesPerBlock)
     preDelay2.prepare (spec);
     preDelayFilt.prepare (spec);
 
-    float preDelayCutoffHzVec alignas (16)[] = { preDelay1CutoffHz, preDelay2CutoffHz, 0.0f, 0.0f };
+    float preDelayCutoffHzVec alignas (16)[] = { SmoothReverbTags::preDelay1CutoffHz, SmoothReverbTags::preDelay2CutoffHz, 0.0f, 0.0f };
     preDelayFilt.setCutoffFrequency (xsimd::load_aligned (preDelayCutoffHzVec));
 
     fs = (float) sampleRate;
-    preDelay1.setDelay (preDelay1LengthMs * 0.001f * fs);
-    preDelay2.setDelay (preDelay2LengthMs * 0.001f * fs);
+    preDelay1.setDelay (SmoothReverbTags::preDelay1LengthMs * 0.001f * fs);
+    preDelay2.setDelay (SmoothReverbTags::preDelay2LengthMs * 0.001f * fs);
 
     reverbInternal = std::make_unique<ReverbInternal>();
     reverbInternal->diffuser.prepare (sampleRate);
@@ -98,8 +98,8 @@ void SmoothReverb::processReverb (float* left, float* right, int numSamples)
     const auto curDecayParam = decayMsParam->getCurrentValue();
     const auto modFactor = 2.5f * std::pow (curDecayParam / 5000.0f, 1.25f);
     const auto delayFactor = 1.0f + (modFactor * *relaxParam) * curLevel;
-    const auto baseDelay1 = preDelay1LengthMs * 0.001f * fs;
-    const auto baseDelay2 = preDelay2LengthMs * 0.001f * fs;
+    const auto baseDelay1 = SmoothReverbTags::preDelay1LengthMs * 0.001f * fs;
+    const auto baseDelay2 = SmoothReverbTags::preDelay2LengthMs * 0.001f * fs;
 
     preDelay1.setDelay (baseDelay1 * delayFactor);
     preDelay2.setDelay (baseDelay2 * delayFactor);

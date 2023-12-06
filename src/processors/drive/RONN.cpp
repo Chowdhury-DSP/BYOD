@@ -1,6 +1,6 @@
 #include "RONN.h"
 
-namespace
+namespace RONNRandom
 {
 int randomSeeds[5] = { 1, 101, 2048, 5005, 9001 };
 
@@ -114,7 +114,7 @@ ParamLayout RONN::createParameterLayout()
     createGainDBParameter (params, "gain_db", "Gain", -12.0f, 12.0f, 0.0f);
 
     StringArray seeds;
-    for (int sInt : randomSeeds)
+    for (int sInt : RONNRandom::randomSeeds)
         seeds.add (String (sInt));
     params.push_back (std::make_unique<AudioParameterChoice> ("seed", "Random Seed", seeds, 0));
 
@@ -127,7 +127,7 @@ void RONN::parameterChanged (const String& parameterID, float newValue)
         return;
 
     auto seedIdx = int (newValue);
-    reloadModel (randomSeeds[seedIdx]);
+    reloadModel (RONNRandom::randomSeeds[seedIdx]);
     needsPrebuffering = true;
 }
 
@@ -136,8 +136,9 @@ void RONN::reloadModel (int randomSeed)
     // set up random distributions
     std::default_random_engine generator ((std::default_random_engine::result_type) randomSeed);
     static std::normal_distribution<float> normal (0.0f, 0.05f);
-    static Orthogonal ortho;
-    static GlorotUniform glorot;
+    using namespace RONNRandom;
+    static RONNRandom::Orthogonal ortho;
+    static RONNRandom::GlorotUniform glorot;
 
     auto denseInWeights = createRandomVec2 (generator, normal, 8, 1);
     auto denseInBias = createRandomVec (generator, normal, 8);

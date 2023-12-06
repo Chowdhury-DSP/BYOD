@@ -1,7 +1,7 @@
 #include "Oscilloscope.h"
 #include "../ParameterHelpers.h"
 
-namespace
+namespace ScopeConstants
 {
 constexpr int scopeFps = 30;
 }
@@ -58,7 +58,7 @@ void Oscilloscope::ScopeBackgroundTask::prepareTask (double sampleRate, int /*sa
 
     requstedBlockSize = samplesToDisplay + triggerBuffer;
 
-    waitMs = int (1000.0 / (double) scopeFps);
+    waitMs = int (1000.0 / (double) ScopeConstants::scopeFps);
 }
 
 void Oscilloscope::ScopeBackgroundTask::resetTask()
@@ -121,7 +121,7 @@ bool Oscilloscope::getCustomComponents (OwnedArray<Component>& customComps, chow
         explicit ScopeComp (ScopeBackgroundTask& sTask) : scopeTask (sTask)
         {
             scopeTask.setShouldBeRunning (true);
-            startTimerHz (scopeFps);
+            startTimerHz (ScopeConstants::scopeFps);
         }
 
         ~ScopeComp() override

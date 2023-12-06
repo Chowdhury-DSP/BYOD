@@ -8,11 +8,6 @@
 #include <AddOnPresets.h>
 #endif
 
-namespace
-{
-const String presetTag = "preset";
-} // namespace
-
 class ChangePresetAction : public UndoableAction
 {
 public:
