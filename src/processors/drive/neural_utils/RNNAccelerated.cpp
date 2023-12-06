@@ -5,6 +5,7 @@
 #pragma GCC diagnostic ignored "-Wshorten-64-to-32"
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+#pragma GCC diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
 
 #include <RTNeural/RTNeural.h>
