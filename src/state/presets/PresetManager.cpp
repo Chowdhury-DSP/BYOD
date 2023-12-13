@@ -188,6 +188,25 @@ bool PresetManager::syncServerPresetsToLocal()
 }
 #endif // BYOD_BUILD_PRESET_SERVER
 
+static void sortPresets (std::vector<chowdsp::Preset>& presets)
+{
+    std::sort (presets.begin(),
+               presets.end(),
+               [] (const chowdsp::Preset& p1, const chowdsp::Preset& p2)
+               {
+                   if (p1.getVendor() != p2.getVendor())
+                       return p1.getVendor() < p2.getVendor();
+
+                   if (p1.getCategory() != p2.getCategory())
+                       return p1.getCategory() < p2.getCategory();
+
+                   if (p1.getCategory().isEmpty())
+                        return p1.getName() > p2.getName();
+
+                   return p1.getName() < p2.getName();
+               });
+}
+
 std::vector<chowdsp::Preset> PresetManager::getFactoryPresets (const ProcessorStore& procStore)
 {
     std::vector<chowdsp::Preset> factoryPresets;
@@ -245,6 +264,7 @@ std::vector<chowdsp::Preset> PresetManager::getFactoryPresets (const ProcessorSt
 #endif
 
     filterPresets (factoryPresets, procStore);
+    sortPresets (factoryPresets);
 
     return factoryPresets;
 }
@@ -375,6 +395,7 @@ void PresetManager::loadUserPresetsFromFolder (const juce::File& file)
         presetMap.erase (presetID++);
 
     filterPresets (presets, procStore);
+    sortPresets (presets);
     addPresets (presets);
 }
 

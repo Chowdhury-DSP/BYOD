@@ -131,19 +131,27 @@ int PresetsComp::createPresetsMenu (int optionID)
         optionID = juce::jmax (optionID, presetItem.itemID);
     }
 
+    std::optional<juce::PopupMenu> userPresetsMenu {};
     for (auto& [vendorName, vendorCollection] : presetMapItems)
     {
         PopupMenu vendorMenu;
         for (auto& [category, categoryMenu] : vendorCollection.categoryPresetMenus)
             vendorMenu.addSubMenu (category, categoryMenu);
 
-        std::sort (vendorCollection.nonCategoryItems.begin(), vendorCollection.nonCategoryItems.end(), [] (auto& item1, auto& item2)
-                   { return item1.text < item2.text; });
         for (auto& extraItem : vendorCollection.nonCategoryItems)
             vendorMenu.addItem (extraItem);
 
+        if (vendorName == "User")
+        {
+            userPresetsMenu = vendorMenu;
+            continue;
+        }
         presetBox.getRootMenu()->addSubMenu (vendorName, vendorMenu);
     }
+
+    // the user presets always go last
+    if (userPresetsMenu.has_value())
+        presetBox.getRootMenu()->addSubMenu ("User", *userPresetsMenu);
 
     return optionID;
 }
