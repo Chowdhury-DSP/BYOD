@@ -9,7 +9,7 @@ constexpr int mSize = 16;
 
 constexpr float highQ = 5.0f;
 constexpr float lowQ = 1.0f / MathConstants<float>::sqrt2;
-float getQ (float param01)
+static float getQ (float param01)
 {
     return lowQ * std::pow ((highQ / lowQ), param01);
 }

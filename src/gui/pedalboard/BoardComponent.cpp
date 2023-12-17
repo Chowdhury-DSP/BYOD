@@ -9,12 +9,12 @@ constexpr int editorHeight = 180;
 constexpr int editorPad = 5;
 constexpr int newButtonWidth = 40;
 
-constexpr int getScaleDim (int dim, float scaleFactor)
+static constexpr int getScaleDim (int dim, float scaleFactor)
 {
     return int ((float) dim * scaleFactor);
 }
 
-juce::Point<int> getRandomPosition (const Component& comp)
+static juce::Point<int> getRandomPosition (const Component& comp)
 {
     auto b = comp.getLocalBounds()
                  .withWidth (comp.getWidth() * 2 / 3)

@@ -6,7 +6,7 @@
 
 namespace ChainHelperFuncs
 {
-[[maybe_unused]] void printBufferLevels (const AudioBuffer<float>& buffer)
+[[maybe_unused]] static void printBufferLevels (const AudioBuffer<float>& buffer)
 {
     const auto numChannels = buffer.getNumChannels();
     const auto numSamples = buffer.getNumSamples();
@@ -17,7 +17,7 @@ namespace ChainHelperFuncs
     }
 }
 
-const MidiBuffer& getMidiBufferToUse (const MidiBuffer& hostMidiBuffer, MidiBuffer& internalMidiBuffer, int osFactor)
+static const MidiBuffer& getMidiBufferToUse (const MidiBuffer& hostMidiBuffer, MidiBuffer& internalMidiBuffer, int osFactor)
 {
     if (hostMidiBuffer.isEmpty() || osFactor == 1)
         return hostMidiBuffer;

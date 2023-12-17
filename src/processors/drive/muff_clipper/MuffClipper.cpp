@@ -4,7 +4,7 @@
 namespace MuffClipperRanges
 {
 const auto cutoffRange = ParameterHelpers::createNormalisableRange (500.0f, 22000.0f, 1200.0f);
-float harmParamToCutoffHz (float harmParam)
+static float harmParamToCutoffHz (float harmParam)
 {
     return cutoffRange.convertFrom0to1 (harmParam);
 }

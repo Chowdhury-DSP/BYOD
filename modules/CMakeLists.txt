@@ -27,6 +27,7 @@ target_link_libraries(juce_plugin_modules
         juce::juce_audio_utils
         juce::juce_audio_plugin_client
         juce::juce_dsp
+        chowdsp::chowdsp_compressor
         chowdsp::chowdsp_dsp_utils
         chowdsp::chowdsp_eq
         chowdsp::chowdsp_sources

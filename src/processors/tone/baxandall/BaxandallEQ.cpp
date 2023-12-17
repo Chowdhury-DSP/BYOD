@@ -4,7 +4,7 @@
 
 namespace BaxandallParams
 {
-float skewParam (float val)
+static float skewParam (float val)
 {
     val = std::pow (val, 3.333f);
     return jlimit (0.01f, 0.99f, 1.0f - val);

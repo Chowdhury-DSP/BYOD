@@ -3,7 +3,7 @@
 
 namespace MXRDistortionParams
 {
-float paramSkew (float paramVal)
+static float paramSkew (float paramVal)
 {
     using namespace ParameterHelpers;
     return 1.0f - iLogPot (iLogPot (0.5f * paramVal + 0.5f));

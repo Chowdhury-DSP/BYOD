@@ -5,7 +5,7 @@
 
 namespace CableConnectionMethods
 {
-void updateConnectionStatuses (const BoardComponent& board, const ConnectionInfo& connection, bool isConnected)
+static void updateConnectionStatuses (const BoardComponent& board, const ConnectionInfo& connection, bool isConnected)
 {
     if (auto* editor = board.findEditorForProcessor (connection.startProc))
     {
@@ -17,7 +17,7 @@ void updateConnectionStatuses (const BoardComponent& board, const ConnectionInfo
         editor->setConnectionStatus (isConnected, connection.endPort, true);
 }
 
-void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent& board, CableView& cableView)
+static void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor* proc, const BoardComponent& board, CableView& cableView)
 {
     for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
     {

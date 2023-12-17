@@ -5,27 +5,27 @@
 
 namespace ChainStateHelperFuncs
 {
-String getPortTag (int portIdx)
+static String getPortTag (int portIdx)
 {
     return "port_" + String (portIdx);
 }
 
-String getConnectionTag (int connectionIdx)
+static String getConnectionTag (int connectionIdx)
 {
     return "connection_" + String (connectionIdx);
 }
 
-String getConnectionEndTag (int connectionIdx)
+static String getConnectionEndTag (int connectionIdx)
 {
     return "connection_end_" + String (connectionIdx);
 }
 
-String getProcessorTagName (const BaseProcessor* proc)
+static String getProcessorTagName (const BaseProcessor* proc)
 {
     return proc->getName().replaceCharacter (' ', '_');
 }
 
-String getProcessorName (const String& tag)
+static String getProcessorName (const String& tag)
 {
     return tag.replaceCharacter ('_', ' ');
 }

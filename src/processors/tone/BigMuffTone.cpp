@@ -4,7 +4,7 @@
 
 namespace BigMuffToneComponents
 {
-auto createComponentSets()
+static auto createComponentSets()
 {
     // Component values taken from this blog post: https://www.coda-effects.com/p/big-muff-tonestack-dealing-with-mids.html
     return std::array<BigMuffTone::Components, 11> {
