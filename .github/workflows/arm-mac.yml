@@ -18,7 +18,7 @@ on:
 jobs:
   build_and_test:
     name: Build plugin for Apple Silicon
-    runs-on: macos-latest
+    runs-on: macos-13
     
     steps:
     - name: Get latest CMake
