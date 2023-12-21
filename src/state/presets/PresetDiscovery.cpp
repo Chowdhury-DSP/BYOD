@@ -16,7 +16,7 @@ namespace preset_discovery
 {
 static constexpr clap_plugin_id plugin_id {
     .abi = "clap",
-    .id = CLAP_ID,
+    .id = BYOD_CLAP_ID,
 };
 
 struct FactoryPresetsProvider

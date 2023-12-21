@@ -109,10 +109,11 @@ juce_add_plugin(BYOD
     APP_GROUP_IDS ${APP_GROUP_IDS_TO_USE}
 )
 
+set(BYOD_CLAP_ID "org.chowdsp.byod")
 if(BYOD_BUILD_CLAP)
     clap_juce_extensions_plugin(
         TARGET BYOD
-        CLAP_ID "org.chowdsp.byod"
+        CLAP_ID ${BYOD_CLAP_ID}
         CLAP_FEATURES audio-effect distortion
         CLAP_PROCESS_EVENTS_RESOLUTION_SAMPLES 64
         CLAP_USE_JUCE_PARAMETER_RANGES DISCRETE
@@ -127,6 +128,7 @@ add_subdirectory(res)
 
 target_compile_definitions(BYOD PUBLIC
     JUCE_VST3_CAN_REPLACE_VST2=0
+    BYOD_CLAP_ID="${BYOD_CLAP_ID}"
     BYOD_BUILD_PRESET_SERVER=${BYOD_BUILD_PRESET_SERVER_FLAG}
 )
 
