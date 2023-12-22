@@ -4,7 +4,7 @@
 
 namespace CableViewHelperMethods
 {
-bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const BaseProcessor* destProc, const OwnedArray<Cable>& cables)
+static bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const BaseProcessor* destProc, const OwnedArray<Cable>& cables)
 {
     if (sourceProc->getNumInputs() == 0)
         return false;
@@ -22,7 +22,7 @@ bool wouldConnectingCreateFeedbackLoop (const BaseProcessor* sourceProc, const B
     return result;
 }
 
-void getClosestPort (const juce::Point<int>& pos, const ProcessorEditor* editor, int& minDistance, CableView::EditorPort& closestPort, bool wantsInputPort, float scaleFactor)
+static void getClosestPort (const juce::Point<int>& pos, const ProcessorEditor* editor, int& minDistance, CableView::EditorPort& closestPort, bool wantsInputPort, float scaleFactor)
 {
     int numPorts = wantsInputPort ? editor->getProcPtr()->getNumInputs() : editor->getProcPtr()->getNumOutputs();
     const auto portDistanceLimit = CableConstants::getPortDistanceLimit (scaleFactor);
