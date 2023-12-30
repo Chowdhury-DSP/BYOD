@@ -40,7 +40,7 @@ struct FactoryPresetsProvider
 
     static constexpr clap_preset_discovery_location factoryPresetsLocation {
         .flags = CLAP_PRESET_DISCOVERY_IS_FACTORY_CONTENT,
-        .name = "Factory Presets Location",
+        .name = " BYOD Factory Presets Location",
         .kind = CLAP_PRESET_DISCOVERY_LOCATION_PLUGIN,
         .location = nullptr,
     };
@@ -124,7 +124,7 @@ struct UserPresetsProvider
 
         userPresetsLocation.flags = CLAP_PRESET_DISCOVERY_IS_USER_CONTENT;
         userPresetsLocation.kind = CLAP_PRESET_DISCOVERY_LOCATION_FILE;
-        userPresetsLocation.name = "User Presets Location";
+        userPresetsLocation.name = "BYOD User Presets Location";
         userPresetsLocation.location = userPresetsFolder.getFullPathName().toRawUTF8();
         indexer()->declare_location (indexer(), &userPresetsLocation);
 
