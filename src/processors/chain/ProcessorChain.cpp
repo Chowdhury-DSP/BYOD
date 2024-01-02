@@ -89,6 +89,11 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
     initializeProcessors();
 }
 
+void ProcessorChain::reset() noexcept
+{
+    ioProcessor.reset();
+}
+
 void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed)
 {
     TRACE_DSP();
