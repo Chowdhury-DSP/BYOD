@@ -17,6 +17,7 @@ public:
 
     static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);
+    void reset() noexcept;
 
     int getOversamplingFactor() const;
     dsp::AudioBlock<float> processAudioInput (const AudioBuffer<float>& buffer, bool& sampleRateChanged);

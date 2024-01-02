@@ -24,6 +24,7 @@ public:
     static void createParameters (Parameters& params);
     void prepare (double sampleRate, int samplesPerBlock);
     void processAudio (AudioBuffer<float>& buffer, const MidiBuffer& hostMidiBuffer);
+    void reset() noexcept;
 
     auto& getProcessors() { return procs; }
     const auto& getProcessors() const { return procs; }

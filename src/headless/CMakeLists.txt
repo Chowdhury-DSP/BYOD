@@ -18,6 +18,7 @@ target_sources(BYOD_headless PRIVATE
 
     tests/AmpIRsSaveLoadTest.cpp
     tests/BadModulationTest.cpp
+    tests/NaNResetTest.cpp
     tests/ParameterSmoothTest.cpp
     tests/PreBufferTest.cpp
     tests/PresetsTest.cpp
