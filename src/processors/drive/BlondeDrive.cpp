@@ -76,7 +76,7 @@ void processDrive (double* left, double* right, const double* A, xsimd::batch<do
         right[n] = stereoVec[1];
     }
 }
-} // namespace
+} // namespace BlondeDriveTags
 
 BlondeDrive::BlondeDrive (UndoManager* um) : BaseProcessor ("Blonde Drive", createParameterLayout(), um)
 {

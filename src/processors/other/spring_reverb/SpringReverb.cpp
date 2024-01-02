@@ -7,7 +7,7 @@ constexpr double preDelayMs = 2.0;
 
 constexpr float smallShakeSeconds = 0.0005f;
 constexpr float largeShakeSeconds = 0.001f;
-} // namespace
+} // namespace SpringReverbConstants
 
 SpringReverb::SpringReverb (double sampleRate)
     : delay { static_cast<int> (0.099 * sampleRate * 1.5) },

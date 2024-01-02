@@ -15,7 +15,7 @@ const String directControlTag = "direct_control";
 
 // this module needs some extra oversampling to help the Newton-Raphson solver converge
 constexpr int oversampleRatio = 2;
-} // namespace
+} // namespace CryBabyTags
 
 CryBaby::CryBaby (UndoManager* um)
     : BaseProcessor (

@@ -29,7 +29,7 @@ static String getProcessorName (const String& tag)
 {
     return tag.replaceCharacter ('_', ' ');
 }
-} // namespace
+} // namespace ChainStateHelperFuncs
 
 ProcessorChainStateHelper::ProcessorChainStateHelper (ProcessorChain& thisChain, chowdsp::DeferredAction& deferredAction)
     : chain (thisChain),

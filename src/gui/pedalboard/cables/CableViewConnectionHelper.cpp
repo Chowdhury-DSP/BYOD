@@ -30,7 +30,7 @@ static void addConnectionsForProcessor (OwnedArray<Cable>& cables, BaseProcessor
         }
     }
 }
-} // namespace
+} // namespace CableConnectionMethods
 
 CableViewConnectionHelper::CableViewConnectionHelper (CableView& cv, BoardComponent& boardComp)
     : cableView (cv),

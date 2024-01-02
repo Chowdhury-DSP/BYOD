@@ -7,7 +7,7 @@ const String shiftTag = "shift";
 const String sizeTag = "size";
 const String feedbackTag = "feedback";
 const String mixTag = "mix";
-} // namespace
+} // namespace ShimmerReverbTags
 
 void ShimmerReverb::ShimmerFDNConfig::prepare (double sampleRate)
 {

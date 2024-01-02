@@ -5,7 +5,7 @@
 namespace ChorusTags
 {
 const String delayTypeTag = "delay_type";
-} // namespace
+} // namespace ChorusTags
 
 Chorus::Chorus (UndoManager* um) : BaseProcessor (
     "Chorus",

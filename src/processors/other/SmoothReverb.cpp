@@ -14,7 +14,7 @@ constexpr auto preDelay2LengthMs = 77.0f;
 
 constexpr auto preDelay1CutoffHz = 3000.0f;
 constexpr auto preDelay2CutoffHz = 2000.0f;
-} // namespace
+} // namespace SmoothReverbTags
 
 SmoothReverb::SmoothReverb (UndoManager* um) : BaseProcessor ("Smooth Reverb", createParameterLayout(), um)
 {

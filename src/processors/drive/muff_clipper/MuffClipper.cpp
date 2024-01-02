@@ -11,7 +11,7 @@ static float harmParamToCutoffHz (float harmParam)
 
 const auto sustainRange = ParameterHelpers::createNormalisableRange (0.4f, 2.0f, 1.0f);
 const auto levelRange = ParameterHelpers::createNormalisableRange (-60.0f, 0.0f, -9.0f);
-} // namespace
+} // namespace MuffClipperRanges
 
 MuffClipper::MuffClipper (UndoManager* um) : BaseProcessor ("Muff Clipper", createParameterLayout(), um)
 {

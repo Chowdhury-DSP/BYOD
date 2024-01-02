@@ -19,7 +19,7 @@ const StringArray irNames {
 const String irTag = "ir";
 const String mixTag = "mix";
 const String gainTag = "gain";
-} // namespace
+} // namespace LofiIRTags
 
 LofiIrs::LofiIrs (UndoManager* um) : BaseProcessor ("LoFi IRs", createParameterLayout(), um),
                                      convolution (getSharedConvolutionMessageQueue())

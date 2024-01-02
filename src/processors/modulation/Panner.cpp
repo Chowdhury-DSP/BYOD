@@ -13,7 +13,7 @@ const String modDepthTag = "mod_depth";
 const String modRateHzTag = "mod_rate";
 const String panModeTag = "pan_mode";
 const String stereoModeTag = "stereo_mode";
-} // namespace
+} // namespace PannerTags
 
 Panner::Panner (UndoManager* um) : BaseProcessor (
     "Panner",

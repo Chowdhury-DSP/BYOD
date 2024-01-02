@@ -28,7 +28,7 @@ static const MidiBuffer& getMidiBufferToUse (const MidiBuffer& hostMidiBuffer, M
 
     return internalMidiBuffer;
 }
-} // namespace
+} // namespace ChainHelperFuncs
 
 ProcessorChain::ProcessorChain (ProcessorStore& store,
                                 AudioProcessorValueTreeState& vts,

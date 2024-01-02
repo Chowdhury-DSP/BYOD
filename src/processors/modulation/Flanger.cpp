@@ -5,7 +5,7 @@
 namespace FlangerTags
 {
 const String delayTypeTag = "delay_type";
-} // namespace
+} // namespace FlangerTags
 
 Flanger::Flanger (UndoManager* um) : BaseProcessor (
     "Flanger",

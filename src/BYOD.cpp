@@ -8,7 +8,7 @@ namespace BYODPaths
 const String settingsFilePath = "ChowdhuryDSP/BYOD/.plugin_settings.json";
 const String logFileSubDir = "ChowdhuryDSP/BYOD/Logs";
 const String logFileNameRoot = "BYOD_Log_";
-} // namespace
+} // namespace BYODPaths
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                logger ({ .logFileSubDir = BYODPaths::logFileSubDir,

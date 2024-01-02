@@ -39,7 +39,7 @@ static void getClosestPort (const juce::Point<int>& pos, const ProcessorEditor* 
         }
     }
 }
-} // namespace
+} // namespace CableViewHelperMethods
 
 CableViewPortLocationHelper::CableViewPortLocationHelper (CableView& cv) : cableView (cv),
                                                                            board (cableView.board),

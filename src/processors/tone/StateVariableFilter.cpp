@@ -7,7 +7,7 @@ namespace SVFTags
 const String modeTag = "mode";
 const String multiModeTag = "multi_mode";
 const String multiModeTypeTag = "multi_mode_type";
-} // namespace
+} // namespace SVFTags
 
 StateVariableFilter::StateVariableFilter (UndoManager* um) : BaseProcessor ("SVF", createParameterLayout(), um)
 {
