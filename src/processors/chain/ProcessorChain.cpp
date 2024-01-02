@@ -28,7 +28,7 @@ static const MidiBuffer& getMidiBufferToUse (const MidiBuffer& hostMidiBuffer, M
 
     return internalMidiBuffer;
 }
-} // namespace
+} // namespace ChainHelperFuncs
 
 ProcessorChain::ProcessorChain (ProcessorStore& store,
                                 AudioProcessorValueTreeState& vts,
@@ -87,6 +87,11 @@ void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
 
     SpinLock::ScopedLockType scopedProcessingLock (processingLock);
     initializeProcessors();
+}
+
+void ProcessorChain::reset() noexcept
+{
+    ioProcessor.reset();
 }
 
 void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed)

@@ -19,7 +19,7 @@ const auto speedRange = ParameterHelpers::createNormalisableRange (5.0f, 100.0f,
 const String senseTag = "sense";
 const String directControlTag = "direct_control";
 const String freqModTag = "freq_mod";
-} // namespace
+} // namespace EnvelopeFilterTags
 
 EnvelopeFilter::EnvelopeFilter (UndoManager* um) : BaseProcessor (
     "Envelope Filter",

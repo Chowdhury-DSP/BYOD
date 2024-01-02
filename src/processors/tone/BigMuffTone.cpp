@@ -21,7 +21,7 @@ static auto createComponentSets()
         BigMuffTone::Components { .name = "Custom", .R8 = 39.0e3f, .C8 = 10.0e-9f, .C9 = 4.0e-9f, .R5_1 = 7.7e3f, .R5_2 = 28.6e3f, .RT = 100.0e3f },
     };
 }
-} // namespace
+} // namespace BigMuffToneComponents
 
 BigMuffTone::BigMuffTone (UndoManager* um) : BaseProcessor ("Muff Tone", createParameterLayout(), um),
                                              componentSets (BigMuffToneComponents::createComponentSets())

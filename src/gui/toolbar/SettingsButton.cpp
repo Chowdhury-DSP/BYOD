@@ -8,7 +8,7 @@ namespace SettingsColours
 {
 const Colour onColour = Colours::yellow;
 const Colour offColour = Colours::white;
-} // namespace
+} // namespace SettingsColours
 
 SettingsButton::SettingsButton (BYOD& processor, chowdsp::OpenGLHelper* oglHelper) : DrawableButton ("Settings", DrawableButton::ImageFitted),
                                                                                      proc (processor),

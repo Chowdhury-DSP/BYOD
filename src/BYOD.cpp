@@ -8,7 +8,7 @@ namespace BYODPaths
 const String settingsFilePath = "ChowdhuryDSP/BYOD/.plugin_settings.json";
 const String logFileSubDir = "ChowdhuryDSP/BYOD/Logs";
 const String logFileNameRoot = "BYOD_Log_";
-} // namespace
+} // namespace BYODPaths
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
                logger ({ .logFileSubDir = BYODPaths::logFileSubDir,
@@ -83,7 +83,8 @@ void BYOD::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
     // real processing here!
     procs->processAudio (buffer, midi);
 
-    chowdsp::BufferMath::sanitizeBuffer<AudioBuffer<float>, float> (buffer);
+    if (! chowdsp::BufferMath::sanitizeBuffer<AudioBuffer<float>, float> (buffer))
+        procs->reset();
 }
 
 void BYOD::processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer&)

@@ -7,7 +7,7 @@ namespace ParamModulatorTags
 const String unipolarModTag = "unipolar_mod";
 const String bipolarModTag = "bipolar_mod";
 const String bipolarModeTag = "bipolar_mode";
-} // namespace
+} // namespace ParamModulatorTags
 
 ParamModulator::ParamModulator (UndoManager* um)
     : BaseProcessor (

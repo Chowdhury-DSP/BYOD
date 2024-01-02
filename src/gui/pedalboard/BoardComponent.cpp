@@ -25,7 +25,7 @@ static juce::Point<int> getRandomPosition (const Component& comp)
     auto& rand = Random::getSystemRandom();
     return b.getCentre() + juce::Point (rand.nextInt ({ -randX, randX }), rand.nextInt ({ -randY, randY }));
 }
-} // namespace
+} // namespace BoardDims
 
 BoardComponent::BoardComponent (ProcessorChain& procs, chowdsp::HostContextProvider& hostCP)
     : Component ("Board"),

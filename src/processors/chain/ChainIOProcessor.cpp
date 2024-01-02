@@ -55,6 +55,17 @@ void ChainIOProcessor::prepare (double sampleRate, int samplesPerBlock)
     isPrepared = true;
 }
 
+void ChainIOProcessor::reset() noexcept
+{
+    oversampling.reset();
+
+    inGain.reset();
+    outGain.reset();
+
+    ioBuffer.clear();
+    dryWetMixer.reset();
+}
+
 int ChainIOProcessor::getOversamplingFactor() const
 {
     if (! isPrepared)

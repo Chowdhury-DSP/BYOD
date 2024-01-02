@@ -39,7 +39,7 @@ constexpr auto BetaF_Q2 = 1430.0;
 constexpr auto AlphaF_Q2 = (1.0 + BetaF_Q2) / BetaF_Q2;
 constexpr auto BetaR_Q2 = 4.0;
 // END USER ENTRIES
-} // namespace
+} // namespace CryBabyComponents
 
 void CryBabyNDK::reset (T fs)
 {

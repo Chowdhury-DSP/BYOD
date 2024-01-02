@@ -201,7 +201,7 @@ static void sortPresets (std::vector<chowdsp::Preset>& presets)
                        return p1.getCategory() < p2.getCategory();
 
                    if (p1.getCategory().isEmpty())
-                        return p1.getName() > p2.getName();
+                       return p1.getName() > p2.getName();
 
                    return p1.getName() < p2.getName();
                });

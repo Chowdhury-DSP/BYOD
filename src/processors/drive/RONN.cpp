@@ -92,7 +92,7 @@ Vec3 createRandomVec3<GlorotUniform> (std::default_random_engine& generator, Glo
     glorot.initialise (-limit, limit);
     return createRandomVec3 (generator, *glorot.dist, size1, size2, size3);
 }
-} // namespace
+} // namespace RONNRandom
 
 RONN::RONN (UndoManager* um) : BaseProcessor ("RONN", createParameterLayout(), um)
 {

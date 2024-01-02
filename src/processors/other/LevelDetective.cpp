@@ -10,7 +10,7 @@ const auto powerColour = Colours::gold.darker (0.1f);
 const auto backgroundColour = Colours::teal.darker (0.1f);
 const String attackTag = "attack";
 const String releaseTag = "release";
-} // namespace
+} // namespace LevelDetectiveTags
 
 LevelDetective::LevelDetective (UndoManager* um) : BaseProcessor (
     "Level Detective",

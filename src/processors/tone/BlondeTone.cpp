@@ -6,7 +6,7 @@ namespace BlondeToneTags
 const String bassTag = "bass";
 const String midTag = "mid";
 const String trebleTag = "treble";
-} // namespace
+} // namespace BlondeToneTags
 
 BlondeTone::BlondeTone (UndoManager* um) : BaseProcessor ("Blonde Tone", createParameterLayout(), um)
 {

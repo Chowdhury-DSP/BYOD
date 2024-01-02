@@ -5,7 +5,7 @@ namespace LevelMeterConstants
 constexpr auto maxDB = 6.0f;
 constexpr auto minDB = -45.0f;
 constexpr auto dBRange = maxDB - minDB;
-} // namespace
+} // namespace LevelMeterConstants
 
 LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsLevels (levelData),
                                                                             dbLevels ({ LevelMeterConstants::minDB, LevelMeterConstants::minDB }),

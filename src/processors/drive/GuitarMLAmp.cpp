@@ -24,7 +24,7 @@ const String conditionTag = "condition";
 const String sampleRateCorrFilterTag = "sample_rate_corr_filter";
 const String customModelTag = "custom_model";
 constexpr std::string_view modelNameTag = "byod_guitarml_model_name";
-} // namespace
+} // namespace RONNTags
 
 GuitarMLAmp::GuitarMLAmp (UndoManager* um) : BaseProcessor ("GuitarML", createParameterLayout(), um)
 {

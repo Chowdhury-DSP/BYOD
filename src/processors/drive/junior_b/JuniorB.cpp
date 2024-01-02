@@ -6,7 +6,7 @@ namespace JuniorBTags
 const String driveTag = "juniorb_drive";
 const String blendTag = "juniorb_blend";
 const String stagesTag = "juniorb_nstages";
-} // namespace
+} // namespace JuniorBTags
 
 JuniorB::JuniorB (UndoManager* um) : BaseProcessor ("Junior B", createParameterLayout(), um)
 {

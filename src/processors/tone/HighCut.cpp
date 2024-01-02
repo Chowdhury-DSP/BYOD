@@ -7,7 +7,7 @@ constexpr float freq2Rv2 (float cutoff, float C8, float R3)
 {
     return (1.0f / (MathConstants<float>::twoPi * C8 * cutoff)) - R3;
 }
-} // namespace
+} // namespace HighCutParams
 
 HighCut::HighCut (UndoManager* um) : BaseProcessor ("High Cut", createParameterLayout(), um)
 {

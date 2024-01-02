@@ -13,7 +13,7 @@ constexpr float negativeInfinityDB = -60.0f;
 
 const Colour regularColour = Colours::yellow;
 const Colour invertedColour = Colours::red;
-} // namespace
+} // namespace GainTags
 
 CleanGain::CleanGain (UndoManager* um) : BaseProcessor ("Clean Gain", createParameterLayout(), um),
                                          invertAttach (

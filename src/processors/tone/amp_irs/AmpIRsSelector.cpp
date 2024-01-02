@@ -102,7 +102,7 @@ struct IRFileTree : chowdsp::AbstractTree<File>
         return menu;
     }
 };
-} // namespace
+} // namespace AmpIRFileUtils
 
 struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
 {

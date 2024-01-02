@@ -50,7 +50,7 @@ void calcDriveStageBypassedCoefs (FilterType& filter, float fs, const KingOfTone
     Transform<float, 1>::bilinear (b_z, a_z, b_s, a_s, 2.0f * fs);
     filter.setCoefs (b_z, a_z);
 }
-} // namespace
+} // namespace ToneKingCoeffs
 
 KingOfToneDrive::KingOfToneDrive (UndoManager* um) : BaseProcessor ("Tone King", createParameterLayout(), um)
 {
