@@ -196,7 +196,7 @@ if (MSVC)
     target_compile_options(BYOD PRIVATE /bigobj)
 endif ()
 
-file(GLOB_RECURSE juce_module_sources CONFIGURE_DEPENDS
+file(GLOB_RECURSE juce_module_sources
     ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/juce_*/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/juce_*/*.mm
     ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/chowdsp_utils/modules/*/chowdsp_*/*.cpp)
