@@ -53,6 +53,7 @@
 #include "other/Compressor.h"
 #include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
+#include "other/FrequencyShifter.h"
 #include "other/Gate.h"
 #include "other/LevelDetective.h"
 #include "other/Octaver.h"
@@ -148,6 +149,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Crying Child", { &processorFactory<CryBaby>, { ProcessorType::Other, CryBaby::numInputs, CryBaby::numOutputs } } },
     { "Delay", { &processorFactory<DelayModule>, { ProcessorType::Other, 1, 1 } } },
     { "Envelope Filter", { &processorFactory<EnvelopeFilter>, { ProcessorType::Other, EnvelopeFilter::numInputs, EnvelopeFilter::numOutputs } } },
+    { "Frequency Shifter", { &processorFactory<FrequencyShifter>, { ProcessorType::Other, 1, 1 } } },
     { "Level Detective", { &processorFactory<LevelDetective>, { ProcessorType::Other, 1, 1 } } },
     { "Gate", { &processorFactory<Gate>, { ProcessorType::Other, 1, 1 } } },
     { "Octaver", { &processorFactory<Octaver>, { ProcessorType::Other, 1, 1 } } },
