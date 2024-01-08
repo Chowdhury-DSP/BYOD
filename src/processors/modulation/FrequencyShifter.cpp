@@ -1,7 +1,7 @@
 #include "FrequencyShifter.h"
+#include "gui/utils/ModulatableSlider.h"
 #include "processors/BufferHelpers.h"
 #include "processors/ParameterHelpers.h"
-#include "gui/utils/ModulatableSlider.h"
 
 namespace freq_shifter_tags
 {
@@ -302,7 +302,7 @@ bool FrequencyShifter::getCustomComponents (OwnedArray<Component>& customComps, 
 
         void updateControlVisibility (Mode mode)
         {
-           setEnabled (mode == Mode::Spread);
+            setEnabled (mode == Mode::Spread);
         }
 
         void visibilityChanged() override
