@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="Laser Cave" plugin="BYOD" vendor="CHOW" category="Modulation"
+        version="1.2.1">
+  <proc_chain state_plugin_version="1.2.1">
+    <Smooth_Reverb>
+      <Parameters x_pos="0.521841824054718" y_pos="0.3168880343437195">
+        <PARAM id="decay" value="1999.518432617188"/>
+        <PARAM id="high_cut" value="8000.0"/>
+        <PARAM id="low_cut" value="199.9999847412109"/>
+        <PARAM id="mix" value="0.3300000131130219"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="relax" value="0.3079999983310699"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Smooth_Reverb>
+    <Laser_Trem>
+      <Parameters x_pos="0.1841794550418854" y_pos="0.3168880343437195">
+        <PARAM id="feedback" value="0.800000011920929"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="mode" value="2.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="shift" value="6.25"/>
+        <PARAM id="spread" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Laser_Trem>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.859919011592865" y_pos="0.3186582922935486">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

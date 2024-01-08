@@ -223,6 +223,7 @@ std::vector<chowdsp::Preset> PresetManager::getFactoryPresets (const ProcessorSt
     factoryPresets.emplace_back (BinaryData::Chopped_Flange_chowpreset, BinaryData::Chopped_Flange_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Mixed_In_Modulation_chowpreset, BinaryData::Mixed_In_Modulation_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Seasick_Phase_chowpreset, BinaryData::Seasick_Phase_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::Laser_Cave_chowpreset, BinaryData::Laser_Cave_chowpresetSize);
 
     // pedals
     factoryPresets.emplace_back (BinaryData::American_Sound_chowpreset, BinaryData::American_Sound_chowpresetSize);

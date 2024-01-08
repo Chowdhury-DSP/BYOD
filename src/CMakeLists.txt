@@ -120,6 +120,7 @@ target_sources(BYOD PRIVATE
     processors/modulation/Panner.cpp
     processors/modulation/Rotary.cpp
     processors/modulation/Tremolo.cpp
+    processors/modulation/FrequencyShifter.cpp
     processors/modulation/Flanger.cpp
     processors/modulation/MIDIModulator.cpp
     processors/modulation/ParamModulator.cpp
