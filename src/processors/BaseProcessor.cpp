@@ -284,7 +284,7 @@ void BaseProcessor::addToPopupMenu (PopupMenu& menu)
             PopupMenu::Item paramItem;
             paramItem.itemID = ++itemID;
             paramItem.text = paramChoice;
-            paramItem.action = [attachment, newParamVal = param->convertTo0to1 ((float) index)]
+            paramItem.action = [attachment, newParamVal = (float) index]
             {
                 attachment->setValueAsCompleteGesture (newParamVal);
             };
