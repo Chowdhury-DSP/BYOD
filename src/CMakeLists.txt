@@ -120,6 +120,7 @@ target_sources(BYOD PRIVATE
     processors/modulation/Panner.cpp
     processors/modulation/Rotary.cpp
     processors/modulation/Tremolo.cpp
+    processors/modulation/FrequencyShifter.cpp
     processors/modulation/Flanger.cpp
     processors/modulation/MIDIModulator.cpp
     processors/modulation/ParamModulator.cpp
@@ -132,7 +133,6 @@ target_sources(BYOD PRIVATE
     processors/other/Compressor.cpp
     processors/other/Delay.cpp
     processors/other/EnvelopeFilter.cpp
-    processors/other/FrequencyShifter.cpp
     processors/other/LevelDetective.cpp
     processors/other/Gate.cpp
     processors/other/Octaver.cpp

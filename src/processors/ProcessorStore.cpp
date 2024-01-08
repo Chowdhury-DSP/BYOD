@@ -40,6 +40,7 @@
 
 #include "modulation/Chorus.h"
 #include "modulation/Flanger.h"
+#include "modulation/FrequencyShifter.h"
 #include "modulation/MIDIModulator.h"
 #include "modulation/Panner.h"
 #include "modulation/ParamModulator.h"
@@ -53,7 +54,6 @@
 #include "other/Compressor.h"
 #include "other/Delay.h"
 #include "other/EnvelopeFilter.h"
-#include "other/FrequencyShifter.h"
 #include "other/Gate.h"
 #include "other/LevelDetective.h"
 #include "other/Octaver.h"
@@ -134,6 +134,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Scanner Vibrato", { &processorFactory<ScannerVibrato>, { ProcessorType::Modulation, ScannerVibrato::numInputs, ScannerVibrato::numOutputs } } },
     { "Solo-Vibe", { &processorFactory<UniVibe>, { ProcessorType::Modulation, UniVibe::numInputs, UniVibe::numOutputs } } },
     { "Tremolo", { &processorFactory<Tremolo>, { ProcessorType::Modulation, Tremolo::numInputs, Tremolo::numOutputs } } },
+    { "Laser Trem", { &processorFactory<FrequencyShifter>, { ProcessorType::Modulation, 1, 1 } } },
 
     { "Clean Gain", { &processorFactory<CleanGain>, { ProcessorType::Utility, 1, 1 } } },
     { "DC Bias", { &processorFactory<DCBias>, { ProcessorType::Utility, 1, 1 } } },
@@ -149,7 +150,6 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Crying Child", { &processorFactory<CryBaby>, { ProcessorType::Other, CryBaby::numInputs, CryBaby::numOutputs } } },
     { "Delay", { &processorFactory<DelayModule>, { ProcessorType::Other, 1, 1 } } },
     { "Envelope Filter", { &processorFactory<EnvelopeFilter>, { ProcessorType::Other, EnvelopeFilter::numInputs, EnvelopeFilter::numOutputs } } },
-    { "Frequency Shifter", { &processorFactory<FrequencyShifter>, { ProcessorType::Other, 1, 1 } } },
     { "Level Detective", { &processorFactory<LevelDetective>, { ProcessorType::Other, 1, 1 } } },
     { "Gate", { &processorFactory<Gate>, { ProcessorType::Other, 1, 1 } } },
     { "Octaver", { &processorFactory<Octaver>, { ProcessorType::Other, 1, 1 } } },

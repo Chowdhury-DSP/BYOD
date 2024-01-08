@@ -233,7 +233,8 @@ void ProcessorChainStateHelper::loadProcChainInternal (const XmlElement* xml,
             const auto& connections = connectionMap.at (portIdx);
             for (auto [cIdx, endPort] : connections)
             {
-                if (auto* procToConnect = cIdx >= 0 ? chain.procs[cIdx] : &chain.outputProcessor; procToConnect != nullptr && procToConnect != proc)
+                if (auto* procToConnect = cIdx >= 0 ? chain.procs[cIdx] : &chain.outputProcessor;
+                    procToConnect != nullptr && procToConnect != proc && proc->getNumOutputs() > portIdx && procToConnect->getNumInputs() > endPort)
                 {
                     ConnectionInfo info { proc, portIdx, procToConnect, endPort };
                     um->perform (new AddOrRemoveConnection (chain, std::move (info)));
