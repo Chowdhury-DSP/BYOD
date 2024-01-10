@@ -119,6 +119,7 @@ static void designFilterBank (std::array<PolyOctave::ERBFilterBank, 2>& filterBa
 
         for (size_t ch = 0; ch < 2; ++ch)
         {
+            filterBank[ch].erbFilterReal[kiter / vec_size].reset();
             filterBank[ch].erbFilterReal[kiter / vec_size].setCoefs ({
                                                                          xsimd::load_aligned (b_coeffs_cplx_real_simd[0].data()),
                                                                          xsimd::load_aligned (b_coeffs_cplx_real_simd[1].data()),
@@ -133,6 +134,7 @@ static void designFilterBank (std::array<PolyOctave::ERBFilterBank, 2>& filterBa
                                                                          xsimd::load_aligned (a_coeffs_cplx_simd[3].data()),
                                                                          xsimd::load_aligned (a_coeffs_cplx_simd[4].data()),
                                                                      });
+            filterBank[ch].erbFilterImag[kiter / vec_size].reset();
             filterBank[ch].erbFilterImag[kiter / vec_size].setCoefs ({
                                                                          xsimd::load_aligned (b_coeffs_cplx_imag_simd[0].data()),
                                                                          xsimd::load_aligned (b_coeffs_cplx_imag_simd[1].data()),
