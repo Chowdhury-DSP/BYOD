@@ -136,6 +136,7 @@ target_sources(BYOD PRIVATE
     processors/other/LevelDetective.cpp
     processors/other/Gate.cpp
     processors/other/Octaver.cpp
+    processors/other/PolyOctave.cpp
     processors/other/ShimmerReverb.cpp
     processors/other/SmoothReverb.cpp
     processors/other/cry_baby/CryBaby.cpp
