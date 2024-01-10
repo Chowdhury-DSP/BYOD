@@ -13,15 +13,31 @@ namespace FilterBankHelpers
 // Reference for filter-bank design and octave shifting:
 // https://aaltodoc.aalto.fi/server/api/core/bitstreams/ff9e52cf-fd79-45eb-b695-93038244ec0e/content
 
+using float_2 = PolyOctave::ERBFilterBank::float_2;
+static_assert (float_2::size == 2);
+static constexpr auto vec_size = float_2::size;
+
+inline float_2 processSample (const chowdsp::IIRFilter<4, float_2>& f, std::array<float_2, 5>& z, float_2 x)
+{
+    const auto y = z[1] + x * f.b[0]; // (we know that b[0] == 0)
+
+    z[1] = z[2] + x * f.b[1] - y * f.a[1];
+    z[2] = z[3] + x * f.b[2] - y * f.a[2];
+    z[3] = z[4] + x * f.b[3] - y * f.a[3];
+    z[4] = x * f.b[4] - y * f.a[4];
+
+    return y;
+}
+
 static constexpr auto q_c = 4.0;
-void designERBFilter (size_t erb_index,
-                      double gamma,
-                      double erb_start,
-                      double q_ERB,
-                      double sample_rate,
-                      double (&b_coeffs_cplx_real)[5],
-                      double (&b_coeffs_cplx_imag)[5],
-                      double (&a_coeffs_cplx)[5])
+static void designERBFilter (size_t erb_index,
+                             double gamma,
+                             double erb_start,
+                             double q_ERB,
+                             double sample_rate,
+                             double (&b_coeffs_cplx_real)[5],
+                             double (&b_coeffs_cplx_imag)[5],
+                             double (&a_coeffs_cplx)[5])
 {
     const auto q_PS = gamma;
 
@@ -73,21 +89,18 @@ void designERBFilter (size_t erb_index,
     b_coeffs_cplx_imag[4] = -ai2 * b_coeffs_proto[2];
 }
 
-void designFilterBank (std::array<PolyOctave::ERBFilterBank, 2>& filterBank,
-                       double gamma,
-                       double erb_start,
-                       double q_ERB,
-                       double sampleRate)
+static void designFilterBank (std::array<PolyOctave::ERBFilterBank, 2>& filterBank,
+                              double gamma,
+                              double erb_start,
+                              double q_ERB,
+                              double sampleRate)
 {
-    using float_2 = PolyOctave::ERBFilterBank::float_2;
-    static_assert (float_2::size == 2);
-    static constexpr auto vec_size = float_2::size;
     for (size_t kiter = 0; kiter < PolyOctave::ERBFilterBank::numFilterBands; kiter += vec_size)
     {
-        alignas (16) std::array<double, 2> b_coeffs_cplx_real_simd[5];
-        alignas (16) std::array<double, 2> b_coeffs_cplx_imag_simd[5];
-        alignas (16) std::array<double, 2> a_coeffs_cplx_simd[5];
-        for (size_t i = 0; i < 2; ++i)
+        alignas (16) std::array<float_2::value_type, float_2::size> b_coeffs_cplx_real_simd[5];
+        alignas (16) std::array<float_2::value_type, float_2::size> b_coeffs_cplx_imag_simd[5];
+        alignas (16) std::array<float_2::value_type, float_2::size> a_coeffs_cplx_simd[5];
+        for (size_t i = 0; i < float_2::size; ++i)
         {
             const auto k = kiter + i;
 
@@ -98,9 +111,9 @@ void designFilterBank (std::array<PolyOctave::ERBFilterBank, 2>& filterBank,
 
             for (size_t c = 0; c < 5; ++c)
             {
-                b_coeffs_cplx_real_simd[c][i] = b_coeffs_cplx_real[c];
-                b_coeffs_cplx_imag_simd[c][i] = b_coeffs_cplx_imag[c];
-                a_coeffs_cplx_simd[c][i] = a_coeffs_cplx[c];
+                b_coeffs_cplx_real_simd[c][i] = static_cast<float_2::value_type> (b_coeffs_cplx_real[c]);
+                b_coeffs_cplx_imag_simd[c][i] = static_cast<float_2::value_type> (b_coeffs_cplx_imag[c]);
+                a_coeffs_cplx_simd[c][i] = static_cast<float_2::value_type> (a_coeffs_cplx[c]);
             }
         }
 
@@ -212,31 +225,52 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
         auto* up2Data = up2OctaveBuffer.getWritePointer (ch);
         auto& upFilterBank = octaveUpFilterBank[static_cast<size_t> (ch)];
         auto& up2FilterBank = octaveUp2FilterBank[static_cast<size_t> (ch)];
+        static constexpr auto eps = std::numeric_limits<double>::epsilon();
 
         for (size_t k = 0; k < ERBFilterBank::numFilterBands; k += ERBFilterBank::float_2::size)
         {
             const auto filter_idx = k / ERBFilterBank::float_2::size;
+            auto& realFilter = upFilterBank.erbFilterReal[filter_idx];
+            auto& imagFilter = upFilterBank.erbFilterImag[filter_idx];
+            chowdsp::ScopedValue z_re { realFilter.z[0] };
+            chowdsp::ScopedValue z_im { imagFilter.z[0] };
             for (int n = 0; n < numSamples; ++n)
             {
-                auto x_re = upFilterBank.erbFilterReal[filter_idx].processSample (dryData[n]);
-                auto x_im = upFilterBank.erbFilterImag[filter_idx].processSample (dryData[n]);
+                auto x_re = FilterBankHelpers::processSample (realFilter, z_re.get(), dryData[n]);
+                auto x_im = FilterBankHelpers::processSample (imagFilter, z_im.get(), dryData[n]);
+                // auto x_re = upFilterBank.erbFilterReal[filter_idx].processSample (dryData[n]);
+                // auto x_im = upFilterBank.erbFilterImag[filter_idx].processSample (dryData[n]);
 
-                auto x_abs_r = xsimd::rsqrt (x_re * x_re + x_im * x_im);
-                upData[n] += xsimd::reduce_add ((x_re * x_re - x_im * x_im) * x_abs_r);
+                auto x_re_sq = x_re * x_re;
+                auto x_im_sq = x_im * x_im;
+                auto x_abs_sq = x_re_sq + x_im_sq;
+
+                auto x_abs_r = xsimd::select (x_abs_sq > eps, xsimd::rsqrt (x_abs_sq), {});
+                upData[n] += xsimd::reduce_add ((x_re_sq - x_im_sq) * x_abs_r);
             }
         }
 
         for (size_t k = 0; k < ERBFilterBank::numFilterBands; k += ERBFilterBank::float_2::size)
         {
             const auto filter_idx = k / ERBFilterBank::float_2::size;
+            auto& realFilter = up2FilterBank.erbFilterReal[filter_idx];
+            auto& imagFilter = up2FilterBank.erbFilterImag[filter_idx];
+            chowdsp::ScopedValue z_re { realFilter.z[0] };
+            chowdsp::ScopedValue z_im { imagFilter.z[0] };
+
             for (int n = 0; n < numSamples; ++n)
             {
-                auto x_re = up2FilterBank.erbFilterReal[filter_idx].processSample (dryData[n]);
-                auto x_im = up2FilterBank.erbFilterImag[filter_idx].processSample (dryData[n]);
+                auto x_re = FilterBankHelpers::processSample (realFilter, z_re.get(), dryData[n]);
+                auto x_im = FilterBankHelpers::processSample (imagFilter, z_im.get(), dryData[n]);
+                // auto x_re = up2FilterBank.erbFilterReal[filter_idx].processSample (dryData[n]);
+                // auto x_im = up2FilterBank.erbFilterImag[filter_idx].processSample (dryData[n]);
 
-                using namespace chowdsp::Power;
-                auto x_abs_sq_r = xsimd::reciprocal (x_re * x_re + x_im * x_im);
-                up2Data[n] += xsimd::reduce_add (x_re * (x_re * x_re - 3.0 * x_im * x_im) * x_abs_sq_r);
+                auto x_re_sq = x_re * x_re;
+                auto x_im_sq = x_im * x_im;
+                auto x_abs_sq = x_re_sq + x_im_sq;
+
+                auto x_abs_sq_r = xsimd::select (x_abs_sq > eps, xsimd::reciprocal (x_abs_sq), {});
+                up2Data[n] += xsimd::reduce_add (x_re * (x_re_sq - 3.0 * x_im_sq) * x_abs_sq_r);
             }
         }
     }
