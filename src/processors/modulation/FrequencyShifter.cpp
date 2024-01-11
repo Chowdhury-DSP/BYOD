@@ -179,7 +179,7 @@ static auto processFreqShifterModulator (chowdsp::SineWave<float>& modulator,
                                          std::span<float> lfoData,
                                          int numSamples) noexcept
 {
-    modulator.setFrequency (modFrequencyHz);
+    modulator.setFrequency (-modFrequencyHz);
 
     auto* lfoSinData = lfoData.data();
     auto* lfoCosData = lfoData.data() + numSamples;

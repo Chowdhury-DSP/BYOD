@@ -17,9 +17,12 @@ using float_2 = PolyOctave::ERBFilterBank::float_2;
 static_assert (float_2::size == 2);
 static constexpr auto vec_size = float_2::size;
 
+template <bool isImag = false>
 inline float_2 processSample (const chowdsp::IIRFilter<4, float_2>& f, std::array<float_2, 5>& z, float_2 x)
 {
-    const auto y = z[1] + x * f.b[0]; // (we know that b[0] == 0)
+    auto y = z[1];
+    if constexpr (! isImag)
+        y += x * f.b[0]; // for the imaginary filter, we know that b[0] == 0
 
     z[1] = z[2] + x * f.b[1] - y * f.a[1];
     z[2] = z[3] + x * f.b[2] - y * f.a[2];
@@ -239,9 +242,7 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
             for (int n = 0; n < numSamples; ++n)
             {
                 auto x_re = FilterBankHelpers::processSample (realFilter, z_re.get(), dryData[n]);
-                auto x_im = FilterBankHelpers::processSample (imagFilter, z_im.get(), dryData[n]);
-                // auto x_re = upFilterBank.erbFilterReal[filter_idx].processSample (dryData[n]);
-                // auto x_im = upFilterBank.erbFilterImag[filter_idx].processSample (dryData[n]);
+                auto x_im = FilterBankHelpers::processSample<true> (imagFilter, z_im.get(), dryData[n]);
 
                 auto x_re_sq = x_re * x_re;
                 auto x_im_sq = x_im * x_im;
@@ -263,9 +264,7 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
             for (int n = 0; n < numSamples; ++n)
             {
                 auto x_re = FilterBankHelpers::processSample (realFilter, z_re.get(), dryData[n]);
-                auto x_im = FilterBankHelpers::processSample (imagFilter, z_im.get(), dryData[n]);
-                // auto x_re = up2FilterBank.erbFilterReal[filter_idx].processSample (dryData[n]);
-                // auto x_im = up2FilterBank.erbFilterImag[filter_idx].processSample (dryData[n]);
+                auto x_im = FilterBankHelpers::processSample<true> (imagFilter, z_im.get(), dryData[n]);
 
                 auto x_re_sq = x_re * x_re;
                 auto x_im_sq = x_im * x_im;
