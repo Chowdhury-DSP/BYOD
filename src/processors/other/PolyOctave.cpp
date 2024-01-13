@@ -200,8 +200,8 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     upOctaveGain.prepare (sampleRate, samplesPerBlock);
 
     doubleBuffer.setMaxSize (2, samplesPerBlock);
-    up2OctaveBuffer.setMaxSize (2, 2 * samplesPerBlock); // allocate extra space for SIMD
-    upOctaveBuffer.setMaxSize (2, 2 * samplesPerBlock); // allocate extra space for SIMD
+    up2OctaveBuffer.setMaxSize (2, static_cast<int> (ERBFilterBank::float_2::size) * samplesPerBlock); // allocate extra space for SIMD
+    upOctaveBuffer.setMaxSize (2, static_cast<int> (ERBFilterBank::float_2::size) * samplesPerBlock); // allocate extra space for SIMD
 
     FilterBankHelpers::designFilterBank (octaveUpFilterBank, 2.0, 5.0, 6.0, sampleRate);
     FilterBankHelpers::designFilterBank (octaveUp2FilterBank, 3.0, 7.0, 4.0, sampleRate);
