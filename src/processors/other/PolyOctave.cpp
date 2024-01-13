@@ -200,8 +200,8 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     upOctaveGain.prepare (sampleRate, samplesPerBlock);
 
     doubleBuffer.setMaxSize (2, samplesPerBlock);
-    up2OctaveBuffer.setMaxSize (2, samplesPerBlock);
-    upOctaveBuffer.setMaxSize (2, samplesPerBlock);
+    up2OctaveBuffer.setMaxSize (2, 2 * samplesPerBlock); // allocate extra space for SIMD
+    upOctaveBuffer.setMaxSize (2, 2 * samplesPerBlock); // allocate extra space for SIMD
 
     FilterBankHelpers::designFilterBank (octaveUpFilterBank, 2.0, 5.0, 6.0, sampleRate);
     FilterBankHelpers::designFilterBank (octaveUp2FilterBank, 3.0, 7.0, 4.0, sampleRate);
@@ -217,24 +217,32 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
 
     doubleBuffer.setCurrentSize (numChannels, numSamples);
     upOctaveBuffer.setCurrentSize (numChannels, numSamples);
-    upOctaveBuffer.clear();
     up2OctaveBuffer.setCurrentSize (numChannels, numSamples);
-    up2OctaveBuffer.clear();
 
     chowdsp::BufferMath::copyBufferData (buffer, doubleBuffer);
 
+    using float_2 = ERBFilterBank::float_2;
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* dryData = doubleBuffer.getReadPointer (ch);
+
         auto* upData = upOctaveBuffer.getWritePointer (ch);
+        auto* upDataSIMD = reinterpret_cast<float_2*> (upOctaveBuffer.getWritePointer (ch));
+        jassert (juce::snapPointerToAlignment (upDataSIMD, xsimd::default_arch::alignment()) == upDataSIMD);
+        std::fill (upDataSIMD, upDataSIMD + numSamples, float_2 {});
+
         auto* up2Data = up2OctaveBuffer.getWritePointer (ch);
+        auto* up2DataSIMD = reinterpret_cast<float_2*> (up2OctaveBuffer.getWritePointer (ch));
+        jassert (juce::snapPointerToAlignment (up2DataSIMD, xsimd::default_arch::alignment()) == upDataSIMD);
+        std::fill (up2DataSIMD, up2DataSIMD + numSamples, float_2 {});
+
         auto& upFilterBank = octaveUpFilterBank[static_cast<size_t> (ch)];
         auto& up2FilterBank = octaveUp2FilterBank[static_cast<size_t> (ch)];
         static constexpr auto eps = std::numeric_limits<double>::epsilon();
 
-        for (size_t k = 0; k < ERBFilterBank::numFilterBands; k += ERBFilterBank::float_2::size)
+        for (size_t k = 0; k < ERBFilterBank::numFilterBands; k += float_2::size)
         {
-            const auto filter_idx = k / ERBFilterBank::float_2::size;
+            const auto filter_idx = k / float_2::size;
             auto& realFilter = upFilterBank.erbFilterReal[filter_idx];
             auto& imagFilter = upFilterBank.erbFilterImag[filter_idx];
             chowdsp::ScopedValue z_re { realFilter.z[0] };
@@ -249,13 +257,20 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
                 auto x_abs_sq = x_re_sq + x_im_sq;
 
                 auto x_abs_r = xsimd::select (x_abs_sq > eps, xsimd::rsqrt (x_abs_sq), {});
-                upData[n] += xsimd::reduce_add ((x_re_sq - x_im_sq) * x_abs_r);
+                upDataSIMD[n] += (x_re_sq - x_im_sq) * x_abs_r;
             }
         }
 
-        for (size_t k = 0; k < ERBFilterBank::numFilterBands; k += ERBFilterBank::float_2::size)
+        // Collapsing the SIMD data into a single "channel".
+        // This is a little bit dangerous since upData, and upDataSIMD
+        // are aliased, but it should always be fine because we're "reading"
+        // faster than we're "writing".
+        for (int n = 0; n < numSamples; ++n)
+            upData[n] = xsimd::reduce_add (upDataSIMD[n]);
+
+        for (size_t k = 0; k < ERBFilterBank::numFilterBands; k += float_2::size)
         {
-            const auto filter_idx = k / ERBFilterBank::float_2::size;
+            const auto filter_idx = k / float_2::size;
             auto& realFilter = up2FilterBank.erbFilterReal[filter_idx];
             auto& imagFilter = up2FilterBank.erbFilterImag[filter_idx];
             chowdsp::ScopedValue z_re { realFilter.z[0] };
@@ -271,9 +286,11 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
                 auto x_abs_sq = x_re_sq + x_im_sq;
 
                 auto x_abs_sq_r = xsimd::select (x_abs_sq > eps, xsimd::reciprocal (x_abs_sq), {});
-                up2Data[n] += xsimd::reduce_add (x_re * (x_re_sq - 3.0 * x_im_sq) * x_abs_sq_r);
+                up2DataSIMD[n] += x_re * (x_re_sq - 3.0 * x_im_sq) * x_abs_sq_r;
             }
         }
+        for (int n = 0; n < numSamples; ++n)
+            up2Data[n] = xsimd::reduce_add (up2DataSIMD[n]);
     }
 
     chowdsp::BufferMath::applyGain (upOctaveBuffer, 2.0 / static_cast<double> (ERBFilterBank::numFilterBands));
