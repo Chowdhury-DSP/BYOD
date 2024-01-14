@@ -38,9 +38,7 @@ JUCE_END_IGNORE_WARNINGS_GCC_LIKE
 #include "jai/SharedJaiContext.h"
 #endif
 
-#if BYOD_USE_MATH_APPROX
 #include <math_approx/math_approx.hpp>
-#endif
 
 // global definitions
 using Parameters = std::vector<std::unique_ptr<juce::RangedAudioParameter>>;

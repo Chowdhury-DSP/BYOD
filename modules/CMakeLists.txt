@@ -16,6 +16,7 @@ add_subdirectory(RTNeural)
  # add other C++ libraries
 add_subdirectory(sst-cpputils)
 add_subdirectory(ea_variant)
+add_subdirectory(math_approx)
 
 include(cmake/WarningFlags.cmake)
 include(cmake/ConfigFlags.cmake)
@@ -43,6 +44,7 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_visualizers
         RTNeural
         ea_variant
+        math_approx
     PUBLIC
         config_flags
         juce::juce_recommended_lto_flags
@@ -97,13 +99,6 @@ if(ASIOSDK_DIR)
     message(STATUS "Using ASIO SDK from ${ASIOSDK_DIR}")
     target_include_directories(juce_plugin_modules PUBLIC ${ASIOSDK_DIR}/common)
     target_compile_definitions(juce_plugin_modules PUBLIC JUCE_ASIO=1)
-endif()
-
-if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/math_approx")
-    message(STATUS "Configuring math_approx")
-    add_subdirectory(math_approx)
-    target_link_libraries(juce_plugin_modules PUBLIC math_approx)
-    target_compile_definitions(juce_plugin_modules PRIVATE BYOD_USE_MATH_APPROX=1)
 endif()
 
 if(IOS)

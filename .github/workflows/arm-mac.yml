@@ -47,15 +47,6 @@ jobs:
         token: ${{ secrets.OUR_GITHUB_PAT }}
         path: modules/jai
 
-    - name: Checkout math_approx
-      uses: actions/checkout@v2
-      if: github.actor == 'jatinchowdhury18'
-      with:
-        ref: main
-        repository: Chowdhury-DSP/math_approx
-        token: ${{ secrets.OUR_GITHUB_PAT }}
-        path: modules/math_approx
-
     - name: Configure
       shell: bash
       run: cmake -Bbuild -GXcode $CONFIGURE_ADD_ONS_FLAG -D"CMAKE_OSX_ARCHITECTURES=arm64"
