@@ -1,7 +1,8 @@
 #include "ParamForwardManager.h"
 
-ParamForwardManager::ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& procChain) : chowdsp::ForwardingParametersManager<ParamForwardManager, 500> (vts),
-                                                                                                          chain (procChain)
+ParamForwardManager::ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& procChain)
+    : chowdsp::ForwardingParametersManager<ParamForwardManager, 500> (vts),
+      chain (procChain)
 {
     // In some AUv3 hosts (cough, cough, GarageBand), sending parameter info change notifications
     // causes the host to crash. Since there's no way for the plugin to determine which AUv3
@@ -50,32 +51,50 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
     auto& procParams = proc->getParameters();
     const auto numParams = procParams.size();
 
-    // Find a range in forwardedParams with numParams empty params in a row
-    int count = 0;
-    for (int i = 0; i < (int) forwardedParams.size(); ++i)
+    const auto setForwardParameterRange = [this, &procParams, &proc, numParams] (int startOffset)
     {
-        if (forwardedParams[i]->getParam() == nullptr)
-            count++;
-        else
-            count = 0;
+        setParameterRange (startOffset,
+                           startOffset + numParams,
+                           [&procParams, &proc, startOffset] (int index) -> chowdsp::ParameterForwardingInfo
+                           {
+                               auto* procParam = procParams[index - startOffset];
 
-        if (count == numParams)
+                               if (auto* paramCast = dynamic_cast<RangedAudioParameter*> (procParam))
+                                   return { paramCast, proc->getName() + ": " + paramCast->name };
+
+                               jassertfalse;
+                               return {};
+                           });
+    };
+
+    if (const auto savedOffset = proc->getForwardingParametersIndexOffset(); savedOffset >= 0)
+    {
+        setForwardParameterRange (savedOffset);
+    }
+    else
+    {
+        // Find a range in forwardedParams with numParams empty params in a row
+        int count = 0;
+        for (int i = 0; i < (int) forwardedParams.size(); ++i)
         {
-            int startOffset = i + 1 - numParams;
-            setParameterRange (startOffset,
-                               startOffset + numParams,
-                               [&procParams, &proc, startOffset] (int index) -> chowdsp::ParameterForwardingInfo
-                               {
-                                   auto* procParam = procParams[index - startOffset];
+            if (forwardedParams[i]->getParam() == nullptr)
+                count++;
+            else
+                count = 0;
 
-                                   if (auto* paramCast = dynamic_cast<RangedAudioParameter*> (procParam))
-                                       return { paramCast, proc->getName() + ": " + paramCast->name };
-
-                                   jassertfalse;
-                                   return {};
-                               });
-
-            break;
+            if (count == numParams)
+            {
+                int startOffset = [i, numParams, proc]
+                {
+                    const auto savedOffset = proc->getForwardingParametersIndexOffset();
+                    if (savedOffset >= 0)
+                        return savedOffset;
+                    return i + 1 - numParams;
+                }();
+                proc->setForwardingParametersIndexOffset (startOffset);
+                setForwardParameterRange (startOffset);
+                break;
+            }
         }
     }
 }
@@ -84,12 +103,19 @@ void ParamForwardManager::processorRemoved (const BaseProcessor* proc)
 {
     auto& procParams = proc->getParameters();
 
-    for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
+    if (const auto savedOffset = proc->getForwardingParametersIndexOffset(); savedOffset >= 0)
     {
-        if (auto* internalParam = param->getParam(); internalParam == procParams[0])
+        clearParameterRange (savedOffset, savedOffset + procParams.size());
+    }
+    else
+    {
+        for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
         {
-            clearParameterRange ((int) index, (int) index + procParams.size());
-            break;
+            if (auto* internalParam = param->getParam(); internalParam == procParams[0])
+            {
+                clearParameterRange ((int) index, (int) index + procParams.size());
+                break;
+            }
         }
     }
 }
