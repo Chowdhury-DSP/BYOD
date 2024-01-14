@@ -48,11 +48,9 @@ target_include_directories(BYOD_headless
         ../../modules/JUCE/modules
         ../../modules/chowdsp_wdf/include
         ../../modules/ea_variant
+        ../../modules/math_approx/include
         ${juce_includes}
 )
-if(TARGET math_approx)
-    target_include_directories(BYOD_headless PRIVATE ../../modules/math_approx/include)
-endif()
 
 target_link_libraries(BYOD_headless PUBLIC
     BinaryData

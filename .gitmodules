@@ -28,3 +28,6 @@
 [submodule "modules/melatonin_perfetto"]
 	path = modules/melatonin_perfetto
 	url = https://github.com/sudara/melatonin_perfetto
+[submodule "modules/math_approx"]
+	path = modules/math_approx
+	url = https://github.com/Chowdhury-DSP/math_approx

@@ -170,7 +170,13 @@ endif()
 # AVX/SSE files for accelerated neural nets
 make_lib_simd_runtime(rnn_accelerated processors/drive/neural_utils/RNNAccelerated.cpp)
 foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
-    target_link_libraries(${target} PRIVATE config_flags juce::juce_recommended_lto_flags warning_flags)
+    target_link_libraries(${target}
+        PRIVATE
+            math_approx
+            config_flags
+            juce::juce_recommended_lto_flags
+            warning_flags
+    )
     target_include_directories(${target}
         PRIVATE
             ${CMAKE_CURRENT_SOURCE_DIR}/../modules/RTNeural
@@ -183,11 +189,6 @@ foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
         C_VISIBILITY_PRESET hidden
         CXX_VISIBILITY_PRESET hidden
     )
-    if(TARGET math_approx)
-        message(STATUS "Using math_approx for ${target}")
-        target_compile_definitions(${target} PRIVATE RTNEURAL_USE_MATH_APPROX=1)
-        target_link_libraries(${target} PRIVATE math_approx)
-    endif()
 endforeach()
 target_compile_definitions(rnn_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=16 RTNEURAL_NAMESPACE=RTNeural_sse_arm)
 target_compile_definitions(rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32 RTNEURAL_NAMESPACE=RTNeural_avx)

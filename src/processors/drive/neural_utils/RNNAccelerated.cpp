@@ -11,11 +11,9 @@
 #endif
 
 #include <RTNeural/RTNeural.h>
-
-#if RTNEURAL_USE_MATH_APPROX
 #include <math_approx/math_approx.hpp>
 
-struct ApproxMathsProvider
+struct RNNMathsProvider
 {
     template <typename T>
     static T tanh (T x)
@@ -29,10 +27,6 @@ struct ApproxMathsProvider
         return math_approx::sigmoid<9> (x);
     }
 };
-using RNNMathsProvider = ApproxMathsProvider;
-#else
-using RNNMathsProvider = RTNEURAL_NAMESPACE::DefaultMathsProvider;
-#endif
 
 #include "model_loaders.h"
 
