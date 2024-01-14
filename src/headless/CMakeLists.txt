@@ -48,6 +48,7 @@ target_include_directories(BYOD_headless
         ../../modules/JUCE/modules
         ../../modules/chowdsp_wdf/include
         ../../modules/ea_variant
+        ../../modules/math_approx/include
         ${juce_includes}
 )
 
