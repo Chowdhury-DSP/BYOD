@@ -235,7 +235,10 @@ public:
                                    fileDir.getChildFile ("test_" + juce::String { i } + ".txt"));
         }();
 
+        juce::Logger::writeToLog ("Loading legacy state from file: " + stateFile.getFullPathName());
+        jassert (stateFile.existsAsFile());
         const auto stateXml = XmlDocument::parse (stateFile);
+        jassert (stateXml != nullptr);
         BYOD plugin;
         juce::MemoryBlock state;
         plugin.copyXmlToBinary (*stateXml, state);
