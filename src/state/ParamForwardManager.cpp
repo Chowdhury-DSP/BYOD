@@ -139,39 +139,53 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
 void ParamForwardManager::processorRemoved (const BaseProcessor* proc)
 {
     auto& procParams = proc->getParameters();
+    const auto numParams = procParams.size();
 
     if (const auto slotIndex = proc->getForwardingParameterSlotIndex(); slotIndex >= 0)
     {
         paramSlotUsed[slotIndex] = false;
         const auto startOffset = slotIndex * maxParameterCount;
-        clearParameterRange (startOffset, startOffset + procParams.size());
+        clearParameterRange (startOffset, startOffset + numParams);
     }
     else
     {
+        int startIndex = -1;
         for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
         {
             if (auto* internalParam = param->getParam(); internalParam == procParams[0])
             {
-                clearParameterRange ((int) index, (int) index + procParams.size());
+                startIndex = static_cast<int> (index);
+                clearParameterRange (startIndex, startIndex + numParams);
                 break;
             }
         }
 
+        if (startIndex >= 0)
+        {
+            const auto startSlot = startIndex / maxParameterCount;
+            const auto endSlot = ((startIndex + numParams) / maxParameterCount);
+            for (int checkSlotIndex = startSlot; checkSlotIndex <= endSlot; ++checkSlotIndex)
+            {
+                bool slotUsed = false;
+                for (int i = checkSlotIndex * maxParameterCount; i < (checkSlotIndex + 1) * maxParameterCount; ++i)
+                {
+                    if (forwardedParams[i]->getParam() != nullptr)
+                    {
+                        slotUsed = true;
+                        break;
+                    }
+                }
 
+                if (! slotUsed)
+                    paramSlotUsed[checkSlotIndex] = false;
+            }
+        }
     }
 }
 
 void ParamForwardManager::setUsingLegacyMode (bool useLegacy)
 {
     usingLegacyMode = useLegacy;
-    if (useLegacy)
-    {
-
-    }
-    else
-    {
-
-    }
 }
 
 void ParamForwardManager::deferHostNotificationsGlobalSettingChanged (SettingID settingID)

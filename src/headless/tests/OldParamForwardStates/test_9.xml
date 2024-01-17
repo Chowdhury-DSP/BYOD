@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<state state_plugin_version="1.2.1">
+  <Parameters>
+    <PARAM id="dry_wet" value="1.0"/>
+    <PARAM id="in_gain" value="0.0"/>
+    <PARAM id="mono_mode" value="0.0"/>
+    <PARAM id="os_factor" value="1.0"/>
+    <PARAM id="os_mode" value="0.0"/>
+    <PARAM id="os_render_factor" value="1.0"/>
+    <PARAM id="os_render_like_realtime" value="1.0"/>
+    <PARAM id="os_render_mode" value="0.0"/>
+    <PARAM id="out_gain" value="0.0"/>
+  </Parameters>
+  <proc_chain>
+    <Blonde_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="bass" value="0.0"/>
+        <PARAM id="mid" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.0"/>
+      </Parameters>
+    </Blonde_Tone>
+    <Pandora_Drive>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="drive" value="0.75"/>
+        <PARAM id="forbidden" value="0.0"/>
+        <PARAM id="gain" value="0.0"/>
+        <PARAM id="low_cut" value="144.0000152587891"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="speed" value="0.5"/>
+        <circuit_elements R4="43000.0" R5="240.0" R6="47.0" R7="560.0" R8="1100.0" C5="9.999999717180685e-10"
+                          C6="1.000000013351432e-10" C8="4.699999863078119e-6" C9="2.199999926233431e-6"
+                          C10="4.699999863078119e-6"/>
+      </Parameters>
+    </Pandora_Drive>
+    <Mixer>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="gain0" value="0.0"/>
+        <PARAM id="gain1" value="0.0"/>
+        <PARAM id="gain2" value="0.0"/>
+        <PARAM id="gain3" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Mixer>
+    <Shimmer_Reverb>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="feedback" value="1.0"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="shift" value="-12.0"/>
+        <PARAM id="size" value="1.0"/>
+      </Parameters>
+    </Shimmer_Reverb>
+    <Solo-Vibe>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="intensity" value="0.5"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="num_stages" value="4.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="speed" value="5.0"/>
+        <PARAM id="stereo" value="0.0"/>
+      </Parameters>
+    </Solo-Vibe>
+    <SVF>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="freq" value="8000.0009765625"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="multi_mode" value="1.0"/>
+        <PARAM id="multi_mode_type" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="q_value" value="0.707099974155426"/>
+      </Parameters>
+    </SVF>
+    <Mixer>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="gain0" value="0.0"/>
+        <PARAM id="gain1" value="0.0"/>
+        <PARAM id="gain2" value="0.0"/>
+        <PARAM id="gain3" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Mixer>
+    <Shimmer_Reverb>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="feedback" value="1.0"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="shift" value="-12.0"/>
+        <PARAM id="size" value="1.0"/>
+      </Parameters>
+    </Shimmer_Reverb>
+    <RONN>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="gain_db" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="seed" value="0.0"/>
+      </Parameters>
+    </RONN>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <Preset_State preset_dirty="1">
+    <Preset name="Default" plugin="BYOD" vendor="CHOW" category="" version="0.5.3"
+            preset_file="">
+      <proc_chain>
+        <Input>
+          <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+            <PARAM id="on_off" value="1.0"/>
+          </Parameters>
+          <port_0 connection_0="-1" connection_end_0="0"/>
+        </Input>
+        <Output>
+          <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+            <PARAM id="on_off"/>
+          </Parameters>
+        </Output>
+      </proc_chain>
+      <extra_info/>
+    </Preset>
+  </Preset_State>
+</state>

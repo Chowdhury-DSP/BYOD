@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<state state_plugin_version="1.2.1">
+  <Parameters>
+    <PARAM id="dry_wet" value="1.0"/>
+    <PARAM id="in_gain" value="0.0"/>
+    <PARAM id="mono_mode" value="0.0"/>
+    <PARAM id="os_factor" value="1.0"/>
+    <PARAM id="os_mode" value="0.0"/>
+    <PARAM id="os_render_factor" value="1.0"/>
+    <PARAM id="os_render_like_realtime" value="1.0"/>
+    <PARAM id="os_render_mode" value="0.0"/>
+    <PARAM id="out_gain" value="0.0"/>
+  </Parameters>
+  <proc_chain>
+    <Tuner>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Tuner>
+    <Spring_Reverb>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="chaos" value="0.0"/>
+        <PARAM id="damping" value="0.5"/>
+        <PARAM id="decay" value="0.5"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="reflect" value="0.5"/>
+        <PARAM id="shake" value="0.0"/>
+        <PARAM id="size" value="0.5"/>
+        <PARAM id="spin" value="0.5"/>
+      </Parameters>
+    </Spring_Reverb>
+    <Bassman_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="bass" value="1.0"/>
+        <PARAM id="mid" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.0"/>
+        <circuit_elements R4="56000.0" C1="2.499999929295171e-10" C2="1.999999987845058e-8"
+                          C3="1.999999987845058e-8"/>
+      </Parameters>
+    </Bassman_Tone>
+    <Laser_Trem>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="shift" value="0.0"/>
+        <PARAM id="spread" value="0.5"/>
+      </Parameters>
+    </Laser_Trem>
+    <Oscilloscope>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Oscilloscope>
+    <Waterfall_Trem.>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.5"/>
+      </Parameters>
+    </Waterfall_Trem.>
+    <SVF>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="freq" value="8000.0009765625"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="multi_mode" value="1.0"/>
+        <PARAM id="multi_mode_type" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="q_value" value="0.707099974155426"/>
+      </Parameters>
+    </SVF>
+    <Mouse_Drive>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="distortion" value="0.75"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="volume" value="0.75"/>
+        <circuit_elements R2="1.0e6" R3="1000.0" R4="47.0" R5="560.0" R6="1000.0" C1="2.200000004393132e-8"
+                          C2="9.999999717180685e-10" C4="1.000000013351432e-10" C5="2.199999926233431e-6"
+                          C6="4.699999863078119e-6" C7="4.699999863078119e-6"/>
+      </Parameters>
+    </Mouse_Drive>
+    <RAM_Filter>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="damp" value="0.0"/>
+        <PARAM id="freq" value="1000.000183105469"/>
+        <PARAM id="mod_depth" value="0.5"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="res" value="0.5"/>
+      </Parameters>
+    </RAM_Filter>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <Preset_State preset_dirty="1">
+    <Preset name="Default" plugin="BYOD" vendor="CHOW" category="" version="0.5.3"
+            preset_file="">
+      <proc_chain>
+        <Input>
+          <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+            <PARAM id="on_off" value="1.0"/>
+          </Parameters>
+          <port_0 connection_0="-1" connection_end_0="0"/>
+        </Input>
+        <Output>
+          <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+            <PARAM id="on_off"/>
+          </Parameters>
+        </Output>
+      </proc_chain>
+      <extra_info/>
+    </Preset>
+  </Preset_State>
+</state>

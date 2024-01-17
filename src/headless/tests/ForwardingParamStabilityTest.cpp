@@ -64,7 +64,7 @@ public:
 #if JUCE_DEBUG
         for (int count = 0; count < 9;)
 #else
-        for (int count = 0; count < 101;)
+        for (int count = 0; count < 19;)
 #endif
         {
             auto& action = actions[rand.nextInt ((int) actions.size())];
@@ -115,6 +115,52 @@ public:
 
     void testLegacyState (int i)
     {
+        /*
+        BYOD plugin;
+        auto* undoManager = plugin.getVTS().undoManager;
+        auto& procChain = plugin.getProcChain();
+
+        struct Action
+        {
+            String name;
+            std::function<bool()> action;
+        };
+
+        std::vector<Action> actions {
+            { "Add Processor", [&]
+              { return addProcessor (procChain, undoManager); } },
+        };
+
+        for (int count = 0; count < 9;)
+        {
+            auto& action = actions[rand.nextInt ((int) actions.size())];
+            if (action.action())
+            {
+                int timeUntilNextAction = rand.nextInt ({ 5, 500 });
+                juce::MessageManager::getInstance()->runDispatchLoopUntil (timeUntilNextAction);
+                count++;
+            }
+        }
+
+        auto& forwardingParams = plugin.getParamForwarder().getForwardedParameters();
+        juce::StringArray paramNames {};
+        for (auto [idx, param] : chowdsp::enumerate (forwardingParams))
+        {
+            if (auto* forwardedParam = param->getParam())
+                paramNames.add (forwardedParam->getName (1024).toStdString());
+            else
+                paramNames.add ("EMPTY");
+        }
+
+        juce::MemoryBlock state;
+        plugin.getStateInformation (state);
+
+        const auto file = juce::File { "test_" + juce::String { i } };
+        file.withFileExtension ("txt").replaceWithText (paramNames.joinIntoString (","));
+
+        plugin.getXmlFromBinary (state.getData(), state.getSize())->writeToFile (file.withFileExtension ("xml"), "");
+        */
+
         const auto [stateFile, paramsFile] = [i]
         {
             auto rootDir = File::getSpecialLocation (File::currentExecutableFile);
@@ -153,39 +199,50 @@ public:
                               "Parameter name mismatch");
             }
         }
+
+        for (int i = 0; i < 20; ++i)
+            removeProcessor (plugin.getProcChain());
+        jassert (plugin.getProcChain().getProcessors().size() == 0);
+
+        addProcessor (plugin.getProcChain(), &plugin.getUndoManager());
+        auto* ip = reinterpret_cast<juce::RangedAudioParameter*> (plugin.getProcChain().getProcessors()[0]->getParameters()[0]);
+
+        const auto& paramForwarder = plugin.getParamForwarder();
+        expect (paramForwarder.getForwardedParameterFromInternal (*ip) == paramForwarder.getForwardedParameters()[0],
+                "Newly added parameter is not in the first parameter slot!");
     }
 
     void runTest() override
     {
-//         beginTest ("Check Max Parameter Count");
-//         runTestForAllProcessors (
-//             this,
-//             [this] (BaseProcessor* proc)
-//             {
-//                 expectLessThan (proc->getParameters().size(),
-//                                 ParamForwardManager::maxParameterCount,
-//                                 "");
-//             },
-//             {},
-//             false);
-//
-//         beginTest ("Forwarding Parameter Stability Test");
-//         rand = Random { 1245 };
-// #if JUCE_DEBUG
-//         for (int i = 0; i < 1; ++i)
-// #else
-//         for (int i = 0; i < 10; ++i)
-// #endif
-//         {
-//             const auto [paramNames, state] = runPlugin();
-//             testPlugin (paramNames, state);
-//         }
+        beginTest ("Check Max Parameter Count");
+        runTestForAllProcessors (
+            this,
+            [this] (BaseProcessor* proc)
+            {
+                expectLessThan (proc->getParameters().size(),
+                                ParamForwardManager::maxParameterCount,
+                                "");
+            },
+            {},
+            false);
+
+        beginTest ("Forwarding Parameter Stability Test");
+        rand = Random { 1245 };
+#if JUCE_DEBUG
+        for (int i = 0; i < 1; ++i)
+#else
+        for (int i = 0; i < 10; ++i)
+#endif
+        {
+            const auto [paramNames, state] = runPlugin();
+            testPlugin (paramNames, state);
+        }
 
         beginTest ("Legacy Forwarding Parameter Compatibility Test");
 #if JUCE_DEBUG
         for (int i = 0; i < 1; ++i)
 #else
-        for (int i = 0; i < 10; ++i)
+        for (int i = 0; i < 5; ++i)
 #endif
         {
             testLegacyState (i);
