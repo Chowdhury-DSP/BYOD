@@ -2,6 +2,70 @@
 #include "processors/chain/ProcessorChainActionHelper.h"
 #include "state/ParamForwardManager.h"
 
+#include "processors/drive/BlondeDrive.h"
+#include "processors/drive/RangeBooster.h"
+#include "processors/drive/Warp.h"
+#include "processors/drive/big_muff/BigMuffDrive.h"
+#include "processors/drive/diode_circuits/DiodeClipper.h"
+#include "processors/drive/diode_circuits/DiodeRectifier.h"
+#include "processors/drive/flapjack/Flapjack.h"
+#include "processors/drive/zen_drive/ZenDrive.h"
+#include "processors/tone/BassCleaner.h"
+#include "processors/tone/BigMuffTone.h"
+#include "processors/tone/BlondeTone.h"
+#include "processors/tone/GraphicEQ.h"
+#include "processors/tone/HighCut.h"
+#include "processors/tone/LofiIrs.h"
+#include "processors/tone/ladder_filter/LadderFilterProcessor.h"
+#include "processors/tone/tube_screamer_tone/TubeScreamerTone.h"
+#include "processors/modulation/Chorus.h"
+#include "processors/modulation/Rotary.h"
+#include "processors/modulation/Tremolo.h"
+#include "processors/modulation/phaser/Phaser4.h"
+#include "processors/modulation/phaser/Phaser8.h"
+#include "processors/modulation/scanner_vibrato/ScannerVibrato.h"
+#include "processors/modulation/uni_vibe/UniVibe.h"
+#include "processors/other/Compressor.h"
+#include "processors/other/Delay.h"
+#include "processors/other/EnvelopeFilter.h"
+#include "processors/other/spring_reverb/SpringReverbProcessor.h"
+
+template <typename ProcType>
+static std::unique_ptr<BaseProcessor> processorFactory (UndoManager* um)
+{
+    return std::make_unique<ProcType> (um);
+}
+
+ProcessorStore::StoreMap minimalStore = {
+    { "Blonde Drive", { &processorFactory<BlondeDrive>, { ProcessorType::Drive, 1, 1 } } },
+    { "Diode Clipper", { &processorFactory<DiodeClipper>, { ProcessorType::Drive, 1, 1 } } },
+    { "Diode Rectifier", { &processorFactory<DiodeRectifier>, { ProcessorType::Drive, 1, 1 } } },
+    { "Flapjack", { &processorFactory<Flapjack>, { ProcessorType::Drive, 1, 1 } } },
+    { "Muff Drive", { &processorFactory<BigMuffDrive>, { ProcessorType::Drive, 1, 1 } } },
+    { "Range Booster", { &processorFactory<RangeBooster>, { ProcessorType::Drive, 1, 1 } } },
+    { "Warp", { &processorFactory<Warp>, { ProcessorType::Drive, 1, 1 } } },
+    { "Yen Drive", { &processorFactory<ZenDrive>, { ProcessorType::Drive, 1, 1 } } },
+    { "Bass Cleaner", { &processorFactory<BassCleaner>, { ProcessorType::Tone, 1, 1 } } },
+    { "Blonde Tone", { &processorFactory<BlondeTone>, { ProcessorType::Tone, 1, 1 } } },
+    { "Graphic EQ", { &processorFactory<GraphicEQ>, { ProcessorType::Tone, 1, 1 } } },
+    { "High Cut", { &processorFactory<HighCut>, { ProcessorType::Tone, 1, 1 } } },
+    { "LoFi IRs", { &processorFactory<LofiIrs>, { ProcessorType::Tone, 1, 1 } } },
+    { "Muff Tone", { &processorFactory<BigMuffTone>, { ProcessorType::Tone, 1, 1 } } },
+    { "TS-Tone", { &processorFactory<TubeScreamerTone>, { ProcessorType::Tone, 1, 1 } } },
+    { "Ladder Filter", { &processorFactory<LadderFilterProcessor>, { ProcessorType::Tone, 1, 1 } } },
+    { "Chorus", { &processorFactory<Chorus>, { ProcessorType::Modulation, Chorus::numInputs, Chorus::numOutputs } } },
+    { "Phaser4", { &processorFactory<Phaser4>, { ProcessorType::Modulation, Phaser4::numInputs, Phaser4::numOutputs } } },
+    { "Phaser8", { &processorFactory<Phaser8>, { ProcessorType::Modulation, Phaser8::numInputs, Phaser8::numOutputs } } },
+    { "Rotary", { &processorFactory<Rotary>, { ProcessorType::Modulation, Rotary::numInputs, Rotary::numOutputs } } },
+    { "Scanner Vibrato", { &processorFactory<ScannerVibrato>, { ProcessorType::Modulation, ScannerVibrato::numInputs, ScannerVibrato::numOutputs } } },
+    { "Solo-Vibe", { &processorFactory<UniVibe>, { ProcessorType::Modulation, UniVibe::numInputs, UniVibe::numOutputs } } },
+    { "Tremolo", { &processorFactory<Tremolo>, { ProcessorType::Modulation, Tremolo::numInputs, Tremolo::numOutputs } } },
+    { "DC Blocker", { &processorFactory<DCBlocker>, { ProcessorType::Utility, 1, 1 } } },
+    { "Compressor", { &processorFactory<Compressor>, { ProcessorType::Other, Compressor::numInputs, Compressor::numOutputs } } },
+    { "Delay", { &processorFactory<DelayModule>, { ProcessorType::Other, 1, 1 } } },
+    { "Envelope Filter", { &processorFactory<EnvelopeFilter>, { ProcessorType::Other, EnvelopeFilter::numInputs, EnvelopeFilter::numOutputs } } },
+};
+
 class ForwardingParamStabilityTest : public UnitTest
 {
 public:
@@ -13,7 +77,7 @@ public:
     bool addProcessor (ProcessorChain& chain, UndoManager* um)
     {
         // get random processor
-        auto& storeMap = ProcessorStore::getStoreMap();
+        auto& storeMap = minimalStore;
         auto storeIter = storeMap.begin();
         int storeIndex = rand.nextInt ((int) storeMap.size());
         std::advance (storeIter, storeIndex);
