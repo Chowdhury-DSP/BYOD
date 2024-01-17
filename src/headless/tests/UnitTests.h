@@ -1,6 +1,9 @@
 #include "../../BYOD.h"
 
-static inline void runTestForAllProcessors (UnitTest* ut, const std::function<void (BaseProcessor*)>& testFunc, const StringArray& procsToSkip = {})
+static inline void runTestForAllProcessors (UnitTest* ut,
+                                            const std::function<void (BaseProcessor*)>& testFunc,
+                                            const StringArray& procsToSkip = {},
+                                            bool startNewTest = true)
 {
     PlayheadHelpers playheadHelper;
     for (auto [name, storeEntry] : ProcessorStore::getStoreMap())
@@ -13,7 +16,8 @@ static inline void runTestForAllProcessors (UnitTest* ut, const std::function<vo
 
         auto proc = storeEntry.factory (nullptr);
         proc->playheadHelpers = &playheadHelper;
-        ut->beginTest (proc->getName() + " Test");
+        if (startNewTest)
+            ut->beginTest (proc->getName() + " Test");
         testFunc (proc.get());
         proc->freeInternalMemory();
     }

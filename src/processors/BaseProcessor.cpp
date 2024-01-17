@@ -139,7 +139,7 @@ std::unique_ptr<XmlElement> BaseProcessor::toXML()
 
     xml->setAttribute ("x_pos", (double) editorPosition.x);
     xml->setAttribute ("y_pos", (double) editorPosition.y);
-    xml->setAttribute ("forwarding_params_offset", forwardingParamsStartIndex);
+    xml->setAttribute ("forwarding_params_slot_index", forwardingParamsSlotIndex);
 
     if (netlistCircuitQuantities != nullptr)
     {
@@ -206,7 +206,7 @@ void BaseProcessor::loadPositionInfoFromXML (XmlElement* xml)
     auto yPos = (float) xml->getDoubleAttribute ("y_pos");
     editorPosition = juce::Point { xPos, yPos };
 
-    forwardingParamsStartIndex = xml->getIntAttribute ("forwarding_params_offset", -1);
+    forwardingParamsSlotIndex = xml->getIntAttribute ("forwarding_params_slot_index", -1);
 }
 
 void BaseProcessor::addConnection (ConnectionInfo&& info)

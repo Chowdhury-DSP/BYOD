@@ -186,8 +186,8 @@ public:
     juce::Point<int> getPosition (Rectangle<int> parentBounds);
 
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
-    int getForwardingParametersIndexOffset() const noexcept { return forwardingParamsStartIndex; }
-    void setForwardingParametersIndexOffset (int offset) { forwardingParamsStartIndex = offset; }
+    int getForwardingParameterSlotIndex() const noexcept { return forwardingParamsSlotIndex; }
+    void setForwardingParameterSlotIndex (int index) { forwardingParamsSlotIndex = index; }
 
     bool isOutputModulationPortConnected();
     const std::vector<String>* getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept;
@@ -314,7 +314,7 @@ private:
     std::unordered_map<int, std::vector<String>> paramsToDisableWhenInputConnected {};
     std::unordered_map<int, std::vector<String>> paramsToEnableWhenInputConnected {};
 
-    int forwardingParamsStartIndex = -1;
+    int forwardingParamsSlotIndex = -1;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };

@@ -2,6 +2,7 @@
 
 #include "processors/chain/ProcessorChain.h"
 
+class ParamForwardManager;
 class StateManager
 {
 public:
@@ -10,7 +11,7 @@ public:
                   chowdsp::PresetManager& presetManager);
 
     std::unique_ptr<XmlElement> saveState();
-    void loadState (XmlElement* xml);
+    void loadState (XmlElement* xml, ParamForwardManager& paramForwardManager);
 
     auto& getUIState() { return uiState; }
 

@@ -12,7 +12,8 @@ public:
                         const chowdsp::Version& stateVersion,
                         bool loadingPreset = false,
                         Component* associatedComponent = nullptr,
-                        WaitableEvent* waiter = nullptr);
+                        WaitableEvent* waiter = nullptr,
+                        ParamForwardManager* paramForwardManager = nullptr);
 
     static bool validateProcChainState (const XmlElement* xml, const ProcessorStore& processorStore);
 

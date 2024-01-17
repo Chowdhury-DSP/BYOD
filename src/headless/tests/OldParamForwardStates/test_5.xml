@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<state state_plugin_version="1.2.1">
+  <Parameters>
+    <PARAM id="dry_wet" value="1.0"/>
+    <PARAM id="in_gain" value="0.0"/>
+    <PARAM id="mono_mode" value="0.0"/>
+    <PARAM id="os_factor" value="1.0"/>
+    <PARAM id="os_mode" value="0.0"/>
+    <PARAM id="os_render_factor" value="1.0"/>
+    <PARAM id="os_render_like_realtime" value="1.0"/>
+    <PARAM id="os_render_mode" value="0.0"/>
+    <PARAM id="out_gain" value="0.0"/>
+  </Parameters>
+  <proc_chain>
+    <Blonde_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="bass" value="0.0"/>
+        <PARAM id="mid" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.0"/>
+      </Parameters>
+    </Blonde_Tone>
+    <Compressor>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="attack" value="10.0"/>
+        <PARAM id="knee" value="6.0"/>
+        <PARAM id="makeup" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ratio" value="2.0"/>
+        <PARAM id="release" value="99.99999237060547"/>
+        <PARAM id="thresh" value="0.0"/>
+      </Parameters>
+    </Compressor>
+    <Trumble_Drive>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="drive" value="0.5"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="stages" value="0.0"/>
+      </Parameters>
+    </Trumble_Drive>
+    <Bassman_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="bass" value="1.0"/>
+        <PARAM id="mid" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.0"/>
+        <circuit_elements R4="56000.0" C1="2.499999929295171e-10" C2="1.999999987845058e-8"
+                          C3="1.999999987845058e-8"/>
+      </Parameters>
+    </Bassman_Tone>
+    <Trainer_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="bass" value="0.5"/>
+        <PARAM id="middle" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.5"/>
+      </Parameters>
+    </Trainer_Tone>
+    <Blonde_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="bass" value="0.0"/>
+        <PARAM id="mid" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.0"/>
+      </Parameters>
+    </Blonde_Tone>
+    <High_Cut>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="cutoff" value="5000.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </High_Cut>
+    <Stinger_Fuzz>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="color" value="0.5"/>
+        <PARAM id="drive" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Stinger_Fuzz>
+    <Stinger_Fuzz>
+      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+        <PARAM id="color" value="0.5"/>
+        <PARAM id="drive" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Stinger_Fuzz>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <Preset_State preset_dirty="1">
+    <Preset name="Default" plugin="BYOD" vendor="CHOW" category="" version="0.5.3"
+            preset_file="">
+      <proc_chain>
+        <Input>
+          <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+            <PARAM id="on_off" value="1.0"/>
+          </Parameters>
+          <port_0 connection_0="-1" connection_end_0="0"/>
+        </Input>
+        <Output>
+          <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+            <PARAM id="on_off"/>
+          </Parameters>
+        </Output>
+      </proc_chain>
+      <extra_info/>
+    </Preset>
+  </Preset_State>
+</state>

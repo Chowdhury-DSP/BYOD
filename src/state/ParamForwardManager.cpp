@@ -46,13 +46,25 @@ const RangedAudioParameter* ParamForwardManager::getForwardedParameterFromIntern
     return nullptr;
 }
 
+int ParamForwardManager::getNextUnusedParamSlot() const
+{
+    for (int i = 0; i < numParamSlots; ++i)
+        if (! paramSlotUsed[i])
+            return i;
+
+    jassertfalse;
+    return -1;
+}
+
 void ParamForwardManager::processorAdded (BaseProcessor* proc)
 {
     auto& procParams = proc->getParameters();
     const auto numParams = procParams.size();
 
-    const auto setForwardParameterRange = [this, &procParams, &proc, numParams] (int startOffset)
+    const auto setForwardParameterRange = [this, &procParams, &proc, numParams] (int slotIndex)
     {
+        paramSlotUsed[slotIndex] = true;
+        const auto startOffset = slotIndex * maxParameterCount;
         setParameterRange (startOffset,
                            startOffset + numParams,
                            [&procParams, &proc, startOffset] (int index) -> chowdsp::ParameterForwardingInfo
@@ -67,12 +79,10 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
                            });
     };
 
-    if (const auto savedOffset = proc->getForwardingParametersIndexOffset(); savedOffset >= 0)
+    if (usingLegacyMode)
     {
-        setForwardParameterRange (savedOffset);
-    }
-    else
-    {
+        jassert (proc->getForwardingParameterSlotIndex() < 0);
+
         // Find a range in forwardedParams with numParams empty params in a row
         int count = 0;
         for (int i = 0; i < (int) forwardedParams.size(); ++i)
@@ -84,40 +94,98 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
 
             if (count == numParams)
             {
-                int startOffset = [i, numParams, proc]
-                {
-                    const auto savedOffset = proc->getForwardingParametersIndexOffset();
-                    if (savedOffset >= 0)
-                        return savedOffset;
-                    return i + 1 - numParams;
-                }();
-                proc->setForwardingParametersIndexOffset (startOffset);
-                setForwardParameterRange (startOffset);
-                break;
+                int startOffset = i + 1 - numParams;
+                setParameterRange (startOffset,
+                                   startOffset + numParams,
+                                   [&procParams, &proc, startOffset] (int index) -> chowdsp::ParameterForwardingInfo
+                                   {
+                                       auto* procParam = procParams[index - startOffset];
+
+                                       if (auto* paramCast = dynamic_cast<RangedAudioParameter*> (procParam))
+                                           return { paramCast, proc->getName() + ": " + paramCast->name };
+
+                                       jassertfalse;
+                                       return {};
+                                   });
+
+                const auto startSlot = startOffset / maxParameterCount;
+                const auto endSlot = ((startOffset + numParams) / maxParameterCount);
+                std::fill (paramSlotUsed + startSlot, paramSlotUsed + endSlot + 1, true);
+
+                return;
             }
         }
+    }
+
+    if (auto slotIndex = proc->getForwardingParameterSlotIndex(); slotIndex >= 0)
+    {
+        jassert (! paramSlotUsed[slotIndex]);
+        setForwardParameterRange (slotIndex);
+    }
+    else
+    {
+        slotIndex = getNextUnusedParamSlot();
+        if (slotIndex < 0)
+        {
+            juce::Logger::writeToLog ("Unable to set up forawrding parameters for " + proc->getName() + " - no free slots available!");
+            return;
+        }
+
+        proc->setForwardingParameterSlotIndex (slotIndex);
+        setForwardParameterRange (slotIndex);
     }
 }
 
 void ParamForwardManager::processorRemoved (const BaseProcessor* proc)
 {
     auto& procParams = proc->getParameters();
+    const auto numParams = procParams.size();
 
-    if (const auto savedOffset = proc->getForwardingParametersIndexOffset(); savedOffset >= 0)
+    if (const auto slotIndex = proc->getForwardingParameterSlotIndex(); slotIndex >= 0)
     {
-        clearParameterRange (savedOffset, savedOffset + procParams.size());
+        paramSlotUsed[slotIndex] = false;
+        const auto startOffset = slotIndex * maxParameterCount;
+        clearParameterRange (startOffset, startOffset + numParams);
     }
     else
     {
+        int startIndex = -1;
         for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
         {
             if (auto* internalParam = param->getParam(); internalParam == procParams[0])
             {
-                clearParameterRange ((int) index, (int) index + procParams.size());
+                startIndex = static_cast<int> (index);
+                clearParameterRange (startIndex, startIndex + numParams);
                 break;
             }
         }
+
+        if (startIndex >= 0)
+        {
+            const auto startSlot = startIndex / maxParameterCount;
+            const auto endSlot = ((startIndex + numParams) / maxParameterCount);
+            for (int checkSlotIndex = startSlot; checkSlotIndex <= endSlot; ++checkSlotIndex)
+            {
+                bool slotUsed = false;
+                for (int i = checkSlotIndex * maxParameterCount; i < (checkSlotIndex + 1) * maxParameterCount; ++i)
+                {
+                    if (forwardedParams[i]->getParam() != nullptr)
+                    {
+                        slotUsed = true;
+                        break;
+                    }
+                }
+
+                if (! slotUsed)
+                    paramSlotUsed[checkSlotIndex] = false;
+            }
+        }
     }
+}
+
+void ParamForwardManager::setUsingLegacyMode (bool useLegacy)
+{
+    usingLegacyMode = useLegacy;
 }
 
 void ParamForwardManager::deferHostNotificationsGlobalSettingChanged (SettingID settingID)
