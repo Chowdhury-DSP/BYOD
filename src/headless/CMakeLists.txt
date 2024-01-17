@@ -57,4 +57,9 @@ target_link_libraries(BYOD_headless PUBLIC
     BYOD
 )
 
+target_compile_definitions(BYOD_headless
+    PRIVATE
+        BYOD_ROOT_DIR="${CMAKE_SOURCE_DIR}"
+)
+
 set_target_properties(BYOD_headless PROPERTIES CXX_VISIBILITY_PRESET hidden)

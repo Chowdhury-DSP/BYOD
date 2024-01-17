@@ -227,9 +227,7 @@ public:
 
         const auto [stateFile, paramsFile] = [i]
         {
-            auto rootDir = File::getSpecialLocation (File::currentExecutableFile);
-            while (rootDir.getFileName() != "BYOD")
-                rootDir = rootDir.getParentDirectory();
+            const auto rootDir = juce::File { BYOD_ROOT_DIR };
             const auto fileDir = rootDir.getChildFile ("src/headless/tests/OldParamForwardStates");
             return std::make_pair (fileDir.getChildFile ("test_" + juce::String { i } + ".xml"),
                                    fileDir.getChildFile ("test_" + juce::String { i } + ".txt"));

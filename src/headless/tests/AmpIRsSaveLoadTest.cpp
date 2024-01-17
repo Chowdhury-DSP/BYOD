@@ -36,9 +36,7 @@ public:
 
         const auto testIRFile = []
         {
-            auto rootDir = File::getSpecialLocation (File::currentExecutableFile);
-            while (rootDir.getFileName() != "BYOD")
-                rootDir = rootDir.getParentDirectory();
+            const auto rootDir = juce::File { BYOD_ROOT_DIR };
             return rootDir.getChildFile ("src/headless/tests/test_ir.wav");
         }();
 
