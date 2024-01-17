@@ -13,91 +13,101 @@
     <PARAM id="out_gain" value="0.0"/>
   </Parameters>
   <proc_chain>
-    <Treble_Booster>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="boost" value="0.25"/>
-        <PARAM id="on_off" value="1.0"/>
-        <circuit_elements R21="1800.0" R22="100000.0" R23="4700.0" R24="100000.0" C14="3.899999878598237e-9"/>
-      </Parameters>
-    </Treble_Booster>
-    <Phaser8>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="depth" value="1.0"/>
-        <PARAM id="feedback" value="0.75"/>
-        <PARAM id="modulation" value="0.75"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="rate" value="0.9999999403953552"/>
-      </Parameters>
-    </Phaser8>
-    <Swinger_Pre>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="bass" value="0.5"/>
-        <PARAM id="drive" value="0.5"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="treble" value="0.5"/>
-      </Parameters>
-    </Swinger_Pre>
-    <Chorus>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+    <Delay>
+      <Parameters x_pos="0.0" y_pos="0.0">
         <PARAM id="delay_type" value="0.0"/>
-        <PARAM id="depth" value="0.5"/>
         <PARAM id="feedback" value="0.0"/>
+        <PARAM id="freq" value="10000.0"/>
         <PARAM id="mix" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
-        <PARAM id="rate" value="0.5"/>
+        <PARAM id="ping_pong" value="0.0"/>
+        <PARAM id="tempo_sync" value="0.0"/>
+        <PARAM id="time_ms" value="99.99999237060547"/>
+        <PARAM id="time_tempo_sync" value="0.0"/>
       </Parameters>
-    </Chorus>
-    <Yen_Drive>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="gain" value="0.5"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="voice" value="0.5"/>
-        <circuit_elements R4="470000.0" C3="4.700000033608376e-7" C4="1.000000013351432e-10"
-                          C5="1.000000011686097e-7"/>
-      </Parameters>
-    </Yen_Drive>
-    <Metal_Face>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="gain" value="-12.0"/>
-        <PARAM id="on_off" value="1.0"/>
-      </Parameters>
-    </Metal_Face>
-    <Fuzz_Machine>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="fuzz" value="0.5"/>
-        <PARAM id="model" value="1.0"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="vol" value="0.5"/>
-      </Parameters>
-    </Fuzz_Machine>
-    <Tone_King>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+    </Delay>
+    <Diode_Clipper>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0009765625"/>
+        <PARAM id="diode" value="0.0"/>
         <PARAM id="drive" value="0.5"/>
-        <PARAM id="mode" value="1.0"/>
-        <PARAM id="on_off" value="1.0"/>
-        <circuit_elements R4="1.0e6" R6="10000.0" R7="33000.0" R8="27000.0" R9="10000.0"
-                          R10="220000.0" R11="6800.0" R12="1000.0" C3="9.99999993922529e-9"
-                          C4="1.000000013351432e-10" C5="9.99999993922529e-9" C6="9.99999993922529e-9"
-                          C7="1.000000011686097e-7"/>
-      </Parameters>
-    </Tone_King>
-    <Vogue_Ladder>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="drive" value="0.0"/>
-        <PARAM id="freq" value="1000.000183105469"/>
-        <PARAM id="k_val" value="0.5"/>
-        <PARAM id="mod_depth" value="0.5"/>
+        <PARAM id="num_diodes" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
-    </Vogue_Ladder>
+    </Diode_Clipper>
+    <High_Cut>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </High_Cut>
+    <Blonde_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="bass" value="0.0"/>
+        <PARAM id="mid" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.0"/>
+      </Parameters>
+    </Blonde_Tone>
+    <Muff_Drive>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="harmonics" value="0.6499999761581421"/>
+        <PARAM id="high_q" value="0.0"/>
+        <PARAM id="level" value="0.6499999761581421"/>
+        <PARAM id="n_stages" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="smoothing" value="0.0"/>
+        <PARAM id="sustain" value="0.5"/>
+      </Parameters>
+    </Muff_Drive>
+    <Scanner_Vibrato>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="6.0"/>
+        <PARAM id="stereo" value="0.0"/>
+      </Parameters>
+    </Scanner_Vibrato>
+    <Scanner_Vibrato>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="6.0"/>
+        <PARAM id="stereo" value="0.0"/>
+      </Parameters>
+    </Scanner_Vibrato>
+    <Ladder_Filter>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="DRIVE" value="0.5"/>
+        <PARAM id="FILTER_MODE" value="0.0"/>
+        <PARAM id="HP_CUTOFF" value="0.0"/>
+        <PARAM id="HP_RESONANCE" value="0.0"/>
+        <PARAM id="LP_CUTOFF" value="1.0"/>
+        <PARAM id="LP_RESONANCE" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Ladder_Filter>
+    <Diode_Clipper>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0009765625"/>
+        <PARAM id="diode" value="0.0"/>
+        <PARAM id="drive" value="0.5"/>
+        <PARAM id="num_diodes" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Diode_Clipper>
     <Input>
-      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="-1" connection_end_0="0"/>
     </Input>
     <Output>
-      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
     </Output>

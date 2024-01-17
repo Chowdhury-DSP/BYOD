@@ -164,6 +164,8 @@ void BaseProcessor::fromXML (XmlElement* xml, const chowdsp::Version&, bool load
 
     vts.state = ValueTree::fromXml (*xml); // don't use `replaceState()` otherwise UndoManager will clear
 
+    forwardingParamsSlotIndex = xml->getIntAttribute ("forwarding_params_slot_index", -1);
+
     if (loadPosition)
         loadPositionInfoFromXML (xml);
 
@@ -205,8 +207,6 @@ void BaseProcessor::loadPositionInfoFromXML (XmlElement* xml)
     auto xPos = (float) xml->getDoubleAttribute ("x_pos");
     auto yPos = (float) xml->getDoubleAttribute ("y_pos");
     editorPosition = juce::Point { xPos, yPos };
-
-    forwardingParamsSlotIndex = xml->getIntAttribute ("forwarding_params_slot_index", -1);
 }
 
 void BaseProcessor::addConnection (ConnectionInfo&& info)

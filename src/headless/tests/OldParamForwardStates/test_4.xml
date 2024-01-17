@@ -13,93 +13,92 @@
     <PARAM id="out_gain" value="0.0"/>
   </Parameters>
   <proc_chain>
-    <Opto_Comp>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="input_gain" value="0.0"/>
-        <PARAM id="mode" value="0.0"/>
+    <Warp>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="fb" value="0.5"/>
+        <PARAM id="fb_drive" value="5.0"/>
+        <PARAM id="freq" value="249.9999847412109"/>
+        <PARAM id="gain" value="6.0"/>
         <PARAM id="on_off" value="1.0"/>
-        <PARAM id="opto" value="0.5"/>
-        <PARAM id="output_gain" value="0.0"/>
-        <PARAM id="ratio" value="2.0"/>
+      </Parameters>
+    </Warp>
+    <Blonde_Drive>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="bias" value="0.5"/>
+        <PARAM id="char" value="0.0"/>
+        <PARAM id="drive" value="0.5"/>
+        <PARAM id="high_q" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Blonde_Drive>
+    <Envelope_Filter>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="direct_control" value="0.0"/>
+        <PARAM id="filter_type" value="0.0"/>
+        <PARAM id="freq" value="249.9999847412109"/>
+        <PARAM id="freq_mod" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="res" value="0.5"/>
+        <PARAM id="sense" value="0.5"/>
         <PARAM id="speed" value="0.5"/>
       </Parameters>
-    </Opto_Comp>
-    <Poly-M>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="freq" value="1000.000183105469"/>
-        <PARAM id="k1" value="0.5"/>
-        <PARAM id="k2" value="0.0"/>
-        <PARAM id="mod_depth" value="0.5"/>
+    </Envelope_Filter>
+    <TS-Tone>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+        <circuit_elements R7="1000.0" R8="220.0" R9="10000.0" R11="1000.0" R12="1000.0"
+                          C5="2.200000039920269e-7" C6="2.200000039920269e-7" C7="9.999999974752427e-7"/>
+      </Parameters>
+    </TS-Tone>
+    <High_Cut>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
-    </Poly-M>
-    <Phaser4>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="depth" value="1.0"/>
-        <PARAM id="fb_stage" value="0.0"/>
-        <PARAM id="feedback" value="0.6000000238418579"/>
-        <PARAM id="mix" value="0.5"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="rate" value="0.9999999403953552"/>
-        <PARAM id="stereo" value="0.0"/>
-        <circuit_elements R6="24000.0" C1="4.700000033608376e-8"/>
-      </Parameters>
-    </Phaser4>
-    <Waterfall_Drive>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="drive" value="0.5"/>
-        <PARAM id="n_stages" value="1.0"/>
+    </High_Cut>
+    <LoFi_IRs>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="gain" value="0.0"/>
+        <PARAM id="ir" value="0.0"/>
+        <PARAM id="mix" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
-    </Waterfall_Drive>
-    <Hysteresis>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="drive" value="0.5"/>
+    </LoFi_IRs>
+    <Blonde_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="bass" value="0.0"/>
+        <PARAM id="mid" value="0.0"/>
         <PARAM id="on_off" value="1.0"/>
-        <PARAM id="sat" value="0.5"/>
-        <PARAM id="width" value="0.5"/>
+        <PARAM id="treble" value="0.0"/>
       </Parameters>
-    </Hysteresis>
-    <Param_Modulator>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="bipolar_mod" value="0.0"/>
-        <PARAM id="bipolar_mode" value="1.0"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="unipolar_mod" value="0.0"/>
-      </Parameters>
-    </Param_Modulator>
+    </Blonde_Tone>
     <Range_Booster>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+      <Parameters x_pos="0.0" y_pos="0.0">
         <PARAM id="boost" value="0.0"/>
         <PARAM id="high_q" value="0.0"/>
         <PARAM id="on_off" value="1.0"/>
         <PARAM id="range" value="2600.0"/>
       </Parameters>
     </Range_Booster>
-    <Stereo_Splitter>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="mode" value="0.0"/>
-        <PARAM id="on_off" value="1.0"/>
-      </Parameters>
-    </Stereo_Splitter>
-    <Tremolo>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+    <Chorus>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="delay_type" value="0.0"/>
         <PARAM id="depth" value="0.5"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="mix" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
-        <PARAM id="rate" value="10.0"/>
-        <PARAM id="stereo" value="0.0"/>
-        <PARAM id="v1_wave" value="0.0"/>
-        <PARAM id="wave" value="0.5"/>
+        <PARAM id="rate" value="0.5"/>
       </Parameters>
-    </Tremolo>
+    </Chorus>
     <Input>
-      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="-1" connection_end_0="0"/>
     </Input>
     <Output>
-      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
     </Output>

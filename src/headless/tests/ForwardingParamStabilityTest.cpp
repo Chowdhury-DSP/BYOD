@@ -303,11 +303,7 @@ public:
         }
 
         beginTest ("Legacy Forwarding Parameter Compatibility Test");
-#if JUCE_DEBUG
-        for (int i = 0; i < 1; ++i)
-#else
         for (int i = 0; i < 5; ++i)
-#endif
         {
             testLegacyState (i);
         }

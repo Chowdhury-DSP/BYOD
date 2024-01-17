@@ -52,7 +52,6 @@ int ParamForwardManager::getNextUnusedParamSlot() const
         if (! paramSlotUsed[i])
             return i;
 
-    jassertfalse;
     return -1;
 }
 
@@ -127,7 +126,7 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
         slotIndex = getNextUnusedParamSlot();
         if (slotIndex < 0)
         {
-            juce::Logger::writeToLog ("Unable to set up forawrding parameters for " + proc->getName() + " - no free slots available!");
+            juce::Logger::writeToLog ("Unable to set up forwarding parameters for " + proc->getName() + " - no free slots available!");
             return;
         }
 

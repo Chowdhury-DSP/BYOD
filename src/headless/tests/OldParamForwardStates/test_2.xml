@@ -13,81 +13,38 @@
     <PARAM id="out_gain" value="0.0"/>
   </Parameters>
   <proc_chain>
-    <Gate>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="attack" value="10.0"/>
-        <PARAM id="hold" value="200.0000152587891"/>
-        <PARAM id="makeup" value="0.0"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="release" value="399.9999389648438"/>
-        <PARAM id="thresh" value="-35.0"/>
-      </Parameters>
-    </Gate>
-    <Envelope_Filter>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="direct_control" value="0.0"/>
-        <PARAM id="filter_type" value="0.0"/>
-        <PARAM id="freq" value="249.9999847412109"/>
-        <PARAM id="freq_mod" value="0.0"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="res" value="0.5"/>
-        <PARAM id="sense" value="0.5"/>
-        <PARAM id="speed" value="0.5"/>
-      </Parameters>
-    </Envelope_Filter>
-    <Bass_Cleaner>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="clean" value="0.5"/>
-        <PARAM id="on_off" value="1.0"/>
-        <circuit_elements R4="3300.0" C3="9.999999974752427e-7" C4="4.700000033608376e-8"/>
-      </Parameters>
-    </Bass_Cleaner>
-    <JK_Amp>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="drive" value="0.5"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="prescence" value="0.0"/>
-      </Parameters>
-    </JK_Amp>
-    <Rotary>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="depth" value="0.5"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="rate" value="1.0"/>
-        <PARAM id="stereo" value="0.0"/>
-      </Parameters>
-    </Rotary>
-    <Octaver>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="cutoff" value="2000.0"/>
-        <PARAM id="mix" value="0.75"/>
-        <PARAM id="on_off" value="1.0"/>
-        <PARAM id="tracking" value="650.0"/>
-      </Parameters>
-    </Octaver>
-    <Tube_Screamer>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+    <Diode_Rectifier>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0009765625"/>
         <PARAM id="diode" value="0.0"/>
-        <PARAM id="gain" value="0.5"/>
+        <PARAM id="drive" value="0.5"/>
         <PARAM id="num_diodes" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>
-        <circuit_elements R4="4700.0" R5="10000.0" C2="9.999999974752427e-7" C3="4.700000033608376e-8"
-                          C4="5.099999936253319e-11"/>
       </Parameters>
-    </Tube_Screamer>
-    <Compressor>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
-        <PARAM id="attack" value="10.0"/>
-        <PARAM id="knee" value="6.0"/>
-        <PARAM id="makeup" value="0.0"/>
+    </Diode_Rectifier>
+    <Flapjack>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="drive" value="0.75"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="lowcut" value="100.0000076293945"/>
+        <PARAM id="mode" value="1.0"/>
         <PARAM id="on_off" value="1.0"/>
-        <PARAM id="ratio" value="2.0"/>
-        <PARAM id="release" value="99.99999237060547"/>
-        <PARAM id="thresh" value="0.0"/>
+        <PARAM id="presence" value="0.5"/>
+        <circuit_elements R1="1.0e6" R2="10000.0" R3="100000.0" R5="10000.0" R6="10000.0"
+                          R7="1000.0" C1="9.99999993922529e-9" C2="9.999999747378752e-6"
+                          C6="2.200000004393132e-8" C7="8.199999967928306e-8"/>
       </Parameters>
-    </Compressor>
+    </Flapjack>
+    <LoFi_IRs>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="gain" value="0.0"/>
+        <PARAM id="ir" value="0.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </LoFi_IRs>
     <Tremolo>
-      <Parameters x_pos="0.0" y_pos="0.0" forwarding_params_slot_index="-1">
+      <Parameters x_pos="0.0" y_pos="0.0">
         <PARAM id="depth" value="0.5"/>
         <PARAM id="on_off" value="1.0"/>
         <PARAM id="rate" value="10.0"/>
@@ -96,14 +53,67 @@
         <PARAM id="wave" value="0.5"/>
       </Parameters>
     </Tremolo>
+    <Muff_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="mids" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+        <PARAM id="type" value="2.0"/>
+        <circuit_elements R5="7700.0" R_mids="28600.0" R8="39000.0" R_tone="100000.0" C8="9.99999993922529e-9"
+                          C9="3.999999886872274e-9"/>
+      </Parameters>
+    </Muff_Tone>
+    <Ladder_Filter>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="DRIVE" value="0.5"/>
+        <PARAM id="FILTER_MODE" value="0.0"/>
+        <PARAM id="HP_CUTOFF" value="0.0"/>
+        <PARAM id="HP_RESONANCE" value="0.0"/>
+        <PARAM id="LP_CUTOFF" value="1.0"/>
+        <PARAM id="LP_RESONANCE" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Ladder_Filter>
+    <Chorus>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.5"/>
+      </Parameters>
+    </Chorus>
+    <Ladder_Filter>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="DRIVE" value="0.5"/>
+        <PARAM id="FILTER_MODE" value="0.0"/>
+        <PARAM id="HP_CUTOFF" value="0.0"/>
+        <PARAM id="HP_RESONANCE" value="0.0"/>
+        <PARAM id="LP_CUTOFF" value="1.0"/>
+        <PARAM id="LP_RESONANCE" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Ladder_Filter>
+    <Graphic_EQ>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="gain_0" value="0.0"/>
+        <PARAM id="gain_1" value="0.0"/>
+        <PARAM id="gain_2" value="0.0"/>
+        <PARAM id="gain_3" value="0.0"/>
+        <PARAM id="gain_4" value="0.0"/>
+        <PARAM id="gain_5" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Graphic_EQ>
     <Input>
-      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
       <port_0 connection_0="-1" connection_end_0="0"/>
     </Input>
     <Output>
-      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046" forwarding_params_slot_index="-1">
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
         <PARAM id="on_off" value="1.0"/>
       </Parameters>
     </Output>
