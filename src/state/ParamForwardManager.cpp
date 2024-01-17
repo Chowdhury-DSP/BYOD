@@ -46,13 +46,25 @@ const RangedAudioParameter* ParamForwardManager::getForwardedParameterFromIntern
     return nullptr;
 }
 
+int ParamForwardManager::getNextUnusedParamSlot() const
+{
+    for (int i = 0; i < numParamSlots; ++i)
+        if (! paramSlotUsed[i])
+            return i;
+
+    jassertfalse;
+    return -1;
+}
+
 void ParamForwardManager::processorAdded (BaseProcessor* proc)
 {
     auto& procParams = proc->getParameters();
     const auto numParams = procParams.size();
 
-    const auto setForwardParameterRange = [this, &procParams, &proc, numParams] (int startOffset)
+    const auto setForwardParameterRange = [this, &procParams, &proc, numParams] (int slotIndex)
     {
+        paramSlotUsed[slotIndex] = true;
+        const auto startOffset = slotIndex * maxParameterCount;
         setParameterRange (startOffset,
                            startOffset + numParams,
                            [&procParams, &proc, startOffset] (int index) -> chowdsp::ParameterForwardingInfo
@@ -67,35 +79,22 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
                            });
     };
 
-    if (const auto savedOffset = proc->getForwardingParametersIndexOffset(); savedOffset >= 0)
+    if (auto slotIndex = proc->getForwardingParameterSlotIndex(); slotIndex >= 0)
     {
-        setForwardParameterRange (savedOffset);
+        jassert (! paramSlotUsed[slotIndex]);
+        setForwardParameterRange (slotIndex);
     }
     else
     {
-        // Find a range in forwardedParams with numParams empty params in a row
-        int count = 0;
-        for (int i = 0; i < (int) forwardedParams.size(); ++i)
+        slotIndex = getNextUnusedParamSlot();
+        if (slotIndex < 0)
         {
-            if (forwardedParams[i]->getParam() == nullptr)
-                count++;
-            else
-                count = 0;
-
-            if (count == numParams)
-            {
-                int startOffset = [i, numParams, proc]
-                {
-                    const auto savedOffset = proc->getForwardingParametersIndexOffset();
-                    if (savedOffset >= 0)
-                        return savedOffset;
-                    return i + 1 - numParams;
-                }();
-                proc->setForwardingParametersIndexOffset (startOffset);
-                setForwardParameterRange (startOffset);
-                break;
-            }
+            juce::Logger::writeToLog ("Unable to set up forawrding parameters for " + proc->getName() + " - no free slots available!");
+            return;
         }
+
+        proc->setForwardingParameterSlotIndex (slotIndex);
+        setForwardParameterRange (slotIndex);
     }
 }
 
@@ -103,21 +102,23 @@ void ParamForwardManager::processorRemoved (const BaseProcessor* proc)
 {
     auto& procParams = proc->getParameters();
 
-    if (const auto savedOffset = proc->getForwardingParametersIndexOffset(); savedOffset >= 0)
+    if (const auto slotIndex = proc->getForwardingParameterSlotIndex(); slotIndex >= 0)
     {
-        clearParameterRange (savedOffset, savedOffset + procParams.size());
+        paramSlotUsed[slotIndex] = false;
+        const auto startOffset = slotIndex * maxParameterCount;
+        clearParameterRange (startOffset, startOffset + procParams.size());
     }
-    else
-    {
-        for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
-        {
-            if (auto* internalParam = param->getParam(); internalParam == procParams[0])
-            {
-                clearParameterRange ((int) index, (int) index + procParams.size());
-                break;
-            }
-        }
-    }
+    // else
+    // {
+    //     for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
+    //     {
+    //         if (auto* internalParam = param->getParam(); internalParam == procParams[0])
+    //         {
+    //             clearParameterRange ((int) index, (int) index + procParams.size());
+    //             break;
+    //         }
+    //     }
+    // }
 }
 
 void ParamForwardManager::deferHostNotificationsGlobalSettingChanged (SettingID settingID)

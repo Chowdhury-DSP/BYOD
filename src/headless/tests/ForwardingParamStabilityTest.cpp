@@ -55,11 +55,17 @@ public:
         std::vector<Action> actions {
             { "Add Processor", [&]
               { return addProcessor (procChain, undoManager); } },
+            { "Add Processor", [&]
+              { return addProcessor (procChain, undoManager); } },
             { "Remove Processor", [&]
               { return removeProcessor (procChain); } },
         };
 
-        for (int count = 0; count < 100;)
+#if JUCE_DEBUG
+        for (int count = 0; count < 9;)
+#else
+        for (int count = 0; count < 101;)
+#endif
         {
             auto& action = actions[rand.nextInt ((int) actions.size())];
             if (action.action())
@@ -105,11 +111,29 @@ public:
 
     void runTest() override
     {
-        rand = Random { 1234 }; // getRandom();
+        beginTest ("Check Max Parameter Count");
+        runTestForAllProcessors (
+            this,
+            [this] (BaseProcessor* proc)
+            {
+                expectLessThan (proc->getParameters().size(),
+                                ParamForwardManager::maxParameterCount,
+                                "");
+            },
+            {},
+            false);
 
         beginTest ("Forwarding Parameter Stability Test");
-        const auto [paramNames, state] = runPlugin();
-        testPlugin (paramNames, state);
+        rand = Random { 1245 };
+#if JUCE_DEBUG
+        for (int i = 0; i < 1; ++i)
+#else
+        for (int i = 0; i < 10; ++i)
+#endif
+        {
+            const auto [paramNames, state] = runPlugin();
+            testPlugin (paramNames, state);
+        }
     }
 
     Random rand;

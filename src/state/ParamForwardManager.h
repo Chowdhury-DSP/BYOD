@@ -8,6 +8,9 @@ class ParamForwardManager : public chowdsp::ForwardingParametersManager<ParamFor
     using SettingID = chowdsp::GlobalPluginSettings::SettingID;
 
 public:
+    static constexpr int maxParameterCount = 12;
+    static constexpr auto numParamSlots = 40;
+
     ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& chain);
     ~ParamForwardManager();
 
@@ -22,6 +25,7 @@ public:
 
 private:
     void deferHostNotificationsGlobalSettingChanged (SettingID settingID);
+    int getNextUnusedParamSlot() const;
 
     ProcessorChain& chain;
 
@@ -29,6 +33,8 @@ private:
 
     chowdsp::SharedPluginSettings pluginSettings;
     std::optional<ScopedForceDeferHostNotifications> deferHostNotifs {};
+
+    bool paramSlotUsed[numParamSlots] {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamForwardManager)
 };
