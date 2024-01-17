@@ -127,7 +127,7 @@ void RONN::parameterChanged (const String& parameterID, float newValue)
         return;
 
     auto seedIdx = int (newValue);
-    reloadModel (RONNRandom::randomSeeds[seedIdx]);
+    // reloadModel (RONNRandom::randomSeeds[seedIdx]);
     needsPrebuffering = true;
 }
 
@@ -198,7 +198,7 @@ void RONN::prepare (double sampleRate, int samplesPerBlock)
     dcBlocker.prepare (sampleRate, samplesPerBlock);
 
     maxBlockSize = samplesPerBlock;
-    doPrebuffering();
+    // doPrebuffering();
 }
 
 void RONN::doPrebuffering()

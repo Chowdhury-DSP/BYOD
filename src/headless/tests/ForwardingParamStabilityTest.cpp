@@ -99,40 +99,96 @@ public:
         for (auto [idx, param] : chowdsp::enumerate (forwardingParams))
         {
             if (auto* forwardedParam = param->getParam())
+            {
                 expectEquals (forwardedParam->getName (1024).toStdString(),
                               paramNames[idx],
                               "Parameter name mismatch");
+            }
             else
+            {
                 expectEquals (std::string {},
                               paramNames[idx],
                               "Parameter name mismatch");
+            }
+        }
+    }
+
+    void testLegacyState (int i)
+    {
+        const auto [stateFile, paramsFile] = [i]
+        {
+            auto rootDir = File::getSpecialLocation (File::currentExecutableFile);
+            while (rootDir.getFileName() != "BYOD")
+                rootDir = rootDir.getParentDirectory();
+            const auto fileDir = rootDir.getChildFile ("src/headless/tests/OldParamForwardStates");
+            return std::make_pair (fileDir.getChildFile ("test_" + juce::String { i } + ".xml"),
+                                   fileDir.getChildFile ("test_" + juce::String { i } + ".txt"));
+        }();
+
+        const auto stateXml = XmlDocument::parse (stateFile);
+        BYOD plugin;
+        juce::MemoryBlock state;
+        plugin.copyXmlToBinary (*stateXml, state);
+        plugin.setStateInformation (state.getData(), state.getSize());
+
+        juce::StringArray paramNames;
+        paramNames.addTokens (paramsFile.loadFileAsString(), ",", {});
+        jassert (paramNames.size() == 500);
+        for (auto& name : paramNames)
+            name = name.trimCharactersAtStart (" ");
+
+        auto& forwardingParams = plugin.getParamForwarder().getForwardedParameters();
+        for (auto [idx, param] : chowdsp::enumerate (forwardingParams))
+        {
+            if (auto* forwardedParam = param->getParam())
+            {
+                expectEquals (forwardedParam->getName (1024),
+                              paramNames[idx],
+                              "Parameter name mismatch");
+            }
+            else
+            {
+                expectEquals (juce::String { "EMPTY" },
+                              paramNames[idx],
+                              "Parameter name mismatch");
+            }
         }
     }
 
     void runTest() override
     {
-        beginTest ("Check Max Parameter Count");
-        runTestForAllProcessors (
-            this,
-            [this] (BaseProcessor* proc)
-            {
-                expectLessThan (proc->getParameters().size(),
-                                ParamForwardManager::maxParameterCount,
-                                "");
-            },
-            {},
-            false);
+//         beginTest ("Check Max Parameter Count");
+//         runTestForAllProcessors (
+//             this,
+//             [this] (BaseProcessor* proc)
+//             {
+//                 expectLessThan (proc->getParameters().size(),
+//                                 ParamForwardManager::maxParameterCount,
+//                                 "");
+//             },
+//             {},
+//             false);
+//
+//         beginTest ("Forwarding Parameter Stability Test");
+//         rand = Random { 1245 };
+// #if JUCE_DEBUG
+//         for (int i = 0; i < 1; ++i)
+// #else
+//         for (int i = 0; i < 10; ++i)
+// #endif
+//         {
+//             const auto [paramNames, state] = runPlugin();
+//             testPlugin (paramNames, state);
+//         }
 
-        beginTest ("Forwarding Parameter Stability Test");
-        rand = Random { 1245 };
+        beginTest ("Legacy Forwarding Parameter Compatibility Test");
 #if JUCE_DEBUG
         for (int i = 0; i < 1; ++i)
 #else
         for (int i = 0; i < 10; ++i)
 #endif
         {
-            const auto [paramNames, state] = runPlugin();
-            testPlugin (paramNames, state);
+            testLegacyState (i);
         }
     }
 

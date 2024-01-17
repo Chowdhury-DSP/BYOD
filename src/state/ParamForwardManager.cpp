@@ -79,6 +79,44 @@ void ParamForwardManager::processorAdded (BaseProcessor* proc)
                            });
     };
 
+    if (usingLegacyMode)
+    {
+        jassert (proc->getForwardingParameterSlotIndex() < 0);
+
+        // Find a range in forwardedParams with numParams empty params in a row
+        int count = 0;
+        for (int i = 0; i < (int) forwardedParams.size(); ++i)
+        {
+            if (forwardedParams[i]->getParam() == nullptr)
+                count++;
+            else
+                count = 0;
+
+            if (count == numParams)
+            {
+                int startOffset = i + 1 - numParams;
+                setParameterRange (startOffset,
+                                   startOffset + numParams,
+                                   [&procParams, &proc, startOffset] (int index) -> chowdsp::ParameterForwardingInfo
+                                   {
+                                       auto* procParam = procParams[index - startOffset];
+
+                                       if (auto* paramCast = dynamic_cast<RangedAudioParameter*> (procParam))
+                                           return { paramCast, proc->getName() + ": " + paramCast->name };
+
+                                       jassertfalse;
+                                       return {};
+                                   });
+
+                const auto startSlot = startOffset / maxParameterCount;
+                const auto endSlot = ((startOffset + numParams) / maxParameterCount);
+                std::fill (paramSlotUsed + startSlot, paramSlotUsed + endSlot + 1, true);
+
+                return;
+            }
+        }
+    }
+
     if (auto slotIndex = proc->getForwardingParameterSlotIndex(); slotIndex >= 0)
     {
         jassert (! paramSlotUsed[slotIndex]);
@@ -108,17 +146,32 @@ void ParamForwardManager::processorRemoved (const BaseProcessor* proc)
         const auto startOffset = slotIndex * maxParameterCount;
         clearParameterRange (startOffset, startOffset + procParams.size());
     }
-    // else
-    // {
-    //     for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
-    //     {
-    //         if (auto* internalParam = param->getParam(); internalParam == procParams[0])
-    //         {
-    //             clearParameterRange ((int) index, (int) index + procParams.size());
-    //             break;
-    //         }
-    //     }
-    // }
+    else
+    {
+        for (auto [index, param] : sst::cpputils::enumerate (forwardedParams))
+        {
+            if (auto* internalParam = param->getParam(); internalParam == procParams[0])
+            {
+                clearParameterRange ((int) index, (int) index + procParams.size());
+                break;
+            }
+        }
+
+
+    }
+}
+
+void ParamForwardManager::setUsingLegacyMode (bool useLegacy)
+{
+    usingLegacyMode = useLegacy;
+    if (useLegacy)
+    {
+
+    }
+    else
+    {
+
+    }
 }
 
 void ParamForwardManager::deferHostNotificationsGlobalSettingChanged (SettingID settingID)

@@ -21,6 +21,8 @@ public:
 
     const RangedAudioParameter* getForwardedParameterFromInternal (const RangedAudioParameter& internalParameter) const;
 
+    void setUsingLegacyMode (bool useLegacy);
+
     static constexpr SettingID refreshParamTreeID = "refresh_param_tree"; // IOS+AUv3 only!
 
 private:
@@ -35,6 +37,7 @@ private:
     std::optional<ScopedForceDeferHostNotifications> deferHostNotifs {};
 
     bool paramSlotUsed[numParamSlots] {};
+    bool usingLegacyMode = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParamForwardManager)
 };

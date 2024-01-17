@@ -39,7 +39,7 @@ std::unique_ptr<XmlElement> StateManager::saveState()
     return xml;
 }
 
-void StateManager::loadState (XmlElement* xmlState)
+void StateManager::loadState (XmlElement* xmlState, ParamForwardManager& paramForwardManager)
 {
     if (xmlState == nullptr) // invalid XML
         return;
@@ -69,9 +69,14 @@ void StateManager::loadState (XmlElement* xmlState)
     std::unique_ptr<WaitableEvent> waiter;
     if (pluginWrapperType != AudioProcessor::WrapperType::wrapperType_AAX)
         waiter = std::make_unique<WaitableEvent>();
-    procChain.getStateHelper().loadProcChain (procChainXml, pluginVersion, false, nullptr, waiter.get());
+    procChain.getStateHelper().loadProcChain (procChainXml,
+                                              pluginVersion,
+                                              false,
+                                              nullptr,
+                                              waiter.get(),
+                                              &paramForwardManager);
     if (waiter != nullptr)
-        waiter->wait (1000);
+        waiter->wait (5000);
 
     std::optional<MessageManagerLock> mml {};
     if (pluginWrapperType != AudioProcessor::WrapperType::wrapperType_AAX)

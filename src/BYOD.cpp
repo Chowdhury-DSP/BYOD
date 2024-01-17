@@ -131,7 +131,7 @@ void BYOD::getStateInformation (MemoryBlock& destData)
 
 void BYOD::setStateInformation (const void* data, int sizeInBytes)
 {
-    stateManager->loadState (getXmlFromBinary (data, sizeInBytes).get());
+    stateManager->loadState (getXmlFromBinary (data, sizeInBytes).get(), *paramForwarder);
 
     if (wrapperType == WrapperType::wrapperType_AudioUnitv3)
     {
