@@ -72,11 +72,13 @@ jobs:
 
     - name: Build
       shell: bash
-      run: cmake --build build --config Release --parallel 3 --target BYOD_Standalone BYOD_VST3 BYOD_CLAP BYOD_headless
+      run: cmake --build build --config Release --parallel 4 --target BYOD_Standalone BYOD_VST3 BYOD_CLAP
 
     - name: Unit Tests
       if: runner.os == 'Linux' || runner.os == 'MacOS'
-      run: build/BYOD --unit-tests --all
+      run: |
+        cmake --build build --config Release --parallel 4 --target BYOD_headless
+        build/BYOD --unit-tests --all
 
     - name: Validate
       if: runner.os == 'Windows' # || runner.os == 'MacOS'
