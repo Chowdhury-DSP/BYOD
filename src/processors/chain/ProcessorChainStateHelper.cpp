@@ -74,14 +74,17 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml,
         });
 }
 
-std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
+std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain (bool savingPreset)
 {
     auto xml = std::make_unique<XmlElement> (procChainStateTag);
 
     auto saveProcessor = [&] (BaseProcessor* proc)
     {
         auto procXml = std::make_unique<XmlElement> (ChainStateHelperFuncs::getProcessorTagName (proc));
-        procXml->addChildElement (proc->toXML().release());
+        auto procParamsXml = proc->toXML();
+        if (savingPreset)
+            procParamsXml->removeAttribute (chowdsp::toString (ParamForwardManager::processorSlotIndexTag));
+        procXml->addChildElement (procParamsXml.release());
 
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {

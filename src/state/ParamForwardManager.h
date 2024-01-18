@@ -10,6 +10,7 @@ class ParamForwardManager : public chowdsp::ForwardingParametersManager<ParamFor
 public:
     static constexpr int maxParameterCount = 12;
     static constexpr auto numParamSlots = 40;
+    static constexpr std::string_view processorSlotIndexTag = "forwarding_params_slot_index";
 
     ParamForwardManager (AudioProcessorValueTreeState& vts, ProcessorChain& chain);
     ~ParamForwardManager();

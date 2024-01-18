@@ -1,6 +1,7 @@
 #include "BaseProcessor.h"
 #include "gui/pedalboard/editors/ProcessorEditor.h"
 #include "netlist_helpers/NetlistViewer.h"
+#include "state/ParamForwardManager.h"
 
 BaseProcessor::BaseProcessor (const String& name,
                               ParamLayout params,
@@ -139,7 +140,7 @@ std::unique_ptr<XmlElement> BaseProcessor::toXML()
 
     xml->setAttribute ("x_pos", (double) editorPosition.x);
     xml->setAttribute ("y_pos", (double) editorPosition.y);
-    xml->setAttribute ("forwarding_params_slot_index", forwardingParamsSlotIndex);
+    xml->setAttribute (chowdsp::toString (ParamForwardManager::processorSlotIndexTag), forwardingParamsSlotIndex);
 
     if (netlistCircuitQuantities != nullptr)
     {
@@ -164,7 +165,7 @@ void BaseProcessor::fromXML (XmlElement* xml, const chowdsp::Version&, bool load
 
     vts.state = ValueTree::fromXml (*xml); // don't use `replaceState()` otherwise UndoManager will clear
 
-    forwardingParamsSlotIndex = xml->getIntAttribute ("forwarding_params_slot_index", -1);
+    forwardingParamsSlotIndex = xml->getIntAttribute (chowdsp::toString (ParamForwardManager::processorSlotIndexTag), -1);
 
     if (loadPosition)
         loadPositionInfoFromXML (xml);
