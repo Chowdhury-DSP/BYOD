@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<state state_plugin_version="1.2.1">
+  <Parameters>
+    <PARAM id="dry_wet" value="1.0"/>
+    <PARAM id="in_gain" value="0.0"/>
+    <PARAM id="mono_mode" value="0.0"/>
+    <PARAM id="os_factor" value="1.0"/>
+    <PARAM id="os_mode" value="0.0"/>
+    <PARAM id="os_render_factor" value="1.0"/>
+    <PARAM id="os_render_like_realtime" value="1.0"/>
+    <PARAM id="os_render_mode" value="0.0"/>
+    <PARAM id="out_gain" value="0.0"/>
+  </Parameters>
+  <proc_chain>
+    <High_Cut>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </High_Cut>
+    <LoFi_IRs>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="gain" value="0.0"/>
+        <PARAM id="ir" value="0.0"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </LoFi_IRs>
+    <Flapjack>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="drive" value="0.75"/>
+        <PARAM id="level" value="0.5"/>
+        <PARAM id="lowcut" value="100.0000076293945"/>
+        <PARAM id="mode" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="presence" value="0.5"/>
+        <circuit_elements R1="1.0e6" R2="10000.0" R3="100000.0" R5="10000.0" R6="10000.0"
+                          R7="1000.0" C1="9.99999993922529e-9" C2="9.999999747378752e-6"
+                          C6="2.200000004393132e-8" C7="8.199999967928306e-8"/>
+      </Parameters>
+    </Flapjack>
+    <Range_Booster>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="boost" value="0.0"/>
+        <PARAM id="high_q" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="range" value="2600.0"/>
+      </Parameters>
+    </Range_Booster>
+    <TS-Tone>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="tone" value="0.5"/>
+        <circuit_elements R7="1000.0" R8="220.0" R9="10000.0" R11="1000.0" R12="1000.0"
+                          C5="2.200000039920269e-7" C6="2.200000039920269e-7" C7="9.999999974752427e-7"/>
+      </Parameters>
+    </TS-Tone>
+    <Envelope_Filter>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="direct_control" value="0.0"/>
+        <PARAM id="filter_type" value="0.0"/>
+        <PARAM id="freq" value="249.9999847412109"/>
+        <PARAM id="freq_mod" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="res" value="0.5"/>
+        <PARAM id="sense" value="0.5"/>
+        <PARAM id="speed" value="0.5"/>
+      </Parameters>
+    </Envelope_Filter>
+    <Chorus>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.5"/>
+      </Parameters>
+    </Chorus>
+    <Delay>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="freq" value="10000.0"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ping_pong" value="0.0"/>
+        <PARAM id="tempo_sync" value="0.0"/>
+        <PARAM id="time_ms" value="99.99999237060547"/>
+        <PARAM id="time_tempo_sync" value="0.0"/>
+      </Parameters>
+    </Delay>
+    <Chorus>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.5"/>
+      </Parameters>
+    </Chorus>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <Preset_State preset_dirty="1">
+    <Preset name="Default" plugin="BYOD" vendor="CHOW" category="" version="0.5.3"
+            preset_file="">
+      <proc_chain>
+        <Input>
+          <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+            <PARAM id="on_off" value="1.0"/>
+          </Parameters>
+          <port_0 connection_0="-1" connection_end_0="0"/>
+        </Input>
+        <Output>
+          <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+            <PARAM id="on_off"/>
+          </Parameters>
+        </Output>
+      </proc_chain>
+      <extra_info/>
+    </Preset>
+  </Preset_State>
+</state>

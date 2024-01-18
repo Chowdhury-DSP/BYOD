@@ -7,12 +7,13 @@ class ProcessorChainStateHelper
 public:
     ProcessorChainStateHelper (ProcessorChain& thisChain, chowdsp::DeferredAction& deferredAction);
 
-    std::unique_ptr<XmlElement> saveProcChain();
+    std::unique_ptr<XmlElement> saveProcChain (bool savingPreset = false);
     void loadProcChain (const XmlElement* xml,
                         const chowdsp::Version& stateVersion,
                         bool loadingPreset = false,
                         Component* associatedComponent = nullptr,
-                        WaitableEvent* waiter = nullptr);
+                        WaitableEvent* waiter = nullptr,
+                        ParamForwardManager* paramForwardManager = nullptr);
 
     static bool validateProcChainState (const XmlElement* xml, const ProcessorStore& processorStore);
 

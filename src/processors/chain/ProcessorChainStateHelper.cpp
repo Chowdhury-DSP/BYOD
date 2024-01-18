@@ -42,7 +42,8 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml,
                                                const chowdsp::Version& stateVersion,
                                                bool loadingPreset,
                                                Component* associatedComponent,
-                                               WaitableEvent* waiter)
+                                               WaitableEvent* waiter,
+                                               ParamForwardManager* paramForwardManager)
 {
     if (xml == nullptr)
     {
@@ -56,22 +57,34 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml,
          loadingPreset,
          xmlState = *xml,
          safeComp = Component::SafePointer { associatedComponent },
-         waiter]
+         waiter,
+         paramForwardManager]
         {
+            using namespace chowdsp::version_literals;
+            if (paramForwardManager != nullptr && stateVersion <= "1.2.1"_v)
+                paramForwardManager->setUsingLegacyMode (true);
+
             loadProcChainInternal (&xmlState, stateVersion, loadingPreset, safeComp.getComponent());
+
+            if (paramForwardManager != nullptr && stateVersion <= "1.2.1"_v)
+                paramForwardManager->setUsingLegacyMode (false);
+
             if (waiter != nullptr)
                 waiter->signal();
         });
 }
 
-std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain()
+std::unique_ptr<XmlElement> ProcessorChainStateHelper::saveProcChain (bool savingPreset)
 {
     auto xml = std::make_unique<XmlElement> (procChainStateTag);
 
     auto saveProcessor = [&] (BaseProcessor* proc)
     {
         auto procXml = std::make_unique<XmlElement> (ChainStateHelperFuncs::getProcessorTagName (proc));
-        procXml->addChildElement (proc->toXML().release());
+        auto procParamsXml = proc->toXML();
+        if (savingPreset)
+            procParamsXml->removeAttribute (chowdsp::toString (ParamForwardManager::processorSlotIndexTag));
+        procXml->addChildElement (procParamsXml.release());
 
         for (int portIdx = 0; portIdx < proc->getNumOutputs(); ++portIdx)
         {

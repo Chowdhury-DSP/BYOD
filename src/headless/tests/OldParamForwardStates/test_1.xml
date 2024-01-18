@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<state state_plugin_version="1.2.1">
+  <Parameters>
+    <PARAM id="dry_wet" value="1.0"/>
+    <PARAM id="in_gain" value="0.0"/>
+    <PARAM id="mono_mode" value="0.0"/>
+    <PARAM id="os_factor" value="1.0"/>
+    <PARAM id="os_mode" value="0.0"/>
+    <PARAM id="os_render_factor" value="1.0"/>
+    <PARAM id="os_render_like_realtime" value="1.0"/>
+    <PARAM id="os_render_mode" value="0.0"/>
+    <PARAM id="out_gain" value="0.0"/>
+  </Parameters>
+  <proc_chain>
+    <Delay>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="feedback" value="0.0"/>
+        <PARAM id="freq" value="10000.0"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ping_pong" value="0.0"/>
+        <PARAM id="tempo_sync" value="0.0"/>
+        <PARAM id="time_ms" value="99.99999237060547"/>
+        <PARAM id="time_tempo_sync" value="0.0"/>
+      </Parameters>
+    </Delay>
+    <Diode_Clipper>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0009765625"/>
+        <PARAM id="diode" value="0.0"/>
+        <PARAM id="drive" value="0.5"/>
+        <PARAM id="num_diodes" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Diode_Clipper>
+    <High_Cut>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </High_Cut>
+    <Blonde_Tone>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="bass" value="0.0"/>
+        <PARAM id="mid" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="treble" value="0.0"/>
+      </Parameters>
+    </Blonde_Tone>
+    <Muff_Drive>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="harmonics" value="0.6499999761581421"/>
+        <PARAM id="high_q" value="0.0"/>
+        <PARAM id="level" value="0.6499999761581421"/>
+        <PARAM id="n_stages" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="smoothing" value="0.0"/>
+        <PARAM id="sustain" value="0.5"/>
+      </Parameters>
+    </Muff_Drive>
+    <Scanner_Vibrato>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="6.0"/>
+        <PARAM id="stereo" value="0.0"/>
+      </Parameters>
+    </Scanner_Vibrato>
+    <Scanner_Vibrato>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="depth" value="0.5"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="mode" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="6.0"/>
+        <PARAM id="stereo" value="0.0"/>
+      </Parameters>
+    </Scanner_Vibrato>
+    <Ladder_Filter>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="DRIVE" value="0.5"/>
+        <PARAM id="FILTER_MODE" value="0.0"/>
+        <PARAM id="HP_CUTOFF" value="0.0"/>
+        <PARAM id="HP_RESONANCE" value="0.0"/>
+        <PARAM id="LP_CUTOFF" value="1.0"/>
+        <PARAM id="LP_RESONANCE" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Ladder_Filter>
+    <Diode_Clipper>
+      <Parameters x_pos="0.0" y_pos="0.0">
+        <PARAM id="cutoff" value="5000.0009765625"/>
+        <PARAM id="diode" value="0.0"/>
+        <PARAM id="drive" value="0.5"/>
+        <PARAM id="num_diodes" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Diode_Clipper>
+    <Input>
+      <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <Preset_State preset_dirty="1">
+    <Preset name="Default" plugin="BYOD" vendor="CHOW" category="" version="0.5.3"
+            preset_file="">
+      <proc_chain>
+        <Input>
+          <Parameters x_pos="0.005020080134272575" y_pos="0.3221343755722046">
+            <PARAM id="on_off" value="1.0"/>
+          </Parameters>
+          <port_0 connection_0="-1" connection_end_0="0"/>
+        </Input>
+        <Output>
+          <Parameters x_pos="0.8594377636909485" y_pos="0.3221343755722046">
+            <PARAM id="on_off"/>
+          </Parameters>
+        </Output>
+      </proc_chain>
+      <extra_info/>
+    </Preset>
+  </Preset_State>
+</state>

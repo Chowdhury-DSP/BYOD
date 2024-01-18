@@ -283,7 +283,7 @@ void PresetManager::filterPresets (std::vector<chowdsp::Preset>& presets, const 
 
 std::unique_ptr<XmlElement> PresetManager::savePresetState()
 {
-    auto xml = procChain->getStateHelper().saveProcChain();
+    auto xml = procChain->getStateHelper().saveProcChain (true);
     StateManager::setCurrentPluginVersionInXML (xml.get());
     return xml;
 }
