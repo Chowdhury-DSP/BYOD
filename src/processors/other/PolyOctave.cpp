@@ -13,7 +13,7 @@ namespace FilterBankHelpers
 // Reference for filter-bank design and octave shifting:
 // https://aaltodoc.aalto.fi/server/api/core/bitstreams/ff9e52cf-fd79-45eb-b695-93038244ec0e/content
 
-using float_2 = PolyOctave::ERBFilterBank::float_2;
+using float_2 = PolyOctave::ComplexERBFilterBank::float_2;
 static_assert (float_2::size == 2);
 static constexpr auto vec_size = float_2::size;
 
@@ -92,13 +92,13 @@ static void designERBFilter (size_t erb_index,
     b_coeffs_cplx_imag[4] = -ai2 * b_coeffs_proto[2];
 }
 
-static void designFilterBank (std::array<PolyOctave::ERBFilterBank, 2>& filterBank,
+static void designFilterBank (std::array<PolyOctave::ComplexERBFilterBank, 2>& filterBank,
                               double gamma,
                               double erb_start,
                               double q_ERB,
                               double sampleRate)
 {
-    for (size_t kiter = 0; kiter < PolyOctave::ERBFilterBank::numFilterBands; kiter += vec_size)
+    for (size_t kiter = 0; kiter < PolyOctave::ComplexERBFilterBank::numFilterBands; kiter += vec_size)
     {
         alignas (16) std::array<float_2::value_type, float_2::size> b_coeffs_cplx_real_simd[5];
         alignas (16) std::array<float_2::value_type, float_2::size> b_coeffs_cplx_imag_simd[5];
@@ -158,7 +158,12 @@ static void designFilterBank (std::array<PolyOctave::ERBFilterBank, 2>& filterBa
 } // namespace FilterBankHelpers
 
 PolyOctave::PolyOctave (UndoManager* um)
-    : BaseProcessor ("Poly Octave", createParameterLayout(), um)
+    : BaseProcessor (
+          "Poly Octave",
+          createParameterLayout(),
+          BasicInputPort {},
+          OutputPort {},
+          um)
 {
     using namespace ParameterHelpers;
     const auto setupGainParam = [this] (const juce::String& paramID,
@@ -200,14 +205,21 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     upOctaveGain.prepare (sampleRate, samplesPerBlock);
 
     doubleBuffer.setMaxSize (2, samplesPerBlock);
-    up2OctaveBuffer.setMaxSize (2, static_cast<int> (ERBFilterBank::float_2::size) * samplesPerBlock); // allocate extra space for SIMD
-    upOctaveBuffer.setMaxSize (2, static_cast<int> (ERBFilterBank::float_2::size) * samplesPerBlock); // allocate extra space for SIMD
+    up2OctaveBuffer.setMaxSize (2, static_cast<int> (ComplexERBFilterBank::float_2::size) * samplesPerBlock); // allocate extra space for SIMD
+    upOctaveBuffer.setMaxSize (2, static_cast<int> (ComplexERBFilterBank::float_2::size) * samplesPerBlock); // allocate extra space for SIMD
 
     FilterBankHelpers::designFilterBank (octaveUpFilterBank, 2.0, 5.0, 6.0, sampleRate);
     FilterBankHelpers::designFilterBank (octaveUp2FilterBank, 3.0, 7.0, 4.0, sampleRate);
 
-    dcBlocker.prepare (2);
-    dcBlocker.calcCoefs (20.0f, (float) sampleRate);
+    for (auto& busDCBlocker : dcBlocker)
+    {
+        busDCBlocker.prepare (2);
+        busDCBlocker.calcCoefs (20.0f, (float) sampleRate);
+    }
+
+    mixOutBuffer.setSize (2, samplesPerBlock);
+    up1OutBuffer.setSize (2, samplesPerBlock);
+    up2OutBuffer.setSize (2, samplesPerBlock);
 }
 
 void PolyOctave::processAudio (AudioBuffer<float>& buffer)
@@ -221,7 +233,7 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
 
     chowdsp::BufferMath::copyBufferData (buffer, doubleBuffer);
 
-    using float_2 = ERBFilterBank::float_2;
+    using float_2 = ComplexERBFilterBank::float_2;
     for (int ch = 0; ch < numChannels; ++ch)
     {
         auto* dryData = doubleBuffer.getReadPointer (ch);
@@ -240,7 +252,7 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
         auto& up2FilterBank = octaveUp2FilterBank[static_cast<size_t> (ch)];
         static constexpr auto eps = std::numeric_limits<double>::epsilon();
 
-        for (size_t k = 0; k < ERBFilterBank::numFilterBands; k += float_2::size)
+        for (size_t k = 0; k < ComplexERBFilterBank::numFilterBands; k += float_2::size)
         {
             const auto filter_idx = k / float_2::size;
             auto& realFilter = upFilterBank.erbFilterReal[filter_idx];
@@ -268,7 +280,7 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
         for (int n = 0; n < numSamples; ++n)
             upData[n] = xsimd::reduce_add (upDataSIMD[n]);
 
-        for (size_t k = 0; k < ERBFilterBank::numFilterBands; k += float_2::size)
+        for (size_t k = 0; k < ComplexERBFilterBank::numFilterBands; k += float_2::size)
         {
             const auto filter_idx = k / float_2::size;
             auto& realFilter = up2FilterBank.erbFilterReal[filter_idx];
@@ -293,11 +305,11 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
             up2Data[n] = xsimd::reduce_add (up2DataSIMD[n]);
     }
 
-    chowdsp::BufferMath::applyGain (upOctaveBuffer, 2.0 / static_cast<double> (ERBFilterBank::numFilterBands));
+    chowdsp::BufferMath::applyGain (upOctaveBuffer, 2.0 / static_cast<double> (ComplexERBFilterBank::numFilterBands));
     upOctaveGain.process (numSamples);
     chowdsp::BufferMath::applyGainSmoothedBuffer (upOctaveBuffer, upOctaveGain);
 
-    chowdsp::BufferMath::applyGain (up2OctaveBuffer, 2.0 / static_cast<double> (ERBFilterBank::numFilterBands));
+    chowdsp::BufferMath::applyGain (up2OctaveBuffer, 2.0 / static_cast<double> (ComplexERBFilterBank::numFilterBands));
     up2OctaveGain.process (numSamples);
     chowdsp::BufferMath::applyGainSmoothedBuffer (up2OctaveBuffer, up2OctaveGain);
 
@@ -306,7 +318,54 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
     chowdsp::BufferMath::addBufferData (up2OctaveBuffer, doubleBuffer);
     chowdsp::BufferMath::addBufferData (upOctaveBuffer, doubleBuffer);
 
-    chowdsp::BufferMath::copyBufferData (doubleBuffer, buffer);
+    mixOutBuffer.setSize (numChannels, numSamples, false, false, true);
+    up1OutBuffer.setSize (numChannels, numSamples, false, false, true);
+    up2OutBuffer.setSize (numChannels, numSamples, false, false, true);
 
-    dcBlocker.processBlock (buffer);
+    chowdsp::BufferMath::copyBufferData (doubleBuffer, mixOutBuffer);
+    chowdsp::BufferMath::copyBufferData (upOctaveBuffer, up1OutBuffer);
+    chowdsp::BufferMath::copyBufferData (up2OctaveBuffer, up2OutBuffer);
+
+    dcBlocker[MixOutput].processBlock (mixOutBuffer);
+    dcBlocker[Up1Output].processBlock (up1OutBuffer);
+    dcBlocker[Up2Output].processBlock (up2OutBuffer);
+
+    outputBuffers.getReference (MixOutput) = &mixOutBuffer;
+    outputBuffers.getReference (Up1Output) = &up1OutBuffer;
+    outputBuffers.getReference (Up2Output) = &up2OutBuffer;
+}
+
+void PolyOctave::processAudioBypassed (AudioBuffer<float>& buffer)
+{
+    const auto numSamples = buffer.getNumSamples();
+
+    mixOutBuffer.setSize (buffer.getNumChannels(), numSamples, false, false, true);
+    up1OutBuffer.setSize (1, numSamples, false, false, true);
+    up2OutBuffer.setSize (1, numSamples, false, false, true);
+
+    chowdsp::BufferMath::copyBufferData (buffer, mixOutBuffer);
+    up1OutBuffer.clear();
+    up2OutBuffer.clear();
+
+    outputBuffers.getReference (MixOutput) = &mixOutBuffer;
+    outputBuffers.getReference (Up1Output) = &up1OutBuffer;
+    outputBuffers.getReference (Up2Output) = &up2OutBuffer;
+}
+
+String PolyOctave::getTooltipForPort (int portIndex, bool isInput)
+{
+    if (! isInput)
+    {
+        switch ((OutputPort) portIndex)
+        {
+            case OutputPort::MixOutput:
+                return "Mix Output";
+            case OutputPort::Up1Output:
+                return "+1 Octave Output";
+            case OutputPort::Up2Output:
+                return "+2 Octave Output";
+        }
+    }
+
+    return BaseProcessor::getTooltipForPort (portIndex, isInput);
 }
