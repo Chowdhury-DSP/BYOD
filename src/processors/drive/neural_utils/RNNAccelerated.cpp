@@ -18,13 +18,13 @@ struct RNNMathsProvider
     template <typename T>
     static T tanh (T x)
     {
-        return math_approx::tanh<9> (x);
+        return math_approx::tanh<7> (x);
     }
 
     template <typename T>
     static T sigmoid (T x)
     {
-        return math_approx::sigmoid<9> (x);
+        return math_approx::sigmoid_exp<5, false> (x);
     }
 };
 
