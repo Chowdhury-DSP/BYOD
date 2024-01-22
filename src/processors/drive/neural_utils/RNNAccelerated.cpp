@@ -24,7 +24,7 @@ struct RNNMathsProvider
     template <typename T>
     static T sigmoid (T x)
     {
-        return math_approx::sigmoid_exp<5, false> (x);
+        return math_approx::sigmoid_exp<5, true> (x);
     }
 };
 
