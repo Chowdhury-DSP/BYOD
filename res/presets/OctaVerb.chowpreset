@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="OctaVerb" plugin="BYOD" vendor="CHOW" category="Pedals" version="1.2.2">
+  <proc_chain state_plugin_version="1.2.2">
+    <Poly_Octave>
+      <Parameters x_pos="0.04100000113248825" y_pos="0.505660355091095">
+        <PARAM id="dry" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="up2_octave" value="0.5"/>
+        <PARAM id="up_octave" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Poly_Octave>
+    <Mixer>
+      <Parameters x_pos="0.4199999868869781" y_pos="0.05471698194742203">
+        <PARAM id="gain0" value="0.0"/>
+        <PARAM id="gain1" value="0.0"/>
+        <PARAM id="gain2" value="0.0"/>
+        <PARAM id="gain3" value="0.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Mixer>
+    <Smooth_Reverb>
+      <Parameters x_pos="0.6769999861717224" y_pos="0.5490565896034241">
+        <PARAM id="decay" value="1996.0751953125"/>
+        <PARAM id="high_cut" value="5563.21142578125"/>
+        <PARAM id="low_cut" value="199.9999847412109"/>
+        <PARAM id="mix" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="relax" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="1"/>
+    </Smooth_Reverb>
+    <Phaser4>
+      <Parameters x_pos="0.3610000014305115" y_pos="0.5415094494819641">
+        <PARAM id="depth" value="1.0"/>
+        <PARAM id="fb_stage" value="0.0"/>
+        <PARAM id="feedback" value="-1.0"/>
+        <PARAM id="mix" value="0.25"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="rate" value="0.4500000476837158"/>
+        <PARAM id="stereo" value="1.0"/>
+        <circuit_elements R6="24000.0" C1="4.700000033608376e-8"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Phaser4>
+    <Input>
+      <Parameters x_pos="0.006000000052154064" y_pos="0.03207547217607498">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0" connection_1="1" connection_end_1="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.843999981880188" y_pos="0.1396226435899734">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>

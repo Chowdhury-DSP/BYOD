@@ -237,6 +237,7 @@ std::vector<chowdsp::Preset> PresetManager::getFactoryPresets (const ProcessorSt
     factoryPresets.emplace_back (BinaryData::Hot_Fuzz_chowpreset, BinaryData::Hot_Fuzz_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::King_Of_Tone_chowpreset, BinaryData::King_Of_Tone_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::MXR_Distortion_chowpreset, BinaryData::MXR_Distortion_chowpresetSize);
+    factoryPresets.emplace_back (BinaryData::OctaVerb_chowpreset, BinaryData::OctaVerb_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::RAT_chowpreset, BinaryData::RAT_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Tube_Screamer_chowpreset, BinaryData::Tube_Screamer_chowpresetSize);
     factoryPresets.emplace_back (BinaryData::Violet_Mist_chowpreset, BinaryData::Violet_Mist_chowpresetSize);

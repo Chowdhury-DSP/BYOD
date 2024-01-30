@@ -136,11 +136,11 @@ target_sources(BYOD PRIVATE
     processors/other/LevelDetective.cpp
     processors/other/Gate.cpp
     processors/other/Octaver.cpp
-    processors/other/PolyOctave.cpp
     processors/other/ShimmerReverb.cpp
     processors/other/SmoothReverb.cpp
     processors/other/cry_baby/CryBaby.cpp
     processors/other/cry_baby/CryBabyNDK.cpp
+    processors/other/poly_octave/PolyOctave.cpp
     processors/other/spring_reverb/SpringReverb.cpp
     processors/other/spring_reverb/SpringReverbProcessor.cpp
     processors/other/krusher/Krusher.cpp

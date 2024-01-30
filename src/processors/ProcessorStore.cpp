@@ -57,11 +57,11 @@
 #include "other/Gate.h"
 #include "other/LevelDetective.h"
 #include "other/Octaver.h"
-#include "other/PolyOctave.h"
 #include "other/ShimmerReverb.h"
 #include "other/SmoothReverb.h"
 #include "other/cry_baby/CryBaby.h"
 #include "other/krusher/Krusher.h"
+#include "other/poly_octave/PolyOctave.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 
 #include "utility/CleanGain.h"
