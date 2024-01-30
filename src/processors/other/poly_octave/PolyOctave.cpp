@@ -11,11 +11,11 @@ const String up2OctaveTag = "up2_octave";
 
 PolyOctave::PolyOctave (UndoManager* um)
     : BaseProcessor (
-          "Poly Octave",
-          createParameterLayout(),
-          BasicInputPort {},
-          OutputPort {},
-          um)
+        "Poly Octave",
+        createParameterLayout(),
+        BasicInputPort {},
+        OutputPort {},
+        um)
 {
     using namespace ParameterHelpers;
     const auto setupGainParam = [this] (const juce::String& paramID,
