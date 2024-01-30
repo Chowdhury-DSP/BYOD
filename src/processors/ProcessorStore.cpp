@@ -154,7 +154,7 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Level Detective", { &processorFactory<LevelDetective>, { ProcessorType::Other, 1, 1 } } },
     { "Gate", { &processorFactory<Gate>, { ProcessorType::Other, 1, 1 } } },
     { "Octaver", { &processorFactory<Octaver>, { ProcessorType::Other, 1, 1 } } },
-    { "Poly Octave", { &processorFactory<PolyOctave>, { ProcessorType::Other, 1, 1 } } },
+    { "Poly Octave", { &processorFactory<PolyOctave>, { ProcessorType::Other, 1, PolyOctave::numOutputs } } },
     { "Shimmer Reverb", { &processorFactory<ShimmerReverb>, { ProcessorType::Other, 1, 1 } } },
     { "Smooth Reverb", { &processorFactory<SmoothReverb>, { ProcessorType::Other, 1, 1 } } },
     { "Spring Reverb", { &processorFactory<SpringReverbProcessor>, { ProcessorType::Other, 1, 1 } } },
