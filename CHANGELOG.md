@@ -8,8 +8,9 @@ All notable changes to this project will be documented in this file.
 - Added "Tempo Sync" options for Delay module.
 - Added a "Mix" parameter for Phaser4 module.
 - Improved DSP performance for many of the modules.
-- Improved memory-efficiency for Spriong Reverb module.
+- Improved memory-efficiency for Spring Reverb module.
 - Improved handling of NaN inputs.
+- Fixed host parameter automation not working in some cases.
 - Fixed user presets not always showing in alphabetical order.
 
 ## [1.2.0] - 2023-08-01

@@ -3,7 +3,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "10.12" CACHE STRING "Minimum OS X deployment ta
 if(WIN32)
     set(CMAKE_SYSTEM_VERSION 7.1 CACHE STRING INTERNAL FORCE) # Windows SDK for Windows 7 and up
 endif()
-project(BYOD VERSION 1.2.2)
+project(BYOD VERSION 1.2.9)
 set(CMAKE_CXX_STANDARD 20)
 
 # Useful for testing with address sanitizer:
@@ -24,7 +24,7 @@ endif()
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
-# juce_set_aax_sdk_path(NONE)
+juce_set_aax_sdk_path(C:/Users/Jatin/SDKs/AAX_SDK_clang/)
 
 # set default plugin formats to build
 if(IOS)
