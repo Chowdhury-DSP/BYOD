@@ -24,7 +24,7 @@ endif()
 add_subdirectory(modules)
 
 # juce_set_vst2_sdk_path(C:/SDKs/VST_SDK/VST2_SDK)
-juce_set_aax_sdk_path(C:/Users/Jatin/SDKs/AAX_SDK_clang/)
+# juce_set_aax_sdk_path(NONE)
 
 # set default plugin formats to build
 if(IOS)
