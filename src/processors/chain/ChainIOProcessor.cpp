@@ -123,9 +123,9 @@ dsp::AudioBlock<float> ChainIOProcessor::processAudioInput (const AudioBuffer<fl
     if (oversampling.updateOSFactor())
     {
         sampleRateChanged = true;
-        mainThreadAction->call ([this]
-                                { latencyChangedCallbackFunc ((int) oversampling.getLatencySamples()); },
-                                true);
+        mainThreadAction.call ([this]
+                               { latencyChangedCallbackFunc ((int) oversampling.getLatencySamples()); },
+                               true);
     }
 
     const auto useStereo = processChannelInputs (buffer);
