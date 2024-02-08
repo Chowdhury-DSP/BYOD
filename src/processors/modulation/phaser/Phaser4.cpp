@@ -14,23 +14,23 @@ const String mixTag = "mix";
 } // namespace Phaser4Tags
 
 Phaser4::Phaser4 (UndoManager* um) : BaseProcessor (
-    "Phaser4",
-    createParameterLayout(),
-    InputPort {},
-    OutputPort {},
-    um,
-    [] (InputPort port)
-    {
-        if (port == InputPort::ModulationInput)
-            return PortType::modulation;
-        return PortType::audio;
-    },
-    [] (OutputPort port)
-    {
-        if (port == OutputPort::ModulationOutput)
-            return PortType::modulation;
-        return PortType::audio;
-    })
+                                         "Phaser4",
+                                         createParameterLayout(),
+                                         InputPort {},
+                                         OutputPort {},
+                                         um,
+                                         [] (InputPort port)
+                                         {
+                                             if (port == InputPort::ModulationInput)
+                                                 return PortType::modulation;
+                                             return PortType::audio;
+                                         },
+                                         [] (OutputPort port)
+                                         {
+                                             if (port == OutputPort::ModulationOutput)
+                                                 return PortType::modulation;
+                                             return PortType::audio;
+                                         })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (rateHzParam, vts, Phaser4Tags::rateTag);
@@ -267,7 +267,11 @@ void Phaser4::fromXML (XmlElement* xml, const chowdsp::Version& version, bool lo
     BaseProcessor::fromXML (xml, version, loadPosition);
 
     using namespace std::string_view_literals;
+#if JUCE_IOS
+    if (version <= chowdsp::Version { "2.0.0"sv })
+#else
     if (version <= chowdsp::Version { "1.2.0"sv })
+#endif
     {
         // The "Mix" control was only introduced in version 1.2.1. Prior to that, mix was always at 100% wet.
         auto* mixParam = vts.getParameter (Phaser4Tags::mixTag);

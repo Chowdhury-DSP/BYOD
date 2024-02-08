@@ -61,12 +61,22 @@ void ProcessorChainStateHelper::loadProcChain (const XmlElement* xml,
          paramForwardManager]
         {
             using namespace chowdsp::version_literals;
-            if (paramForwardManager != nullptr && stateVersion <= "1.2.1"_v)
+            if (paramForwardManager != nullptr
+#if JUCE_IOS
+                && stateVersion <= "2.0.0"_v)
+#else
+                && stateVersion <= "1.2.1"_v)
+#endif
                 paramForwardManager->setUsingLegacyMode (true);
 
             loadProcChainInternal (&xmlState, stateVersion, loadingPreset, safeComp.getComponent());
 
-            if (paramForwardManager != nullptr && stateVersion <= "1.2.1"_v)
+            if (paramForwardManager != nullptr
+#if JUCE_IOS
+                && stateVersion <= "2.0.0"_v)
+#else
+                && stateVersion <= "1.2.1"_v)
+#endif
                 paramForwardManager->setUsingLegacyMode (false);
 
             if (waiter != nullptr)
