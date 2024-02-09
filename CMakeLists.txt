@@ -142,28 +142,6 @@ endif()
 
 target_link_libraries(BYOD PRIVATE juce_plugin_modules)
 
-if(IOS)
-    message(STATUS "Setting iOS-specific properties...")
-
-    foreach(target IN ITEMS BinaryData RTNeural juce_plugin_modules BYOD BYOD_Standalone BYOD_AUv3)
-        set_target_properties(${target}
-            PROPERTIES
-                RUNTIME_OUTPUT_DIRECTORY "./"
-                ARCHIVE_OUTPUT_DIRECTORY "./"
-                LIBRARY_OUTPUT_DIRECTORY "./")
-    endforeach()
-
-    set_target_properties(BYOD_Standalone PROPERTIES
-            XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)"
-            XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
-            XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
-
-    set_target_properties(BYOD_AUv3 PROPERTIES
-            XCODE_ATTRIBUTE_INSTALL_PATH "$(LOCAL_APPS_DIR)/BYOD.app/PlugIns"
-            XCODE_ATTRIBUTE_SKIP_INSTALL "NO"
-            XCODE_ATTRIBUTE_ENABLE_IN_APP_PURCHASE "YES")
-endif()
-
 option(BYOD_BUILD_ADD_ON_MODULES "Build BYOD with add-on modules" OFF)
 if(BYOD_BUILD_ADD_ON_MODULES)
     add_subdirectory(modules/BYOD-add-ons)
