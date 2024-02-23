@@ -199,11 +199,20 @@ if (MSVC)
     target_compile_options(BYOD PRIVATE /bigobj)
 endif ()
 
-file(GLOB_RECURSE juce_module_sources
+file(GLOB_RECURSE module_sources
+    # JUCE module format is already unity building
     ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/juce_*/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/juce_*/*.mm
-    ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/chowdsp_utils/modules/*/chowdsp_*/*.cpp)
-set_source_files_properties(${juce_module_sources}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../modules/JUCE/modules/chowdsp_utils/modules/*/chowdsp_*/*.cpp
+
+    # files that include "byod_jai_lib.h" have issues with unity builds
+    ${CMAKE_CURRENT_SOURCE_DIR}/jai/SharedJaiContext.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/processors/other/krusher/Krusher.cpp
+
+    # already a massive cpp file!
+    ${CMAKE_CURRENT_SOURCE_DIR}/processors/ProcessorStore.cpp
+)
+set_source_files_properties(${module_sources}
     TARGET_DIRECTORY BYOD
     PROPERTIES SKIP_PRECOMPILE_HEADERS TRUE SKIP_UNITY_BUILD_INCLUSION TRUE)
 set_target_properties(BYOD PROPERTIES UNITY_BUILD ON UNITY_BUILD_BATCH_SIZE 8)

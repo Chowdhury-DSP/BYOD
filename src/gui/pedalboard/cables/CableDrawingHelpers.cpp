@@ -13,7 +13,7 @@ constexpr float glowSizeFactor = 2.5f;
 juce::Rectangle<float> getPortGlowBounds (juce::Point<int> location, float scaleFactor)
 {
     const auto glowDim = (float) getPortDistanceLimit (scaleFactor) * glowSizeFactor;
-    auto glowBounds = (Rectangle (glowDim, glowDim)).withCentre (location.toFloat());
+    auto glowBounds = (juce::Rectangle (glowDim, glowDim)).withCentre (location.toFloat());
 
     return glowBounds;
 }

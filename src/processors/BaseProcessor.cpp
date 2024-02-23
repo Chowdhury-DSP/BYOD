@@ -363,7 +363,7 @@ PortType BaseProcessor::getOutputPortType (int portIndex) const
     return outputPortTypes[(size_t) portIndex];
 }
 
-void BaseProcessor::setPosition (juce::Point<int> pos, Rectangle<int> parentBounds)
+void BaseProcessor::setPosition (juce::Point<int> pos, juce::Rectangle<int> parentBounds)
 {
     if (parentBounds.getWidth() <= 0 || parentBounds.getHeight() <= 0)
         return; // out of bounds!
@@ -378,7 +378,7 @@ void BaseProcessor::setPosition (juce::Point<int> pos, Rectangle<int> parentBoun
     editorPosition.y = jlimit (0.0f, 0.9f, editorPosition.y);
 }
 
-juce::Point<int> BaseProcessor::getPosition (Rectangle<int> parentBounds)
+juce::Point<int> BaseProcessor::getPosition (juce::Rectangle<int> parentBounds)
 {
     return (editorPosition * juce::Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() }).toInt();
 }

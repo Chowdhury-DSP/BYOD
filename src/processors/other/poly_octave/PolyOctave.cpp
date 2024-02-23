@@ -97,7 +97,7 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
 
         auto* up2Data = up2OctaveBuffer.getWritePointer (ch);
         auto* up2DataSIMD = reinterpret_cast<float_2*> (up2OctaveBuffer.getWritePointer (ch));
-        jassert (juce::snapPointerToAlignment (up2DataSIMD, xsimd::default_arch::alignment()) == upDataSIMD);
+        jassert (juce::snapPointerToAlignment (up2DataSIMD, xsimd::default_arch::alignment()) == up2DataSIMD);
         std::fill (up2DataSIMD, up2DataSIMD + numSamples, float_2 {});
 
         auto& upFilterBank = octaveUpFilterBank[static_cast<size_t> (ch)];

@@ -15,8 +15,6 @@
 #include <JuceHeader.h>
 
 // Any other widely used headers that don't change...
-#include <FuzzySearchDatabase.hpp>
-
 JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wzero-as-null-pointer-constant",
                                      "-Wsign-conversion")
 #include <RTNeural/RTNeural.h>

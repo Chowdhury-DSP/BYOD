@@ -34,7 +34,7 @@ void ScreenshotGenerator::takeScreenshots (const ArgumentList& args)
     plugin->editorBeingDeleted (editor.get());
 }
 
-void ScreenshotGenerator::screenshotForBounds (Component* editor, Rectangle<int> bounds, const File& dir, const String& filename)
+void ScreenshotGenerator::screenshotForBounds (Component* editor, juce::Rectangle<int> bounds, const File& dir, const String& filename)
 {
     auto screenshot = editor->createComponentSnapshot (bounds);
 

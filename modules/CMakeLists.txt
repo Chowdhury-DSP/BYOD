@@ -39,7 +39,9 @@ target_link_libraries(juce_plugin_modules
         chowdsp::chowdsp_rhythm
         chowdsp::chowdsp_presets
         chowdsp::chowdsp_serialization
+        chowdsp::chowdsp_logging
         chowdsp::chowdsp_units
+        chowdsp::chowdsp_fuzzy_search
         chowdsp::chowdsp_wdf
         chowdsp::chowdsp_visualizers
         RTNeural
@@ -85,7 +87,6 @@ target_include_directories(juce_plugin_modules
         ${CMAKE_SOURCE_DIR}/modules/magic_enum/include
         ${CMAKE_SOURCE_DIR}/modules/RTNeural/modules/xsimd/include
         $<TARGET_PROPERTY:sst-cpputils,INTERFACE_INCLUDE_DIRECTORIES>
-        ${CMAKE_SOURCE_DIR}/modules/fuzzysearchdatabase/src
 )
 
 set_target_properties(juce_plugin_modules PROPERTIES

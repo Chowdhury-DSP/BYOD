@@ -4,7 +4,8 @@
 
 namespace preset_search
 {
-using Database = fuzzysearch::Database<int>;
+static constexpr size_t numPresetSearchFields = 3;
+using Database = chowdsp::SearchDatabase<int, numPresetSearchFields>;
 using Results = std::vector<const chowdsp::Preset*>;
 
 void initialiseDatabase (const chowdsp::PresetManager& presetManager, Database& database);

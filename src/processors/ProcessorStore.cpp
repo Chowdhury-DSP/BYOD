@@ -1,3 +1,6 @@
+// Jai modules need to go first!
+#include "other/krusher/Krusher.h"
+
 #include "ProcessorStore.h"
 
 #include "drive/BassFace.h"
@@ -60,7 +63,6 @@
 #include "other/ShimmerReverb.h"
 #include "other/SmoothReverb.h"
 #include "other/cry_baby/CryBaby.h"
-#include "other/krusher/Krusher.h"
 #include "other/poly_octave/PolyOctave.h"
 #include "other/spring_reverb/SpringReverbProcessor.h"
 

@@ -1,7 +1,7 @@
 #include "LookAndFeels.h"
 
 //==================================================================
-void ByodLNF::drawPopupMenuItem (Graphics& g, const Rectangle<int>& area, const bool isSeparator, const bool isActive, const bool isHighlighted, const bool /*isTicked*/, const bool hasSubMenu, const String& text, const String& shortcutKeyText, const Drawable* icon, const Colour* const textColourToUse)
+void ByodLNF::drawPopupMenuItem (Graphics& g, const juce::Rectangle<int>& area, const bool isSeparator, const bool isActive, const bool isHighlighted, const bool /*isTicked*/, const bool hasSubMenu, const String& text, const String& shortcutKeyText, const Drawable* icon, const Colour* const textColourToUse)
 {
     LookAndFeel_V4::drawPopupMenuItem (g, area, isSeparator, isActive, isHighlighted, false /*isTicked*/, hasSubMenu, text, shortcutKeyText, icon, textColourToUse);
 }
@@ -49,7 +49,7 @@ void ProcessorLNF::positionComboBoxText (ComboBox& box, Label& label)
 void ProcessorLNF::drawComboBox (Graphics& g, int width, int height, bool, int, int, int, int, ComboBox& box)
 {
     auto cornerSize = box.findParentComponentOfClass<ChoicePropertyComponent>() != nullptr ? 0.0f : 3.0f;
-    Rectangle<int> boxBounds (0, 0, width, height);
+    juce::Rectangle<int> boxBounds (0, 0, width, height);
 
     g.setColour (box.findColour (ComboBox::backgroundColourId));
     g.fillRoundedRectangle (boxBounds.toFloat(), cornerSize);

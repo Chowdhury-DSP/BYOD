@@ -157,7 +157,7 @@ bool MidiModulator::getCustomComponents (OwnedArray<Component>& customComps, cho
                 return degreesToRadians (120.0f * value - 60.0f);
         }
 
-        static void drawControlVizBackground (Graphics& g, Rectangle<int> bounds, bool isBipolar)
+        static void drawControlVizBackground (Graphics& g, juce::Rectangle<int> bounds, bool isBipolar)
         {
             g.setColour (Colours::grey.brighter());
 
@@ -198,7 +198,7 @@ bool MidiModulator::getCustomComponents (OwnedArray<Component>& customComps, cho
             }
         }
 
-        static void drawControlLine (Graphics& g, Rectangle<int> bounds, float value, bool isBipolar)
+        static void drawControlLine (Graphics& g, juce::Rectangle<int> bounds, float value, bool isBipolar)
         {
             const auto height = (float) bounds.getHeight();
             const auto lineLength = height * 0.925f;

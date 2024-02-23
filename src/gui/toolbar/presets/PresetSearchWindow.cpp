@@ -36,7 +36,7 @@ struct PresetSearchWindow::ResultsListModel : public ListBoxModel
 
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool rowIsSelected) override
     {
-        auto bounds = Rectangle { width, height };
+        auto bounds = juce::Rectangle { width, height };
         if (rowIsSelected)
         {
             g.setColour (Colour (0xFF0EDED4));
