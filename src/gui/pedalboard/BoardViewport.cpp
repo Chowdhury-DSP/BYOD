@@ -94,7 +94,7 @@ void BoardViewport::resized()
     comp.setBounds (0, 0, width, height);
 
     constexpr int buttonDim = 34;
-    auto buttonRect = Rectangle { 0, height - buttonDim, buttonDim, buttonDim };
+    auto buttonRect = juce::Rectangle { 0, height - buttonDim, buttonDim, buttonDim };
     plusButton.setBounds (buttonRect.reduced (1));
     minusButton.setBounds (buttonRect.withX (buttonDim).reduced (1));
     scaleLabel.setBounds (2 * buttonDim, height - buttonDim, 100, buttonDim);

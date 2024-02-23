@@ -29,7 +29,7 @@ struct PresetsListModel : public ListBoxModel
 
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height, bool /*rowIsSelected*/) override
     {
-        auto bounds = Rectangle { width, height };
+        auto bounds = juce::Rectangle { width, height };
 
         g.setColour (Colours::white.withAlpha (0.4f));
         g.drawLine (Line { bounds.getTopLeft(), bounds.getTopRight() }.toFloat(), 1.0f);

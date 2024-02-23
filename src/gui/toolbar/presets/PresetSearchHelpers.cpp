@@ -2,6 +2,11 @@
 
 namespace preset_search
 {
+static std::string_view to_string_view (const juce::String& str) noexcept
+{
+    return { str.toRawUTF8(), str.getNumBytesAsUTF8() };
+}
+
 void initialiseDatabase (const chowdsp::PresetManager& presetManager, Database& database)
 {
     enum SearchFields
@@ -14,7 +19,7 @@ void initialiseDatabase (const chowdsp::PresetManager& presetManager, Database& 
 
     juce::Logger::writeToLog ("Initializing preset search database...");
 
-    database.reset();
+    database.resetEntries (presetManager.getNumPresets());
     database.setWeights ({
         1.0f, // Name
         0.9f, // Vendor
@@ -23,14 +28,14 @@ void initialiseDatabase (const chowdsp::PresetManager& presetManager, Database& 
     database.setThreshold (0.5f);
 
     const auto t1 = std::chrono::steady_clock::now();
-    std::vector<std::string> fields (magic_enum::enum_count<SearchFields>());
+    std::array<std::string_view, numPresetSearchFields> fields {};
 
     for (const auto& [presetID, preset] : presetManager.getPresetMap())
     {
-        fields[Name] = preset.getName().toStdString();
-        fields[Vendor] = preset.getVendor().toStdString();
-        fields[Category] = preset.getCategory().toStdString();
-        database.addEntry (presetID, fields); // TODO: it would be cool if we could add entries in a batch?
+        fields[Name] = to_string_view (preset.getName());
+        fields[Vendor] = to_string_view (preset.getVendor());
+        fields[Category] = to_string_view (preset.getCategory());
+        database.addEntry (presetID, fields);
     }
 
     const auto t2 = std::chrono::steady_clock::now();
@@ -38,13 +43,19 @@ void initialiseDatabase (const chowdsp::PresetManager& presetManager, Database& 
     juce::Logger::writeToLog ("Finished scanning preset database in "
                               + juce::String { fp_ms.count() }
                               + " milliseconds");
+
+    database.prepareForSearch();
 }
 
 Results getSearchResults (const chowdsp::PresetManager& presetManager, const Database& database, const juce::String& query)
 {
+    const auto searchResults = database.search (to_string_view (query));
+
     Results resultsVector;
+    resultsVector.reserve (searchResults.size());
+
     const auto& presetMap = presetManager.getPresetMap();
-    for (const auto result : database.search (query.toStdString()))
+    for (const auto& result : searchResults)
     {
         const auto presetIter = presetMap.find (result.key);
         if (presetIter != presetMap.end())

@@ -14,7 +14,7 @@ public:
     void timerCallback() final;
 
 private:
-    Rectangle<int> getMeterBounds() const;
+    juce::Rectangle<int> getMeterBounds() const;
 
     const LevelDataType& rmsLevels;
     std::array<float, 2> dbLevels;

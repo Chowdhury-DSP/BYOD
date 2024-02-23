@@ -152,7 +152,7 @@ void Cable::drawCableShadow (Graphics& g, float thickness)
 
 void Cable::drawCableEndCircle (Graphics& g, juce::Point<float> centre, Colour colour) const
 {
-    auto circle = (Rectangle { minCableThickness, minCableThickness } * 2.4f * scaleFactor.load()).withCentre (centre);
+    auto circle = (juce::Rectangle { minCableThickness, minCableThickness } * 2.4f * scaleFactor.load()).withCentre (centre);
     g.setColour (colour);
     g.fillEllipse (circle);
 

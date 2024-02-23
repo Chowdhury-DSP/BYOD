@@ -36,7 +36,7 @@ public:
 
 private:
     void showNewProcMenu (PopupMenu& menu, PopupMenu::Options& options, juce::Point<int> mousePos, ConnectionInfo* connectionInfo = nullptr);
-    void setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds = {});
+    void setEditorPosition (ProcessorEditor* editor, juce::Rectangle<int> bounds = {});
     void mouseDown (const MouseEvent& e) override;
     void mouseDrag (const MouseEvent& e) override;
     void mouseUp (const MouseEvent& e) override;

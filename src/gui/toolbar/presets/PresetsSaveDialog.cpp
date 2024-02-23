@@ -97,7 +97,7 @@ void PresetsSaveDialog::paint (Graphics& g)
     g.setFont ((float) PresetSaveDims::itemHeight * 0.35f);
     auto drawItemLabel = [&] (const Component& comp, const String& label)
     {
-        auto textBounds = Rectangle { PresetSaveDims::labelsWidth, comp.getHeight() }.withY (comp.getY());
+        auto textBounds = juce::Rectangle { PresetSaveDims::labelsWidth, comp.getHeight() }.withY (comp.getY());
         g.drawFittedText (label, textBounds, Justification::centredRight, 1);
     };
 

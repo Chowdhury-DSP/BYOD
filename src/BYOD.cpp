@@ -11,10 +11,12 @@ const String logFileNameRoot = "BYOD_Log_";
 } // namespace BYODPaths
 
 BYOD::BYOD() : chowdsp::PluginBase<BYOD> (&undoManager),
-               logger ({ .logFileSubDir = BYODPaths::logFileSubDir,
-                         .logFileNameRoot = BYODPaths::logFileNameRoot,
-                         .crashLogAnalysisCallback = [this] (const File& logFile)
-                         { crashLogFile.emplace (logFile); } }),
+               logger ({
+                           .logFileSubDir = BYODPaths::logFileSubDir,
+                           .logFileNameRoot = BYODPaths::logFileNameRoot,
+                       },
+                       [this] (const File& logFile)
+                       { crashLogFile.emplace (logFile); }),
                procStore (&undoManager)
 {
 #if PERFETTO

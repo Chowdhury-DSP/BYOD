@@ -21,6 +21,11 @@ jobs:
     runs-on: macos-13
     
     steps:
+    - name: Set Xcode version
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.2'
+
     - name: Get latest CMake
       uses: lukka/get-cmake@latest
 

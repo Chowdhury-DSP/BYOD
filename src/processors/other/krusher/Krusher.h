@@ -1,7 +1,5 @@
 #pragma once
 
-#include "processors/BaseProcessor.h"
-
 #define KRUSHER_USE_JAI_IMPL BYOD_BUILDING_JAI_MODULES
 
 #if KRUSHER_USE_JAI_IMPL
@@ -9,6 +7,8 @@
 #else
 #include "krusher_fallback_impl.h"
 #endif
+
+#include "processors/BaseProcessor.h"
 
 class Krusher : public BaseProcessor
 {
