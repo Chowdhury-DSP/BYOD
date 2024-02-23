@@ -8,7 +8,6 @@
 #include "krusher_fallback_impl.h"
 #endif
 
-
 #include "processors/BaseProcessor.h"
 
 class Krusher : public BaseProcessor
