@@ -5,7 +5,7 @@ EditorSelector::EditorSelector (const BoardComponent& boardComp) : board (boardC
 {
 }
 
-void EditorSelector::findLassoItemsInArea (Array<ProcessorEditor*>& results, const Rectangle<int>& area)
+void EditorSelector::findLassoItemsInArea (Array<ProcessorEditor*>& results, const juce::Rectangle<int>& area)
 {
     const auto checkAndAddEditor = [&results, area] (ProcessorEditor* editor)
     {

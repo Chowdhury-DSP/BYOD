@@ -204,7 +204,7 @@ void KnobsComponent::paint (Graphics& g)
             font = Font (font.getHeight() - 0.5f).boldened();
 
         g.setFont (font);
-        Rectangle<int> nameBox (comp.getX(), comp.getY() - nameOffset + offset, comp.getWidth(), nameHeight);
+        juce::Rectangle<int> nameBox (comp.getX(), comp.getY() - nameOffset + offset, comp.getWidth(), nameHeight);
         g.drawFittedText (name, nameBox, Justification::centred, 1);
     };
 
@@ -238,7 +238,7 @@ void KnobsComponent::resized()
         if (boxes.size() > 0)
         {
             compWidth = getWidth() - yDim;
-            boxes[0]->setBounds (Rectangle (compWidth, yDim).withCentre (getLocalBounds().getCentre()));
+            boxes[0]->setBounds (juce::Rectangle (compWidth, yDim).withCentre (getLocalBounds().getCentre()));
         }
 
         if (buttons.size() > 0)
@@ -300,14 +300,14 @@ void KnobsComponent::resized()
     {
         int compIdx = 0;
 
-        Rectangle<int> bounds[4];
+        juce::Rectangle<int> bounds[4];
         const int sWidth = proportionOfWidth (0.308f);
         const int xOff = proportionOfWidth (0.231f);
         const int yOff = proportionOfHeight (0.143f);
-        bounds[0] = Rectangle<int> { 0, yOff, sWidth, sWidth };
-        bounds[1] = Rectangle<int> { xOff, 2 * yOff, sWidth, sWidth };
-        bounds[2] = Rectangle<int> { 2 * xOff, yOff, sWidth, sWidth };
-        bounds[3] = Rectangle<int> { 3 * xOff, 2 * yOff, sWidth, sWidth };
+        bounds[0] = juce::Rectangle { 0, yOff, sWidth, sWidth };
+        bounds[1] = juce::Rectangle { xOff, 2 * yOff, sWidth, sWidth };
+        bounds[2] = juce::Rectangle { 2 * xOff, yOff, sWidth, sWidth };
+        bounds[3] = juce::Rectangle { 3 * xOff, 2 * yOff, sWidth, sWidth };
 
         for (auto* s : sliders)
         {
@@ -329,7 +329,7 @@ void KnobsComponent::resized()
     {
         int compIdx = 0;
 
-        Rectangle<int> bounds[5];
+        juce::Rectangle<int> bounds[5];
         const int sWidth = proportionOfWidth (0.215f);
         const int y1 = proportionOfHeight (0.25f);
         const int y2 = proportionOfHeight (0.60f);
@@ -340,11 +340,11 @@ void KnobsComponent::resized()
         const int x4 = proportionOfWidth (0.75f);
         const int x5 = proportionOfWidth (0.39f);
 
-        bounds[0] = Rectangle<int> { x1, y1, sWidth, sWidth };
-        bounds[1] = Rectangle<int> { x2, y2, sWidth, sWidth };
-        bounds[2] = Rectangle<int> { x3, y2, sWidth, sWidth };
-        bounds[3] = Rectangle<int> { x4, y1, sWidth, sWidth };
-        bounds[4] = Rectangle<int> { x5, y3, sWidth, sWidth };
+        bounds[0] = juce::Rectangle { x1, y1, sWidth, sWidth };
+        bounds[1] = juce::Rectangle { x2, y2, sWidth, sWidth };
+        bounds[2] = juce::Rectangle { x3, y2, sWidth, sWidth };
+        bounds[3] = juce::Rectangle { x4, y1, sWidth, sWidth };
+        bounds[4] = juce::Rectangle { x5, y3, sWidth, sWidth };
 
         for (auto* s : sliders)
         {
@@ -359,7 +359,7 @@ void KnobsComponent::resized()
     {
         int compIdx = 0;
 
-        Rectangle<int> bounds[5];
+        juce::Rectangle<int> bounds[5];
         const int sWidth = proportionOfWidth (0.288f);
         const int y1 = proportionOfHeight (0.464f);
         const int y2 = proportionOfHeight (0.107f);
@@ -372,11 +372,11 @@ void KnobsComponent::resized()
         const int xDim = proportionOfWidth (0.346f);
         const int yDim = proportionOfHeight (0.214f);
 
-        bounds[0] = Rectangle<int> { 0, y1, sWidth, sWidth };
-        bounds[1] = Rectangle<int> { x1, y2, sWidth, sWidth };
-        bounds[2] = Rectangle<int> { x2, y1, sWidth, sWidth };
-        bounds[3] = Rectangle<int> { x3, y1, sWidth, sWidth };
-        bounds[4] = Rectangle<int> { x4, y3, xDim, yDim };
+        bounds[0] = juce::Rectangle { 0, y1, sWidth, sWidth };
+        bounds[1] = juce::Rectangle { x1, y2, sWidth, sWidth };
+        bounds[2] = juce::Rectangle { x2, y1, sWidth, sWidth };
+        bounds[3] = juce::Rectangle { x3, y1, sWidth, sWidth };
+        bounds[4] = juce::Rectangle { x4, y3, xDim, yDim };
 
         for (auto* s : sliders)
         {
@@ -402,7 +402,7 @@ void KnobsComponent::resized()
         {
             s->setSliderStyle (Slider::SliderStyle::LinearVertical);
             s->setTextBoxStyle (Slider::TextBoxBelow, false, width - 2, proportionOfHeight (0.11f));
-            auto bounds = Rectangle { x + 2, yPad, width - 4, getHeight() - yPad };
+            auto bounds = juce::Rectangle { x + 2, yPad, width - 4, getHeight() - yPad };
             x += width;
 
             s->setBounds (bounds);

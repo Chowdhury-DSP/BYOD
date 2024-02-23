@@ -112,8 +112,8 @@ void BoardComponent::resized()
     const auto thisEditorHeight = BoardDims::getScaleDim (BoardDims::editorHeight, scaleFactor);
     auto centreEditorHeight = (height - thisEditorHeight) / 2;
 
-    setEditorPosition (inputEditor.get(), Rectangle (BoardDims::editorPad, centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
-    setEditorPosition (outputEditor.get(), Rectangle (width - (thisEditorWidth / 2 + BoardDims::editorPad), centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
+    setEditorPosition (inputEditor.get(), juce::Rectangle (BoardDims::editorPad, centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
+    setEditorPosition (outputEditor.get(), juce::Rectangle (width - (thisEditorWidth / 2 + BoardDims::editorPad), centreEditorHeight, thisEditorWidth / 2, thisEditorHeight));
 
     for (auto* editor : processorEditors)
         setEditorPosition (editor);
@@ -122,7 +122,7 @@ void BoardComponent::resized()
     cableView.updateCablePositions();
 
     newProcButton.setBounds (width - BoardDims::newButtonWidth, 0, BoardDims::newButtonWidth, BoardDims::newButtonWidth);
-    infoComp.setBounds (Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
+    infoComp.setBounds (juce::Rectangle<int> (jmin (400, width), jmin (250, height)).withCentre (getLocalBounds().getCentre()));
 
     repaint();
 }
@@ -299,7 +299,7 @@ ProcessorEditor* BoardComponent::findEditorForProcessor (const BaseProcessor* pr
     return nullptr;
 }
 
-void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> bounds)
+void BoardComponent::setEditorPosition (ProcessorEditor* editor, juce::Rectangle<int> bounds)
 {
     const auto thisEditorWidth = BoardDims::getScaleDim (BoardDims::editorWidth, scaleFactor);
     const auto thisEditorHeight = BoardDims::getScaleDim (BoardDims::editorHeight, scaleFactor);
@@ -308,8 +308,8 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> 
     auto position = proc->getPosition (getBounds());
     if (position == juce::Point (0, 0) && getWidth() > 0 && getHeight() > 0) // no position set yet
     {
-        if (bounds == Rectangle<int> {})
-            bounds = Rectangle (thisEditorWidth, thisEditorHeight).withCentre (nextEditorPosition);
+        if (bounds == juce::Rectangle<int> {})
+            bounds = juce::Rectangle (thisEditorWidth, thisEditorHeight).withCentre (nextEditorPosition);
 
         editor->setBounds (bounds);
         proc->setPosition (editor->getBounds().getTopLeft(), getBounds());
@@ -317,8 +317,8 @@ void BoardComponent::setEditorPosition (ProcessorEditor* editor, Rectangle<int> 
     }
     else
     {
-        if (bounds == Rectangle<int> {})
-            bounds = Rectangle (thisEditorWidth, thisEditorHeight);
+        if (bounds == juce::Rectangle<int> {})
+            bounds = juce::Rectangle (thisEditorWidth, thisEditorHeight);
 
         editor->setBounds (bounds.withPosition (position));
     }

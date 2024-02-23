@@ -104,7 +104,7 @@ bool Tuner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::Ho
             return degreesToRadians (60.0f * centsNorm);
         }
 
-        static void drawTunerVizBackground (Graphics& g, Rectangle<int> bounds)
+        static void drawTunerVizBackground (Graphics& g, juce::Rectangle<int> bounds)
         {
             g.setColour (Colours::grey.brighter());
 
@@ -130,7 +130,7 @@ bool Tuner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::Ho
             }
         }
 
-        static void drawTunerLine (Graphics& g, Rectangle<int> bounds, int cents)
+        static void drawTunerLine (Graphics& g, juce::Rectangle<int> bounds, int cents)
         {
             const auto height = (float) bounds.getHeight();
             const auto lineLength = height * 0.925f;

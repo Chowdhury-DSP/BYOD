@@ -91,7 +91,7 @@ void Oscilloscope::ScopeBackgroundTask::runTask (const AudioBuffer<float>& buffe
 
     // update path
     ScopedLock sl (crit);
-    if (bounds == Rectangle<float> {})
+    if (bounds == juce::Rectangle<float> {})
         return;
 
     scopePath.clear();
@@ -100,7 +100,7 @@ void Oscilloscope::ScopeBackgroundTask::runTask (const AudioBuffer<float>& buffe
         scopePath.lineTo (mapXY (i, data[triggerOffset + i]));
 }
 
-void Oscilloscope::ScopeBackgroundTask::setBounds (Rectangle<int> newBounds)
+void Oscilloscope::ScopeBackgroundTask::setBounds (juce::Rectangle<int> newBounds)
 {
     ScopedLock sl (crit);
     bounds = newBounds.toFloat();

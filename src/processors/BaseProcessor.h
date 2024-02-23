@@ -181,9 +181,9 @@ public:
     PortType getInputPortType (int portIndex) const;
     PortType getOutputPortType (int portIndex) const;
 
-    void setPosition (juce::Point<int> pos, Rectangle<int> parentBounds);
+    void setPosition (juce::Point<int> pos, juce::Rectangle<int> parentBounds);
     void setPosition (const BaseProcessor& other) { editorPosition = other.editorPosition; }
-    juce::Point<int> getPosition (Rectangle<int> parentBounds);
+    juce::Point<int> getPosition (juce::Rectangle<int> parentBounds);
 
     const auto& getParameters() const { return AudioProcessor::getParameters(); }
     int getForwardingParameterSlotIndex() const noexcept { return forwardingParamsSlotIndex; }

@@ -23,9 +23,9 @@ LevelMeterComponent::LevelMeterComponent (const LevelDataType& levelData) : rmsL
     startTimerHz (timerHz);
 }
 
-Rectangle<int> LevelMeterComponent::getMeterBounds() const
+juce::Rectangle<int> LevelMeterComponent::getMeterBounds() const
 {
-    return Rectangle { 35, getHeight() - 2 }.withCentre (getLocalBounds().getCentre());
+    return juce::Rectangle { 35, getHeight() - 2 }.withCentre (getLocalBounds().getCentre());
 }
 
 void LevelMeterComponent::paint (Graphics& g)

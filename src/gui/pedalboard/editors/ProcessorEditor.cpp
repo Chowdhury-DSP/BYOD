@@ -201,9 +201,9 @@ void ProcessorEditor::resized()
     if (! isIOProcessor)
     {
         const auto xButtonSize = proportionOfWidth (0.1f);
-        settingsButton.setBounds (Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (proportionOfWidth (0.01f)));
+        settingsButton.setBounds (juce::Rectangle { width - 3 * xButtonSize, 0, xButtonSize, xButtonSize }.reduced (proportionOfWidth (0.01f)));
         powerButton.setBounds (width - 2 * xButtonSize, 0, xButtonSize, xButtonSize);
-        xButton.setBounds (Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (proportionOfWidth (0.015f)));
+        xButton.setBounds (juce::Rectangle { width - xButtonSize, 0, xButtonSize, xButtonSize }.reduced (proportionOfWidth (0.015f)));
     }
 
     const int portDim = proportionOfHeight (0.17f);

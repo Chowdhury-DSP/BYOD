@@ -26,13 +26,13 @@ private:
         void runTask (const AudioBuffer<float>& data) override;
 
         juce::Point<float> mapXY (int sampleIndex, float yVal) const;
-        void setBounds (Rectangle<int> newBounds);
+        void setBounds (juce::Rectangle<int> newBounds);
         Path getScopePath() const noexcept;
 
     private:
         CriticalSection crit;
         Path scopePath;
-        Rectangle<float> bounds {};
+        juce::Rectangle<float> bounds {};
 
         int samplesToDisplay = 0;
         int triggerBuffer = 0;
