@@ -1,5 +1,9 @@
 #pragma once
 
+#include <array>
+#include <cmath>
+#include <span>
+
 struct Krusher_Lofi_Resample_State
 {
     double upsample_overshoot = 0.0;
@@ -157,7 +161,6 @@ inline void bit_reduce_decode (const Bit_Reduction_Block& br_block,
                 break;
 
             default:
-                jassertfalse;
                 break;
         }
     }
