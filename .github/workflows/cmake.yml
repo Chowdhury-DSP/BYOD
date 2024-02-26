@@ -26,7 +26,8 @@ jobs:
           - os: ubuntu-22.04
             cmake_args: "-DCMAKE_CXX_COMPILER=g++-11"
           - os: windows-2022
-            cmake_args: -G"Ninja Multi-Config" -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
+            cmake_gan: -G"Ninja Multi-Config"
+            cmake_args: -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
           - os: macos-13
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
 
@@ -83,10 +84,9 @@ jobs:
 
     - name: Configure
       env:
-        CMAKE_ARGS: ${{ matrix.cmake_args }}
         CONFIGURE_ADD_ONS_FLAG: "${{ github.event_name != 'pull_request' && '-DBYOD_BUILD_ADD_ON_MODULES=ON' || '' }}"
       shell: bash
-      run: cmake -Bbuild $CONFIGURE_ADD_ONS_FLAG ${CMAKE_ARGS}
+      run: cmake -Bbuild $CONFIGURE_ADD_ONS_FLAG ${{ matrix.cmake_args }} ${{ matrix.cmake_gen }}
 
     - name: Build
       shell: bash
