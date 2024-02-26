@@ -43,6 +43,10 @@ jobs:
       with:
         xcode-version: '15.2'
 
+    - name: Install Ninja
+      if: runner.os == 'Windows'
+      uses: seanmiddleditch/gha-setup-ninja@master
+
     - name: Add msbuild to PATH
       if: runner.os == 'Windows'
       uses: microsoft/setup-msbuild@v2
