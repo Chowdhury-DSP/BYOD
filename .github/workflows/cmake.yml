@@ -26,7 +26,7 @@ jobs:
           - os: ubuntu-22.04
             cmake_args: "-DCMAKE_CXX_COMPILER=g++-11"
           - os: windows-2022
-            cmake_gan: -G"Ninja Multi-Config"
+            cmake_gen: -G"Ninja Multi-Config"
             cmake_args: -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
           - os: macos-13
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
