@@ -26,10 +26,10 @@ jobs:
           - os: ubuntu-latest
             cmake_args: "-DCMAKE_CXX_COMPILER=g++-11"
           - os: windows-2022
-            cmake_args: "-TClangCL -A x64"
+            cmake_args: "-G\"Ninja Multi-Config\" -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_C_COMPILER=clang-cl"
           - os: macos-13
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-    
+
     steps:
     - name: Install Linux Deps
       if: runner.os == 'Linux'
@@ -42,6 +42,14 @@ jobs:
       uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: '15.2'
+
+    - name: Add msbuild to PATH
+      if: runner.os == 'Windows'
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup MSVC devcmd
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
 
     - name: Get latest CMake
       uses: lukka/get-cmake@latest
@@ -70,14 +78,12 @@ jobs:
         path: modules/jai
 
     - name: Configure
-      shell: bash
       env:
         CMAKE_ARGS: ${{ matrix.cmake_args }}
         CONFIGURE_ADD_ONS_FLAG: "${{ github.event_name != 'pull_request' && '-DBYOD_BUILD_ADD_ON_MODULES=ON' || '' }}"
       run: cmake -Bbuild $CONFIGURE_ADD_ONS_FLAG $CMAKE_ARGS
 
     - name: Build
-      shell: bash
       run: cmake --build build --config Release --parallel 4 --target BYOD_Standalone BYOD_VST3 BYOD_CLAP
 
     - name: Unit Tests
