@@ -23,13 +23,14 @@ jobs:
       fail-fast: false # show all errors for each platform (vs. cancel jobs on error)
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             cmake_args: "-DCMAKE_CXX_COMPILER=g++-11"
           - os: windows-2022
-            cmake_args: "-TClangCL -A x64"
+            cmake_gen: -G"Ninja Multi-Config"
+            cmake_args: -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
           - os: macos-13
             cmake_args: "-DCMAKE_BUILD_TYPE=Release"
-    
+
     steps:
     - name: Install Linux Deps
       if: runner.os == 'Linux'
@@ -42,6 +43,18 @@ jobs:
       uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: '15.2'
+
+    - name: Install Ninja
+      if: runner.os == 'Windows'
+      uses: seanmiddleditch/gha-setup-ninja@master
+
+    - name: Add msbuild to PATH
+      if: runner.os == 'Windows'
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup MSVC devcmd
+      if: runner.os == 'Windows'
+      uses: ilammy/msvc-dev-cmd@v1
 
     - name: Get latest CMake
       uses: lukka/get-cmake@latest
@@ -70,11 +83,10 @@ jobs:
         path: modules/jai
 
     - name: Configure
-      shell: bash
       env:
-        CMAKE_ARGS: ${{ matrix.cmake_args }}
         CONFIGURE_ADD_ONS_FLAG: "${{ github.event_name != 'pull_request' && '-DBYOD_BUILD_ADD_ON_MODULES=ON' || '' }}"
-      run: cmake -Bbuild $CONFIGURE_ADD_ONS_FLAG $CMAKE_ARGS
+      shell: bash
+      run: cmake -Bbuild $CONFIGURE_ADD_ONS_FLAG ${{ matrix.cmake_args }} ${{ matrix.cmake_gen }}
 
     - name: Build
       shell: bash
