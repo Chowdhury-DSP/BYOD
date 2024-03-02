@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# expand bash aliases
-shopt -s expand_aliases
-source ~/.bashrc
+# # expand bash aliases
+# shopt -s expand_aliases
+# source ~/.bashrc
 
 # exit on failure
 set -e
@@ -79,7 +79,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     cmake --build build-aax --config $build_config -j12 --target "${TARGET_NAME}_AAX" | xcpretty
 
 else # Windows
-    cmake -Bbuild-aax -G"Visual Studio 17 2022" -T ClangCL -A x64 -DBYOD_BUILD_ADD_ON_MODULES=ON
+    cmake -Bbuild-aax -G"Ninja Multi-Config" -DBYOD_BUILD_ADD_ON_MODULES=ON \
+        -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_RC_COMPILER=llvm-rc
     cmake --build build-aax --config $build_config --parallel $(nproc) --target "${TARGET_NAME}_AAX"
 fi
 
