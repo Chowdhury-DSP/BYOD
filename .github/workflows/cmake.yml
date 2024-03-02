@@ -93,7 +93,7 @@ jobs:
       run: cmake --build build --config Release --parallel 4 --target BYOD_Standalone BYOD_VST3 BYOD_CLAP
 
     - name: Unit Tests
-      if: runner.os == 'Linux' || runner.os == 'MacOS'
+      if: runner.os == 'Linux' || runner.os == 'Windows'
       run: |
         cmake --build build --config Release --parallel 4 --target BYOD_headless
         build/BYOD --unit-tests --all
@@ -101,6 +101,7 @@ jobs:
     - name: Run auval
       if: runner.os == 'MacOS'
       run: |
+        cmake --build build --config Release --parallel 4 --target BYOD_AU
         sudo cp -R -f "build/BYOD_artefacts/Release/AU/BYOD.component" "/Library/Audio/Plug-Ins/Components/BYOD.component"
         killall -9 AudioComponentRegistrar
         auval -a
