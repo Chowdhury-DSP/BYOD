@@ -7,6 +7,7 @@ namespace PolyOctaveTags
 const String dryTag = "dry";
 const String upOctaveTag = "up_octave";
 const String up2OctaveTag = "up2_octave";
+const String downOctaveTag = "down_octave";
 } // namespace PolyOctaveTags
 
 PolyOctave::PolyOctave (UndoManager* um)
@@ -28,6 +29,7 @@ PolyOctave::PolyOctave (UndoManager* um)
             return 2 * x * x;
         };
     };
+    setupGainParam (PolyOctaveTags::downOctaveTag, downOctaveGain);
     setupGainParam (PolyOctaveTags::dryTag, dryGain);
     setupGainParam (PolyOctaveTags::upOctaveTag, upOctaveGain);
     setupGainParam (PolyOctaveTags::up2OctaveTag, up2OctaveGain);
@@ -43,6 +45,7 @@ ParamLayout PolyOctave::createParameterLayout()
     using namespace ParameterHelpers;
     auto params = createBaseParams();
 
+    createPercentParameter (params, PolyOctaveTags::downOctaveTag, "-1 Oct", 0.0f);
     createPercentParameter (params, PolyOctaveTags::dryTag, "+0 Oct", 0.5f);
     createPercentParameter (params, PolyOctaveTags::upOctaveTag, "+1 Oct", 0.0f);
     createPercentParameter (params, PolyOctaveTags::up2OctaveTag, "+2 Oct", 0.0f);
@@ -55,13 +58,21 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     dryGain.prepare (sampleRate, samplesPerBlock);
     up2OctaveGain.prepare (sampleRate, samplesPerBlock);
     upOctaveGain.prepare (sampleRate, samplesPerBlock);
+    downOctaveGain.prepare (sampleRate, samplesPerBlock);
 
     doubleBuffer.setMaxSize (2, samplesPerBlock);
     up2OctaveBuffer.setMaxSize (2, static_cast<int> (ComplexERBFilterBank::float_2::size) * samplesPerBlock); // allocate extra space for SIMD
     upOctaveBuffer.setMaxSize (2, static_cast<int> (ComplexERBFilterBank::float_2::size) * samplesPerBlock); // allocate extra space for SIMD
+    downOctaveBuffer.setMaxSize (2, samplesPerBlock);
 
     FilterBankHelpers::designFilterBank (octaveUpFilterBank, 2.0, 5.0, 6.0, sampleRate);
     FilterBankHelpers::designFilterBank (octaveUp2FilterBank, 3.0, 7.0, 4.0, sampleRate);
+
+    for (auto& shifter : downOctavePitchShifters)
+    {
+        shifter.prepare (sampleRate);
+        shifter.set_pitch_factor (0.5);
+    }
 
     for (auto& busDCBlocker : dcBlocker)
     {
@@ -72,6 +83,7 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     mixOutBuffer.setSize (2, samplesPerBlock);
     up1OutBuffer.setSize (2, samplesPerBlock);
     up2OutBuffer.setSize (2, samplesPerBlock);
+    down1OutBuffer.setSize (2, samplesPerBlock);
 }
 
 void PolyOctave::processAudio (AudioBuffer<float>& buffer)
@@ -82,9 +94,18 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
     doubleBuffer.setCurrentSize (numChannels, numSamples);
     upOctaveBuffer.setCurrentSize (numChannels, numSamples);
     up2OctaveBuffer.setCurrentSize (numChannels, numSamples);
+    downOctaveBuffer.setCurrentSize (numChannels, numSamples);
 
     chowdsp::BufferMath::copyBufferData (buffer, doubleBuffer);
 
+    // "down" processing
+    for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (doubleBuffer), downOctaveBuffer))
+    {
+        for (auto [x, y] : chowdsp::zip (data_in, data_out))
+            y = downOctavePitchShifters[(size_t) ch].process_sample (x);
+    }
+
+    // "up" processing
     using float_2 = ComplexERBFilterBank::float_2;
     for (int ch = 0; ch < numChannels; ++ch)
     {
@@ -165,26 +186,35 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
     up2OctaveGain.process (numSamples);
     chowdsp::BufferMath::applyGainSmoothedBuffer (up2OctaveBuffer, up2OctaveGain);
 
+    chowdsp::BufferMath::applyGain (downOctaveBuffer, juce::Decibels::decibelsToGain (3.0f));
+    downOctaveGain.process (numSamples);
+    chowdsp::BufferMath::applyGainSmoothedBuffer (downOctaveBuffer, downOctaveGain);
+
     dryGain.process (numSamples);
     chowdsp::BufferMath::applyGainSmoothedBuffer (doubleBuffer, dryGain);
     chowdsp::BufferMath::addBufferData (up2OctaveBuffer, doubleBuffer);
     chowdsp::BufferMath::addBufferData (upOctaveBuffer, doubleBuffer);
+    chowdsp::BufferMath::addBufferData (downOctaveBuffer, doubleBuffer);
 
     mixOutBuffer.setSize (numChannels, numSamples, false, false, true);
     up1OutBuffer.setSize (numChannels, numSamples, false, false, true);
     up2OutBuffer.setSize (numChannels, numSamples, false, false, true);
+    down1OutBuffer.setSize (numChannels, numSamples, false, false, true);
 
     chowdsp::BufferMath::copyBufferData (doubleBuffer, mixOutBuffer);
     chowdsp::BufferMath::copyBufferData (upOctaveBuffer, up1OutBuffer);
     chowdsp::BufferMath::copyBufferData (up2OctaveBuffer, up2OutBuffer);
+    chowdsp::BufferMath::copyBufferData (downOctaveBuffer, down1OutBuffer);
 
     dcBlocker[MixOutput].processBlock (mixOutBuffer);
     dcBlocker[Up1Output].processBlock (up1OutBuffer);
     dcBlocker[Up2Output].processBlock (up2OutBuffer);
+    dcBlocker[Down1Output].processBlock (down1OutBuffer);
 
     outputBuffers.getReference (MixOutput) = &mixOutBuffer;
     outputBuffers.getReference (Up1Output) = &up1OutBuffer;
     outputBuffers.getReference (Up2Output) = &up2OutBuffer;
+    outputBuffers.getReference (Down1Output) = &down1OutBuffer;
 }
 
 void PolyOctave::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -194,14 +224,17 @@ void PolyOctave::processAudioBypassed (AudioBuffer<float>& buffer)
     mixOutBuffer.setSize (buffer.getNumChannels(), numSamples, false, false, true);
     up1OutBuffer.setSize (1, numSamples, false, false, true);
     up2OutBuffer.setSize (1, numSamples, false, false, true);
+    down1OutBuffer.setSize (1, numSamples, false, false, true);
 
     chowdsp::BufferMath::copyBufferData (buffer, mixOutBuffer);
     up1OutBuffer.clear();
     up2OutBuffer.clear();
+    down1OutBuffer.clear();
 
     outputBuffers.getReference (MixOutput) = &mixOutBuffer;
     outputBuffers.getReference (Up1Output) = &up1OutBuffer;
     outputBuffers.getReference (Up2Output) = &up2OutBuffer;
+    outputBuffers.getReference (Down1Output) = &down1OutBuffer;
 }
 
 String PolyOctave::getTooltipForPort (int portIndex, bool isInput)
@@ -216,6 +249,8 @@ String PolyOctave::getTooltipForPort (int portIndex, bool isInput)
                 return "+1 Octave Output";
             case OutputPort::Up2Output:
                 return "+2 Octave Output";
+            case OutputPort::Down1Output:
+                return "-1 Octave Output";
         }
     }
 
