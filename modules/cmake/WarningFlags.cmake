@@ -43,6 +43,7 @@ if(WIN32)
             -Wno-implicit-int-float-conversion
             -Wno-implicit-const-int-float-conversion
             -Wno-unsafe-buffer-usage
+            -Wno-unknown-warning-option
             -Wno-header-hygiene
         )
     elseif((CMAKE_CXX_COMPILER_ID STREQUAL "MSVC") OR (CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC"))

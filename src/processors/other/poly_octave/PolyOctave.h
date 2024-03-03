@@ -1,6 +1,7 @@
 #pragma once
 
 #include "processors/BaseProcessor.h"
+#include "DelayPitchShifter.h"
 
 class PolyOctave : public BaseProcessor
 {
@@ -26,8 +27,9 @@ public:
     enum OutputPort
     {
         MixOutput,
-        Up1Output,
         Up2Output,
+        Up1Output,
+        Down1Output,
     };
 
     static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
@@ -36,19 +38,23 @@ private:
     chowdsp::SmoothedBufferValue<double> dryGain {};
     chowdsp::SmoothedBufferValue<double> upOctaveGain {};
     chowdsp::SmoothedBufferValue<double> up2OctaveGain {};
+    chowdsp::SmoothedBufferValue<double> downOctaveGain {};
 
     chowdsp::Buffer<double> doubleBuffer;
     chowdsp::Buffer<double> upOctaveBuffer;
     chowdsp::Buffer<double> up2OctaveBuffer;
+    chowdsp::Buffer<double> downOctaveBuffer;
 
     std::array<ComplexERBFilterBank, 2> octaveUpFilterBank;
     std::array<ComplexERBFilterBank, 2> octaveUp2FilterBank;
+    std::array<pitch_shift::Processor<double>, 2> downOctavePitchShifters;
 
     std::array<chowdsp::FirstOrderHPF<float>, (size_t) numOutputs> dcBlocker;
 
     juce::AudioBuffer<float> mixOutBuffer;
     juce::AudioBuffer<float> up1OutBuffer;
     juce::AudioBuffer<float> up2OutBuffer;
+    juce::AudioBuffer<float> down1OutBuffer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyOctave)
 };
