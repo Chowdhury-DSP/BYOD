@@ -18,7 +18,7 @@ struct Delay
     void prepare (double sample_rate, T initial_phase_offset_01 = {})
     {
         N_int = static_cast<size_t> (sample_rate * 0.075);
-        delay_buffer.resize (2 * N_int, T{});
+        delay_buffer.resize (2 * N_int, T {});
         N = static_cast<T> (N_int);
         write_pointer = 0;
 
@@ -28,7 +28,7 @@ struct Delay
 
     void reset()
     {
-        std::fill (delay_buffer.begin(), delay_buffer.end(), T{});
+        std::fill (delay_buffer.begin(), delay_buffer.end(), T {});
         write_pointer = 0;
         read_pointer = N * phase_offset_01;
     }
@@ -49,7 +49,7 @@ struct Delay
         const auto alpha = read_pointer - static_cast<T> (rp_int);
         const auto y = ((T) 1 - alpha) * delay_buffer[rp_int] + alpha * delay_buffer[rp_int + 1];
 
-        read_pointer = std::fmod(read_pointer + read_pointer_increment, N);
+        read_pointer = std::fmod (read_pointer + read_pointer_increment, N);
         write_pointer = (write_pointer + 1) % N_int;
 
         const auto amplitude_mod = (T) 0.5 * ((T) 1 - math_approx::cos<5> (juce::MathConstants<T>::twoPi * get_phase_01()));
@@ -86,4 +86,4 @@ struct Processor
         return d_0.process_sample (x) + d_half.process_sample (x);
     }
 };
-}
+} // namespace pitch_shift

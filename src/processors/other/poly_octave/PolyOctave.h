@@ -1,7 +1,7 @@
 #pragma once
 
-#include "processors/BaseProcessor.h"
 #include "DelayPitchShifter.h"
+#include "processors/BaseProcessor.h"
 
 class PolyOctave : public BaseProcessor
 {
