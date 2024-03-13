@@ -315,11 +315,11 @@ bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowd
             addChildComponent (tempoSyncSelector);
             addChildComponent (delayTimeSlider);
 
-            const auto* modeChoiceParam = getParameterPointer<chowdsp::RhythmParameter*> (vts, DelayTags::tempoSyncAmountTag);
-            tempoSyncSelector.addItemList (modeChoiceParam->choices, 1);
-            tempoSyncSelector.setSelectedItemIndex (0);
+            const auto* tempoChoiceParam = getParameterPointer<chowdsp::RhythmParameter*> (vts, DelayTags::tempoSyncAmountTag);
+            tempoSyncSelector.addItemList (tempoChoiceParam->choices, 1);
+            tempoSyncSelector.setSelectedItemIndex (tempoChoiceParam->getIndex());
             tempoSyncSelector.setScrollWheelEnabled (true);
-            hcp.registerParameterComponent (tempoSyncSelector, *modeChoiceParam);
+            hcp.registerParameterComponent (tempoSyncSelector, *tempoChoiceParam);
 
             hcp.registerParameterComponent (delayTimeSlider, delayTimeSlider.getParameter());
 
