@@ -17,7 +17,7 @@ struct Delay
 
     void prepare (double sample_rate, T initial_phase_offset_01 = {})
     {
-        N_int = static_cast<size_t> (sample_rate * 0.075);
+        N_int = static_cast<size_t> (sample_rate * 0.06);
         delay_buffer.resize (2 * N_int, T {});
         N = static_cast<T> (N_int);
         write_pointer = 0;
