@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Improved DSP performance for many of the modules.
 - Improved memory-efficiency for Spring Reverb module.
 - Improved handling of NaN inputs.
+- Improved preset searching.
 - Fixed host parameter automation not working in some cases.
 - Fixed user presets not always showing in alphabetical order.
 
