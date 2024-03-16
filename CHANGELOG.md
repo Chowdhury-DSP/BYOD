@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## UNRELEASED
+## [1.3.0] - 2024-03-15
 - Added "Laser Trem" module.
 - Added "Poly Octave" module.
 - Added "Tempo Sync" options for Delay module.
