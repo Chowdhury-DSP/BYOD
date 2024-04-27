@@ -1,0 +1,38 @@
+{
+  "plugins": [
+    {
+      "author": "Chowdhury-DSP",
+      "homepage": "https://github.com/Chowdhury-DSP/BYOD",
+      "name": "BYOD",
+      "description": "Build-Your-Own Distortion (BYOD) is a guitar effects plugin that allows users to create custom signal chains with various distortion effects, musical tone-shaping filters, and other signal processors.",
+      "tags": ["Guitar Effects", "Distortion", "Signal Processing"],
+      "version": "1.3.0",
+      "id": "BYOD",
+      "date": "2024-03-15",
+      "files": {
+        "audio": {
+          "name": "byod-demo.wav",
+          "size": 352844
+        },
+        "image": {
+          "name": "byod-screenshot.png",
+          "size": 35091
+        },
+        "linux": {
+          "name": "BYOD-Linux-x64-1.3.0.deb",
+          "size": 21200000,
+          "release_date": "2024-03-15T23:58:44Z"
+        },
+        "mac": {
+          "name": "BYOD-Mac-1.3.0.dmg",
+          "size": 85000000,
+          "release_date": "2024-03-15T23:58:09Z"
+        },
+        "win": {
+          "name": "BYOD-Win-64bit-1.3.0.exe",
+          "size": 25200000
+        }
+      }
+    }
+  ]
+}
