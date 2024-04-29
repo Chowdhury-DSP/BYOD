@@ -1,13 +1,12 @@
 #pragma once
 
-#include "PolyOctave.h"
+#include "PolyOctaveFilterBankTypes.h"
 
-namespace FilterBankHelpers
+namespace poly_octave_v1
 {
 // Reference for filter-bank design and octave shifting:
 // https://aaltodoc.aalto.fi/server/api/core/bitstreams/ff9e52cf-fd79-45eb-b695-93038244ec0e/content
 
-using float_2 = PolyOctave::ComplexERBFilterBank::float_2;
 static_assert (float_2::size == 2);
 static_assert (xsimd::batch<double>::size == 2);
 static constexpr auto vec_size = float_2::size;
@@ -89,13 +88,13 @@ static auto designERBFilter (size_t erb_index,
     return center_target_freq;
 }
 
-static void designFilterBank (std::array<PolyOctave::ComplexERBFilterBank, 2>& filterBank,
+static void designFilterBank (std::array<ComplexERBFilterBank, 2>& filterBank,
                               double gamma,
                               double erb_start,
                               double q_ERB,
                               double sampleRate)
 {
-    for (size_t kiter = 0; kiter < PolyOctave::ComplexERBFilterBank::numFilterBands; kiter += vec_size)
+    for (size_t kiter = 0; kiter < ComplexERBFilterBank::numFilterBands; kiter += vec_size)
     {
         alignas (16) std::array<float_2::value_type, float_2::size> b_coeffs_cplx_real_simd[5];
         alignas (16) std::array<float_2::value_type, float_2::size> b_coeffs_cplx_imag_simd[5];
@@ -159,5 +158,10 @@ static void designFilterBank (std::array<PolyOctave::ComplexERBFilterBank, 2>& f
                                                                      });
         }
     }
+}
+
+void process_filter_bank()
+{
+
 }
 } // namespace FilterBankHelpers
