@@ -13,11 +13,11 @@ const String v1Tag = "v1_mode";
 
 PolyOctave::PolyOctave (UndoManager* um)
     : BaseProcessor (
-        "Poly Octave",
-        createParameterLayout(),
-        BasicInputPort {},
-        OutputPort {},
-        um)
+          "Poly Octave",
+          createParameterLayout(),
+          BasicInputPort {},
+          OutputPort {},
+          um)
 {
     using namespace ParameterHelpers;
     const auto setupGainParam = [this] (const juce::String& paramID,
@@ -70,10 +70,18 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     upOctaveBuffer_double.setMaxSize (2, 2 * samplesPerBlock); // allocate extra space for SIMD
     downOctaveBuffer_double.setMaxSize (2, samplesPerBlock);
 
-    poly_octave_v1::designFilterBank (octaveUpFilterBank, 2.0, 5.0, 6.0, sampleRate);
-    poly_octave_v1::designFilterBank (octaveUp2FilterBank, 3.0, 7.0, 4.0, sampleRate);
-
+    poly_octave_v2::design_filter_bank<poly_octave_v2::N1> (octaveUpFilterBank, 2.0, 5.0, 5.0, sampleRate);
+    poly_octave_v2::design_filter_bank<poly_octave_v2::N1> (octaveUp2FilterBank, 3.0, 7.0, 6.0, sampleRate);
     for (auto& shifter : downOctavePitchShifters)
+    {
+        shifter.prepare (sampleRate);
+        shifter.set_pitch_factor (0.5f);
+    }
+
+    poly_octave_v1::designFilterBank (octaveUpFilterBank_v1, 2.0, 5.0, 6.0, sampleRate);
+    poly_octave_v1::designFilterBank (octaveUp2FilterBank_v1, 3.0, 7.0, 4.0, sampleRate);
+
+    for (auto& shifter : downOctavePitchShifters_v1)
     {
         shifter.prepare (sampleRate);
         shifter.set_pitch_factor (0.5);
@@ -86,9 +94,9 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     }
 
     mixOutBuffer.setSize (2, samplesPerBlock);
-    up1OutBuffer.setSize (2, samplesPerBlock);
-    up2OutBuffer.setSize (2, samplesPerBlock);
-    down1OutBuffer.setSize (2, samplesPerBlock);
+    up1OutBuffer.setSize (2, 4 * samplesPerBlock + 8); // padding for SIMD
+    up2OutBuffer.setSize (2, 4 * samplesPerBlock + 8); // padding for SIMD
+    down1OutBuffer.setSize (2, 4 * samplesPerBlock + 8); // padding for SIMD
 }
 
 void PolyOctave::processAudio (AudioBuffer<float>& buffer)
@@ -99,7 +107,62 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
         return;
     }
 
+    const auto numChannels = buffer.getNumChannels();
+    const auto numSamples = buffer.getNumSamples();
 
+    mixOutBuffer.setSize (numChannels, numSamples, false, false, true);
+    up1OutBuffer.setSize (numChannels, numSamples, false, false, true);
+    up2OutBuffer.setSize (numChannels, numSamples, false, false, true);
+    down1OutBuffer.setSize (numChannels, numSamples, false, false, true);
+
+    // "down" processing
+    for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), down1OutBuffer))
+    {
+        for (auto [x, y] : chowdsp::zip (data_in, data_out))
+            y = downOctavePitchShifters[(size_t) ch].process_sample (x);
+    }
+    downOctaveGain.process (numSamples);
+    chowdsp::BufferMath::applyGainSmoothedBuffer (down1OutBuffer, downOctaveGain);
+
+    // "up1" processing
+    for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up1OutBuffer))
+    {
+        poly_octave_v2::process<1> (octaveUpFilterBank[ch],
+                                    data_in.data(),
+                                    data_out.data(),
+                                    numSamples);
+    }
+    upOctaveGain.process (numSamples);
+    chowdsp::BufferMath::applyGainSmoothedBuffer (up1OutBuffer, upOctaveGain);
+
+    // "up2" processing
+    for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up2OutBuffer))
+    {
+        poly_octave_v2::process<2> (octaveUp2FilterBank[ch],
+                                    data_in.data(),
+                                    data_out.data(),
+                                    numSamples);
+    }
+    up2OctaveGain.process (numSamples);
+    chowdsp::BufferMath::applyGainSmoothedBuffer (up2OutBuffer, up2OctaveGain);
+
+    chowdsp::BufferMath::copyBufferData (buffer, mixOutBuffer);
+    dryGain.process (numSamples);
+    chowdsp::BufferMath::applyGainSmoothedBuffer (mixOutBuffer, dryGain);
+
+    chowdsp::BufferMath::addBufferData (up1OutBuffer, mixOutBuffer);
+    chowdsp::BufferMath::addBufferData (up2OutBuffer, mixOutBuffer);
+    chowdsp::BufferMath::addBufferData (down1OutBuffer, mixOutBuffer);
+
+    dcBlocker[MixOutput].processBlock (mixOutBuffer);
+    dcBlocker[Up1Output].processBlock (up1OutBuffer);
+    dcBlocker[Up2Output].processBlock (up2OutBuffer);
+    dcBlocker[Down1Output].processBlock (down1OutBuffer);
+
+    outputBuffers.getReference (MixOutput) = &mixOutBuffer;
+    outputBuffers.getReference (Up1Output) = &up1OutBuffer;
+    outputBuffers.getReference (Up2Output) = &up2OutBuffer;
+    outputBuffers.getReference (Down1Output) = &down1OutBuffer;
 }
 
 void PolyOctave::processAudioV1 (AudioBuffer<float>& buffer)
@@ -118,7 +181,7 @@ void PolyOctave::processAudioV1 (AudioBuffer<float>& buffer)
     for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (doubleBuffer), downOctaveBuffer_double))
     {
         for (auto [x, y] : chowdsp::zip (data_in, data_out))
-            y = downOctavePitchShifters[(size_t) ch].process_sample (x);
+            y = downOctavePitchShifters_v1[(size_t) ch].process_sample (x);
     }
 
     // "up" processing
@@ -137,8 +200,8 @@ void PolyOctave::processAudioV1 (AudioBuffer<float>& buffer)
         jassert (juce::snapPointerToAlignment (up2DataSIMD, xsimd::default_arch::alignment()) == up2DataSIMD);
         std::fill (up2DataSIMD, up2DataSIMD + numSamples, float_2 {});
 
-        auto& upFilterBank = octaveUpFilterBank[static_cast<size_t> (ch)];
-        auto& up2FilterBank = octaveUp2FilterBank[static_cast<size_t> (ch)];
+        auto& upFilterBank = octaveUpFilterBank_v1[static_cast<size_t> (ch)];
+        auto& up2FilterBank = octaveUp2FilterBank_v1[static_cast<size_t> (ch)];
         static constexpr auto eps = std::numeric_limits<double>::epsilon();
 
         for (size_t k = 0; k < poly_octave_v1::ComplexERBFilterBank::numFilterBands; k += float_2::size)
@@ -231,7 +294,6 @@ void PolyOctave::processAudioV1 (AudioBuffer<float>& buffer)
     outputBuffers.getReference (Up2Output) = &up2OutBuffer;
     outputBuffers.getReference (Down1Output) = &down1OutBuffer;
 }
-
 
 void PolyOctave::processAudioBypassed (AudioBuffer<float>& buffer)
 {

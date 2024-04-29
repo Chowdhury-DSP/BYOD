@@ -40,14 +40,19 @@ private:
     chowdsp::SmoothedBufferValue<float> up2OctaveGain {};
     chowdsp::SmoothedBufferValue<float> downOctaveGain {};
 
+    // V2 processing stuff...
+    std::array<poly_octave_v2::ComplexERBFilterBank<poly_octave_v2::N1>, 2> octaveUpFilterBank;
+    std::array<poly_octave_v2::ComplexERBFilterBank<poly_octave_v2::N1>, 2> octaveUp2FilterBank;
+    std::array<pitch_shift::Processor<float>, 2> downOctavePitchShifters;
+
     // V1 processing stuff...
     chowdsp::Buffer<double> doubleBuffer;
     chowdsp::Buffer<double> upOctaveBuffer_double;
     chowdsp::Buffer<double> up2OctaveBuffer_double;
     chowdsp::Buffer<double> downOctaveBuffer_double;
-    std::array<poly_octave_v1::ComplexERBFilterBank, 2> octaveUpFilterBank;
-    std::array<poly_octave_v1::ComplexERBFilterBank, 2> octaveUp2FilterBank;
-    std::array<pitch_shift::Processor<double>, 2> downOctavePitchShifters;
+    std::array<poly_octave_v1::ComplexERBFilterBank, 2> octaveUpFilterBank_v1;
+    std::array<poly_octave_v1::ComplexERBFilterBank, 2> octaveUp2FilterBank_v1;
+    std::array<pitch_shift::Processor<double>, 2> downOctavePitchShifters_v1;
 
     std::array<chowdsp::FirstOrderHPF<float>, (size_t) numOutputs> dcBlocker;
 
