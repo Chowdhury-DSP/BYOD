@@ -4,9 +4,9 @@ if(WIN32)
     set(CMAKE_SYSTEM_VERSION 7.1 CACHE STRING INTERNAL FORCE) # Windows SDK for Windows 7 and up
 endif()
 if(APPLE AND (CMAKE_SYSTEM_NAME STREQUAL "iOS"))
-    project(BYOD VERSION 2.1.0)
+    project(BYOD VERSION 2.1.1)
 else()
-    project(BYOD VERSION 1.3.0)
+    project(BYOD VERSION 1.3.1)
 endif()
 set(CMAKE_CXX_STANDARD 20)
 
