@@ -70,8 +70,8 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     upOctaveBuffer_double.setMaxSize (2, 2 * samplesPerBlock); // allocate extra space for SIMD
     downOctaveBuffer_double.setMaxSize (2, samplesPerBlock);
 
-    poly_octave_v2::design_filter_bank<poly_octave_v2::N1> (octaveUpFilterBank, 2.0, 5.0, 5.0, sampleRate);
-    poly_octave_v2::design_filter_bank<poly_octave_v2::N1> (octaveUp2FilterBank, 3.0, 7.0, 6.0, sampleRate);
+    poly_octave_v2::design_filter_bank<poly_octave_v2::N1> (octaveUpFilterBank, 2.0, 5.0, 4.5, sampleRate);
+    poly_octave_v2::design_filter_bank<poly_octave_v2::N1> (octaveUp2FilterBank, 3.0, 6.0, 2.75, sampleRate);
     for (auto& shifter : downOctavePitchShifters)
     {
         shifter.prepare (sampleRate);
