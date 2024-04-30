@@ -13,11 +13,11 @@ const String v1Tag = "v1_mode";
 
 PolyOctave::PolyOctave (UndoManager* um)
     : BaseProcessor (
-          "Poly Octave",
-          createParameterLayout(),
-          BasicInputPort {},
-          OutputPort {},
-          um)
+        "Poly Octave",
+        createParameterLayout(),
+        BasicInputPort {},
+        OutputPort {},
+        um)
 {
     using namespace ParameterHelpers;
     const auto setupGainParam = [this] (const juce::String& paramID,

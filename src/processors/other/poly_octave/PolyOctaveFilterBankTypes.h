@@ -10,7 +10,7 @@ struct ComplexERBFilterBank
     static constexpr size_t numFilterBands = 44;
     std::array<chowdsp::IIRFilter<4, float_2>, numFilterBands / float_2::size> erbFilterReal, erbFilterImag;
 };
-}
+} // namespace poly_octave_v1
 
 namespace poly_octave_v2
 {
@@ -35,4 +35,4 @@ struct ComplexERBFilterBank
 
     std::array<ComplexFilter, num_filter_bands / T::size> erb_filter_complex;
 };
-}
+} // namespace poly_octave_v2

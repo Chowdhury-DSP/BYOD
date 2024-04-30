@@ -1,8 +1,8 @@
 #pragma once
 
 #include "DelayPitchShifter.h"
-#include "processors/BaseProcessor.h"
 #include "PolyOctaveFilterBankTypes.h"
+#include "processors/BaseProcessor.h"
 
 class PolyOctave : public BaseProcessor
 {
