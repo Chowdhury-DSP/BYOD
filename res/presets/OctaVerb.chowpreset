@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="OctaVerb" plugin="BYOD" vendor="CHOW" category="Pedals" version="1.2.2">
-  <proc_chain state_plugin_version="1.2.2">
+<Preset name="OctaVerb" plugin="BYOD" vendor="CHOW" category="Pedals" version="1.3.1">
+  <proc_chain state_plugin_version="1.3.1">
     <Poly_Octave>
       <Parameters x_pos="0.04100000113248825" y_pos="0.505660355091095">
         <PARAM id="dry" value="0.0"/>
         <PARAM id="on_off" value="1.0"/>
         <PARAM id="up2_octave" value="0.5"/>
         <PARAM id="up_octave" value="1.0"/>
+        <PARAM id="v1_mode" value="0.0"/>
       </Parameters>
       <port_0 connection_0="3" connection_end_0="0"/>
     </Poly_Octave>
