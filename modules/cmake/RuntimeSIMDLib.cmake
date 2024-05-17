@@ -1,10 +1,13 @@
 include(CheckCXXCompilerFlag)
-function(make_lib_simd_runtime name file)
+function(make_lib_simd_runtime name)
+    set(multiValueArgs SOURCES)
+    cmake_parse_arguments(ARG "" "" "${multiValueArgs}" ${ARGN})
+
     add_library(${name}_sse_or_arm STATIC)
-    target_sources(${name}_sse_or_arm PRIVATE ${file})
+    target_sources(${name}_sse_or_arm PRIVATE ${ARG_SOURCES})
 
     add_library(${name}_avx STATIC)
-    target_sources(${name}_avx PRIVATE ${file})
+    target_sources(${name}_avx PRIVATE ${ARG_SOURCES})
     target_compile_definitions(${name}_avx PRIVATE BYOD_COMPILING_WITH_AVX=1)
     if(WIN32)
         CHECK_CXX_COMPILER_FLAG("/arch:AVX" COMPILER_OPT_ARCH_AVX_SUPPORTED)

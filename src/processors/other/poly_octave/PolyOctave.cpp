@@ -1,5 +1,6 @@
 #include "PolyOctave.h"
-#include "PolyOctaveFilterBandHelpers.h"
+#include "PolyOctaveV1FilterBankImpl.h"
+#include "PolyOctaveV2FilterBankImpl.h"
 #include "processors/ParameterHelpers.h"
 
 namespace PolyOctaveTags
@@ -13,11 +14,11 @@ const String v1Tag = "v1_mode";
 
 PolyOctave::PolyOctave (UndoManager* um)
     : BaseProcessor (
-        "Poly Octave",
-        createParameterLayout(),
-        BasicInputPort {},
-        OutputPort {},
-        um)
+          "Poly Octave",
+          createParameterLayout(),
+          BasicInputPort {},
+          OutputPort {},
+          um)
 {
     using namespace ParameterHelpers;
     const auto setupGainParam = [this] (const juce::String& paramID,
@@ -42,6 +43,14 @@ PolyOctave::PolyOctave (UndoManager* um)
     uiOptions.powerColour = Colour { 0xffe70510 };
     uiOptions.info.description = "A \"polyphonic octave generator\" effect.";
     uiOptions.info.authors = StringArray { "Jatin Chowdhury" };
+
+#if JUCE_INTEL
+    if (juce::SystemStats::hasAVX() && juce::SystemStats::hasFMA3())
+    {
+        juce::Logger::writeToLog ("Using Poly Octave with AVX SIMD instructions!");
+        use_avx = true;
+    }
+#endif
 }
 
 ParamLayout PolyOctave::createParameterLayout()
@@ -94,9 +103,9 @@ void PolyOctave::prepare (double sampleRate, int samplesPerBlock)
     }
 
     mixOutBuffer.setSize (2, samplesPerBlock);
-    up1OutBuffer.setSize (2, 4 * samplesPerBlock + 8); // padding for SIMD
-    up2OutBuffer.setSize (2, 4 * samplesPerBlock + 8); // padding for SIMD
-    down1OutBuffer.setSize (2, 4 * samplesPerBlock + 8); // padding for SIMD
+    up1OutBuffer.setSize (2, 8 * samplesPerBlock + 32); // padding for SIMD
+    up2OutBuffer.setSize (2, 8 * samplesPerBlock + 32); // padding for SIMD
+    down1OutBuffer.setSize (2, samplesPerBlock);
 }
 
 void PolyOctave::processAudio (AudioBuffer<float>& buffer)
@@ -125,23 +134,47 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
     chowdsp::BufferMath::applyGainSmoothedBuffer (down1OutBuffer, downOctaveGain);
 
     // "up1" processing
-    for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up1OutBuffer))
+    for (const auto& [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up1OutBuffer))
     {
-        poly_octave_v2::process<1> (octaveUpFilterBank[ch],
-                                    data_in.data(),
-                                    data_out.data(),
-                                    numSamples);
+#if JUCE_INTEL
+        if (use_avx)
+        {
+            poly_octave_v2::process_avx<1> (octaveUpFilterBank[ch],
+                                            data_in.data(),
+                                            data_out.data(),
+                                            numSamples);
+        }
+        else
+#endif
+        {
+            poly_octave_v2::process<1> (octaveUpFilterBank[ch],
+                                        data_in.data(),
+                                        data_out.data(),
+                                        numSamples);
+        }
     }
     upOctaveGain.process (numSamples);
     chowdsp::BufferMath::applyGainSmoothedBuffer (up1OutBuffer, upOctaveGain);
 
     // "up2" processing
-    for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up2OutBuffer))
+    for (const auto& [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up2OutBuffer))
     {
-        poly_octave_v2::process<2> (octaveUp2FilterBank[ch],
-                                    data_in.data(),
-                                    data_out.data(),
-                                    numSamples);
+#if JUCE_INTEL
+        if (use_avx)
+        {
+            poly_octave_v2::process_avx<2> (octaveUp2FilterBank[ch],
+                                            data_in.data(),
+                                            data_out.data(),
+                                            numSamples);
+        }
+        else
+#endif
+        {
+            poly_octave_v2::process<2> (octaveUp2FilterBank[ch],
+                                        data_in.data(),
+                                        data_out.data(),
+                                        numSamples);
+        }
     }
     up2OctaveGain.process (numSamples);
     chowdsp::BufferMath::applyGainSmoothedBuffer (up2OutBuffer, up2OctaveGain);
