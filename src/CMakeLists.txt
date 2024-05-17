@@ -167,9 +167,13 @@ if (NOT(${JAI_COMPILER} STREQUAL "JAI_COMPILER-NOTFOUND"))
     target_compile_definitions(BYOD PRIVATE BYOD_BUILDING_JAI_MODULES=1)
 endif()
 
-# AVX/SSE files for accelerated neural nets
-make_lib_simd_runtime(rnn_accelerated processors/drive/neural_utils/RNNAccelerated.cpp)
-foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
+# AVX/SSE files for accelerated neural nets and other DSP
+make_lib_simd_runtime(dsp_accelerated
+    SOURCES
+        processors/drive/neural_utils/RNNAccelerated.cpp
+        processors/other/poly_octave/PolyOctaveV2FilterBankImpl.cpp
+)
+foreach(target IN ITEMS dsp_accelerated_sse_or_arm dsp_accelerated_avx)
     target_link_libraries(${target}
         PRIVATE
             math_approx
@@ -182,7 +186,11 @@ foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
             ${CMAKE_CURRENT_SOURCE_DIR}/../modules/RTNeural
             ${CMAKE_CURRENT_SOURCE_DIR}/../modules/RTNeural/modules/xsimd/include
     )
-    target_compile_definitions(${target} PRIVATE RTNEURAL_USE_XSIMD=1)
+    target_compile_definitions(${target}
+        PRIVATE
+            RTNEURAL_USE_XSIMD=1
+            _USE_MATH_DEFINES=1
+    )
     set_target_properties(${target} PROPERTIES
         POSITION_INDEPENDENT_CODE TRUE
         VISIBILITY_INLINES_HIDDEN TRUE
@@ -190,9 +198,9 @@ foreach(target IN ITEMS rnn_accelerated_sse_or_arm rnn_accelerated_avx)
         CXX_VISIBILITY_PRESET hidden
     )
 endforeach()
-target_compile_definitions(rnn_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=16 RTNEURAL_NAMESPACE=RTNeural_sse_arm)
-target_compile_definitions(rnn_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32 RTNEURAL_NAMESPACE=RTNeural_avx)
-target_link_libraries(BYOD PRIVATE rnn_accelerated)
+target_compile_definitions(dsp_accelerated_sse_or_arm PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=16 RTNEURAL_NAMESPACE=RTNeural_sse_arm)
+target_compile_definitions(dsp_accelerated_avx PRIVATE RTNEURAL_DEFAULT_ALIGNMENT=32 RTNEURAL_NAMESPACE=RTNeural_avx)
+target_link_libraries(BYOD PRIVATE dsp_accelerated)
 
 # special flags for MSVC
 if (MSVC)

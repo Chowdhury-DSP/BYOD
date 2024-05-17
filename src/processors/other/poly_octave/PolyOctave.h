@@ -1,7 +1,8 @@
 #pragma once
 
 #include "DelayPitchShifter.h"
-#include "PolyOctaveFilterBankTypes.h"
+#include "PolyOctaveV1FilterBank.h"
+#include "PolyOctaveV2FilterBank.h"
 #include "processors/BaseProcessor.h"
 
 class PolyOctave : public BaseProcessor
@@ -60,6 +61,10 @@ private:
     juce::AudioBuffer<float> up1OutBuffer;
     juce::AudioBuffer<float> up2OutBuffer;
     juce::AudioBuffer<float> down1OutBuffer;
+
+#if JUCE_INTEL
+    bool use_avx = false;
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyOctave)
 };
