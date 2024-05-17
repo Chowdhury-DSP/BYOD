@@ -424,7 +424,7 @@ void process (ComplexERBFilterBank<N>& filter_bank,
                 const auto greater_than_eps = _mm_cmpgt_ps (x_abs_sq, eps_sse);
                 const auto x_abs_sq_r = _mm_and_ps (greater_than_eps, _mm_rcp_ps (x_abs_sq));
                 const auto x_im_sq_x3 = _mm_add_ps (x_im_sq, _mm_add_ps (x_im_sq, x_im_sq));
-                buffer_out_simd[n] = _mm_add_ps (buffer_out_simd[n], _mm_mul_ps (_mm_sub_ps (x_re_sq, x_im_sq_x3), x_abs_sq_r));
+                buffer_out_simd[n] = _mm_add_ps (buffer_out_simd[n], _mm_mul_ps (_mm_sub_ps (x_re_sq, x_im_sq_x3), _mm_mul_ps (x_re, x_abs_sq_r)));
             }
         }
 
@@ -576,7 +576,7 @@ void process_avx ([[maybe_unused]] ComplexERBFilterBank<N>& filter_bank,
                 const auto greater_than_eps = _mm256_cmp_ps (x_abs_sq, eps_avx, _CMP_GT_OQ);
                 const auto x_abs_sq_r = _mm256_and_ps (greater_than_eps, _mm256_rcp_ps (x_abs_sq));
                 const auto x_im_sq_x3 = _mm256_add_ps (x_im_sq, _mm256_add_ps (x_im_sq, x_im_sq));
-                buffer_out_simd[n] = _mm256_add_ps (buffer_out_simd[n], _mm256_mul_ps (_mm256_sub_ps (x_re_sq, x_im_sq_x3), x_abs_sq_r));
+                buffer_out_simd[n] = _mm256_add_ps (buffer_out_simd[n], _mm256_mul_ps (_mm256_sub_ps (x_re_sq, x_im_sq_x3), _mm256_mul_ps (x_re, x_abs_sq_r)));
             }
         }
 

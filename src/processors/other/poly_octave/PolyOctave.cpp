@@ -134,7 +134,7 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
     chowdsp::BufferMath::applyGainSmoothedBuffer (down1OutBuffer, downOctaveGain);
 
     // "up1" processing
-    for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up1OutBuffer))
+    for (const auto& [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up1OutBuffer))
     {
 #if JUCE_INTEL
         if (use_avx)
@@ -157,7 +157,7 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
     chowdsp::BufferMath::applyGainSmoothedBuffer (up1OutBuffer, upOctaveGain);
 
     // "up2" processing
-    for (auto [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up2OutBuffer))
+    for (const auto& [ch, data_in, data_out] : chowdsp::buffer_iters::zip_channels (std::as_const (buffer), up2OutBuffer))
     {
 #if JUCE_INTEL
         if (use_avx)
