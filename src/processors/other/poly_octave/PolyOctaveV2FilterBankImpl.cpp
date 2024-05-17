@@ -307,11 +307,11 @@ void process (ComplexERBFilterBank<N>& filter_bank,
 {
     // buffer_out size is padded by 4x
     static constexpr auto eps = std::numeric_limits<float>::epsilon();
-    const auto norm_gain = 1.0f / std::pow (static_cast<float> (N), static_cast<float> (num_octaves_up));
+    static constexpr auto norm_gain = 2.0f / static_cast<float> (N);
 
 #if defined(__ARM_NEON__)
-    auto* buffer_out_simd = reinterpret_cast<float32x4_t*> (juce::snapPointerToAlignment (buffer_out, 16));
-    std::fill (buffer_out_simd, buffer_out_simd + num_samples, T {});
+    auto* buffer_out_simd = reinterpret_cast<float32x4_t*> (snapPointerToAlignment (buffer_out, 16));
+    std::fill (buffer_out_simd, buffer_out_simd + num_samples, float32x4_t {});
 
     const auto eps_neon = vld1q_dup_f32 (&eps);
     const auto norm_gain_neon = vld1q_dup_f32 (&norm_gain);
@@ -353,6 +353,11 @@ void process (ComplexERBFilterBank<N>& filter_bank,
             }
             else if constexpr (num_octaves_up == 2)
             {
+                const auto greater_than_eps = vcgtq_f32 (x_abs_sq, eps_neon);
+                const auto x_abs_r = vbslq_f32 (greater_than_eps, vrecpeq_f32 (x_abs_sq), zero_neon);
+                const auto x_im_sq_x3 = vaddq_f32 (x_im_sq, vaddq_f32 (x_im_sq, x_im_sq));
+                buffer_out_simd[n] = vfmaq_f32 (buffer_out_simd[n], vsubq_f32 (x_re_sq, x_im_sq_x3), vmulq_f32 (x_re, x_abs_r));
+
                 // @TODO
                 // auto x_abs_sq_r = xsimd::select (x_abs_sq > eps, xsimd::reciprocal (x_abs_sq), {});
                 // buffer_out_simd[n] += x_re * (x_re_sq - (S) 3 * x_im_sq) * x_abs_sq_r;
@@ -519,7 +524,7 @@ void process_avx ([[maybe_unused]] ComplexERBFilterBank<N>& filter_bank,
 {
     // buffer_out size is padded by 8x
     [[maybe_unused]] static constexpr auto eps = std::numeric_limits<float>::epsilon();
-    [[maybe_unused]] const auto norm_gain = 1.0f / std::pow (static_cast<float> (N), static_cast<float> (num_octaves_up));
+    [[maybe_unused]] static constexpr auto norm_gain = 2.0f / static_cast<float> (N);
 
 
 #if defined(__AVX__)
