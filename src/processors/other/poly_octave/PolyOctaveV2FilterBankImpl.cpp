@@ -51,7 +51,7 @@ inline std::pair<float32x4_t, float32x4_t> process_sample_neon (float32x4_t x,
     return { y_real, y_imag };
 }
 #elif defined(__AVX__) || defined(__SSE2__)
-#if defined (__AVX__)
+#if defined(__AVX__)
 inline std::pair<__m256, __m256> process_sample_avx (__m256 x,
                                                      __m256 a1,
                                                      __m256 a2,
@@ -526,7 +526,6 @@ void process_avx ([[maybe_unused]] ComplexERBFilterBank<N>& filter_bank,
     [[maybe_unused]] static constexpr auto eps = std::numeric_limits<float>::epsilon();
     [[maybe_unused]] static constexpr auto norm_gain = 2.0f / static_cast<float> (N);
 
-
 #if defined(__AVX__)
     auto* buffer_out_simd = reinterpret_cast<__m256*> (snapPointerToAlignment (buffer_out, 32));
     std::fill (buffer_out_simd, buffer_out_simd + num_samples, __m256 {});
@@ -595,7 +594,7 @@ void process_avx ([[maybe_unused]] ComplexERBFilterBank<N>& filter_bank,
         __m256 rr = _mm256_dp_ps (buffer_out_simd[n], one_avx, 0xff);
         __m256 tmp = _mm256_permute2f128_ps (rr, rr, 1);
         rr = _mm256_add_ps (rr, tmp);
-        buffer_out[n] = _mm256_cvtss_f32  (rr);
+        buffer_out[n] = _mm256_cvtss_f32 (rr);
     }
 #endif
 }
