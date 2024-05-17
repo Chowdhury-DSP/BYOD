@@ -33,6 +33,28 @@ struct ComplexERBFilterBank
         std::array<T, 3> z_imag {};
     };
 
+    alignas (32) std::array<S, num_filter_bands> a1 {};
+    alignas (32) std::array<S, num_filter_bands> a2 {};
+
+    alignas (32) std::array<S, num_filter_bands> shared_b0 {};
+    alignas (32) std::array<S, num_filter_bands> shared_b1 {};
+    alignas (32) std::array<S, num_filter_bands> shared_b2 {};
+
+    alignas (32) std::array<S, num_filter_bands> real_b1 {};
+    alignas (32) std::array<S, num_filter_bands> real_b2 {};
+
+    alignas (32) std::array<S, num_filter_bands> imag_b1 {};
+    alignas (32) std::array<S, num_filter_bands> imag_b2 {};
+
+    alignas (32) std::array<S, num_filter_bands> shared_z1 {};
+    alignas (32) std::array<S, num_filter_bands> shared_z2 {};
+
+    alignas (32) std::array<S, num_filter_bands> real_z1 {};
+    alignas (32) std::array<S, num_filter_bands> real_z2 {};
+
+    alignas (32) std::array<S, num_filter_bands> imag_z1 {};
+    alignas (32) std::array<S, num_filter_bands> imag_z2 {};
+
     std::array<ComplexFilter, num_filter_bands / T::size> erb_filter_complex;
 };
 } // namespace poly_octave_v2

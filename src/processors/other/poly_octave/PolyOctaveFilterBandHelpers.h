@@ -190,6 +190,70 @@ inline std::pair<T, T> process_sample (const T& x,
     return { y_real, y_imag };
 }
 
+inline std::pair<T, T> process_sample_soa (const T& x,
+                                           T a1,
+                                           T a2,
+                                           T shared_b0,
+                                           T shared_b1,
+                                           T shared_b2,
+                                           T real_b1,
+                                           T real_b2,
+                                           T imag_b1,
+                                           T imag_b2,
+                                           T& shared_z1,
+                                           T& shared_z2,
+                                           T& real_z1,
+                                           T& real_z2,
+                                           T& imag_z1,
+                                           T& imag_z2)
+{
+    const auto y_shared = shared_z1 + x * shared_b0;
+    shared_z1 = shared_z2 + x * shared_b1 - y_shared * a1;
+    shared_z2 = x * shared_b2 - y_shared * a2;
+
+    const auto y_real = real_z1 + y_shared; // for the real filter, we know that b[0] == 1
+    real_z1 = real_z2 + y_shared * real_b1 - y_real * a1;
+    real_z2 = y_shared * real_b2 - y_real * a2;
+
+    const auto y_imag = imag_z1; // for the imaginary filter, we know that b[0] == 0
+    imag_z1 = imag_z2 + y_shared * imag_b1 - y_imag * a1;
+    imag_z2 = y_shared * imag_b2 - y_imag * a2;
+
+    return { y_real, y_imag };
+}
+
+inline std::pair<float32x4_t, float32x4_t> process_sample_neon (float32x4_t x,
+                                                                float32x4_t a1,
+                                                                float32x4_t a2,
+                                                                float32x4_t shared_b0,
+                                                                float32x4_t shared_b1,
+                                                                float32x4_t shared_b2,
+                                                                float32x4_t real_b1,
+                                                                float32x4_t real_b2,
+                                                                float32x4_t imag_b1,
+                                                                float32x4_t imag_b2,
+                                                                float32x4_t& shared_z1,
+                                                                float32x4_t& shared_z2,
+                                                                float32x4_t& real_z1,
+                                                                float32x4_t& real_z2,
+                                                                float32x4_t& imag_z1,
+                                                                float32x4_t& imag_z2)
+{
+    const auto y_shared = vfmaq_f32 (shared_z1, x, shared_b0);
+    shared_z1 = vfmsq_f32 (vfmaq_f32 (shared_z2, x, shared_b1), y_shared, a1);
+    shared_z2 = x * shared_b2 - y_shared * a2;
+
+    const auto y_real = vaddq_f32 (real_z1, y_shared); // for the real filter, we know that b[0] == 1
+    real_z1 = vfmsq_f32 (vfmaq_f32 (real_z2, y_shared, real_b1), y_real, a1);
+    real_z2 = vfmsq_f32 (vmulq_f32 (y_shared, real_b2), y_real, a2);
+
+    const auto y_imag = imag_z1; // for the imaginary filter, we know that b[0] == 0
+    imag_z1 = vfmsq_f32 (vfmaq_f32 (imag_z2, y_shared, imag_b1), y_imag, a1);
+    imag_z2 = vfmsq_f32 (vmulq_f32 (y_shared, imag_b2), y_imag, a2);
+
+    return { y_real, y_imag };
+}
+
 static constexpr auto q_c = 4.0;
 static auto design_erb_filter (size_t erb_index,
                                double gamma,
@@ -245,6 +309,16 @@ static void design_filter_bank (std::array<ComplexERBFilterBank<N>, 2>& filter_b
                                 double q_ERB,
                                 double sample_rate)
 {
+    for (auto& bank : filter_bank)
+    {
+        bank.shared_z1 = {};
+        bank.shared_z2 = {};
+        bank.imag_z1 = {};
+        bank.imag_z2 = {};
+        bank.real_z1 = {};
+        bank.real_z2 = {};
+    }
+
     for (size_t kiter = 0; kiter < ComplexERBFilterBank<N>::num_filter_bands; ++kiter)
     {
         double b_coeffs_cplx_shared_double[3] {};
@@ -263,6 +337,16 @@ static void design_filter_bank (std::array<ComplexERBFilterBank<N>, 2>& filter_b
 
         for (auto& bank : filter_bank)
         {
+            bank.a1[kiter] = static_cast<float> (a_coeffs_cplx_double[1]);
+            bank.a2[kiter] = static_cast<float> (a_coeffs_cplx_double[2]);
+            bank.shared_b0[kiter] = static_cast<float> (b_coeffs_cplx_shared_double[0]);
+            bank.shared_b1[kiter] = static_cast<float> (b_coeffs_cplx_shared_double[1]);
+            bank.shared_b2[kiter] = static_cast<float> (b_coeffs_cplx_shared_double[2]);
+            bank.real_b1[kiter] = static_cast<float> (b_coeffs_cplx_real_double[1]);
+            bank.real_b2[kiter] = static_cast<float> (b_coeffs_cplx_real_double[2]);
+            bank.imag_b1[kiter] = static_cast<float> (b_coeffs_cplx_imag_double[1]);
+            bank.imag_b2[kiter] = static_cast<float> (b_coeffs_cplx_imag_double[2]);
+
             const auto k_div = kiter / T::size;
             const auto k_off = kiter - (k_div * T::size);
 
@@ -289,26 +373,110 @@ static void process (ComplexERBFilterBank<N>& filter_bank,
 {
     // buffer_out size is padded by 4x
     static constexpr auto eps = std::numeric_limits<T>::epsilon();
-    auto* buffer_out_simd = juce::snapPointerToAlignment (reinterpret_cast<T*> (buffer_out), xsimd::default_arch::alignment());
+
+#if 1
+    auto* buffer_out_simd = reinterpret_cast<float32x4_t*> (juce::snapPointerToAlignment (buffer_out, 16));
     std::fill (buffer_out_simd, buffer_out_simd + num_samples, T {});
+
+    const auto eps_neon = vld1q_dup_f32 (&eps);
+    const auto zero_neon = float32x4_t {};
     for (size_t k = 0; k < N; k += T::size)
     {
-        const auto filter_idx = k / T::size;
-        auto& cplx_filter = filter_bank.erb_filter_complex[filter_idx];
-        chowdsp::ScopedValue z_shared { cplx_filter.z_shared };
-        chowdsp::ScopedValue z_re { cplx_filter.z_real };
-        chowdsp::ScopedValue z_im { cplx_filter.z_imag };
+        const auto a1 = vld1q_f32 (filter_bank.a1.data() + k);
+        const auto a2 = vld1q_f32 (filter_bank.a2.data() + k);
+        const auto shared_b0 = vld1q_f32 (filter_bank.shared_b0.data() + k);
+        const auto shared_b1 = vld1q_f32 (filter_bank.shared_b1.data() + k);
+        const auto shared_b2 = vld1q_f32 (filter_bank.shared_b2.data() + k);
+        const auto real_b1 = vld1q_f32 (filter_bank.real_b1.data() + k);
+        const auto real_b2 = vld1q_f32 (filter_bank.real_b2.data() + k);
+        const auto imag_b1 = vld1q_f32 (filter_bank.imag_b1.data() + k);
+        const auto imag_b2 = vld1q_f32 (filter_bank.imag_b2.data() + k);
+
+        auto shared_z1 = vld1q_f32 (filter_bank.shared_z1.data() + k);
+        auto shared_z2 = vld1q_f32 (filter_bank.shared_z2.data() + k);
+        auto real_z1 = vld1q_f32 (filter_bank.real_z1.data() + k);
+        auto real_z2 = vld1q_f32 (filter_bank.real_z2.data() + k);
+        auto imag_z1 = vld1q_f32 (filter_bank.imag_z1.data() + k);
+        auto imag_z2 = vld1q_f32 (filter_bank.imag_z2.data() + k);
+
         for (int n = 0; n < num_samples; ++n)
         {
             const auto x_in = static_cast<T> (buffer_in[n]);
-            const auto [x_re, x_im] = process_sample (x_in,
-                                                      cplx_filter.b_shared_coeffs,
-                                                      cplx_filter.b_real_coeffs,
-                                                      cplx_filter.b_imag_coeffs,
-                                                      cplx_filter.a_coeffs,
-                                                      z_shared.get(),
-                                                      z_re.get(),
-                                                      z_im.get());
+            const auto [x_re, x_im] = process_sample_neon (x_in, a1, a2, shared_b0, shared_b1, shared_b2, real_b1, real_b2, imag_b1, imag_b2, shared_z1, shared_z2, real_z1, real_z2, imag_z1, imag_z2);
+
+            auto x_re_sq = x_re * x_re;
+            auto x_im_sq = x_im * x_im;
+            auto x_abs_sq = x_re_sq + x_im_sq;
+
+            if constexpr (num_octaves_up == 1)
+            {
+                const auto greater_than_eps = vcgtq_f32 (x_abs_sq, eps_neon);
+                const auto sqrt = vrsqrteq_f32 (x_abs_sq);
+                const auto x_abs_r = vbslq_f32 (greater_than_eps, sqrt, zero_neon);
+                buffer_out_simd[n] = vfmaq_f32 (buffer_out_simd[n], vsubq_f32 (x_re_sq, x_im_sq), x_abs_r);
+            }
+            else if constexpr (num_octaves_up == 2)
+            {
+                // auto x_abs_sq_r = xsimd::select (x_abs_sq > eps, xsimd::reciprocal (x_abs_sq), {});
+                // buffer_out_simd[n] += x_re * (x_re_sq - (S) 3 * x_im_sq) * x_abs_sq_r;
+            }
+        }
+
+        vst1q_f32 (filter_bank.shared_z1.data() + k, shared_z1);
+        vst1q_f32 (filter_bank.shared_z2.data() + k, shared_z2);
+        vst1q_f32 (filter_bank.real_z1.data() + k, real_z1);
+        vst1q_f32 (filter_bank.real_z2.data() + k, real_z2);
+        vst1q_f32 (filter_bank.imag_z1.data() + k, imag_z1);
+        vst1q_f32 (filter_bank.imag_z2.data() + k, imag_z2);
+    }
+
+    for (int n = 0; n < num_samples; ++n)
+    {
+        auto rr = vadd_f32 (vget_high_f32 (buffer_out_simd[n]), vget_low_f32 (buffer_out_simd[n]));
+        buffer_out[n] = vget_lane_f32 (vpadd_f32 (rr, rr), 0);
+    }
+#else
+    auto* buffer_out_simd = juce::snapPointerToAlignment (reinterpret_cast<T*> (buffer_out), xsimd::default_arch::alignment());
+    std::fill (buffer_out_simd, buffer_out_simd + num_samples, T {});
+
+    for (size_t k = 0; k < N; k += T::size)
+    {
+        const auto a1 = xsimd::load_aligned (filter_bank.a1.data() + k);
+        const auto a2 = xsimd::load_aligned (filter_bank.a2.data() + k);
+        const auto shared_b0 = xsimd::load_aligned (filter_bank.shared_b0.data() + k);
+        const auto shared_b1 = xsimd::load_aligned (filter_bank.shared_b1.data() + k);
+        const auto shared_b2 = xsimd::load_aligned (filter_bank.shared_b2.data() + k);
+        const auto real_b1 = xsimd::load_aligned (filter_bank.real_b1.data() + k);
+        const auto real_b2 = xsimd::load_aligned (filter_bank.real_b2.data() + k);
+        const auto imag_b1 = xsimd::load_aligned (filter_bank.imag_b1.data() + k);
+        const auto imag_b2 = xsimd::load_aligned (filter_bank.imag_b2.data() + k);
+
+        auto shared_z1 = xsimd::load_aligned (filter_bank.shared_z1.data() + k);
+        auto shared_z2 = xsimd::load_aligned (filter_bank.shared_z2.data() + k);
+        auto real_z1 = xsimd::load_aligned (filter_bank.real_z1.data() + k);
+        auto real_z2 = xsimd::load_aligned (filter_bank.real_z2.data() + k);
+        auto imag_z1 = xsimd::load_aligned (filter_bank.imag_z1.data() + k);
+        auto imag_z2 = xsimd::load_aligned (filter_bank.imag_z2.data() + k);
+
+        for (int n = 0; n < num_samples; ++n)
+        {
+            const auto x_in = static_cast<T> (buffer_in[n]);
+            const auto [x_re, x_im] = process_sample_soa (x_in,
+                                                          a1,
+                                                          a2,
+                                                          shared_b0,
+                                                          shared_b1,
+                                                          shared_b2,
+                                                          real_b1,
+                                                          real_b2,
+                                                          imag_b1,
+                                                          imag_b2,
+                                                          shared_z1,
+                                                          shared_z2,
+                                                          real_z1,
+                                                          real_z2,
+                                                          imag_z1,
+                                                          imag_z2);
 
             auto x_re_sq = x_re * x_re;
             auto x_im_sq = x_im * x_im;
@@ -325,10 +493,18 @@ static void process (ComplexERBFilterBank<N>& filter_bank,
                 buffer_out_simd[n] += x_re * (x_re_sq - (S) 3 * x_im_sq) * x_abs_sq_r;
             }
         }
+
+        xsimd::store_aligned (filter_bank.shared_z1.data() + k, shared_z1);
+        xsimd::store_aligned (filter_bank.shared_z2.data() + k, shared_z2);
+        xsimd::store_aligned (filter_bank.real_z1.data() + k, real_z1);
+        xsimd::store_aligned (filter_bank.real_z2.data() + k, real_z2);
+        xsimd::store_aligned (filter_bank.imag_z1.data() + k, imag_z1);
+        xsimd::store_aligned (filter_bank.imag_z2.data() + k, imag_z2);
     }
 
     for (int n = 0; n < num_samples; ++n)
         buffer_out[n] = xsimd::reduce_add (buffer_out_simd[n]);
+#endif
 
     static constexpr auto norm_gain = 2.0f / static_cast<float> (N);
     juce::FloatVectorOperations::multiply (buffer_out, norm_gain, num_samples);
