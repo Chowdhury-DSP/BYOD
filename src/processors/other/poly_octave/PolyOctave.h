@@ -1,6 +1,8 @@
 #pragma once
 
 #include "DelayPitchShifter.h"
+#include "PolyOctaveV1FilterBank.h"
+#include "PolyOctaveV2FilterBank.h"
 #include "processors/BaseProcessor.h"
 
 class PolyOctave : public BaseProcessor
@@ -15,14 +17,9 @@ public:
     void processAudio (AudioBuffer<float>& buffer) override;
     void processAudioBypassed (AudioBuffer<float>& buffer) override;
 
-    String getTooltipForPort (int portIndex, bool isInput) override;
+    void fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition) override;
 
-    struct ComplexERBFilterBank
-    {
-        static constexpr size_t numFilterBands = 44;
-        using float_2 = xsimd::batch<double>;
-        std::array<chowdsp::IIRFilter<4, float_2>, numFilterBands / float_2::size> erbFilterReal, erbFilterImag;
-    };
+    String getTooltipForPort (int portIndex, bool isInput) override;
 
     enum OutputPort
     {
@@ -35,19 +32,28 @@ public:
     static constexpr auto numOutputs = (int) magic_enum::enum_count<OutputPort>();
 
 private:
-    chowdsp::SmoothedBufferValue<double> dryGain {};
-    chowdsp::SmoothedBufferValue<double> upOctaveGain {};
-    chowdsp::SmoothedBufferValue<double> up2OctaveGain {};
-    chowdsp::SmoothedBufferValue<double> downOctaveGain {};
+    void processAudioV1 (AudioBuffer<float>& buffer);
 
+    chowdsp::BoolParameter* v1_mode = nullptr;
+
+    chowdsp::SmoothedBufferValue<float> dryGain {};
+    chowdsp::SmoothedBufferValue<float> upOctaveGain {};
+    chowdsp::SmoothedBufferValue<float> up2OctaveGain {};
+    chowdsp::SmoothedBufferValue<float> downOctaveGain {};
+
+    // V2 processing stuff...
+    std::array<poly_octave_v2::ComplexERBFilterBank<poly_octave_v2::N1>, 2> octaveUpFilterBank;
+    std::array<poly_octave_v2::ComplexERBFilterBank<poly_octave_v2::N1>, 2> octaveUp2FilterBank;
+    std::array<pitch_shift::Processor<float>, 2> downOctavePitchShifters;
+
+    // V1 processing stuff...
     chowdsp::Buffer<double> doubleBuffer;
-    chowdsp::Buffer<double> upOctaveBuffer;
-    chowdsp::Buffer<double> up2OctaveBuffer;
-    chowdsp::Buffer<double> downOctaveBuffer;
-
-    std::array<ComplexERBFilterBank, 2> octaveUpFilterBank;
-    std::array<ComplexERBFilterBank, 2> octaveUp2FilterBank;
-    std::array<pitch_shift::Processor<double>, 2> downOctavePitchShifters;
+    chowdsp::Buffer<double> upOctaveBuffer_double;
+    chowdsp::Buffer<double> up2OctaveBuffer_double;
+    chowdsp::Buffer<double> downOctaveBuffer_double;
+    std::array<poly_octave_v1::ComplexERBFilterBank, 2> octaveUpFilterBank_v1;
+    std::array<poly_octave_v1::ComplexERBFilterBank, 2> octaveUp2FilterBank_v1;
+    std::array<pitch_shift::Processor<double>, 2> downOctavePitchShifters_v1;
 
     std::array<chowdsp::FirstOrderHPF<float>, (size_t) numOutputs> dcBlocker;
 
@@ -55,6 +61,10 @@ private:
     juce::AudioBuffer<float> up1OutBuffer;
     juce::AudioBuffer<float> up2OutBuffer;
     juce::AudioBuffer<float> down1OutBuffer;
+
+#if JUCE_INTEL
+    bool use_avx = false;
+#endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PolyOctave)
 };

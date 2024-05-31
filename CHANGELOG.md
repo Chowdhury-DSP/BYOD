@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UNRELEASED]
+- Updated "Poly Octave" DSP to sound cleaner and use less CPU
+
 ## [1.3.0] - 2024-03-15
 - Added "Laser Trem" module.
 - Added "Poly Octave" module.
