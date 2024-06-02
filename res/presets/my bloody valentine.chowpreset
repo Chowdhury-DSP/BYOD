@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<Preset name="my bloody valentine" plugin="BYOD" vendor="User" category=""
-        version="1.3.0" preset_file="/home/henry/Sync/ThirdPartyStuff/.clap plugins/BYOD/userpresets/User/my bloody valentine.chowpreset">
+<Preset name="my bloody valentine" plugin="BYOD" vendor="CHOW" category="Players"
+        version="1.3.0"
   <proc_chain state_plugin_version="1.3.0">
     <Graphic_EQ>
       <Parameters x_pos="0.1529999971389771" y_pos="0.02641509473323822">
