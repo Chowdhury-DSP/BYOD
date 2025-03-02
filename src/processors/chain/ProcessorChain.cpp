@@ -214,7 +214,8 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer, const MidiBuffer&
         // process standalone modulation ports
         auto noInputsConnected = processor->getNumInputConnections() == 0;
         auto modOutputConnected = processor->isOutputModulationPortConnected();
-        if (noInputsConnected && modOutputConnected)
+        auto onlyModOut = processor->onlyHasModulationOutput();
+        if (noInputsConnected && (modOutputConnected || onlyModOut))
             runProcessor (processor, inputBuffer, outProcessed);
     }
 

@@ -189,7 +189,8 @@ public:
     int getForwardingParameterSlotIndex() const noexcept { return forwardingParamsSlotIndex; }
     void setForwardingParameterSlotIndex (int index) { forwardingParamsSlotIndex = index; }
 
-    bool isOutputModulationPortConnected();
+    bool onlyHasModulationOutput() const;
+    bool isOutputModulationPortConnected() const;
     const std::vector<String>* getParametersToDisableWhenInputIsConnected (int portIndex) const noexcept;
     const std::vector<String>* getParametersToEnableWhenInputIsConnected (int portIndex) const noexcept;
 
