@@ -383,7 +383,20 @@ juce::Point<int> BaseProcessor::getPosition (juce::Rectangle<int> parentBounds)
     return (editorPosition * juce::Point { (float) parentBounds.getWidth(), (float) parentBounds.getHeight() }).toInt();
 }
 
-bool BaseProcessor::isOutputModulationPortConnected()
+bool BaseProcessor::onlyHasModulationOutput() const
+{
+    if (getProcessorType() != Modulation)
+        return false;
+
+    for (int portIdx = 0; portIdx < getNumOutputs(); ++portIdx)
+    {
+        if (getOutputPortType (portIdx) != PortType::modulation)
+            return false;
+    }
+    return true;
+}
+
+bool BaseProcessor::isOutputModulationPortConnected() const
 {
     if (getProcessorType() != Modulation)
         return false;
