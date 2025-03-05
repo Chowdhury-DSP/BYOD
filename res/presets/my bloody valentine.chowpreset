@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name="my bloody valentine" plugin="BYOD" vendor="CHOW" category="Players"
+        version="1.3.0"
+  <proc_chain state_plugin_version="1.3.0">
+    <Graphic_EQ>
+      <Parameters x_pos="0.1529999971389771" y_pos="0.02641509473323822">
+        <PARAM id="gain_0" value="4.799999237060547"/>
+        <PARAM id="gain_1" value="5.0"/>
+        <PARAM id="gain_2" value="-1.100000381469727"/>
+        <PARAM id="gain_3" value="7.200000762939453"/>
+        <PARAM id="gain_4" value="-1.800000190734863"/>
+        <PARAM id="gain_5" value="2.399999618530273"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="2" connection_end_0="0"/>
+    </Graphic_EQ>
+    <Amp_IRs>
+      <Parameters x_pos="0.6830000281333923" y_pos="0.03018867969512939">
+        <PARAM id="gain" value="4.75"/>
+        <PARAM id="ir" value="3.0"/>
+        <PARAM id="mix" value="0.449999988079071"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="3" connection_end_0="0"/>
+    </Amp_IRs>
+    <Fuzz_Machine>
+      <Parameters x_pos="0.4239999949932098" y_pos="0.02830188721418381">
+        <PARAM id="fuzz" value="0.8040000200271606"/>
+        <PARAM id="model" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="vol" value="0.449999988079071"/>
+      </Parameters>
+      <port_0 connection_0="1" connection_end_0="0"/>
+    </Fuzz_Machine>
+    <Delay>
+      <Parameters x_pos="0.02199999988079071" y_pos="0.6094339489936829">
+        <PARAM id="delay_type" value="0.0"/>
+        <PARAM id="feedback" value="0.75"/>
+        <PARAM id="freq" value="7950.0"/>
+        <PARAM id="mix" value="0.5"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="ping_pong" value="0.0"/>
+        <PARAM id="tempo_sync" value="0.0"/>
+        <PARAM id="time_ms" value="199.9999847412109"/>
+        <PARAM id="time_tempo_sync" value="0.0"/>
+      </Parameters>
+      <port_0 connection_0="4" connection_end_0="0"/>
+    </Delay>
+    <Shimmer_Reverb>
+      <Parameters x_pos="0.289000004529953" y_pos="0.6113207340240479">
+        <PARAM id="feedback" value="1.0"/>
+        <PARAM id="mix" value="0.699999988079071"/>
+        <PARAM id="on_off" value="1.0"/>
+        <PARAM id="shift" value="12.0"/>
+        <PARAM id="size" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="5" connection_end_0="0"/>
+    </Shimmer_Reverb>
+    <Diode_Clipper>
+      <Parameters x_pos="0.5519999861717224" y_pos="0.6132075190544128">
+        <PARAM id="cutoff" value="4700.0"/>
+        <PARAM id="diode" value="0.0"/>
+        <PARAM id="drive" value="0.449999988079071"/>
+        <PARAM id="num_diodes" value="1.0"/>
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="-1" connection_end_0="0"/>
+    </Diode_Clipper>
+    <Input>
+      <Parameters x_pos="0.002000000094994903" y_pos="0.02641509473323822">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+      <port_0 connection_0="0" connection_end_0="0"/>
+    </Input>
+    <Output>
+      <Parameters x_pos="0.8470000028610229" y_pos="0.6132075190544128">
+        <PARAM id="on_off" value="1.0"/>
+      </Parameters>
+    </Output>
+  </proc_chain>
+  <extra_info/>
+</Preset>
