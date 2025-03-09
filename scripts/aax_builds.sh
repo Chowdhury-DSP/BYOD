@@ -110,7 +110,7 @@ else # Windows
         --keypassword "$ilok_pass" \
         --in $aax_location \
         --out $aax_location
-        
+
     wraptool verify --verbose --in "$aax_location/Contents/x64/${PLUGIN_NAME}.aaxplugin"
 fi
 
@@ -122,7 +122,15 @@ cp -R "$aax_location" "$aax_target_dir/${PLUGIN_NAME}.aaxplugin"
 
 if [[ "$*" = *deploy* ]]; then
     set +e
-
-    ssh "jatin@ccrma-gate.stanford.edu" "rm -r ~/aax_builds/${TARGET_DIR}/${PLUGIN_NAME}.aaxplugin"
-    scp -r "$aax_location" "jatin@ccrma-gate.stanford.edu:~/aax_builds/${TARGET_DIR}/"
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        ssh "jatin@ccrma-gate.stanford.edu" "rm -r ~/aax_builds/${TARGET_DIR}/${PLUGIN_NAME}.aaxplugin"
+        scp -r "$aax_location" "jatin@ccrma-gate.stanford.edu:~/aax_builds/${TARGET_DIR}/"
+    else
+        cd ~/ChowDSP/aax-builds-win64
+        git pull
+        cp -r "$aax_target_dir/${PLUGIN_NAME}.aaxplugin" .
+        git add .
+        git commit -am "Update BYOD AAX build"
+        git push
+    fi
 fi

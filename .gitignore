@@ -11,6 +11,8 @@ bin/
 .idea/
 .cache/
 xcode/
+.focus-config
+.raddbg_project
 
 # Mac extras
 .DS_Store
