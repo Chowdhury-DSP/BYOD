@@ -33,7 +33,7 @@ BaseProcessor::BaseProcessor (const String& name,
     onOffParam = vts.getRawParameterValue ("on_off");
 
     outputBuffers.resize (jmax (1, numOutputs));
-    outputBuffers.fill (nullptr);
+    outputBuffers.fill ({});
     outputConnections.resize ((size_t) numOutputs);
 
     inputBuffers.resize (numInputs);

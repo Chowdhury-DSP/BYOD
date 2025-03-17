@@ -176,7 +176,7 @@ public:
     chowdsp::BufferView<float>& getInputBufferView (int idx = 0) { return inputBuffers.getReference (idx); }
     AudioBuffer<float> getInputBuffer (int idx = 0) const { return inputBuffers.getReference (idx).toAudioBuffer(); }
     AudioBuffer<float> getInputBufferNonConst (int idx = 0) { return inputBuffers.getReference (idx).toAudioBuffer(); } // Most derived classes should never use this!
-    AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
+    chowdsp::BufferView<float> getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
     const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[(size_t) portIdx].getReference (connectionIdx); }
 
     int getNumOutputConnections (int portIdx) const { return outputConnections[(size_t) portIdx].size(); }
@@ -256,7 +256,7 @@ protected:
     AudioProcessorValueTreeState vts;
     ProcessorUIOptions uiOptions;
 
-    Array<AudioBuffer<float>*> outputBuffers;
+    Array<chowdsp::BufferView<float>> outputBuffers;
     Array<int> inputsConnected;
 
     chowdsp::SharedLNFAllocator lnfAllocator;

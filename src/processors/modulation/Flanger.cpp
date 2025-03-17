@@ -258,8 +258,8 @@ void Flanger::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 
     bypassNeedsReset = true;
 }
@@ -306,6 +306,6 @@ void Flanger::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }

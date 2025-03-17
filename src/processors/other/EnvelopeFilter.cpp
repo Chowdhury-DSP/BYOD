@@ -208,8 +208,8 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 void EnvelopeFilter::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -240,8 +240,8 @@ void EnvelopeFilter::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.setSize (1, numSamples, false, false, true);
         audioOutBuffer.clear();
     }
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)

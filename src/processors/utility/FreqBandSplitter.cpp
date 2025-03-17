@@ -47,7 +47,7 @@ void FreqBandSplitter::processAudio (AudioBuffer<float>& buffer)
     crossover.processBlock (buffer, buffers[LowBand], buffers[MidBand], buffers[HighBand]);
 
     for (int i = 0; i < numOuts; ++i)
-        outputBuffers.getReference (i) = &buffers[i];
+        outputBuffers.getReference (i) = buffers[i];
 }
 
 void FreqBandSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -56,7 +56,7 @@ void FreqBandSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
         b.makeCopyOf (buffer, true);
 
     for (int i = 0; i < numOuts; ++i)
-        outputBuffers.getReference (i) = &buffers[i];
+        outputBuffers.getReference (i) = buffers[i];
 }
 
 String FreqBandSplitter::getTooltipForPort (int portIndex, bool isInput)

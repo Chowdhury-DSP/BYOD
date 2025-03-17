@@ -188,11 +188,11 @@ void SmoothReverb::processAudio (AudioBuffer<float>& buffer)
     // mix dry/wet
     mixer.mixWetSamples (dsp::AudioBlock<float> { outBuffer });
 
-    outputBuffers.getReference (0) = &outBuffer;
+    outputBuffers.getReference (0) = outBuffer;
 }
 
 void SmoothReverb::processAudioBypassed (AudioBuffer<float>& buffer)
 {
     outBuffer.makeCopyOf (buffer, true);
-    outputBuffers.getReference (0) = &outBuffer;
+    outputBuffers.getReference (0) = outBuffer;
 }

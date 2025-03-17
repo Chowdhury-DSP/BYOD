@@ -62,7 +62,7 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
     if (! isInput0Connected && ! isInput1Connected)
     {
         buffer.clear();
-        outputBuffers.getReference (0) = &buffer;
+        outputBuffers.getReference (0) = buffer;
         return;
     }
 
@@ -96,7 +96,7 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
     if (isInput0Connected && isInput1Connected)
         stereoBuffer.applyGain (0.5f);
 
-    outputBuffers.getReference (0) = &stereoBuffer;
+    outputBuffers.getReference (0) = stereoBuffer;
 }
 
 void StereoMerger::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -112,7 +112,7 @@ void StereoMerger::processAudioBypassed (AudioBuffer<float>& buffer)
     if (! isInput0Connected && ! isInput1Connected)
     {
         buffer.clear();
-        outputBuffers.getReference (0) = &buffer;
+        outputBuffers.getReference (0) = buffer;
         return;
     }
 
@@ -123,7 +123,7 @@ void StereoMerger::processAudioBypassed (AudioBuffer<float>& buffer)
         stereoBuffer.addFrom (ch, 0, inBuffer, sourceCh, 0, numSamples);
     }
 
-    outputBuffers.getReference (0) = &stereoBuffer;
+    outputBuffers.getReference (0) = stereoBuffer;
 }
 
 String StereoMerger::getTooltipForPort (int portIndex, bool isInput)

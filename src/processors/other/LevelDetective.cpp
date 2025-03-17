@@ -75,22 +75,22 @@ void LevelDetective::processAudio (AudioBuffer<float>& buffer)
         levelOutBuffer.clear();
     }
 
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 void LevelDetective::processAudioBypassed (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
     levelOutBuffer.setSize (1, numSamples, false, false, true);
+    levelOutBuffer.clear();
     if (inputsConnected.contains (AudioInput))
     {
-        levelOutBuffer.clear();
         nonstd::span<const float> audioChannelData = { buffer.getReadPointer (0), (size_t) numSamples };
         nonstd::span<const float> levelChannelData = { levelOutBuffer.getReadPointer (0), (size_t) numSamples };
         levelVisualizer.pushChannel (0, audioChannelData);
         levelVisualizer.pushChannel (1, levelChannelData);
-        outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
     }
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 bool LevelDetective::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)

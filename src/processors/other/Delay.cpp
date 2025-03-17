@@ -160,7 +160,7 @@ void DelayModule::processMonoStereoDelay (AudioBuffer<float>& buffer, DelayType&
     }
 
     dryWet.mixWetSamples (block);
-    outputBuffers.getReference (0) = &buffer;
+    outputBuffers.getReference (0) = buffer;
 }
 
 template <typename DelayType>
@@ -232,7 +232,7 @@ void DelayModule::processPingPongDelay (AudioBuffer<float>& buffer, DelayType& d
     dryWetMixer.mixWetSamples (block);
 
     // tell future processors to use stereo buffer
-    outputBuffers.getReference (0) = &bufferToProcess;
+    outputBuffers[0] = bufferToProcess;
 }
 
 void DelayModule::processAudio (AudioBuffer<float>& buffer)
@@ -292,7 +292,7 @@ void DelayModule::processAudioBypassed (AudioBuffer<float>& buffer)
         bypassNeedsReset = false;
     }
 
-    outputBuffers.getReference (0) = &buffer;
+    outputBuffers[0] = buffer;
 }
 
 bool DelayModule::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)

@@ -168,15 +168,16 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
 
     for (int i = 0; i < numOutputs; ++i)
     {
-        auto* outBuffer = proc->getOutputBuffer (i);
-        if (outBuffer == nullptr)
-            outBuffer = &buffer;
+        auto outBufferView = proc->getOutputBuffer (i);
+        if (outBufferView.getNumSamples() == 0)
+            outBufferView = buffer;
+        auto outBuffer = outBufferView.toAudioBuffer();
 
         const int numOutProcs = proc->getNumOutputConnections (i);
         for (int j = numOutProcs - 1; j >= 0; --j)
         {
             const auto& connectionInfo = proc->getOutputConnection (i, j);
-            processBuffer (connectionInfo.endProc, connectionInfo.endPort, *outBuffer);
+            processBuffer (connectionInfo.endProc, connectionInfo.endPort, outBuffer);
 
             nextNumProcs -= 1;
         }
@@ -244,10 +245,14 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer, const MidiBuffer&
     else
     {
         // do output processing (downsampling, output gain)
-        if (auto* outBuffer = outputProcessor.getOutputBuffer())
-            ioProcessor.processAudioOutput (*outBuffer, buffer);
+        if (auto outBuffer = outputProcessor.getOutputBuffer(); outBuffer.getNumSamples() > 0)
+        {
+            ioProcessor.processAudioOutput (outBuffer.toAudioBuffer(), buffer);
+        }
         else
+        {
             jassertfalse; // output buffer is null after output was processed?
+        }
     }
 
     arena.clear();

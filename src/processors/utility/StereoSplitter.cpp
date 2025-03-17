@@ -81,8 +81,8 @@ void StereoSplitter::processAudio (AudioBuffer<float>& buffer)
         jassertfalse;
     }
 
-    outputBuffers.getReference (LeftChannel) = &buffers[LeftChannel];
-    outputBuffers.getReference (RightChannel) = &buffers[RightChannel];
+    outputBuffers.getReference (LeftChannel) = buffers[LeftChannel];
+    outputBuffers.getReference (RightChannel) = buffers[RightChannel];
 }
 
 void StereoSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -104,8 +104,8 @@ void StereoSplitter::processAudioBypassed (AudioBuffer<float>& buffer)
         buffers[RightChannel].copyFrom (0, 0, buffer, 1, 0, numSamples);
     }
 
-    outputBuffers.getReference (LeftChannel) = &buffers[LeftChannel];
-    outputBuffers.getReference (RightChannel) = &buffers[RightChannel];
+    outputBuffers.getReference (LeftChannel) = buffers[LeftChannel];
+    outputBuffers.getReference (RightChannel) = buffers[RightChannel];
 }
 
 String StereoSplitter::getTooltipForPort (int portIndex, bool isInput)

@@ -89,16 +89,16 @@ void Mixer::processAudio (AudioBuffer<float>& buffer)
     if (numInputsProcessed == 0)
     {
         buffer.clear();
-        outputBuffers.getReference (0) = &buffer;
+        outputBuffers.getReference (0) = buffer;
     }
     else if (numInputsProcessed == 1)
     {
         buffer.makeCopyOf (*outBuffer, true);
-        outputBuffers.getReference (0) = &buffer;
+        outputBuffers.getReference (0) = buffer;
     }
     else
     {
-        outputBuffers.getReference (0) = outBuffer;
+        outputBuffers.getReference (0) = *outBuffer;
     }
 }
 
@@ -109,13 +109,13 @@ void Mixer::processAudioBypassed (AudioBuffer<float>& buffer)
         if (inputsConnected.contains (i))
         {
             auto&& inBuffer = getInputBufferNonConst (i);
-            outputBuffers.getReference (0) = &inBuffer;
+            outputBuffers.getReference (0) = inBuffer;
             return;
         }
     }
 
     buffer.clear();
-    outputBuffers.getReference (0) = &buffer;
+    outputBuffers.getReference (0) = buffer;
 }
 
 String Mixer::getTooltipForPort (int portIndex, bool isInput)

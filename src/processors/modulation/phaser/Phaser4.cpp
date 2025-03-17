@@ -225,8 +225,8 @@ void Phaser4::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }
 
 void Phaser4::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -258,8 +258,8 @@ void Phaser4::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }
 
 void Phaser4::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)

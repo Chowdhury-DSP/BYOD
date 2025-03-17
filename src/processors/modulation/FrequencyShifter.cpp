@@ -144,7 +144,7 @@ void FrequencyShifter::processAudio (AudioBuffer<float>& buffer)
         juce::FloatVectorOperations::addWithMultiply (wetData.data(), dryData.data(), dryGain.getSmoothedBuffer(), numSamples);
     }
 
-    outputBuffers.getReference (0) = &outputBuffer;
+    outputBuffers.getReference (0) = outputBuffer;
 }
 
 void FrequencyShifter::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -171,7 +171,7 @@ void FrequencyShifter::processAudioBypassed (AudioBuffer<float>& buffer)
     wetGain.process (numSamples);
     chowdsp::BufferMath::copyBufferData (buffer, outputBuffer);
 
-    outputBuffers.getReference (0) = &outputBuffer;
+    outputBuffers.getReference (0) = outputBuffer;
 }
 
 static auto processFreqShifterModulator (chowdsp::SineWave<float>& modulator,

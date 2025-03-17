@@ -192,10 +192,10 @@ void PolyOctave::processAudio (AudioBuffer<float>& buffer)
     dcBlocker[Up2Output].processBlock (up2OutBuffer);
     dcBlocker[Down1Output].processBlock (down1OutBuffer);
 
-    outputBuffers.getReference (MixOutput) = &mixOutBuffer;
-    outputBuffers.getReference (Up1Output) = &up1OutBuffer;
-    outputBuffers.getReference (Up2Output) = &up2OutBuffer;
-    outputBuffers.getReference (Down1Output) = &down1OutBuffer;
+    outputBuffers.getReference (MixOutput) = mixOutBuffer;
+    outputBuffers.getReference (Up1Output) = up1OutBuffer;
+    outputBuffers.getReference (Up2Output) = up2OutBuffer;
+    outputBuffers.getReference (Down1Output) = down1OutBuffer;
 }
 
 void PolyOctave::processAudioV1 (AudioBuffer<float>& buffer)
@@ -322,10 +322,10 @@ void PolyOctave::processAudioV1 (AudioBuffer<float>& buffer)
     dcBlocker[Up2Output].processBlock (up2OutBuffer);
     dcBlocker[Down1Output].processBlock (down1OutBuffer);
 
-    outputBuffers.getReference (MixOutput) = &mixOutBuffer;
-    outputBuffers.getReference (Up1Output) = &up1OutBuffer;
-    outputBuffers.getReference (Up2Output) = &up2OutBuffer;
-    outputBuffers.getReference (Down1Output) = &down1OutBuffer;
+    outputBuffers.getReference (MixOutput) = mixOutBuffer;
+    outputBuffers.getReference (Up1Output) = up1OutBuffer;
+    outputBuffers.getReference (Up2Output) = up2OutBuffer;
+    outputBuffers.getReference (Down1Output) = down1OutBuffer;
 }
 
 void PolyOctave::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -342,10 +342,10 @@ void PolyOctave::processAudioBypassed (AudioBuffer<float>& buffer)
     up2OutBuffer.clear();
     down1OutBuffer.clear();
 
-    outputBuffers.getReference (MixOutput) = &mixOutBuffer;
-    outputBuffers.getReference (Up1Output) = &up1OutBuffer;
-    outputBuffers.getReference (Up2Output) = &up2OutBuffer;
-    outputBuffers.getReference (Down1Output) = &down1OutBuffer;
+    outputBuffers.getReference (MixOutput) = mixOutBuffer;
+    outputBuffers.getReference (Up1Output) = up1OutBuffer;
+    outputBuffers.getReference (Up2Output) = up2OutBuffer;
+    outputBuffers.getReference (Down1Output) = down1OutBuffer;
 }
 
 String PolyOctave::getTooltipForPort (int portIndex, bool isInput)

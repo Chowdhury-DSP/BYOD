@@ -159,8 +159,8 @@ void Panner::processAudio (AudioBuffer<float>& buffer)
             processStereoInput (inputBuffer);
     }
 
-    outputBuffers.getReference (AudioOutput) = &stereoBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modulationBuffer;
+    outputBuffers.getReference (AudioOutput) = stereoBuffer;
+    outputBuffers.getReference (ModulationOutput) = modulationBuffer;
 }
 
 void Panner::processSingleChannelPan (chowdsp::Panner<float>& panner, const AudioBuffer<float>& inBuffer, AudioBuffer<float>& outBuffer, float basePanValue, int inBufferChannel, float modMultiply)
@@ -248,8 +248,8 @@ void Panner::processAudioBypassed (AudioBuffer<float>& buffer)
         stereoBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &stereoBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modulationBuffer;
+    outputBuffers.getReference (AudioOutput) = stereoBuffer;
+    outputBuffers.getReference (ModulationOutput) = modulationBuffer;
 }
 
 bool Panner::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)
