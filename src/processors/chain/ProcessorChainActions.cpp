@@ -71,10 +71,20 @@ public:
                             + String (info.startPort) + " to " + info.endProc->getName() + " port #"
                             + String (info.endPort));
 
+        chain.connectionsCount++;
+        const auto arenaBytes = chain.getRequiredArenaSizeBytes();
+        const auto needsNewArena = chain.needsNewArena (arenaBytes);
+        std::span<std::byte> arenaData {};
+        if (needsNewArena)
+            arenaData = chain.allocArena (arenaBytes);
+
         {
             SpinLock::ScopedLockType scopedProcessingLock { chain.processingLock };
             info.startProc->addConnection (ConnectionInfo (info));
+            if (needsNewArena)
+                std::swap (arenaData, chain.arena.get_memory_resource());
         }
+        chain.deallocArena (arenaData);
         chain.connectionAddedBroadcaster (info);
     }
 
@@ -84,10 +94,20 @@ public:
                             + String (info.startPort) + " to " + info.endProc->getName() + " port #"
                             + String (info.endPort));
 
+        chain.connectionsCount--;
+        const auto arenaBytes = chain.getRequiredArenaSizeBytes();
+        const auto needsNewArena = chain.needsNewArena (arenaBytes);
+        std::span<std::byte> arenaData {};
+        if (needsNewArena)
+            arenaData = chain.allocArena (arenaBytes);
+
         {
             SpinLock::ScopedLockType scopedProcessingLock { chain.processingLock };
             info.startProc->removeConnection (info);
+            if (needsNewArena)
+                std::swap (arenaData, chain.arena.get_memory_resource());
         }
+        chain.deallocArena (arenaData);
         chain.connectionRemovedBroadcaster (info);
     }
 

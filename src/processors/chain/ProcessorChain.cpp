@@ -71,6 +71,9 @@ void ProcessorChain::initializeProcessors()
         if (auto* proc = procs[i])
             proc->prepareProcessing (osSampleRate, osSamplesPerBlock);
     }
+
+    deallocArena (arena.get_memory_resource());
+    arena.get_memory_resource() = allocArena (getRequiredArenaSizeBytes());
 }
 
 void ProcessorChain::prepare (double sampleRate, int samplesPerBlock)
@@ -142,14 +145,18 @@ void ProcessorChain::runProcessor (BaseProcessor* proc, AudioBuffer<float>& buff
         }
         else if (nextNumProcs > 1 && nextNumInputs == 1)
         {
-            auto& copyNextBuffer = nextProc->getInputBufferNonConst();
-            copyNextBuffer.makeCopyOf (nextBuffer, true);
+            auto bufferView = arena.alloc_buffer (nextBuffer);
+            chowdsp::BufferMath::copyBufferData (nextBuffer, bufferView);
+            nextProc->getInputBufferView() = bufferView;
+            auto copyNextBuffer = bufferView.toAudioBuffer();
             runProcessor (nextProc, copyNextBuffer, outProcessed);
         }
         else
         {
-            auto& copyNextBuffer = nextProc->getInputBufferNonConst (inputIndex);
-            copyNextBuffer.makeCopyOf (nextBuffer, true);
+            auto bufferView = arena.alloc_buffer (nextBuffer);
+            chowdsp::BufferMath::copyBufferData (nextBuffer, bufferView);
+            nextProc->getInputBufferView (inputIndex) = bufferView;
+            auto copyNextBuffer = bufferView.toAudioBuffer();
 
             nextProc->incrementNumInputsReady();
             if (nextProc->getNumInputsReady() < nextProc->getNumInputConnections())
@@ -242,6 +249,8 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer, const MidiBuffer&
         else
             jassertfalse; // output buffer is null after output was processed?
     }
+
+    arena.clear();
 }
 
 void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, float /*newValue*/)
@@ -253,4 +262,53 @@ void ProcessorChain::parameterChanged (const juce::String& /*parameterID*/, floa
                                if (! presetManager->getIsDirty())
                                    presetManager->setIsDirty (true); },
                            true);
+}
+
+size_t ProcessorChain::getRequiredArenaSizeBytes()
+{
+    const auto osFactor = ioProcessor.getOversamplingFactor();
+    const int osSamplesPerBlock = mySamplesPerBlock * osFactor;
+    const auto osSamplesPerBlockPadded = chowdsp::Math::round_to_next_multiple (osSamplesPerBlock, 4);
+    const auto bufferSizeBytes = osSamplesPerBlockPadded * 2 * sizeof (float);
+
+    const auto numIOBuffers = chowdsp::Math::round_to_next_multiple (connectionsCount + 1, 10);
+    const auto ioBufferBytes = numIOBuffers * bufferSizeBytes;
+
+    static constexpr size_t blockSize = 8192;
+    const auto totalNumBytes = chowdsp::Math::round_to_next_multiple (ioBufferBytes, blockSize);
+
+    return totalNumBytes;
+}
+
+bool ProcessorChain::needsNewArena (size_t requiredBytes) const
+{
+    const auto currentArenaBytes = arena.get_memory_resource().size();
+
+    // If the current arena is too small then we need a new one
+    if (currentArenaBytes < requiredBytes)
+        return true;
+
+    // If the current arena if way too big (more than 20%), then we need a new one
+    if (currentArenaBytes * 4 / 5 > requiredBytes)
+        return true;
+
+    return false;
+}
+
+std::span<std::byte> ProcessorChain::allocArena (size_t bytes)
+{
+    juce::Logger::writeToLog ("Allocating arena of size: " + juce::String { bytes });
+    return {
+        (std::byte*) chowdsp::aligned_alloc (16, bytes),
+        bytes,
+    };
+}
+
+void ProcessorChain::deallocArena (std::span<std::byte> bytes)
+{
+    if (bytes.empty())
+        return;
+
+    juce::Logger::writeToLog ("De-allocating arena of size: " + juce::String { bytes.size() });
+    chowdsp::aligned_free (bytes.data());
 }

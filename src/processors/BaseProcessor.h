@@ -67,6 +67,19 @@ static PortTypesVector initialisePortTypes (PortMapper mapper)
 }
 } // namespace base_processor_detail
 
+struct DSPArena : chowdsp::ArenaAllocator<std::span<std::byte>>
+{
+    chowdsp::BufferView<float> alloc_buffer (int num_channels, int num_samples)
+    {
+        return chowdsp::make_temp_buffer<float> (*this, num_channels, num_samples);
+    }
+
+    chowdsp::BufferView<float> alloc_buffer (const chowdsp::BufferView<const float>& buffer)
+    {
+        return alloc_buffer (buffer.getNumChannels(), buffer.getNumSamples());
+    }
+};
+
 class BaseProcessor : private JuceProcWrapper
 {
 public:
@@ -160,8 +173,9 @@ public:
     /** Returns the netlist circuit quantities, or nullptr if the processor has no circuit quantities. */
     auto* getNetlistCircuitQuantities() { return netlistCircuitQuantities.get(); }
 
-    const AudioBuffer<float>& getInputBuffer (int idx = 0) const { return inputBuffers.getReference (idx); }
-    AudioBuffer<float>& getInputBufferNonConst (int idx = 0) { return inputBuffers.getReference (idx); } // Most derived classes should never use this!
+    chowdsp::BufferView<float>& getInputBufferView (int idx = 0) { return inputBuffers.getReference (idx); }
+    AudioBuffer<float> getInputBuffer (int idx = 0) const { return inputBuffers.getReference (idx).toAudioBuffer(); }
+    AudioBuffer<float> getInputBufferNonConst (int idx = 0) { return inputBuffers.getReference (idx).toAudioBuffer(); } // Most derived classes should never use this!
     AudioBuffer<float>* getOutputBuffer (int idx = 0) { return outputBuffers[idx]; }
     const ConnectionInfo& getOutputConnection (int portIdx, int connectionIdx) const { return outputConnections[(size_t) portIdx].getReference (connectionIdx); }
 
@@ -283,7 +297,7 @@ private:
     const int numOutputs {};
 
     std::vector<Array<ConnectionInfo>> outputConnections;
-    Array<AudioBuffer<float>> inputBuffers;
+    Array<chowdsp::BufferView<float>> inputBuffers;
     int numInputsReady = 0;
 
     juce::Point<float> editorPosition;

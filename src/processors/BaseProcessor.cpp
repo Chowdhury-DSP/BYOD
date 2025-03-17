@@ -47,12 +47,6 @@ void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
 {
     prepare (sampleRate, numSamples);
 
-    for (auto& b : inputBuffers)
-    {
-        b.setSize (2, numSamples);
-        b.clear();
-    }
-
     for (auto& mag : portMagnitudes)
     {
         mag.smoother.prepare ({ sampleRate, (uint32) numSamples, 1 });
@@ -64,21 +58,18 @@ void BaseProcessor::prepareProcessing (double sampleRate, int numSamples)
 void BaseProcessor::freeInternalMemory()
 {
     releaseMemory();
-    for (auto& b : inputBuffers)
-        b.setSize (0, 0);
 }
 
 void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
 {
-    auto updateBufferMag = [&] (const AudioBuffer<float>& inBuffer, int inputIndex)
+    auto updateBufferMag = [&] (const chowdsp::BufferView<const float>& inBuffer, int inputIndex)
     {
         const auto inBufferNumChannels = inBuffer.getNumChannels();
         const auto inBufferNumSamples = inBuffer.getNumSamples();
 
         auto rmsAvg = 0.0f;
         for (int ch = 0; ch < inBufferNumChannels; ++ch)
-            rmsAvg += Decibels::gainToDecibels (inBuffer.getRMSLevel (ch, 0, inBufferNumSamples)); // @TODO: not sure if getRMSLevel is optimized enough...
-
+            rmsAvg += Decibels::gainToDecibels (chowdsp::BufferMath::getRMSLevel (inBuffer, ch));
         rmsAvg /= (float) inBufferNumChannels;
 
         auto& portMag = portMagnitudes[(size_t) inputIndex];
@@ -97,7 +88,12 @@ void BaseProcessor::processAudioBlock (AudioBuffer<float>& buffer)
         else if (numInputs > 1)
         {
             for (int i = 0; i < numInputs; ++i)
-                updateBufferMag (getInputBuffer (i), i);
+            {
+                if (inputBuffers.getReference (i).getNumSamples() > 0)
+                    updateBufferMag (inputBuffers[i], i);
+                else if (inputsConnected.contains (i))
+                    updateBufferMag (buffer, i);
+            }
         }
     }
 
@@ -232,7 +228,6 @@ void BaseProcessor::removeConnection (const ConnectionInfo& info)
         {
             connections.remove (cIdx);
             info.endProc->inputsConnected.removeFirstMatchingValue (info.endPort);
-            info.endProc->inputBuffers[info.endPort].clear();
             info.endProc->inputConnectionChanged (info.endPort, false);
             break;
         }

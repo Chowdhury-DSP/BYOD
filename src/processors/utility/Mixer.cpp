@@ -54,7 +54,7 @@ void Mixer::processAudio (AudioBuffer<float>& buffer)
 
         numInputsProcessed++;
 
-        auto& inBuffer = getInputBufferNonConst (i);
+        auto&& inBuffer = getInputBufferNonConst (i);
         int numChannels = inBuffer.getNumChannels();
         int numSamples = inBuffer.getNumSamples();
 
@@ -108,7 +108,7 @@ void Mixer::processAudioBypassed (AudioBuffer<float>& buffer)
     {
         if (inputsConnected.contains (i))
         {
-            auto& inBuffer = getInputBufferNonConst (i);
+            auto&& inBuffer = getInputBufferNonConst (i);
             outputBuffers.getReference (0) = &inBuffer;
             return;
         }

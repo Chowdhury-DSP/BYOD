@@ -68,7 +68,7 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
 
     if (isInput0Connected)
     {
-        auto& inBuffer = getInputBufferNonConst (LeftChannel);
+        auto&& inBuffer = getInputBufferNonConst (LeftChannel);
         makeBufferMono (inBuffer);
 
         stereoBuffer.addFrom (0, 0, inBuffer, 0, 0, numSamples);
@@ -78,7 +78,7 @@ void StereoMerger::processAudio (AudioBuffer<float>& buffer)
 
     if (isInput1Connected)
     {
-        auto& inBuffer = getInputBufferNonConst (RightChannel);
+        auto&& inBuffer = getInputBufferNonConst (RightChannel);
         makeBufferMono (inBuffer);
 
         if (isLeftRight)
@@ -116,7 +116,7 @@ void StereoMerger::processAudioBypassed (AudioBuffer<float>& buffer)
         return;
     }
 
-    auto& inBuffer = getInputBuffer (isInput0Connected ? 0 : 1);
+    auto&& inBuffer = getInputBuffer (isInput0Connected ? 0 : 1);
     for (int ch = 0; ch < 2; ++ch)
     {
         auto sourceCh = inBuffer.getNumChannels() == 1 ? 0 : ch;

@@ -74,6 +74,7 @@ target_compile_definitions(juce_plugin_modules
         JucePlugin_VersionString="${CMAKE_PROJECT_VERSION}"
         JucePlugin_Name="${CMAKE_PROJECT_NAME}"
         JUCE_MODAL_LOOPS_PERMITTED=1
+        CHOWDSP_BUFFER_MAX_NUM_CHANNELS=2
     INTERFACE
         $<TARGET_PROPERTY:juce_plugin_modules,COMPILE_DEFINITIONS>
 )

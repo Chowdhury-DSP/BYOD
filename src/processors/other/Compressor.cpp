@@ -170,7 +170,7 @@ void Compressor::processAudio (AudioBuffer<float>& buffer)
         gainComputer->setParameters (*threshDBParam, *ratioParam, *kneeDBParam);
         gainComputer->process (levelOutBuffer);
 
-        auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numChannels = audioInBuffer.getNumChannels();
         audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
         for (int ch = 0; ch < numChannels; ++ch)

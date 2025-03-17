@@ -83,5 +83,12 @@ private:
     MidiBuffer internalMidiBuffer;
     PlayheadHelpers playheadHelper;
 
+    size_t getRequiredArenaSizeBytes();
+    bool needsNewArena (size_t requiredBytes) const;
+    static std::span<std::byte> allocArena (size_t bytes);
+    static void deallocArena (std::span<std::byte> bytes);
+    int connectionsCount {};
+    DSPArena arena {};
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };
