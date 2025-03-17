@@ -18,7 +18,7 @@ struct IRFileTree : chowdsp::AbstractTree<File, IRFileTree>
         insertElements (std::move (irFiles));
     }
 
-    static File& insertElementInternal(IRFileTree& self, File&& irFile, Node& root)
+    static File& insertElementInternal (IRFileTree& self, File&& irFile, Node& root)
     {
         return self.insertElementInternal (std::move (irFile), root);
     }
@@ -77,8 +77,8 @@ struct IRFileTree : chowdsp::AbstractTree<File, IRFileTree>
         PopupMenu menu;
 
         for (auto* node = root.first_child;
-            node != nullptr;
-            node = node->next_sibling)
+             node != nullptr;
+             node = node->next_sibling)
         {
             if (node->value.has_value())
             {
@@ -288,7 +288,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
             }
 
             const auto firstUserIR = userIRFiles.first();
-            jassert (firstUserIR != juce::File{}); // we checked that the tree isn't empty, so this should not be null!
+            jassert (firstUserIR != juce::File {}); // we checked that the tree isn't empty, so this should not be null!
             ampIRs.loadIRFromStream (firstUserIR.createInputStream(), {}, firstUserIR, getTopLevelComponent());
             return;
         }
@@ -329,7 +329,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
             }
 
             const auto lastUserIR = userIRFiles.last();
-            jassert (lastUserIR != juce::File{}); // we checked that the tree isn't empty, so this should not be null!
+            jassert (lastUserIR != juce::File {}); // we checked that the tree isn't empty, so this should not be null!
             ampIRs.loadIRFromStream (lastUserIR.createInputStream(), {}, lastUserIR, getTopLevelComponent());
             return;
         }

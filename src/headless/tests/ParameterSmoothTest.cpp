@@ -53,8 +53,6 @@ public:
         runTestForAllProcessors (this,
                                  [this] (BaseProcessor* proc)
                                  {
-
-
                                      auto params = proc->getVTS().processor.getParameters();
                                      for (auto* p : params)
                                      {
