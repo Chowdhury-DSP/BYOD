@@ -36,8 +36,8 @@ struct CubicBezier
         using namespace chowdsp::Polynomials;
 
         /* calculate the curve point at parameter value t */
-        auto xVal = estrin<3> ({ ax, bx, cx, p1x }, t);
-        auto yVal = estrin<3> ({ ay, by, cy, p1y }, t);
+        auto xVal = estrin<3> (chowdsp::Polynomial<float, 3> { { ax, bx, cx, p1x } }, t);
+        auto yVal = estrin<3> (chowdsp::Polynomial<float, 3> { { ay, by, cy, p1y } }, t);
 
         return juce::Point { xVal, yVal };
     }

@@ -179,8 +179,8 @@ void CryBaby::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 void CryBaby::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -213,8 +213,8 @@ void CryBaby::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 bool CryBaby::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)

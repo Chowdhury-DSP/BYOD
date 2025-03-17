@@ -15,9 +15,14 @@ public:
 
     void testParameter (BaseProcessor* proc, AudioParameterFloat* param)
     {
+        DSPArena arena {};
+        arena.get_memory_resource() = ProcessorChain::allocArena (1 << 18);
+        proc->arena = &arena;
+
         AudioBuffer<float> buffer (1, testBlockSize);
         buffer.clear();
         proc->processAudioBlock (buffer);
+        arena.clear();
 
         constexpr int numParamVals = 10;
         float paramValues[numParamVals] = { 0.0f, 1.0f, 0.5f, 0.6f, 0.4f, 0.2f, 0.1f, 0.3f, 0.7f, 1.0f };
@@ -29,6 +34,7 @@ public:
 
             param->setValueNotifyingHost (paramValues[i]);
             proc->processAudioBlock (buffer);
+            arena.clear();
 
             FloatVectorOperations::copy (&testData[i * testBlockSize], buffer.getReadPointer (0), testBlockSize);
         }
@@ -38,6 +44,8 @@ public:
             maxDiff = jmax (maxDiff, std::abs (testData[i] - testData[i - 1]));
 
         expectLessThan (maxDiff, 0.1f, "Parameter is not sufficiently smooth!");
+
+        ProcessorChain::deallocArena (arena.get_memory_resource());
     }
 
     void runTest() override

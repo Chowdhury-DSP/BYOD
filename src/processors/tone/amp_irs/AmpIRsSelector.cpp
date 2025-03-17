@@ -4,7 +4,7 @@ namespace AmpIRFileUtils
 {
 constexpr chowdsp::GlobalPluginSettings::SettingID userIRFolderID { "user_ir_folder" };
 
-struct IRFileTree : chowdsp::AbstractTree<File>
+struct IRFileTree : chowdsp::AbstractTree<File, IRFileTree>
 {
     File rootDirectory {};
     void loadFilesFromDirectory (const File& rootDir, const AudioFormatManager& formatManager)
@@ -18,7 +18,48 @@ struct IRFileTree : chowdsp::AbstractTree<File>
         insertElements (std::move (irFiles));
     }
 
-    File& insertElementInternal (File&& irFile, NodeVector& topLevelNodes) override
+    static File& insertElementInternal (IRFileTree& self, File&& irFile, Node& root)
+    {
+        return self.insertElementInternal (std::move (irFile), root);
+    }
+
+    File& insertFile (File&& file, std::vector<std::string>& subPaths, Node& root)
+    {
+        const auto nodeComparator = [] (const Node& el1, const Node& el2)
+        {
+            if (el1.value.has_value() && el2.value.is_tag())
+                return false; // node 1 is a File, node 2 is a sub-dir
+
+            if (el1.value.is_tag() && el2.value.has_value())
+                return true; // node 1 is a sub-dir, node 2 is a leaf
+
+            if (el1.value.is_tag())
+                return el1.value.tag() < el2.value.tag(); // both nodes are sub-dirs
+
+            return el1.value.leaf() < el2.value.leaf(); // both nodes are files
+        };
+
+        if (subPaths.empty())
+        {
+            Node* newFileNode = createLeafNode (std::move (file));
+            insertNodeSorted (root, newFileNode, nodeComparator);
+            return newFileNode->value.leaf();
+        }
+
+        const auto tag = subPaths.back();
+        subPaths.pop_back();
+        for (auto* node = root.first_child; node != nullptr; node = node->next_sibling)
+        {
+            if (node->value.is_tag() && node->value.tag() == tag)
+                return insertFile (std::move (file), subPaths, *node);
+        }
+
+        Node* newSubDirNode = createTagNode (tag);
+        insertNodeSorted (root, newSubDirNode, nodeComparator);
+        return insertFile (std::move (file), subPaths, *newSubDirNode);
+    }
+
+    File& insertElementInternal (File&& irFile, Node& root)
     {
         std::vector<std::string> subPaths {};
         File pathToRootDir { irFile.getParentDirectory() };
@@ -28,58 +69,20 @@ struct IRFileTree : chowdsp::AbstractTree<File>
             pathToRootDir = pathToRootDir.getParentDirectory();
         }
 
-        return insertFile (std::move (irFile), subPaths, topLevelNodes);
+        return insertFile (std::move (irFile), subPaths, root);
     }
 
-    File& insertFile (File&& file, std::vector<std::string>& subPaths, NodeVector& nodes)
-    {
-        const auto nodeComparator = [] (const Node& el1, const Node& el2)
-        {
-            if (el1.leaf.has_value() && ! el2.leaf.has_value())
-                return false; // node 1 is a File, node 2 is a sub-dir
-
-            if (! el1.leaf.has_value() && el2.leaf.has_value())
-                return true; // node 1 is a sub-dir, node 2 is a leaf
-
-            if (! el1.leaf.has_value())
-                return el1.tag < el2.tag; // both nodes are sub-dirs
-
-            return el1.leaf < el2.leaf; // both nodes are files
-        };
-
-        if (subPaths.empty())
-        {
-            Node newFileNode { nodeArena };
-            newFileNode.leaf = std::move (file);
-            return *chowdsp::VectorHelpers::insert_sorted (nodes, std::move (newFileNode), nodeComparator)->leaf;
-        }
-
-        const auto tag = subPaths.back();
-        subPaths.pop_back();
-        auto existingSubDirNode = std::find_if (nodes.begin(), nodes.end(), [&tag] (const Node& node)
-                                                { return node.tag == tag; });
-        if (existingSubDirNode != nodes.end())
-        {
-            return insertFile (std::move (file), subPaths, existingSubDirNode->subtree);
-        }
-
-        Node newSubDirNode { nodeArena };
-        newSubDirNode.tag = tag;
-        auto& insertedSubDirNode = *chowdsp::VectorHelpers::insert_sorted (nodes,
-                                                                           std::move (newSubDirNode),
-                                                                           nodeComparator);
-        return insertFile (std::move (file), subPaths, insertedSubDirNode.subtree);
-    }
-
-    static PopupMenu createPopupMenu (int& menuIndex, const NodeVector& nodes, AmpIRs& ampIRs, Component* topLevelComponent)
+    static PopupMenu createPopupMenu (int& menuIndex, const Node& root, AmpIRs& ampIRs, Component* topLevelComponent)
     {
         PopupMenu menu;
 
-        for (const auto& node : nodes)
+        for (auto* node = root.first_child;
+             node != nullptr;
+             node = node->next_sibling)
         {
-            if (node.leaf.has_value())
+            if (node->value.has_value())
             {
-                const auto irFile = *node.leaf;
+                const auto irFile = node->value.leaf();
                 if (! irFile.existsAsFile())
                     continue;
 
@@ -94,12 +97,56 @@ struct IRFileTree : chowdsp::AbstractTree<File>
             }
             else
             {
-                auto subMenu = createPopupMenu (menuIndex, node.subtree, ampIRs, topLevelComponent);
-                menu.addSubMenu (node.tag, std::move (subMenu));
+                auto subMenu = createPopupMenu (menuIndex, *node, ampIRs, topLevelComponent);
+                menu.addSubMenu (chowdsp::toString (node->value.tag()), std::move (subMenu));
             }
         }
 
         return menu;
+    }
+
+    juce::File first (const Node* root = nullptr) const
+    {
+        if (root == nullptr)
+            root = &getRootNode();
+
+        for (auto* node = root->first_child; node != nullptr; node = node->next_sibling)
+        {
+            if (node->value.is_tag())
+                return first (node);
+
+            if (node->value.has_value())
+                return node->value.leaf();
+        }
+
+        return {};
+    }
+
+    juce::File last (const Node* root = nullptr) const
+    {
+        if (root == nullptr)
+            root = &getRootNode();
+
+        for (auto* node = root->first_child; node != nullptr; node = node->next_sibling)
+        {
+            if (node->next_sibling == nullptr && node->value.is_tag())
+                return first (node);
+
+            if (node->next_sibling == nullptr && node->value.has_value())
+                return node->value.leaf();
+        }
+
+        return {};
+    }
+
+    const Node* find (const juce::File& file) const
+    {
+        for (const Node* node = &getRootNode(); node != nullptr; node = node->next_linear)
+        {
+            if (node->value.has_value() && node->value.leaf() == file)
+                return node;
+        }
+        return nullptr;
     }
 };
 } // namespace AmpIRFileUtils
@@ -114,7 +161,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
         refreshUserIRs();
         refreshBox();
         refreshText();
-        this->setName (ampIRs.irTag + "__box");
+        Component::setName (ampIRs.irTag + "__box");
 
         hcp.registerParameterComponent (*this, *vts.getParameter (ampIRs.irTag));
         onIRChanged = ampIRs.irChangedBroadcaster.connect ([this]
@@ -167,7 +214,7 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
         }
 
         if (userIRFiles.size() > 0)
-            menu->addSubMenu ("User:", AmpIRFileUtils::IRFileTree::createPopupMenu (menuIdx, userIRFiles.getNodes(), ampIRs, getTopLevelComponent()));
+            menu->addSubMenu ("User:", AmpIRFileUtils::IRFileTree::createPopupMenu (menuIdx, userIRFiles.getRootNode(), ampIRs, getTopLevelComponent()));
 
         menu->addSeparator();
 
@@ -240,20 +287,20 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
                 return;
             }
 
-            const auto firstUserIR = userIRFiles.getElementByIndex (0);
-            jassert (firstUserIR != nullptr); // we checked that the tree isn't empty, so this should not be null!
-            ampIRs.loadIRFromStream (firstUserIR->createInputStream(), {}, *firstUserIR, getTopLevelComponent());
+            const auto firstUserIR = userIRFiles.first();
+            jassert (firstUserIR != juce::File {}); // we checked that the tree isn't empty, so this should not be null!
+            ampIRs.loadIRFromStream (firstUserIR.createInputStream(), {}, firstUserIR, getTopLevelComponent());
             return;
         }
 
         // go to next user IR:
-        const auto currentUserIRIndex = userIRFiles.getIndexForElement (ampIRs.irState.file);
-        if (currentUserIRIndex >= 0)
+        if (auto* currentFileNode = userIRFiles.find (ampIRs.irState.file))
         {
-            const auto nextIRFile = userIRFiles.getElementByIndex (currentUserIRIndex + 1);
-            if (nextIRFile != nullptr)
+            if (auto* nextFileNode = currentFileNode->next_sibling;
+                nextFileNode != nullptr && nextFileNode->value.has_value())
             {
-                ampIRs.loadIRFromStream (nextIRFile->createInputStream(), {}, *nextIRFile, getTopLevelComponent());
+                const auto nextIRFile = nextFileNode->value.leaf();
+                ampIRs.loadIRFromStream (nextIRFile.createInputStream(), {}, nextIRFile, getTopLevelComponent());
                 return;
             }
         }
@@ -281,20 +328,20 @@ struct AmpIRsSelector : ComboBox, chowdsp::TrackedByBroadcasters
                 return;
             }
 
-            const auto lastUserIR = userIRFiles.getElementByIndex (userIRFiles.size() - 1);
-            jassert (lastUserIR != nullptr); // we checked that the tree isn't empty, so this should not be null!
-            ampIRs.loadIRFromStream (lastUserIR->createInputStream(), {}, *lastUserIR, getTopLevelComponent());
+            const auto lastUserIR = userIRFiles.last();
+            jassert (lastUserIR != juce::File {}); // we checked that the tree isn't empty, so this should not be null!
+            ampIRs.loadIRFromStream (lastUserIR.createInputStream(), {}, lastUserIR, getTopLevelComponent());
             return;
         }
 
         // go to previous user IR:
-        const auto currentUserIRIndex = userIRFiles.getIndexForElement (ampIRs.irState.file);
-        if (currentUserIRIndex > 0)
+        if (auto* currentFileNode = userIRFiles.find (ampIRs.irState.file))
         {
-            const auto prevIRFile = userIRFiles.getElementByIndex (currentUserIRIndex - 1);
-            if (prevIRFile != nullptr)
+            if (auto* prevFileNode = currentFileNode->prev_sibling;
+                prevFileNode != nullptr && prevFileNode->value.has_value())
             {
-                ampIRs.loadIRFromStream (prevIRFile->createInputStream(), {}, *prevIRFile, getTopLevelComponent());
+                const auto prevIRFile = prevFileNode->value.leaf();
+                ampIRs.loadIRFromStream (prevIRFile.createInputStream(), {}, prevIRFile, getTopLevelComponent());
                 return;
             }
         }

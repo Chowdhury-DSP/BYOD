@@ -226,8 +226,8 @@ void ScannerVibrato::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }
 
 void ScannerVibrato::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -259,6 +259,6 @@ void ScannerVibrato::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }

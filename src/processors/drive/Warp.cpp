@@ -45,8 +45,8 @@ inline std::pair<float, float> newton_raphson (float x, float y1, float b, float
  */
 constexpr float calcQ (float gainDB)
 {
-    constexpr float adaptiveQCoeffs[] = { -7.75358366e-09f, 5.21182270e-23f, 2.70080663e-06f, -3.04753193e-20f, -3.29851878e-04f, 1.89860352e-18f, 2.59076683e-02f, -4.77485061e-17f, 3.78416236e-01f };
-    return chowdsp::Polynomials::estrin<8> (adaptiveQCoeffs, gainDB);
+    constexpr std::array<float, 9> adaptiveQCoeffs { -7.75358366e-09f, 5.21182270e-23f, 2.70080663e-06f, -3.04753193e-20f, -3.29851878e-04f, 1.89860352e-18f, 2.59076683e-02f, -4.77485061e-17f, 3.78416236e-01f };
+    return chowdsp::Polynomials::estrin<8> (chowdsp::Polynomial<float, 8> { adaptiveQCoeffs }, gainDB);
 }
 } // namespace WarpFuncs
 

@@ -186,9 +186,9 @@ void Phaser8::processAudio (AudioBuffer<float>& buffer)
         nonModulatedOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &modulatedOutBuffer;
-    outputBuffers.getReference (Stage1Output) = &nonModulatedOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = modulatedOutBuffer;
+    outputBuffers.getReference (Stage1Output) = nonModulatedOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }
 
 void Phaser8::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -225,7 +225,7 @@ void Phaser8::processAudioBypassed (AudioBuffer<float>& buffer)
         nonModulatedOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &modulatedOutBuffer;
-    outputBuffers.getReference (Stage1Output) = &nonModulatedOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = modulatedOutBuffer;
+    outputBuffers.getReference (Stage1Output) = nonModulatedOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }

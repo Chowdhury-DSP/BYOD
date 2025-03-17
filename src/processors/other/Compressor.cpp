@@ -170,7 +170,7 @@ void Compressor::processAudio (AudioBuffer<float>& buffer)
         gainComputer->setParameters (*threshDBParam, *ratioParam, *kneeDBParam);
         gainComputer->process (levelOutBuffer);
 
-        auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numChannels = audioInBuffer.getNumChannels();
         audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
         for (int ch = 0; ch < numChannels; ++ch)
@@ -188,8 +188,8 @@ void Compressor::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 void Compressor::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -220,6 +220,6 @@ void Compressor::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.setSize (1, numSamples, false, false, true);
         audioOutBuffer.clear();
     }
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }

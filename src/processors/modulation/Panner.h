@@ -33,10 +33,20 @@ public:
 
 private:
     void setPanMode();
-    void generateModulationSignal (int numSamples);
-    void processMonoInput (const AudioBuffer<float>& buffer);
-    void processStereoInput (const AudioBuffer<float>& buffer);
-    void processSingleChannelPan (chowdsp::Panner<float>& panner, const AudioBuffer<float>& inBuffer, AudioBuffer<float>& outBuffer, float basePanValue, int inBufferChannel = 0, float modMultiply = 1.0f);
+    void generateModulationSignal (chowdsp::BufferView<float> modBuffer);
+    void processMonoInput (const chowdsp::BufferView<const float>& buffer,
+                           const chowdsp::BufferView<const float>& modBuffer,
+                           const chowdsp::BufferView<float>& stereoBuffer);
+    void processStereoInput (const chowdsp::BufferView<const float>& buffer,
+                             const chowdsp::BufferView<const float>& modBuffer,
+                             const chowdsp::BufferView<float>& stereoBuffer);
+    void processSingleChannelPan (chowdsp::Panner<float>& panner,
+                                  const chowdsp::BufferView<const float>& inBuffer,
+                                  const chowdsp::BufferView<const float>& modBuffer,
+                                  const chowdsp::BufferView<float>& outBuffer,
+                                  float basePanValue,
+                                  int inBufferChannel = 0,
+                                  float modMultiply = 1.0f) const;
 
     bool getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp) override;
 
@@ -50,11 +60,10 @@ private:
     std::atomic<float>* stereoMode = nullptr;
 
     chowdsp::Panner<float> panners[2];
-    AudioBuffer<float> stereoBuffer, tempStereoBuffer;
+    AudioBuffer<float> tempStereoBuffer;
 
     chowdsp::SineWave<float> modulator;
     dsp::Gain<float> modulationGain;
-    AudioBuffer<float> modulationBuffer;
     bool isModulationOn = true;
 
     std::atomic_bool isStereoInput { true };

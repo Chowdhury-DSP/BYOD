@@ -44,6 +44,11 @@ public:
     chowdsp::Broadcaster<void (const ConnectionInfo&)> connectionAddedBroadcaster;
     chowdsp::Broadcaster<void (const ConnectionInfo&)> connectionRemovedBroadcaster;
 
+    size_t getRequiredArenaSizeBytes();
+    bool needsNewArena (size_t requiredBytes) const;
+    static std::span<std::byte> allocArena (size_t bytes);
+    static void deallocArena (std::span<std::byte> bytes);
+
 private:
     void initializeProcessors();
     void runProcessor (BaseProcessor* proc, AudioBuffer<float>& buffer, bool& outProcessed);
@@ -82,6 +87,9 @@ private:
 
     MidiBuffer internalMidiBuffer;
     PlayheadHelpers playheadHelper;
+
+    int connectionsCount {};
+    DSPArena arena {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ProcessorChain)
 };

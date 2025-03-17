@@ -155,6 +155,8 @@ void Phaser4::processModulation (int numSamples)
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
         BufferHelpers::collapseToMonoBuffer (modInputBuffer, modOutBuffer);
+        for (auto [ch, data] : chowdsp::buffer_iters::channels (modOutBuffer))
+            juce::FloatVectorOperations::clip (data.data(), data.data(), -1.0f, 1.0f, numSamples);
     }
     else
     {
@@ -225,8 +227,8 @@ void Phaser4::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }
 
 void Phaser4::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -258,8 +260,8 @@ void Phaser4::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }
 
 void Phaser4::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)

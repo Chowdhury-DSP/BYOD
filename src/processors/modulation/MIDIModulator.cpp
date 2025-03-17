@@ -84,7 +84,7 @@ void MidiModulator::processAudio (AudioBuffer<float>& buffer)
     modOutBuffer.setSize (1, numSamples, false, false, true);
     modOutBuffer.copyFrom (0, 0, midiModSmooth.getSmoothedBuffer(), numSamples, 1.0f);
 
-    outputBuffers.getReference (0) = &modOutBuffer;
+    outputBuffers.getReference (0) = modOutBuffer;
 }
 
 void MidiModulator::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -94,7 +94,7 @@ void MidiModulator::processAudioBypassed (AudioBuffer<float>& buffer)
     modOutBuffer.setSize (1, numSamples, false, false, true);
     modOutBuffer.clear();
 
-    outputBuffers.getReference (0) = &modOutBuffer;
+    outputBuffers.getReference (0) = modOutBuffer;
 }
 
 //===================================================================
