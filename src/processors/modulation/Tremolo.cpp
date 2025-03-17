@@ -256,8 +256,8 @@ void Tremolo::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }
 
 void Tremolo::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -289,8 +289,8 @@ void Tremolo::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (ModulationOutput) = &modOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (ModulationOutput) = modOutBuffer;
 }
 
 void Tremolo::fromXML (XmlElement* xml, const chowdsp::Version& version, bool loadPosition)

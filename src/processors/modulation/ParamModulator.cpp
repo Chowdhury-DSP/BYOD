@@ -62,7 +62,7 @@ void ParamModulator::processAudio (AudioBuffer<float>& buffer)
     modOutBuffer.setSize (1, numSamples, false, false, true);
     modOutBuffer.copyFrom (0, 0, modSmooth.getSmoothedBuffer(), numSamples, 1.0f);
 
-    outputBuffers.getReference (0) = &modOutBuffer;
+    outputBuffers.getReference (0) = modOutBuffer;
 }
 
 void ParamModulator::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -72,7 +72,7 @@ void ParamModulator::processAudioBypassed (AudioBuffer<float>& buffer)
     modOutBuffer.setSize (1, numSamples, false, false, true);
     modOutBuffer.clear();
 
-    outputBuffers.getReference (0) = &modOutBuffer;
+    outputBuffers.getReference (0) = modOutBuffer;
 }
 
 bool ParamModulator::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)

@@ -32,15 +32,16 @@ juce::ParameterID ParamForwardManager::getForwardingParameterID (int paramNum)
 
 const RangedAudioParameter* ParamForwardManager::getForwardedParameterFromInternal (const RangedAudioParameter& internalParameter) const
 {
-    if (const auto paramIter = std::find_if (forwardedParams.begin(),
-                                             forwardedParams.end(),
-                                             [&internalParameter] (const auto* fParam)
-                                             {
-                                                 return fParam->getParam() == &internalParameter;
-                                             });
+    if (const auto paramIter = std::find_if (
+            forwardedParams.begin(),
+            forwardedParams.end(),
+            [&internalParameter] (const chowdsp::OptionalPointer<chowdsp::ForwardingParameter>& fParam)
+            {
+                return fParam->getParam() == &internalParameter;
+            });
         paramIter != forwardedParams.end())
     {
-        return *paramIter;
+        return paramIter->get();
     }
 
     return nullptr;

@@ -174,7 +174,7 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
             return jlimit (20.0f, 20.0e3f, filterFreqHz + freqModGain * levelPtr[i] * filterFreqHz);
         };
 
-        auto& audioInBuffer = getInputBuffer (AudioInput);
+        const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numChannels = audioInBuffer.getNumChannels();
         audioOutBuffer.setSize (numChannels, numSamples, false, false, true);
         for (int ch = 0; ch < numChannels; ch++)
@@ -208,8 +208,8 @@ void EnvelopeFilter::processAudio (AudioBuffer<float>& buffer)
         audioOutBuffer.clear();
     }
 
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 void EnvelopeFilter::processAudioBypassed (AudioBuffer<float>& buffer)
@@ -240,8 +240,8 @@ void EnvelopeFilter::processAudioBypassed (AudioBuffer<float>& buffer)
         audioOutBuffer.setSize (1, numSamples, false, false, true);
         audioOutBuffer.clear();
     }
-    outputBuffers.getReference (AudioOutput) = &audioOutBuffer;
-    outputBuffers.getReference (LevelOutput) = &levelOutBuffer;
+    outputBuffers.getReference (AudioOutput) = audioOutBuffer;
+    outputBuffers.getReference (LevelOutput) = levelOutBuffer;
 }
 
 bool EnvelopeFilter::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider& hcp)

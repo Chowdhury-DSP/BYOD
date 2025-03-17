@@ -35,7 +35,7 @@ void OutputProcessor::processAudio (AudioBuffer<float>& buffer)
     rmsLevels[0] = buffer.getMagnitude (0, 0, numSamples);
     rmsLevels[1] = buffer.getMagnitude (1 % numChannels, 0, numSamples);
 
-    outputBuffers.getReference (0) = &buffer;
+    outputBuffers.getReference (0) = buffer;
 }
 
 bool OutputProcessor::getCustomComponents (OwnedArray<Component>& customComps, chowdsp::HostContextProvider&)

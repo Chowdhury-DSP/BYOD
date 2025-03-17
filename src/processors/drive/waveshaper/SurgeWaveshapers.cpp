@@ -115,7 +115,7 @@ inline Vec4 Asym (QuadFilterWaveshaperState* __restrict, Vec4 in, Vec4 drive)
     auto x = in * drive + Vec4 (0.5f);
     auto isPos = x >= Vec4 (0.0f);
     auto pos = xsimd::tanh (x);
-    auto neg = chowdsp::Polynomials::horner<3> ({ Vec4 (0.07f), Vec4 (0.0054f), Vec4 (1.0f), Vec4 (0.0f) }, x);
+    auto neg = chowdsp::Polynomials::horner<3> (chowdsp::Polynomial<Vec4, 3> { { 0.07f, 0.0054f, 1.0f, 0.0f } }, x);
     neg = xsimd::max (neg, Vec4 (-10.0f));
 
     return xsimd::select (isPos, pos, neg) - tanh0p5;

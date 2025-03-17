@@ -41,10 +41,15 @@ public:
             {
                 proc->prepareProcessing (testSampleRate, testBlockSize);
 
+                DSPArena arena {};
+                arena.get_memory_resource() = ProcessorChain::allocArena (1 << 18);
+                proc->arena = &arena;
+
                 MidiBuffer midi;
                 AudioBuffer<float> buffer (1, testBlockSize);
                 buffer.clear();
                 proc->midiBuffer = &midi;
+                proc->arena = &arena;
                 proc->processAudioBlock (buffer);
 
                 const auto steadyStateMax = [] (const auto& name)
@@ -54,6 +59,8 @@ public:
                     return 1.0e-4f;
                 }(proc->getName());
                 testBuffer (buffer.getReadPointer (0), steadyStateMax);
+
+                ProcessorChain::deallocArena (arena.get_memory_resource());
             },
             StringArray { "Muff Drive", "Muff Clipper", "Trumble Drive", "Swinger Pre" });
     }
