@@ -216,8 +216,9 @@ void ProcessorChain::processAudio (AudioBuffer<float>& buffer, const MidiBuffer&
 
     for (auto* processor : procs)
     {
-        // set up MIDI buffer
+        // set up MIDI buffer and arena
         processor->midiBuffer = &processMidiBuffer;
+        processor->arena = &arena;
 
         // process standalone modulation ports
         auto noInputsConnected = processor->getNumInputConnections() == 0;
@@ -276,7 +277,7 @@ size_t ProcessorChain::getRequiredArenaSizeBytes()
     const auto osSamplesPerBlockPadded = chowdsp::Math::round_to_next_multiple (osSamplesPerBlock, 4);
     const auto bufferSizeBytes = osSamplesPerBlockPadded * 2 * sizeof (float);
 
-    const auto numIOBuffers = chowdsp::Math::round_to_next_multiple (connectionsCount + 1, 10);
+    const auto numIOBuffers = chowdsp::Math::round_to_next_multiple (2 * connectionsCount + 1, 10);
     const auto ioBufferBytes = numIOBuffers * bufferSizeBytes;
 
     static constexpr size_t blockSize = 8192;

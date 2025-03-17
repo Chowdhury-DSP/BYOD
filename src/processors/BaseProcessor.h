@@ -215,6 +215,8 @@ public:
      */
     const MidiBuffer* midiBuffer = nullptr;
 
+    DSPArena* arena = nullptr;
+
     /** Provided by the processor chain */
     const PlayheadHelpers* playheadHelpers = nullptr;
 

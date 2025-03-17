@@ -16,23 +16,23 @@ const String stereoModeTag = "stereo_mode";
 } // namespace PannerTags
 
 Panner::Panner (UndoManager* um) : BaseProcessor (
-    "Panner",
-    createParameterLayout(),
-    InputPort {},
-    OutputPort {},
-    um,
-    [] (InputPort port)
-    {
-        if (port == InputPort::ModulationInput)
-            return PortType::modulation;
-        return PortType::audio;
-    },
-    [] (OutputPort port)
-    {
-        if (port == OutputPort::ModulationOutput)
-            return PortType::modulation;
-        return PortType::audio;
-    })
+                                       "Panner",
+                                       createParameterLayout(),
+                                       InputPort {},
+                                       OutputPort {},
+                                       um,
+                                       [] (InputPort port)
+                                       {
+                                           if (port == InputPort::ModulationInput)
+                                               return PortType::modulation;
+                                           return PortType::audio;
+                                       },
+                                       [] (OutputPort port)
+                                       {
+                                           if (port == OutputPort::ModulationOutput)
+                                               return PortType::modulation;
+                                           return PortType::audio;
+                                       })
 {
     using namespace ParameterHelpers;
     loadParameterPointer (mainPan, vts, PannerTags::mainPanTag);
@@ -79,14 +79,12 @@ void Panner::prepare (double sampleRate, int samplesPerBlock)
     for (auto& panner : panners)
         panner.prepare ({ sampleRate, (uint32) samplesPerBlock, 2 });
 
-    stereoBuffer.setSize (2, samplesPerBlock);
     tempStereoBuffer.setSize (2, samplesPerBlock);
 
     const auto monoSpec = dsp::ProcessSpec { sampleRate, (uint32) samplesPerBlock, 1 };
     modulator.prepare (monoSpec);
     modulationGain.prepare (monoSpec);
     modulationGain.setRampDurationSeconds (0.02);
-    modulationBuffer.setSize (1, samplesPerBlock);
 }
 
 void Panner::setPanMode()
@@ -113,18 +111,17 @@ void Panner::setPanMode()
         panner.setRule (panRule);
 }
 
-void Panner::generateModulationSignal (int numSamples)
+void Panner::generateModulationSignal (chowdsp::BufferView<float> modulationBuffer)
 {
-    modulationBuffer.setSize (1, numSamples, false, false, true);
     modulationBuffer.clear();
-    auto&& modBlock = dsp::AudioBlock<float> { modulationBuffer };
+    auto&& modBlock = modulationBuffer.toAudioBlock();
     auto&& modContext = dsp::ProcessContextReplacing<float> { modBlock };
 
     if (inputsConnected.contains (ModulationInput))
     {
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
-        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modulationBuffer);
+        chowdsp::BufferMath::sumToMono (modInputBuffer, modulationBuffer);
     }
     else
     {
@@ -135,17 +132,19 @@ void Panner::generateModulationSignal (int numSamples)
     modulationGain.setGainLinear (*modDepth);
     modulationGain.process (modContext);
 
-    isModulationOn = modulationBuffer.getMagnitude (0, numSamples) > 0.001f;
+    isModulationOn = chowdsp::BufferMath::getMagnitude (modulationBuffer) > 0.001f;
 }
 
 void Panner::processAudio (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
+    auto stereoBuffer = arena->alloc_buffer (2, numSamples);
+    auto modulationBuffer = arena->alloc_buffer (1, numSamples);
+    const auto frame = arena->create_frame();
 
     setPanMode();
-    generateModulationSignal (numSamples);
+    generateModulationSignal (modulationBuffer);
 
-    stereoBuffer.setSize (2, numSamples, false, false, true);
     stereoBuffer.clear();
 
     if (inputsConnected.contains (AudioInput))
@@ -154,16 +153,22 @@ void Panner::processAudio (AudioBuffer<float>& buffer)
         const auto numChannels = inputBuffer.getNumChannels();
 
         if (numChannels == 1)
-            processMonoInput (inputBuffer);
+            processMonoInput (inputBuffer, modulationBuffer, stereoBuffer);
         else
-            processStereoInput (inputBuffer);
+            processStereoInput (inputBuffer, modulationBuffer, stereoBuffer);
     }
 
     outputBuffers.getReference (AudioOutput) = stereoBuffer;
     outputBuffers.getReference (ModulationOutput) = modulationBuffer;
 }
 
-void Panner::processSingleChannelPan (chowdsp::Panner<float>& panner, const AudioBuffer<float>& inBuffer, AudioBuffer<float>& outBuffer, float basePanValue, int inBufferChannel, float modMultiply)
+void Panner::processSingleChannelPan (chowdsp::Panner<float>& panner,
+                                      const chowdsp::BufferView<const float>& inBuffer,
+                                      const chowdsp::BufferView<const float>& modulationBuffer,
+                                      const chowdsp::BufferView<float>& outBuffer,
+                                      float basePanValue,
+                                      int inBufferChannel,
+                                      float modMultiply) const
 {
     if (isModulationOn)
     {
@@ -182,19 +187,23 @@ void Panner::processSingleChannelPan (chowdsp::Panner<float>& panner, const Audi
     else // no modulation
     {
         panner.setPan (basePanValue);
-        auto&& inBlock = dsp::AudioBlock<const float> { inBuffer }.getSingleChannelBlock ((size_t) inBufferChannel);
-        auto&& outBlock = dsp::AudioBlock<float> { outBuffer };
+        auto&& inBlock = inBuffer.toAudioBlock().getSingleChannelBlock ((size_t) inBufferChannel);
+        auto&& outBlock = outBuffer.toAudioBlock();
         panner.process (dsp::ProcessContextNonReplacing<float> { inBlock, outBlock });
     }
 }
 
-void Panner::processMonoInput (const AudioBuffer<float>& buffer)
+void Panner::processMonoInput (const chowdsp::BufferView<const float>& buffer,
+                               const chowdsp::BufferView<const float>& modBuffer,
+                               const chowdsp::BufferView<float>& stereoBuffer)
 {
     isStereoInput = false;
-    processSingleChannelPan (panners[0], buffer, stereoBuffer, *mainPan);
+    processSingleChannelPan (panners[0], buffer, modBuffer, stereoBuffer, *mainPan);
 }
 
-void Panner::processStereoInput (const AudioBuffer<float>& buffer)
+void Panner::processStereoInput (const chowdsp::BufferView<const float>& buffer,
+                                 const chowdsp::BufferView<const float>& modBuffer,
+                                 const chowdsp::BufferView<float>& stereoBuffer)
 {
     isStereoInput = true;
 
@@ -212,40 +221,34 @@ void Panner::processStereoInput (const AudioBuffer<float>& buffer)
         baseRightPan = jmin (currentMainPan * 2.0f + 1.0f, 1.0f) * widthMult;
     }
 
-    processSingleChannelPan (panners[0], buffer, stereoBuffer, baseLeftPan);
-    processSingleChannelPan (panners[1], buffer, tempStereoBuffer, baseRightPan, 1, -1.0f);
+    processSingleChannelPan (panners[0], buffer, modBuffer, stereoBuffer, baseLeftPan);
+    processSingleChannelPan (panners[1], buffer, modBuffer, tempStereoBuffer, baseRightPan, 1, -1.0f);
 
-    for (int ch = 0; ch < 2; ++ch)
-        stereoBuffer.addFrom (ch, 0, tempStereoBuffer, ch, 0, numSamples);
+    chowdsp::BufferMath::addBufferData (tempStereoBuffer, stereoBuffer);
 }
 
 void Panner::processAudioBypassed (AudioBuffer<float>& buffer)
 {
     const auto numSamples = buffer.getNumSamples();
+    auto stereoBuffer = arena->alloc_buffer (2, numSamples);
+    auto modulationBuffer = arena->alloc_buffer (1, numSamples);
+    const auto frame = arena->create_frame();
 
-    modulationBuffer.setSize (1, numSamples, false, false, true);
+    modulationBuffer.clear();
     if (inputsConnected.contains (ModulationInput)) // make mono and pass samples through
     {
         // get modulation buffer from input (-1, 1)
         const auto& modInputBuffer = getInputBuffer (ModulationInput);
-        BufferHelpers::collapseToMonoBuffer (modInputBuffer, modulationBuffer);
-    }
-    else
-    {
-        modulationBuffer.clear();
+        chowdsp::BufferMath::sumToMono (modInputBuffer, modulationBuffer);
     }
 
-    stereoBuffer.setSize (2, numSamples, false, false, true);
+    stereoBuffer.clear();
     if (inputsConnected.contains (AudioInput))
     {
         const auto& audioInBuffer = getInputBuffer (AudioInput);
         const auto numChannels = audioInBuffer.getNumChannels();
         for (int ch = 0; ch < 2; ++ch)
-            stereoBuffer.copyFrom (ch, 0, audioInBuffer, ch % numChannels, 0, numSamples);
-    }
-    else
-    {
-        stereoBuffer.clear();
+            chowdsp::BufferMath::addBufferChannels (audioInBuffer, stereoBuffer, ch % numChannels, ch);
     }
 
     outputBuffers.getReference (AudioOutput) = stereoBuffer;

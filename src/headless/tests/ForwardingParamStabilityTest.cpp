@@ -273,7 +273,7 @@ public:
         auto* ip = reinterpret_cast<juce::RangedAudioParameter*> (plugin.getProcChain().getProcessors()[0]->getParameters()[0]);
 
         const auto& paramForwarder = plugin.getParamForwarder();
-        expect (paramForwarder.getForwardedParameterFromInternal (*ip) == paramForwarder.getForwardedParameters()[0],
+        expect (paramForwarder.getForwardedParameterFromInternal (*ip) == paramForwarder.getForwardedParameters()[0].get(),
                 "Newly added parameter is not in the first parameter slot!");
     }
 
