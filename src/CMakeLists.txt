@@ -83,6 +83,7 @@ target_sources(BYOD PRIVATE
     processors/drive/king_of_tone/KingOfToneDrive.cpp
     processors/drive/mouse_drive/MouseDrive.cpp
     processors/drive/muff_clipper/MuffClipper.cpp
+    processors/drive/nam/NAMProcessor.cpp
     processors/drive/muff_clipper/MuffClipperStage.cpp
     processors/drive/mxr_distortion/MXRDistortion.cpp
     processors/drive/neural_utils/ResampledRNN.cpp

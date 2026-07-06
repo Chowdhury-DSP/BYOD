@@ -20,6 +20,7 @@
 #include "drive/junior_b/JuniorB.h"
 #include "drive/king_of_tone/KingOfToneDrive.h"
 #include "drive/mouse_drive/MouseDrive.h"
+#include "drive/nam/NAMProcessor.h"
 #include "drive/muff_clipper/MuffClipper.h"
 #include "drive/mxr_distortion/MXRDistortion.h"
 #include "drive/tube_amp/TubeAmp.h"
@@ -104,6 +105,9 @@ ProcessorStore::StoreMap ProcessorStore::store = {
     { "Metal Face", { &processorFactory<MetalFace>, { ProcessorType::Drive, 1, 1 } } },
     { "Mouse Drive", { &processorFactory<MouseDrive>, { ProcessorType::Drive, 1, 1 } } },
     { "Muff Clipper", { &processorFactory<MuffClipper>, { ProcessorType::Drive, 1, 1 } } },
+#if ! JUCE_IOS
+    { "NAM", { &processorFactory<NAMProcessor>, { ProcessorType::Drive, 1, 1 } } },
+#endif
     { "Muff Drive", { &processorFactory<BigMuffDrive>, { ProcessorType::Drive, 1, 1 } } },
     { "Range Booster", { &processorFactory<RangeBooster>, { ProcessorType::Drive, 1, 1 } } },
     { "RONN", { &processorFactory<RONN>, { ProcessorType::Drive, 1, 1 } } },

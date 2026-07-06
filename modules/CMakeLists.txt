@@ -18,6 +18,72 @@ add_subdirectory(sst-cpputils)
 add_subdirectory(ea_variant)
 add_subdirectory(math_approx)
 
+# add NeuralAudio (for NAM processor). We can't use its top-level CMakeLists
+# directly because it re-adds RTNeural and math_approx via add_subdirectory,
+# which would conflict with the targets already defined above. Instead we
+# build NeuralAudio's sources ourselves and reuse the deps we already have.
+# The NeuralAudio processor is not built on iOS.
+if(NOT IOS)
+    set(NEURAL_AUDIO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/NeuralAudio)
+    set(NAM_CORE_DIR ${NEURAL_AUDIO_DIR}/deps/NeuralAmpModelerCore)
+
+    set(NEURAL_AUDIO_SOURCES
+        ${NEURAL_AUDIO_DIR}/NeuralAudio/NeuralModel.cpp
+        ${NEURAL_AUDIO_DIR}/NeuralAudio/RTNeuralLoader.cpp
+    )
+
+    set(NAM_CORE_SOURCES
+        ${NAM_CORE_DIR}/NAM/activations.cpp
+        ${NAM_CORE_DIR}/NAM/conv1d.cpp
+        ${NAM_CORE_DIR}/NAM/get_dsp.cpp
+        ${NAM_CORE_DIR}/NAM/ring_buffer.cpp
+        ${NAM_CORE_DIR}/NAM/lstm.cpp
+        ${NAM_CORE_DIR}/NAM/dsp.cpp
+        ${NAM_CORE_DIR}/NAM/container.cpp
+        ${NAM_CORE_DIR}/NAM/wavenet/slimmable.cpp
+        ${NAM_CORE_DIR}/NAM/wavenet/model.cpp
+        ${NAM_CORE_DIR}/NAM/wavenet/a2_fast.cpp
+    )
+
+    add_library(NeuralAudio STATIC ${NEURAL_AUDIO_SOURCES} ${NAM_CORE_SOURCES})
+    target_compile_features(NeuralAudio PUBLIC cxx_std_20)
+    # Note: these definitions are PRIVATE so they don't leak into consumers
+    # (BYOD's own code uses a different RTNeural backend).
+    target_compile_definitions(NeuralAudio PRIVATE
+        NAM_SAMPLE_FLOAT
+        DSP_SAMPLE_FLOAT
+        BUILD_NAMCORE
+        NAM_ENABLE_A2_FAST
+        BUILD_INTERNAL_STATIC_WAVENET
+        WAVENET_MATH=FastMath
+        LSTM_MATH=FastMath
+        WAVENET_MAX_NUM_FRAMES=64
+        LAYER_ARRAY_BUFFER_PADDING=24
+        RTNEURAL_USE_EIGEN=1
+        RTNEURAL_DEFAULT_ALIGNMENT=16
+        _USE_MATH_DEFINES
+    )
+    target_include_directories(NeuralAudio
+        PUBLIC
+            ${NEURAL_AUDIO_DIR}
+        PRIVATE
+            ${NAM_CORE_DIR}
+            ${NEURAL_AUDIO_DIR}/deps/RTNeural
+            ${NEURAL_AUDIO_DIR}/deps/RTNeural/modules/Eigen
+            ${NEURAL_AUDIO_DIR}/deps/RTNeural/modules/json
+            ${NEURAL_AUDIO_DIR}/deps/math_approx/include
+    )
+    set_target_properties(NeuralAudio PROPERTIES
+        POSITION_INDEPENDENT_CODE TRUE
+        VISIBILITY_INLINES_HIDDEN TRUE
+        C_VISIBILITY_PRESET hidden
+        CXX_VISIBILITY_PRESET hidden
+    )
+    if (MSVC)
+        target_compile_options(NeuralAudio PRIVATE /bigobj)
+    endif()
+endif()
+
 include(cmake/WarningFlags.cmake)
 include(cmake/ConfigFlags.cmake)
 include(cmake/RuntimeSIMDLib.cmake)
@@ -60,6 +126,19 @@ if(BYOD_BUILD_CLAP)
             chowdsp::chowdsp_clap_extensions
             clap_juce_extensions
     )
+endif()
+
+if(NOT IOS)
+    # WHOLE_ARCHIVE is required so that NAMCore's static ConfigParserHelper
+    # initializers (in wavenet/model.cpp, lstm.cpp, convnet.cpp, linear.cpp,
+    # container.cpp) survive the final link. Without it, the linker discards
+    # those object files (they only contain a static registration and are not
+    # referenced by symbol), and runtime lookup fails with:
+    #   "No config parser registered for architecture: WaveNet"
+    # The generator expression propagates the flag to the final executable /
+    # shared library link, as required for it to actually take effect.
+    target_link_libraries(juce_plugin_modules PRIVATE
+        "$<LINK_LIBRARY:WHOLE_ARCHIVE,NeuralAudio>")
 endif()
 
 target_compile_definitions(juce_plugin_modules
